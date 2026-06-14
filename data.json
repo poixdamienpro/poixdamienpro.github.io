@@ -1,0 +1,2364 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-06-14",
+    "description": "Buy-ineer — Référentiel équipementiers industriels"
+  },
+  "industries": [
+    "Automobile & Mobilité électrique",
+    "Aéronautique & Défense",
+    "Énergie & Utilities",
+    "Industrie & Manufacturing",
+    "Marine & Offshore",
+    "Ferroviaire",
+    "Spatial"
+  ],
+  "product_categories": [
+    "Batteries & Stockage",
+    "PDU (Power Distribution)",
+    "OBC (On-Board Charger)",
+    "Vannes & Actionneurs",
+    "Convertisseurs & Onduleurs",
+    "Câblage & Connecteurs",
+    "Capteurs & Instrumentation",
+    "Moteurs & Entraînements"
+  ],
+  "companies": [
+    {
+      "name": "CATL",
+      "country": "🇨🇳 Chine",
+      "hq": "Ningde",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "LiFePO4",
+        "NMC",
+        "Pack 800V",
+        "BMS"
+      ],
+      "desc": "Leader mondial des batteries lithium (~38% de part de marché). Fournisseur de BMW, Tesla, Volkswagen, Hyundai.",
+      "site": "https://www.catl.com",
+      "logo": "⚡",
+      "verified": true,
+      "premium": true,
+      "employees": "100 000+",
+      "founded": "2011",
+      "contact": "contact@catl.com"
+    },
+    {
+      "name": "Samsung SDI",
+      "country": "🇰🇷 Corée du Sud",
+      "hq": "Yongin",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "NMC",
+        "PRiMX",
+        "ESS"
+      ],
+      "desc": "Cellules prismatiques et cylindriques pour VE et ESS. Fournisseur BMW, Volkswagen, Stellantis.",
+      "site": "https://www.samsungsdi.com",
+      "logo": "🔷",
+      "verified": true,
+      "premium": false,
+      "employees": "30 000+",
+      "founded": "1970",
+      "contact": ""
+    },
+    {
+      "name": "LG Energy Solution",
+      "country": "🇰🇷 Corée du Sud",
+      "hq": "Séoul",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "NMC",
+        "Cylindrique 2170",
+        "Pouch"
+      ],
+      "desc": "Fournisseur de GM, Hyundai, Stellantis, Tesla. Gigafactories en Pologne et USA.",
+      "site": "https://www.lgenergysolution.com",
+      "logo": "🟩",
+      "verified": true,
+      "premium": false,
+      "employees": "20 000+",
+      "founded": "2020",
+      "contact": ""
+    },
+    {
+      "name": "Saft (TotalEnergies)",
+      "country": "🇫🇷 France",
+      "hq": "Levallois-Perret",
+      "industry": "Aéronautique & Défense",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "Li-ion",
+        "Spatial",
+        "Défense",
+        "DO-311A"
+      ],
+      "desc": "Référence mondiale des batteries haute-fiabilité pour spatial, défense et aviation. Fondée en 1918.",
+      "site": "https://www.saftbatteries.com",
+      "logo": "🇫🇷",
+      "verified": true,
+      "premium": true,
+      "employees": "4 000+",
+      "founded": "1918",
+      "contact": "info@saftbatteries.com"
+    },
+    {
+      "name": "Forsee Power",
+      "country": "🇫🇷 France",
+      "hq": "Chasseneuil-du-Poitou",
+      "industry": "Ferroviaire",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "NMC",
+        "Bus",
+        "Train",
+        "Camion"
+      ],
+      "desc": "Intégrateur français de batteries lithium pour mobilité lourde. Leader européen sur son segment.",
+      "site": "https://www.forseepower.com",
+      "logo": "🚌",
+      "verified": true,
+      "premium": true,
+      "employees": "350+",
+      "founded": "2011",
+      "contact": "contact@forseepower.com"
+    },
+    {
+      "name": "Blue Solutions",
+      "country": "🇫🇷 France",
+      "hq": "Ergué-Gabéric",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "Tout-solide",
+        "LMP",
+        "Bus"
+      ],
+      "desc": "Seule entreprise au monde à produire des batteries tout-solide en série. Technologie LMP brevetée.",
+      "site": "https://www.blue-solutions.com",
+      "logo": "🔵",
+      "verified": true,
+      "premium": false,
+      "employees": "500+",
+      "founded": "2011",
+      "contact": ""
+    },
+    {
+      "name": "Verkor",
+      "country": "🇫🇷 France",
+      "hq": "Grenoble / Dunkerque",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "NMC",
+        "Bas-carbone",
+        "Gigafactory"
+      ],
+      "desc": "Batteries bas-carbone pour VE premium. Soutenu par Renault. Gigafactory Dunkerque 2025.",
+      "site": "https://www.verkor.com",
+      "logo": "🟢",
+      "verified": true,
+      "premium": false,
+      "employees": "500+",
+      "founded": "2020",
+      "contact": ""
+    },
+    {
+      "name": "TYVA Energie",
+      "country": "🇫🇷 France",
+      "hq": "Annonay (Ardèche)",
+      "industry": "Industrie & Manufacturing",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "Moduloo 3D",
+        "TYVA Refill",
+        "245 Wh/kg",
+        "Made in France"
+      ],
+      "desc": "Batteries lithium modulaires sans soudure. Technologie TYVA Refill : cellules remplaçables. 245 Wh/kg.",
+      "site": "https://tyva-energie.com",
+      "logo": "🔋",
+      "verified": true,
+      "premium": true,
+      "employees": "50+",
+      "founded": "2013",
+      "contact": "hello@tyva-energie.com"
+    },
+    {
+      "name": "Batconnect",
+      "country": "🇫🇷 France",
+      "hq": "Cugnaux (31)",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "IoT",
+        "LiFePO4",
+        "Fleet",
+        "GPS"
+      ],
+      "desc": "Batteries lithium connectées IoT : monitoring temps réel, GPS, maintenance prédictive IA. Made in France.",
+      "site": "https://batconnect.fr",
+      "logo": "📶",
+      "verified": true,
+      "premium": true,
+      "employees": "~15",
+      "founded": "2019",
+      "contact": "bonjour@batconnect.fr"
+    },
+    {
+      "name": "Corvus Energy",
+      "country": "🇨🇦 Canada",
+      "hq": "Bergen / Richmond BC",
+      "industry": "Marine & Offshore",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "ESS marine",
+        "NMC",
+        "DNV GL",
+        "ABS"
+      ],
+      "desc": "Spécialiste ESS pour la marine. Packs pour ferries hybrides et navires offshore. Certifié DNV GL et ABS.",
+      "site": "https://www.corvusenergy.com",
+      "logo": "⚓",
+      "verified": true,
+      "premium": false,
+      "employees": "300+",
+      "founded": "2009",
+      "contact": ""
+    },
+    {
+      "name": "Eaton",
+      "country": "🇮🇪 Irlande",
+      "hq": "Dublin",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "PDU (Power Distribution)",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "PDU rack",
+        "UPS",
+        "Switchgear"
+      ],
+      "desc": "Leader mondial de la gestion de puissance : PDU intelligents, UPS, disjoncteurs pour datacenter.",
+      "site": "https://www.eaton.com",
+      "logo": "🔌",
+      "verified": true,
+      "premium": true,
+      "employees": "85 000+",
+      "founded": "1911",
+      "contact": "eaton@eaton.com"
+    },
+    {
+      "name": "Schneider Electric",
+      "country": "🇫🇷 France",
+      "hq": "Rueil-Malmaison",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "PDU (Power Distribution)",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "APC",
+        "Galaxy UPS",
+        "EcoStruxure"
+      ],
+      "desc": "N°1 mondial de la gestion de l'énergie. PDU APC, UPS Galaxy. CA ~37 Md€.",
+      "site": "https://www.se.com",
+      "logo": "🟩",
+      "verified": true,
+      "premium": false,
+      "employees": "140 000+",
+      "founded": "1836",
+      "contact": ""
+    },
+    {
+      "name": "Safran Electrical & Power",
+      "country": "🇫🇷 France",
+      "hq": "Blagnac",
+      "industry": "Aéronautique & Défense",
+      "products": [
+        "PDU (Power Distribution)",
+        "Câblage & Connecteurs"
+      ],
+      "tags": [
+        "SSPC 270V",
+        "Avionique",
+        "DO-160G"
+      ],
+      "desc": "PDU SSPC avioniques sur bus 270V DC pour More Electric Aircraft. Certifié DO-160G.",
+      "site": "https://www.safran-group.com",
+      "logo": "🛩️",
+      "verified": true,
+      "premium": true,
+      "employees": "12 000+",
+      "founded": "2005",
+      "contact": "safran@safran-group.com"
+    },
+    {
+      "name": "Delta Electronics",
+      "country": "🇹🇼 Taïwan",
+      "hq": "Taipei",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "OBC (On-Board Charger)",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "OBC 22kW",
+        "V2G",
+        "ISO 15118"
+      ],
+      "desc": "OBC bidirectionnels jusqu'à 22 kW pour VE lourds. V2G supporté. Rendement >94%. IP67.",
+      "site": "https://www.deltaww.com",
+      "logo": "△",
+      "verified": true,
+      "premium": true,
+      "employees": "88 000+",
+      "founded": "1971",
+      "contact": "delta@deltaww.com"
+    },
+    {
+      "name": "Victron Energy",
+      "country": "🇳🇱 Pays-Bas",
+      "hq": "Almere",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "OBC (On-Board Charger)",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "MultiPlus",
+        "MPPT",
+        "Off-grid"
+      ],
+      "desc": "Onduleurs-chargeurs MultiPlus, MPPT, ESS. Référence du off-grid, marine et camping-car.",
+      "site": "https://www.victronenergy.com",
+      "logo": "☀️",
+      "verified": true,
+      "premium": false,
+      "employees": "1 000+",
+      "founded": "1975",
+      "contact": ""
+    },
+    {
+      "name": "Brusa Elektronik",
+      "country": "🇨🇭 Suisse",
+      "hq": "Sennwald",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "OBC (On-Board Charger)"
+      ],
+      "tags": [
+        "NLG7",
+        "OBC 43kW",
+        "Haute puissance"
+      ],
+      "desc": "Pionnier des chargeurs embarqués haute puissance. Gamme NLG jusqu'à 43 kW pour constructeurs premium.",
+      "site": "https://www.brusa.biz",
+      "logo": "🔌",
+      "verified": true,
+      "premium": false,
+      "employees": "300+",
+      "founded": "1980",
+      "contact": ""
+    },
+    {
+      "name": "Moog",
+      "country": "🇺🇸 États-Unis",
+      "hq": "East Aurora, NY",
+      "industry": "Aéronautique & Défense",
+      "products": [
+        "Vannes & Actionneurs",
+        "Moteurs & Entraînements"
+      ],
+      "tags": [
+        "Servovalvules",
+        "EMA",
+        "Commandes de vol"
+      ],
+      "desc": "Actionneurs et vannes de précision pour commandes de vol, défense et simulation haute dynamique.",
+      "site": "https://www.moog.com",
+      "logo": "✈️",
+      "verified": true,
+      "premium": true,
+      "employees": "13 000+",
+      "founded": "1951",
+      "contact": "moog@moog.com"
+    },
+    {
+      "name": "Parker Hannifin",
+      "country": "🇺🇸 États-Unis",
+      "hq": "Cleveland, OH",
+      "industry": "Industrie & Manufacturing",
+      "products": [
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "Hydraulique",
+        "Pneumatique",
+        "CETOP 5"
+      ],
+      "desc": "Leader mondial des technologies de mouvement : vannes proportionnelles, vérins, hydraulique.",
+      "site": "https://www.parker.com",
+      "logo": "⚙️",
+      "verified": true,
+      "premium": false,
+      "employees": "55 000+",
+      "founded": "1917",
+      "contact": ""
+    },
+    {
+      "name": "Rotork",
+      "country": "🇬🇧 Royaume-Uni",
+      "hq": "Bath",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "Actionneurs électriques",
+        "IP68",
+        "ATEX"
+      ],
+      "desc": "Actionneurs électriques, pneumatiques et hydrauliques pour oil & gas, eau et chimie.",
+      "site": "https://www.rotork.com",
+      "logo": "🔧",
+      "verified": true,
+      "premium": false,
+      "employees": "4 000+",
+      "founded": "1957",
+      "contact": ""
+    },
+    {
+      "name": "Bürkert",
+      "country": "🇩🇪 Allemagne",
+      "hq": "Ingelfingen",
+      "industry": "Industrie & Manufacturing",
+      "products": [
+        "Vannes & Actionneurs",
+        "Capteurs & Instrumentation"
+      ],
+      "tags": [
+        "Électrovannes",
+        "Microfluidique",
+        "Pharma"
+      ],
+      "desc": "Électrovannes, régulateurs et capteurs de débit. Leader en microfluidique et applications pharma.",
+      "site": "https://www.burkert.com",
+      "logo": "🔵",
+      "verified": true,
+      "premium": false,
+      "employees": "2 800+",
+      "founded": "1946",
+      "contact": ""
+    },
+    {
+      "name": "ABB",
+      "country": "🇨🇭 Suisse",
+      "hq": "Zurich",
+      "industry": "Industrie & Manufacturing",
+      "products": [
+        "Moteurs & Entraînements",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "ACS880",
+        "HVDC",
+        "IE4",
+        "Robotique"
+      ],
+      "desc": "Référence mondiale en automatisation et entraînements. Variateurs ACS, moteurs HXR. CA ~32 Md$.",
+      "site": "https://www.abb.com",
+      "logo": "🔩",
+      "verified": true,
+      "premium": true,
+      "employees": "105 000+",
+      "founded": "1988",
+      "contact": "abb@abb.com"
+    },
+    {
+      "name": "Siemens",
+      "country": "🇩🇪 Allemagne",
+      "hq": "Munich",
+      "industry": "Industrie & Manufacturing",
+      "products": [
+        "Moteurs & Entraînements",
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "SINAMICS",
+        "SIMOTICS",
+        "SIMATIC"
+      ],
+      "desc": "Variateurs SINAMICS, moteurs SIMOTICS, automates SIMATIC. Référence mondiale en automatisation.",
+      "site": "https://www.siemens.com",
+      "logo": "🔵",
+      "verified": true,
+      "premium": false,
+      "employees": "320 000+",
+      "founded": "1847",
+      "contact": ""
+    },
+    {
+      "name": "Nidec",
+      "country": "🇯🇵 Japon",
+      "hq": "Kyoto",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Moteurs & Entraînements"
+      ],
+      "tags": [
+        "eAxle",
+        "PMSM",
+        "Traction EV"
+      ],
+      "desc": "N°1 mondial des moteurs électriques. eAxle intégré pour VE jusqu'à 200 kW.",
+      "site": "https://www.nidec.com",
+      "logo": "🔄",
+      "verified": true,
+      "premium": false,
+      "employees": "110 000+",
+      "founded": "1973",
+      "contact": ""
+    },
+    {
+      "name": "Alstom",
+      "country": "🇫🇷 France",
+      "hq": "Saint-Ouen",
+      "industry": "Ferroviaire",
+      "products": [
+        "Batteries & Stockage",
+        "Convertisseurs & Onduleurs",
+        "Moteurs & Entraînements"
+      ],
+      "tags": [
+        "BESS",
+        "Traction",
+        "Coradia iLint"
+      ],
+      "desc": "Leader de la mobilité ferroviaire. Propulsion, traction, stockage embarqué BESS pour trains et trams.",
+      "site": "https://www.alstom.com",
+      "logo": "🚄",
+      "verified": true,
+      "premium": false,
+      "employees": "75 000+",
+      "founded": "1928",
+      "contact": ""
+    },
+    {
+      "name": "Danfoss",
+      "country": "🇩🇰 Danemark",
+      "hq": "Nordborg",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "Convertisseurs & Onduleurs",
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "VLT",
+        "VACON",
+        "Pompes chaleur"
+      ],
+      "desc": "Variateurs VLT/VACON, hydraulique mobile et pompes à chaleur. Gestion de l'énergie industrielle.",
+      "site": "https://www.danfoss.com",
+      "logo": "🌡️",
+      "verified": true,
+      "premium": false,
+      "employees": "42 000+",
+      "founded": "1933",
+      "contact": ""
+    },
+    {
+      "name": "TE Connectivity",
+      "country": "🇨🇭 Suisse",
+      "hq": "Schaffhausen",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Câblage & Connecteurs",
+        "Capteurs & Instrumentation"
+      ],
+      "tags": [
+        "HVA280",
+        "IP67",
+        "HVIL",
+        "LV214"
+      ],
+      "desc": "Connecteurs haute tension et capteurs pour VE et aérospatial. Références HVA280, MQS.",
+      "site": "https://www.te.com",
+      "logo": "🔗",
+      "verified": true,
+      "premium": false,
+      "employees": "90 000+",
+      "founded": "1941",
+      "contact": ""
+    },
+    {
+      "name": "Sensata Technologies",
+      "country": "🇳🇱 Pays-Bas",
+      "hq": "Attleboro, MA",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Capteurs & Instrumentation"
+      ],
+      "tags": [
+        "Courant HV",
+        "ASIL-B",
+        "ISO 26262"
+      ],
+      "desc": "Capteurs courant, relais HV et pression pour VE. Certifié ISO 26262 ASIL-B.",
+      "site": "https://www.sensata.com",
+      "logo": "📡",
+      "verified": true,
+      "premium": false,
+      "employees": "20 000+",
+      "founded": "1916",
+      "contact": ""
+    },
+    {
+      "name": "Amphenol",
+      "country": "🇺🇸 États-Unis",
+      "hq": "Wallingford, CT",
+      "industry": "Aéronautique & Défense",
+      "products": [
+        "Câblage & Connecteurs"
+      ],
+      "tags": [
+        "MIL-DTL-38999",
+        "RF",
+        "Fibres optiques"
+      ],
+      "desc": "Leader mondial des connecteurs. MIL-DTL-38999, RF, fibre optique pour défense et aérospatial.",
+      "site": "https://www.amphenol.com",
+      "logo": "🔌",
+      "verified": true,
+      "premium": false,
+      "employees": "95 000+",
+      "founded": "1932",
+      "contact": ""
+    },
+    {
+      "name": "Infineon Technologies",
+      "country": "🇩🇪 Allemagne",
+      "hq": "Munich",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Convertisseurs & Onduleurs"
+      ],
+      "tags": [
+        "SiC MOSFET",
+        "IGBT",
+        "GaN",
+        "1200V"
+      ],
+      "desc": "Semi-conducteurs de puissance SiC, IGBT, GaN pour OBC et onduleurs de traction.",
+      "site": "https://www.infineon.com",
+      "logo": "🔬",
+      "verified": true,
+      "premium": false,
+      "employees": "58 000+",
+      "founded": "1999",
+      "contact": ""
+    },
+    {
+      "name": "Emerson (Fisher)",
+      "country": "🇺🇸 États-Unis",
+      "hq": "St. Louis, MO",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "Fisher",
+        "FIELDVUE",
+        "Anti-cavitation"
+      ],
+      "desc": "Marque Fisher : vannes de contrôle procédé. Positionneurs FIELDVUE numériques. Oil & gas, chimie.",
+      "site": "https://www.emerson.com",
+      "logo": "🌐",
+      "verified": true,
+      "premium": false,
+      "employees": "88 000+",
+      "founded": "1890",
+      "contact": ""
+    },
+    {
+      "name": "Neogy",
+      "country": "🇫🇷 France",
+      "hq": "Pompignac (33)",
+      "industry": "Automobile & Mobilité électrique",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "NMC",
+        "LFP",
+        "Na-ion",
+        "500 MWh/an"
+      ],
+      "desc": "Packs batterie sur-mesure B2B. Usine 3 000 m² à Pompignac, 500 MWh/an. Multi-chimie.",
+      "site": "https://www.neogy.fr",
+      "logo": "⚙️",
+      "verified": true,
+      "premium": false,
+      "employees": "100+",
+      "founded": "2015",
+      "contact": ""
+    },
+    {
+      "name": "Lemo",
+      "country": "🇨🇭 Suisse",
+      "hq": "Écublens",
+      "industry": "Aéronautique & Défense",
+      "products": [
+        "Câblage & Connecteurs"
+      ],
+      "tags": [
+        "Push-pull",
+        "IP68",
+        "Médical",
+        "Broadcast"
+      ],
+      "desc": "Connecteurs push-pull de précision. Référence médical, broadcast, militaire. Made in Switzerland.",
+      "site": "https://www.lemo.com",
+      "logo": "🇨🇭",
+      "verified": true,
+      "premium": false,
+      "employees": "2 000+",
+      "founded": "1946",
+      "contact": ""
+    },
+    {
+      "name": "Flowserve",
+      "country": "🇺🇸 États-Unis",
+      "hq": "Irving, TX",
+      "industry": "Énergie & Utilities",
+      "products": [
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "API 6D",
+        "Billes",
+        "Papillon",
+        "Pompes"
+      ],
+      "desc": "Pompes, vannes et actionneurs industriels dans plus de 50 pays. Certifié API 6D.",
+      "site": "https://www.flowserve.com",
+      "logo": "💧",
+      "verified": true,
+      "premium": false,
+      "employees": "16 000+",
+      "founded": "1997",
+      "contact": ""
+    },
+    {
+      "name": "Airbus Defence & Space",
+      "country": "🇫🇷 France / 🇩🇪 Allemagne",
+      "hq": "Toulouse / Ottobrunn",
+      "industry": "Spatial",
+      "products": [
+        "Batteries & Stockage",
+        "PDU (Power Distribution)"
+      ],
+      "tags": [
+        "COSMO-BATT",
+        "ASTRO-BATT",
+        "STELLAR-BATT",
+        "ESA",
+        "GEO/LEO",
+        "Ariane 6"
+      ],
+      "desc": "Division spatiale d'Airbus. Batteries de bord pour satellites GEO/LEO/MEO : COSMO-BATT, ASTRO-BATT et STELLAR-BATT. Plus de 100 modules en vol. Maître d'œuvre du Module de Service Européen (Artemis).",
+      "site": "https://www.airbus.com/en/products-services/space",
+      "logo": "🛰️",
+      "verified": true,
+      "premium": true,
+      "employees": "35 000+",
+      "founded": "2014",
+      "contact": "space@airbus.com"
+    },
+    {
+      "name": "GS Yuasa Technology (Space)",
+      "country": "🇯🇵 Japon",
+      "hq": "Kyoto",
+      "industry": "Spatial",
+      "products": [
+        "Batteries & Stockage"
+      ],
+      "tags": [
+        "LSE112",
+        "LSE134",
+        "Li-ion spatial",
+        "NASA",
+        "JAXA",
+        "200+ satellites"
+      ],
+      "desc": "Leader mondial des cellules Li-ion pour l'espace. Gamme LSE (4 générations depuis 1998). Plus de 200 satellites alimentés, 550 millions d'heures sans anomalie. Fournisseur NASA, JAXA, ESA.",
+      "site": "https://gsyuasa-lp.com/satellites-and-rockets/",
+      "logo": "🇯🇵",
+      "verified": true,
+      "premium": false,
+      "employees": "18 000+",
+      "founded": "1917",
+      "contact": ""
+    },
+    {
+      "name": "EaglePicher Technologies",
+      "country": "🇺🇸 États-Unis",
+      "hq": "Joplin, Missouri",
+      "industry": "Spatial",
+      "products": [
+        "Batteries & Stockage",
+        "PDU (Power Distribution)"
+      ],
+      "tags": [
+        "Batteries satellite",
+        "BMS spatial",
+        "JPSS",
+        "MEV",
+        "GEOStar",
+        "NASA"
+      ],
+      "desc": "Fournisseur historique de batteries pour l'espace et la défense américaine. 100+ ans d'expérience. Programmes NASA JPSS-2, ICESat-2, MEV.",
+      "site": "https://www.eaglepicher.com",
+      "logo": "🦅",
+      "verified": true,
+      "premium": false,
+      "employees": "700+",
+      "founded": "1843",
+      "contact": ""
+    },
+    {
+      "name": "Bradford ECAPS",
+      "country": "🇸🇪 Suède",
+      "hq": "Solna, Stockholm",
+      "industry": "Spatial",
+      "products": [
+        "Vannes & Actionneurs"
+      ],
+      "tags": [
+        "HPGP",
+        "LMP-103S",
+        "Propulsion verte",
+        "1N",
+        "5N",
+        "22N",
+        "ADN",
+        "Smallsat"
+      ],
+      "desc": "Pionnier de la propulsion spatiale verte (HPGP). Propergol LMP-103S à base d'ADN non toxique. Vols qualifiés sur PRISMA (ESA), SkySat. Fournisseur NASA, ESA, opérateurs commerciaux.",
+      "site": "https://www.ecaps.se",
+      "logo": "🚀",
+      "verified": true,
+      "premium": false,
+      "employees": "50+",
+      "founded": "2000",
+      "contact": ""
+    },
+    {
+      "name": "Moog Space & Defense",
+      "country": "🇺🇸 États-Unis",
+      "hq": "East Aurora, NY",
+      "industry": "Spatial",
+      "products": [
+        "Vannes & Actionneurs",
+        "PDU (Power Distribution)"
+      ],
+      "tags": [
+        "Vannes propulsion spatiale",
+        "Actionneurs satellite",
+        "Launch vehicle",
+        "SLS",
+        "ISS"
+      ],
+      "desc": "Division spatiale de Moog. Vannes de propulsion, actionneurs de déploiement et systèmes de contrôle pour lanceurs et satellites. Présent sur ISS, SLS et nombreux satellites commerciaux.",
+      "site": "https://www.moog.com/markets/space.html",
+      "logo": "🛸",
+      "verified": true,
+      "premium": false,
+      "employees": "13 000+",
+      "founded": "1951",
+      "contact": ""
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "LiFePO4 Pack 280Ah",
+      "maker": "CATL",
+      "cat": "Batteries & Stockage",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "⚡",
+      "desc": "Cellule prismatique LiFePO4 haute durée de vie. Standard ESS et véhicules commerciaux.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "LiFePO4"
+        },
+        {
+          "l": "Capacité",
+          "v": "280 Ah"
+        },
+        {
+          "l": "Tension (16S)",
+          "v": "51,2 V"
+        },
+        {
+          "l": "Énergie pack",
+          "v": "~14,3 kWh"
+        },
+        {
+          "l": "Cycle de vie",
+          "v": "> 4 000 cycles"
+        },
+        {
+          "l": "Température",
+          "v": "-20 à +60 °C"
+        },
+        {
+          "l": "IP",
+          "v": "IP67"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Densité énergie",
+          "v": 78,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Durée de vie",
+          "v": 95,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance spécifique",
+          "v": 55,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "UN38.3",
+        "IEC 62619",
+        "UL 1973"
+      ],
+      "price": "~480 € / kWh"
+    },
+    {
+      "id": "p2",
+      "name": "NMC Qilin 100Ah — 4C",
+      "maker": "CATL",
+      "cat": "Batteries & Stockage",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "⚡",
+      "desc": "Cellule NMC génération Qilin pour recharge ultra-rapide 4C. Cell-to-pack, immersion liquide.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC"
+        },
+        {
+          "l": "Capacité",
+          "v": "100 Ah"
+        },
+        {
+          "l": "Charge max",
+          "v": "4C (400 A)"
+        },
+        {
+          "l": "Énergie spécifique",
+          "v": "255 Wh/kg"
+        },
+        {
+          "l": "Température",
+          "v": "-30 à +55 °C"
+        },
+        {
+          "l": "Refroidissement",
+          "v": "Immersion liquide"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Densité énergie",
+          "v": 95,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Durée de vie",
+          "v": 65,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance spécifique",
+          "v": 92,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "UN38.3"
+      ],
+      "price": "~620 € / kWh"
+    },
+    {
+      "id": "p3",
+      "name": "VL 45E — Li-ion Aviation",
+      "maker": "Saft (TotalEnergies)",
+      "cat": "Batteries & Stockage",
+      "industry": "Aéronautique & Défense",
+      "icon": "🇫🇷",
+      "desc": "Cellule Li-ion certifiée DO-311A pour aéronautique et défense. -55°C à +70°C.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC"
+        },
+        {
+          "l": "Capacité",
+          "v": "45 Ah"
+        },
+        {
+          "l": "Énergie spécifique",
+          "v": "~175 Wh/kg"
+        },
+        {
+          "l": "Température",
+          "v": "-55 à +70 °C"
+        },
+        {
+          "l": "Certif. aéro",
+          "v": "DO-311A"
+        },
+        {
+          "l": "Poids",
+          "v": "~1,1 kg"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Fiabilité",
+          "v": 99,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Plage température",
+          "v": 97,
+          "c": "#D4500A"
+        },
+        {
+          "l": "Densité énergie",
+          "v": 68,
+          "c": "#3A5A78"
+        }
+      ],
+      "certs": [
+        "DO-311A",
+        "MIL-PRF-32565",
+        "CE"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p4",
+      "name": "ZEN Pack Bus 672V",
+      "maker": "Forsee Power",
+      "cat": "Batteries & Stockage",
+      "industry": "Ferroviaire",
+      "icon": "🚌",
+      "desc": "Pack 672V NMC haute densité pour bus électriques urbains. BMS propriétaire, liquide actif.",
+      "specs": [
+        {
+          "l": "Tension pack",
+          "v": "672 V DC"
+        },
+        {
+          "l": "Énergie",
+          "v": "~150 kWh"
+        },
+        {
+          "l": "Puissance crête",
+          "v": "300 kW"
+        },
+        {
+          "l": "Cycle de vie",
+          "v": "> 3 000 cycles"
+        },
+        {
+          "l": "Refroidissement",
+          "v": "Liquide actif"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Densité énergie",
+          "v": 82,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Durée de vie",
+          "v": 80,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance crête",
+          "v": 75,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ECE R100",
+        "CE"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p5",
+      "name": "Moduloo Ax — 48V 30Ah",
+      "maker": "TYVA Energie",
+      "cat": "Batteries & Stockage",
+      "industry": "Industrie & Manufacturing",
+      "icon": "🔋",
+      "desc": "Batterie NMC 48V format A4+, jusqu'à 245 Wh/kg. Sans soudure. Made in France.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC"
+        },
+        {
+          "l": "Tension",
+          "v": "51,8 V (14S)"
+        },
+        {
+          "l": "Capacité",
+          "v": "30 Ah"
+        },
+        {
+          "l": "Énergie",
+          "v": "~1 554 Wh"
+        },
+        {
+          "l": "Densité énergie",
+          "v": "245 Wh/kg"
+        },
+        {
+          "l": "Origine",
+          "v": "Made in France"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Densité énergie",
+          "v": 95,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Compacité",
+          "v": 90,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Modularité",
+          "v": 98,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "UN38.3",
+        "ISO 9001",
+        "CE"
+      ],
+      "price": "1 690 € HT"
+    },
+    {
+      "id": "p6",
+      "name": "Moduloo 3D — Sur-mesure",
+      "maker": "TYVA Energie",
+      "cat": "Batteries & Stockage",
+      "industry": "Industrie & Manufacturing",
+      "icon": "🔋",
+      "desc": "Assemblage modulaire 3D sans soudure. Cellules remplaçables (TYVA Refill). Prototypage rapide.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC / LiFePO4"
+        },
+        {
+          "l": "Assemblage",
+          "v": "Sans soudure 3D"
+        },
+        {
+          "l": "Reconditionnement",
+          "v": "TYVA Refill"
+        },
+        {
+          "l": "BMS",
+          "v": "40 Wh – 1 MWh"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Flexibilité",
+          "v": 99,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Éco-conception",
+          "v": 95,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Densité énergie",
+          "v": 70,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ISO 9001",
+        "CE"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p7",
+      "name": "LFP 48V 100Ah IoT",
+      "maker": "Batconnect",
+      "cat": "Batteries & Stockage",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "📶",
+      "desc": "Pack LiFePO4 connecté IoT : monitoring temps réel, GPS, IA prédictive. Garantie 10 ans.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "LiFePO4"
+        },
+        {
+          "l": "Tension",
+          "v": "48 V"
+        },
+        {
+          "l": "Capacité",
+          "v": "100 Ah"
+        },
+        {
+          "l": "Connectivité",
+          "v": "4G/BLE + GPS"
+        },
+        {
+          "l": "Garantie",
+          "v": "10 ans"
+        },
+        {
+          "l": "Durée de vie",
+          "v": "> 20 ans"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Durée de vie",
+          "v": 97,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Connectivité",
+          "v": 95,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Densité énergie",
+          "v": 72,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "UN38.3"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p8",
+      "name": "Orca Energy 2.1 MWh Marine",
+      "maker": "Corvus Energy",
+      "cat": "Batteries & Stockage",
+      "industry": "Marine & Offshore",
+      "icon": "⚓",
+      "desc": "ESS maritime 2,1 MWh pour propulsion hybride. Certifié DNV GL et ABS. SCADA embarqué.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC marine"
+        },
+        {
+          "l": "Énergie",
+          "v": "2,1 MWh"
+        },
+        {
+          "l": "Bus DC",
+          "v": "700 V"
+        },
+        {
+          "l": "Puissance continue",
+          "v": "1 200 kW"
+        },
+        {
+          "l": "Poids",
+          "v": "~22 tonnes"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Densité énergie",
+          "v": 70,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Durée de vie",
+          "v": 80,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance spécifique",
+          "v": 72,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "DNV GL",
+        "ABS",
+        "CE"
+      ],
+      "price": "Sur devis (~400 k€)"
+    },
+    {
+      "id": "p9",
+      "name": "ePDU G3 Advanced 32A",
+      "maker": "Eaton",
+      "cat": "PDU (Power Distribution)",
+      "industry": "Industrie & Manufacturing",
+      "icon": "🔌",
+      "desc": "PDU rack intelligent, monitoring par prise, SNMP v3 et Modbus TCP. Format 0U vertical.",
+      "specs": [
+        {
+          "l": "Courant entrée",
+          "v": "32 A"
+        },
+        {
+          "l": "Tension",
+          "v": "200–240 V AC"
+        },
+        {
+          "l": "Prises",
+          "v": "24× C13 + 4× C19"
+        },
+        {
+          "l": "Puissance max",
+          "v": "7,2 kW"
+        },
+        {
+          "l": "Interface",
+          "v": "SNMP v3, Modbus TCP"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Monitoring",
+          "v": 95,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance max",
+          "v": 72,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Connectivité",
+          "v": 88,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "UL",
+        "IEC 60884-2-7"
+      ],
+      "price": "~1 200 €"
+    },
+    {
+      "id": "p10",
+      "name": "SSPC PDU 270V DC",
+      "maker": "Safran Electrical & Power",
+      "cat": "PDU (Power Distribution)",
+      "industry": "Aéronautique & Défense",
+      "icon": "🛩️",
+      "desc": "PDU avionique SSPC sur bus 270V DC. Coupure <1 ms, zéro arc. Pour More Electric Aircraft.",
+      "specs": [
+        {
+          "l": "Bus",
+          "v": "270 V DC"
+        },
+        {
+          "l": "Canaux SSPC",
+          "v": "32"
+        },
+        {
+          "l": "Temps coupure",
+          "v": "< 1 ms"
+        },
+        {
+          "l": "Poids",
+          "v": "3,8 kg"
+        },
+        {
+          "l": "Température",
+          "v": "-55 à +85 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Rapidité coupure",
+          "v": 99,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Plage température",
+          "v": 97,
+          "c": "#D4500A"
+        },
+        {
+          "l": "Densité puissance",
+          "v": 85,
+          "c": "#3A5A78"
+        }
+      ],
+      "certs": [
+        "DO-160G",
+        "MIL-STD-461",
+        "EASA CS-25"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p11",
+      "name": "OBC 22 kW Bidirectionnel V2G",
+      "maker": "Delta Electronics",
+      "cat": "OBC (On-Board Charger)",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "△",
+      "desc": "Chargeur embarqué bidirectionnel 22 kW pour bus et camions EV. V2G, ISO 15118, IP67.",
+      "specs": [
+        {
+          "l": "Puissance",
+          "v": "22 kW"
+        },
+        {
+          "l": "Tension entrée",
+          "v": "3×400 V AC"
+        },
+        {
+          "l": "Plage sortie",
+          "v": "200–900 V DC"
+        },
+        {
+          "l": "Rendement",
+          "v": "> 94 %"
+        },
+        {
+          "l": "IP",
+          "v": "IP67"
+        },
+        {
+          "l": "Poids",
+          "v": "14 kg"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Rendement",
+          "v": 94,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Densité puissance",
+          "v": 85,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Flexibilité tension",
+          "v": 90,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "ISO 15118",
+        "IEC 61851",
+        "UNECE R10"
+      ],
+      "price": "~3 800 €"
+    },
+    {
+      "id": "p12",
+      "name": "MultiPlus-II 48/5000",
+      "maker": "Victron Energy",
+      "cat": "OBC (On-Board Charger)",
+      "industry": "Énergie & Utilities",
+      "icon": "☀️",
+      "desc": "Onduleur-chargeur 5 kVA pour off-grid et hybrides. PowerAssist intégré, rendement 96%.",
+      "specs": [
+        {
+          "l": "Puissance",
+          "v": "5 000 VA"
+        },
+        {
+          "l": "Charge max",
+          "v": "120 A DC"
+        },
+        {
+          "l": "Tension batt.",
+          "v": "48 V DC"
+        },
+        {
+          "l": "Rendement",
+          "v": "96 %"
+        },
+        {
+          "l": "Température",
+          "v": "-40 à +65 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Rendement",
+          "v": 96,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Polyvalence",
+          "v": 88,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Robustesse",
+          "v": 82,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "VDE 0126-1-1"
+      ],
+      "price": "~1 650 €"
+    },
+    {
+      "id": "p13",
+      "name": "D633 Servovanne 2 étages",
+      "maker": "Moog",
+      "cat": "Vannes & Actionneurs",
+      "industry": "Aéronautique & Défense",
+      "icon": "✈️",
+      "desc": "Servovanne électrohydraulique haute performance. 120 Hz, précision <0,1%. Référence commandes de vol.",
+      "specs": [
+        {
+          "l": "Débit",
+          "v": "19 l/min @ 70 bar"
+        },
+        {
+          "l": "Pression max",
+          "v": "350 bar"
+        },
+        {
+          "l": "Bande passante",
+          "v": "120 Hz (-90°)"
+        },
+        {
+          "l": "Hystérésis",
+          "v": "< 0,1 %"
+        },
+        {
+          "l": "Masse",
+          "v": "0,97 kg"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Bande passante",
+          "v": 96,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Précision",
+          "v": 99,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Tenue pression",
+          "v": 90,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "EASA",
+        "MIL-H-5440",
+        "AS9100D"
+      ],
+      "price": "~8 500 €"
+    },
+    {
+      "id": "p14",
+      "name": "ACS880 — 0,75–5 600 kW",
+      "maker": "ABB",
+      "cat": "Convertisseurs & Onduleurs",
+      "industry": "Industrie & Manufacturing",
+      "icon": "🔩",
+      "desc": "Variateur industriel DTC. Gamme 0,75–5 600 kW. Rendement >98%. Profibus, PROFINET.",
+      "specs": [
+        {
+          "l": "Puissance",
+          "v": "0,75–5 600 kW"
+        },
+        {
+          "l": "Tension",
+          "v": "380–690 V AC"
+        },
+        {
+          "l": "Contrôle",
+          "v": "DTC"
+        },
+        {
+          "l": "Rendement",
+          "v": "> 98 %"
+        },
+        {
+          "l": "Surcharge",
+          "v": "150% / 1 min"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Rendement",
+          "v": 98,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Plage puissance",
+          "v": 96,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Précision couple",
+          "v": 94,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "UL",
+        "cUL"
+      ],
+      "price": "800–150 000 €"
+    },
+    {
+      "id": "p15",
+      "name": "CoolSiC MOSFET 1200V",
+      "maker": "Infineon Technologies",
+      "cat": "Convertisseurs & Onduleurs",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "🔬",
+      "desc": "Module SiC MOSFET 1200V pour OBC et onduleurs. -50% pertes vs IGBT, 300 kHz max.",
+      "specs": [
+        {
+          "l": "Technologie",
+          "v": "SiC MOSFET 4e gén."
+        },
+        {
+          "l": "Tension",
+          "v": "1 200 V"
+        },
+        {
+          "l": "Courant",
+          "v": "30–300 A"
+        },
+        {
+          "l": "Fréquence max",
+          "v": "300 kHz"
+        },
+        {
+          "l": "Température jonction",
+          "v": "-40 à +175 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Efficacité",
+          "v": 97,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Tenue thermique",
+          "v": 93,
+          "c": "#D4500A"
+        },
+        {
+          "l": "Densité puissance",
+          "v": 95,
+          "c": "#3A5A78"
+        }
+      ],
+      "certs": [
+        "AEC-Q101",
+        "CE",
+        "RoHS"
+      ],
+      "price": "15–350 € / module"
+    },
+    {
+      "id": "p16",
+      "name": "CS-HV500 Capteur ±500A",
+      "maker": "Sensata Technologies",
+      "cat": "Capteurs & Instrumentation",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "📡",
+      "desc": "Capteur Hall HV ±500A pour packs batterie VE. ISO 26262 ASIL-B, isolation 5 kV DC.",
+      "specs": [
+        {
+          "l": "Plage",
+          "v": "±500 A"
+        },
+        {
+          "l": "Isolation",
+          "v": "5 000 V DC"
+        },
+        {
+          "l": "Précision",
+          "v": "< ±0,5 %"
+        },
+        {
+          "l": "Bande passante",
+          "v": "50 kHz"
+        },
+        {
+          "l": "Température",
+          "v": "-40 à +125 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Précision",
+          "v": 90,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Isolation",
+          "v": 95,
+          "c": "#D4500A"
+        },
+        {
+          "l": "Bande passante",
+          "v": 75,
+          "c": "#3A5A78"
+        }
+      ],
+      "certs": [
+        "CE",
+        "AEC-Q100",
+        "ISO 26262 ASIL-B"
+      ],
+      "price": "~85 € / u"
+    },
+    {
+      "id": "p17",
+      "name": "HVA280 — Connecteur HV 250A",
+      "maker": "TE Connectivity",
+      "cat": "Câblage & Connecteurs",
+      "industry": "Automobile & Mobilité électrique",
+      "icon": "🔗",
+      "desc": "Connecteur HV 250A pour bus DC batterie VE. HVIL auto-ségrégant. IP67 assemblé.",
+      "specs": [
+        {
+          "l": "Tension",
+          "v": "600 V DC"
+        },
+        {
+          "l": "Courant",
+          "v": "250 A"
+        },
+        {
+          "l": "Résistance contact",
+          "v": "< 0,2 mΩ"
+        },
+        {
+          "l": "IP",
+          "v": "IP67"
+        },
+        {
+          "l": "Température",
+          "v": "-40 à +125 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Tenue courant",
+          "v": 85,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Résistance contact",
+          "v": 95,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Tenue thermique",
+          "v": 88,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "LV214",
+        "USCAR-21"
+      ],
+      "price": "~32 € / u"
+    },
+    {
+      "id": "p18",
+      "name": "MIL-DTL-38999 Série III",
+      "maker": "Amphenol",
+      "cat": "Câblage & Connecteurs",
+      "industry": "Aéronautique & Défense",
+      "icon": "🔌",
+      "desc": "Connecteur circulaire militaire. Standard de référence défense et aérospatial. Résistance MIL-STD-810.",
+      "specs": [
+        {
+          "l": "Norme",
+          "v": "MIL-DTL-38999 III"
+        },
+        {
+          "l": "Nb contacts",
+          "v": "4–128"
+        },
+        {
+          "l": "Tension max",
+          "v": "1 500 V AC"
+        },
+        {
+          "l": "Température",
+          "v": "-65 à +200 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Fiabilité mécanique",
+          "v": 98,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Plage température",
+          "v": 99,
+          "c": "#D4500A"
+        },
+        {
+          "l": "Densité contacts",
+          "v": 88,
+          "c": "#3A5A78"
+        }
+      ],
+      "certs": [
+        "MIL-DTL-38999",
+        "AS9100D"
+      ],
+      "price": "45–450 € / u"
+    },
+    {
+      "id": "p19",
+      "name": "IQ3 Actionneur Électrique",
+      "maker": "Rotork",
+      "cat": "Vannes & Actionneurs",
+      "industry": "Énergie & Utilities",
+      "icon": "🔧",
+      "desc": "Actionneur électrique multi-tours IQ3. Diagnostic intégré, Profibus/Modbus. IP68. ATEX option.",
+      "specs": [
+        {
+          "l": "Couple nominal",
+          "v": "50–2 000 N·m"
+        },
+        {
+          "l": "Interface",
+          "v": "Profibus / Modbus"
+        },
+        {
+          "l": "Protection",
+          "v": "IP68 (10m, 72h)"
+        },
+        {
+          "l": "Température",
+          "v": "-30 à +70 °C"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Tenue environnement",
+          "v": 95,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Connectivité",
+          "v": 85,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Couple volumique",
+          "v": 80,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "CE",
+        "ATEX",
+        "IECEx",
+        "IP68"
+      ],
+      "price": "~2 500 €"
+    },
+    {
+      "id": "p20",
+      "name": "BESS TrainPack 800V",
+      "maker": "Alstom",
+      "cat": "Batteries & Stockage",
+      "industry": "Ferroviaire",
+      "icon": "🚄",
+      "desc": "BESS embarqué pour trains sans caténaire et récupération d'énergie freinage. Coradia iLint.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "NMC"
+        },
+        {
+          "l": "Tension bus",
+          "v": "800 V DC"
+        },
+        {
+          "l": "Énergie",
+          "v": "50–200 kWh"
+        },
+        {
+          "l": "Puissance crête",
+          "v": "400 kW"
+        },
+        {
+          "l": "Cycle de vie",
+          "v": "> 6 000 cycles"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Durée de vie",
+          "v": 92,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Puissance volumique",
+          "v": 80,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Robustesse ferroviaire",
+          "v": 95,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "EN 50155",
+        "EN 50126",
+        "CE"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p21",
+      "name": "COSMO-BATT — Satellite GEO/NAV",
+      "maker": "Airbus Defence & Space",
+      "cat": "Batteries & Stockage",
+      "industry": "Spatial",
+      "icon": "🛰️",
+      "desc": "Batterie modulaire pour satellites télécom et navigation GEO/MEO. Modules 500–3 000 Wh. Plus de 300 unités fabriquées, >100 en vol sur E3000-NEO, OneSat et Galileo.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "Li-ion COTS qualifié spatial"
+        },
+        {
+          "l": "Énergie / module",
+          "v": "500 – 3 000 Wh"
+        },
+        {
+          "l": "Tension nominale",
+          "v": "4,2 V / cellule"
+        },
+        {
+          "l": "Application",
+          "v": "GEO / MEO Télécom & Nav"
+        },
+        {
+          "l": "Plateformes",
+          "v": "E3000-NEO, OneSat, Galileo"
+        },
+        {
+          "l": "Unités en vol",
+          "v": "> 100 modules"
+        },
+        {
+          "l": "Qualification",
+          "v": "ECSS Class 1"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Fiabilité en vol",
+          "v": 99,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Héritage mission",
+          "v": 95,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Ratio énergie/masse",
+          "v": 72,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ECSS-E-ST-20-08",
+        "ESA qualifié",
+        "ISO 9001:2015"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p22",
+      "name": "ASTRO-BATT — LEO 30/50/100V",
+      "maker": "Airbus Defence & Space",
+      "cat": "Batteries & Stockage",
+      "industry": "Spatial",
+      "icon": "🛰️",
+      "desc": "Batterie modulaire LEO pour missions optiques et radar jusqu'à 12,5 ans en orbite. Disponible en 30V, 50V et 100V avec même design mécanique. Qualifiée mi-2024.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "Li-ion COTS qualifié spatial"
+        },
+        {
+          "l": "Configurations tension",
+          "v": "30V / 50V / 100V"
+        },
+        {
+          "l": "Application",
+          "v": "LEO optique & radar"
+        },
+        {
+          "l": "Durée de mission",
+          "v": "Jusqu'à 12,5 ans"
+        },
+        {
+          "l": "Montage",
+          "v": "Interne ou externe"
+        },
+        {
+          "l": "Qualification",
+          "v": "ECSS Class 1 — 2024"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Fiabilité en vol",
+          "v": 98,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Flexibilité tension",
+          "v": 95,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Adaptabilité mission",
+          "v": 90,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ECSS Class 1",
+        "ESA qualifié",
+        "DO-311A"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p23",
+      "name": "LSE134 Gen III — Cellule Li-ion Spatiale",
+      "maker": "GS Yuasa Technology (Space)",
+      "cat": "Batteries & Stockage",
+      "industry": "Spatial",
+      "icon": "🇯🇵",
+      "desc": "Cellule Li-ion Gen III pour l'espace. 40% DOD en LEO sur plus de 10 ans. Intégrée sur JPSS-2 (NASA/NOAA). Plus de 17 000 cellules livrées depuis 1998.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "Li-ion NMC grade spatial"
+        },
+        {
+          "l": "Capacité",
+          "v": "110 – 134 Ah"
+        },
+        {
+          "l": "Tension nominale",
+          "v": "3,75 V"
+        },
+        {
+          "l": "DOD LEO",
+          "v": "40% sur > 10 ans"
+        },
+        {
+          "l": "Température",
+          "v": "-20 à +30 °C"
+        },
+        {
+          "l": "Certification",
+          "v": "ISO 9001 / AS9100"
+        },
+        {
+          "l": "Héritage",
+          "v": "> 200 satellites"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Héritage en vol",
+          "v": 99,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Durée de vie LEO",
+          "v": 96,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Fiabilité",
+          "v": 99,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "AS9100D",
+        "JIS Q9100",
+        "ISO 14001",
+        "NASA qualifié"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p24",
+      "name": "JPSS-2 Battery — 7,9 kWh / 29,6V",
+      "maker": "EaglePicher Technologies",
+      "cat": "Batteries & Stockage",
+      "industry": "Spatial",
+      "icon": "🦅",
+      "desc": "Pack Li-ion 7,9 kWh / 29,6V pour satellite JPSS-2 (NASA/NOAA). Cellules GS Yuasa LSE134 Gen III. Basé sur plateformes GEOStar-3 et ICESat-2 éprouvées.",
+      "specs": [
+        {
+          "l": "Chimie",
+          "v": "Li-ion (GS Yuasa LSE134)"
+        },
+        {
+          "l": "Énergie",
+          "v": "7,9 kWh"
+        },
+        {
+          "l": "Tension système",
+          "v": "29,6 V"
+        },
+        {
+          "l": "Programme",
+          "v": "JPSS-2 (NASA/NOAA)"
+        },
+        {
+          "l": "Plateforme base",
+          "v": "GEOStar-3 & ICESat-2"
+        },
+        {
+          "l": "Certification",
+          "v": "NASA GEVS / AS9100D"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Héritage mission NASA",
+          "v": 98,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Fiabilité système",
+          "v": 97,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Densité énergie",
+          "v": 65,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "NASA GEVS",
+        "AS9100D",
+        "MIL-STD-1540"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p25",
+      "name": "1N HPGP — Propulseur vert LEO",
+      "maker": "Bradford ECAPS",
+      "cat": "Vannes & Actionneurs",
+      "industry": "Spatial",
+      "icon": "🚀",
+      "desc": "Propulseur monergol vert 1N. Propergol LMP-103S (ADN) non toxique, haute performance. 46 propulseurs volés sur PRISMA (ESA) et SkySat. Idéal smallsats.",
+      "specs": [
+        {
+          "l": "Type",
+          "v": "Monopropulseur vert HPGP"
+        },
+        {
+          "l": "Propergol",
+          "v": "LMP-103S (ADN)"
+        },
+        {
+          "l": "Poussée nominale",
+          "v": "1 N"
+        },
+        {
+          "l": "Isp spécifique",
+          "v": "~220 s"
+        },
+        {
+          "l": "Tension alimentation",
+          "v": "28 V DC"
+        },
+        {
+          "l": "Masse propulseur",
+          "v": "~200 g"
+        },
+        {
+          "l": "Héritage vol",
+          "v": "PRISMA, SkySat — 46 unités"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Héritage en vol",
+          "v": 90,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Performance Isp",
+          "v": 82,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Sécurité non toxique",
+          "v": 98,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ESA qualifié",
+        "NASA TRL 9",
+        "REACH compliant"
+      ],
+      "price": "Sur devis"
+    },
+    {
+      "id": "p26",
+      "name": "5N HPGP — Contrôle d'orbite",
+      "maker": "Bradford ECAPS",
+      "cat": "Vannes & Actionneurs",
+      "industry": "Spatial",
+      "icon": "🚀",
+      "desc": "Propulseur 5N HPGP pour contrôle d'attitude et manœuvres orbitales. Étudié par NASA Goddard pour missions interplanétaires.",
+      "specs": [
+        {
+          "l": "Type",
+          "v": "Monopropulseur vert HPGP"
+        },
+        {
+          "l": "Propergol",
+          "v": "LMP-103S (ADN)"
+        },
+        {
+          "l": "Poussée nominale",
+          "v": "5 N"
+        },
+        {
+          "l": "Isp spécifique",
+          "v": "~231 s"
+        },
+        {
+          "l": "Tension alimentation",
+          "v": "28 V DC"
+        },
+        {
+          "l": "Application",
+          "v": "Satellites < 750 kg"
+        }
+      ],
+      "bars": [
+        {
+          "l": "Héritage en vol",
+          "v": 82,
+          "c": "#2D6A4F"
+        },
+        {
+          "l": "Performance Isp",
+          "v": 88,
+          "c": "#3A5A78"
+        },
+        {
+          "l": "Polyvalence mission",
+          "v": 85,
+          "c": "#D4500A"
+        }
+      ],
+      "certs": [
+        "ESA qualifié",
+        "REACH compliant",
+        "TRL 8+"
+      ],
+      "price": "Sur devis"
+    }
+  ]
+}
