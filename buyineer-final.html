@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Buy-ineer — Référentiel équipementiers industriels</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1C2B3A;--rust:#D4500A;--rust-soft:#FBF0EA;
+  --steel:#3A5A78;--steel-soft:#EAF0F6;
+  --sage:#2D6A4F;--sage-soft:#E8F4EE;
+  --gold:#B07D2A;--gold-soft:#FBF5E6;
+  --paper:#F5F4F0;--white:#fff;
+  --border:#DDD9D0;--border2:#C8C3B8;
+  --muted:#7A7568;--text2:#3D3A35;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--sans);cursor:pointer}
+
+/* TICKER */
+.ticker{background:var(--ink);height:30px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.07)}
+.ticker-label{font-family:var(--mono);font-size:10px;color:var(--rust);padding:0 14px;flex-shrink:0;letter-spacing:.1em;text-transform:uppercase}
+.ticker-track{flex:1;overflow:hidden;position:relative}
+.ticker-inner{display:inline-block;white-space:nowrap;animation:ticker 55s linear infinite;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* NAV */
+nav.main{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:30px;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:none;padding:0}
+.logo-mark{width:32px;height:32px;background:var(--rust);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:#fff}
+.logo-name{font-family:var(--serif);font-size:18px;color:var(--ink)}
+.logo-name span{color:var(--rust)}
+.nav-links{display:flex;height:100%;align-items:stretch;gap:0}
+.nav-link{padding:0 14px;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--sans)}
+.nav-link:hover{color:var(--ink)}
+.nav-link.active{color:var(--rust);border-bottom-color:var(--rust);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-pro-toggle{padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:var(--paper);color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.03em}
+.btn-pro-toggle.active{background:var(--sage);border-color:var(--sage);color:#fff}
+.btn-signup{padding:7px 16px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:12px;font-weight:700}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* LAYOUT */
+.layout{display:flex;max-width:1280px;margin:0 auto}
+.sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);padding:18px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto;background:var(--white)}
+.sidebar-section{margin-bottom:16px}
+.sidebar-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.sidebar-label::before{content:'';display:block;width:2px;height:10px;background:var(--rust);border-radius:1px}
+.sidebar-divider{height:1px;background:var(--border);margin:10px 0 14px}
+.search-wrap{position:relative}
+.search-wrap span{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)}
+.search-input{width:100%;padding:7px 8px 7px 26px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:var(--sans);color:var(--ink);outline:none;background:var(--paper)}
+.search-input:focus{border-color:var(--steel)}
+.chip-group{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:3px 9px;border-radius:3px;border:1px solid var(--border);font-size:11px;font-weight:500;background:var(--white);color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:var(--sans)}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.reset-btn{width:100%;padding:7px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;margin-top:10px}
+.reset-btn:hover{border-color:var(--rust);color:var(--rust)}
+.content{flex:1;padding:18px 22px;min-width:0}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.toolbar-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.10em;text-transform:uppercase}
+.result-count{font-size:13px;color:var(--muted);margin-left:14px}
+.result-count strong{color:var(--ink)}
+
+/* TAGS / BADGES */
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid var(--border);background:var(--paper);color:var(--muted)}
+.tag-industry{background:var(--steel-soft);color:var(--steel);border-color:#B8CCDE}
+.tag-sage{background:var(--sage-soft);color:var(--sage);border-color:#9ECFB5}
+.tag-gold{background:var(--gold-soft);color:var(--gold);border-color:#E8C96A}
+.badge-premium{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold-soft);color:var(--gold);border:1px solid #E8C96A}
+.badge-verified{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:var(--sage-soft);color:var(--sage);border:1px solid #9ECFB5}
+
+/* COMPANY CARDS */
+.grid-companies{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.company-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.company-card:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.09)}
+.company-card.premium{border-color:#E8C96A;box-shadow:0 2px 10px rgba(176,125,42,.12)}
+.company-card.premium:hover{border-color:#D4A828}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-logo{width:38px;height:38px;border-radius:6px;background:var(--paper);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.card-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.2}
+.card-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.card-badges{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.6;margin:10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.card-site{font-size:11px;color:var(--steel);font-weight:600}
+.card-prod-count{font-size:11px;font-weight:700;color:var(--rust);background:var(--rust-soft);border:1px solid #F5C9AA;border-radius:3px;padding:2px 6px}
+
+/* PRODUCT CARDS */
+.grid-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.prod-card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);display:flex;flex-direction:column;transition:border-color .15s}
+.prod-card:hover{border-color:var(--steel)}
+.prod-card-top{padding:12px 16px;border-bottom:1px solid var(--border)}
+.prod-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.prod-icon-wrap{width:36px;height:36px;border-radius:6px;background:var(--paper);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.prod-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}
+.prod-maker{font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.compare-cb{width:22px;height:22px;border-radius:4px;border:1.5px solid var(--border);background:transparent;color:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .12s}
+.compare-cb.selected{background:var(--ink);border-color:var(--ink);color:#fff}
+.prod-desc{font-size:12px;color:var(--text2);line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod-card-body{padding:10px 16px;flex:1;position:relative}
+.spec-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.spec-table td{padding:4px 0;font-size:12px;border-bottom:1px solid var(--paper)}
+.spec-table td:first-child{color:var(--muted);width:50%}
+.spec-table td:last-child{font-weight:700;text-align:right;color:var(--ink)}
+.spec-blurred td:last-child{filter:blur(4px);user-select:none;color:var(--text2)}
+.bar-row{margin-bottom:6px}
+.bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
+.bar-track{height:4px;background:var(--paper);border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:2px}
+.cert-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.prod-card-footer{padding:8px 16px;background:var(--paper);border-top:1px solid var(--border);border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between}
+.price-tag{font-size:13px;font-weight:700;color:var(--sage)}
+.lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(245,244,240,.88);backdrop-filter:blur(2px);border-radius:0 0 10px 10px;z-index:5}
+.lock-overlay p{font-size:12px;color:var(--muted);text-align:center;max-width:180px;line-height:1.5;margin:0}
+
+/* PAGE HEADER */
+.page-header{background:var(--white);border-bottom:1px solid var(--border);padding:24px 24px 20px}
+.page-header-inner{max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.page-title{font-family:var(--serif);font-size:28px;color:var(--ink);font-weight:400;margin-bottom:6px}
+.page-title span{color:var(--rust);font-style:italic}
+.page-subtitle{font-size:13px;color:var(--muted)}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap}
+.kpi{background:var(--steel-soft);border:1px solid #B8CCDE;border-radius:6px;padding:8px 14px;display:flex;align-items:center;gap:10px}
+.kpi-n{font-family:var(--serif);font-size:24px;color:var(--steel);line-height:1}
+.kpi-l{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:600}
+
+/* COMPARE BANNER */
+.compare-banner{position:fixed;bottom:0;left:0;right:0;z-index:150;background:var(--ink);border-top:3px solid var(--rust);padding:10px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .25s}
+.compare-banner.visible{transform:translateY(0)}
+.compare-pill{padding:4px 10px;border-radius:3px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:12px;color:#fff;display:flex;align-items:center;gap:6px}
+.compare-pill button{background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;padding:0;line-height:1}
+.compare-pills{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.btn-compare{padding:8px 20px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-weight:700;font-size:13px;white-space:nowrap}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(28,43,58,.72);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:12px;max-width:700px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.22)}
+.modal-head{background:var(--ink);border-radius:12px 12px 0 0;padding:22px 26px}
+.modal-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.modal-logo{width:50px;height:50px;border-radius:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.modal-name{font-family:var(--serif);font-size:22px;color:#fff;font-weight:400}
+.modal-location{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.modal-close{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-size:13px;border-radius:4px;padding:5px 12px}
+.modal-body{padding:22px 26px}
+.modal-section{margin-bottom:18px}
+.modal-section-title{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-item{background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:10px 14px}
+.detail-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.detail-value{font-size:13px;font-weight:700;color:var(--ink)}
+.modal-tags{display:flex;flex-wrap:wrap;gap:5px}
+.modal-prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-prod-card{background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.modal-prod-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.modal-prod-specs{font-size:11px;color:var(--muted);line-height:1.6}
+.modal-prod-price{font-size:11px;font-weight:700;color:var(--sage);margin-top:4px}
+.modal-actions{border-top:1px solid var(--border);padding-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-visit{padding:10px 20px;border-radius:4px;background:var(--rust);color:#fff;font-weight:700;font-size:13px;border:none}
+.btn-contact-locked{padding:10px 20px;border-radius:4px;background:var(--paper);border:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.btn-see-products{padding:8px 16px;border-radius:4px;background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:12px;font-weight:700;margin-top:10px}
+
+/* COMPARE MODAL */
+.cmp-modal{position:absolute;inset:20px;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:auto;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.cmp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.cmp-head h2{font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:400;margin:0}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th,.cmp-table td{padding:8px 12px;border:1px solid var(--border);vertical-align:top}
+.cmp-table th{background:var(--ink);color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.cmp-table th.prod-col{background:var(--steel);text-align:center}
+.cmp-table td{text-align:center;font-weight:600}
+.cmp-table td.row-label{text-align:left;font-weight:400;color:var(--text2);background:var(--paper)}
+.cmp-section{background:var(--steel-soft)!important;color:var(--steel);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.cmp-best{color:var(--sage);font-weight:700}
+.cmp-worst{color:#C0392B}
+
+/* LANDING */
+.hero{background:var(--ink);padding:72px 24px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(212,80,10,.15) 0%,transparent 60%),radial-gradient(circle at 70% 30%,rgba(58,90,120,.22) 0%,transparent 60%);pointer-events:none}
+.hero-inner{position:relative;max-width:720px;margin:0 auto}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:20px}
+.hero h1{font-family:var(--serif);font-size:clamp(34px,6vw,60px);color:#fff;line-height:1.1;margin:0 0 22px;font-weight:400}
+.hero h1 em{color:var(--rust)}
+.hero p{font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;max-width:520px;margin:0 auto 34px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-hero-primary{padding:13px 28px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:15px;font-weight:700}
+.btn-hero-secondary{padding:13px 28px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;font-size:15px;font-weight:500}
+.stats-band{background:var(--white);border-bottom:1px solid var(--border)}
+.stats-band-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-cell{padding:24px;text-align:center;border-right:1px solid var(--border)}
+.stat-n{font-family:var(--serif);font-size:40px;color:var(--ink);line-height:1}
+.stat-l{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.section{padding:64px 24px}
+.section-inner{max-width:960px;margin:0 auto}
+.section-eyebrow{font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:10px}
+.section-title{font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:400;margin:0 0 36px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:24px}
+.step-num{font-family:var(--mono);font-size:11px;color:var(--rust);margin-bottom:10px;letter-spacing:.08em}
+.step-icon{font-size:26px;margin-bottom:10px}
+.step-title{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:400;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.value-section{background:var(--ink);padding:64px 24px}
+.value-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.value-list{display:flex;flex-direction:column;gap:14px}
+.value-item{display:flex;gap:12px;align-items:flex-start}
+.value-item-icon{font-size:18px;flex-shrink:0}
+.value-item-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.value-item-desc{font-size:12px;color:rgba(255,255,255,.55);line-height:1.6}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.testi-card{background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:22px}
+.testi-quote{font-size:13px;color:var(--text2);line-height:1.7;font-style:italic;margin:0 0 14px}
+.testi-name{font-size:12px;font-weight:700;color:var(--ink)}
+.testi-role{font-size:11px;color:var(--muted)}
+.cta-section{padding:56px 24px;background:var(--paper);text-align:center;border-top:1px solid var(--border)}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.btn-cta-primary{padding:13px 28px;border-radius:4px;background:var(--ink);border:none;color:#fff;font-size:14px;font-weight:700}
+.btn-cta-secondary{padding:13px 28px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--ink);font-size:14px;font-weight:600}
+
+/* PRICING */
+.pricing-header{background:var(--white);border-bottom:1px solid var(--border);padding:56px 24px 44px;text-align:center}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1020px;margin:0 auto;padding:44px 24px}
+.plan-card{background:var(--white);border:2px solid var(--border);border-radius:10px;padding:26px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.plan-card.highlight{border-color:var(--rust);box-shadow:0 8px 32px rgba(212,80,10,.15)}
+.plan-popular{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--rust);color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:0 0 6px 6px;letter-spacing:.06em}
+.plan-name{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.plan-price{font-family:var(--serif);font-size:36px;color:var(--ink);line-height:1;margin-bottom:4px}
+.plan-card.highlight .plan-price{color:var(--rust)}
+.plan-period{font-size:12px;color:var(--muted);margin-bottom:14px}
+.plan-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;min-height:38px}
+.plan-cta{width:100%;padding:10px;border-radius:4px;border:none;font-size:13px;font-weight:700;margin-bottom:20px}
+.plan-cta.primary{background:var(--rust);color:#fff}
+.plan-cta.secondary{background:var(--ink);color:#fff}
+.plan-divider{height:1px;background:var(--border);margin-bottom:18px}
+.plan-features{display:flex;flex-direction:column;gap:9px}
+.plan-feature{display:flex;gap:9px;align-items:flex-start;font-size:12px}
+.plan-feature.ok{color:var(--text2)}
+.plan-feature.no{color:var(--muted)}
+.plan-feature-icon{flex-shrink:0;font-weight:700;font-size:13px;line-height:1.5}
+.plan-feature.ok .plan-feature-icon{color:var(--sage)}
+.plan-feature.no .plan-feature-icon{color:#ccc}
+.enterprise-band{max-width:1020px;margin:0 auto 44px;padding:0 24px}
+.enterprise-card{background:var(--ink);border-radius:10px;padding:26px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.faq-section{max-width:720px;margin:0 auto;padding:0 24px 56px}
+.faq-item{border-top:1px solid var(--border);padding:16px 0}
+.faq-q{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* PRO UPSELL SIDEBAR */
+.pro-upsell{margin-top:18px;padding:12px;background:var(--gold-soft);border:1px solid #E8C96A;border-radius:6px}
+.pro-upsell-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.pro-upsell p{font-size:11px;color:var(--text2);line-height:1.6;margin:0 0 8px}
+.btn-upsell{width:100%;padding:7px;border-radius:4px;background:var(--gold);border:none;color:#fff;font-size:11px;font-weight:700}
+
+@media(max-width:900px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .steps-grid,.testimonials-grid,.plans-grid,.value-inner{grid-template-columns:1fr}
+  .stats-band-inner{grid-template-columns:1fr 1fr}
+  .detail-grid,.modal-prod-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-label">// NOUVEAU</span>
+  <div class="ticker-track">
+    <span class="ticker-inner" id="tickerText"></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="main">
+  <button class="logo" onclick="showPage('home')">
+    <div class="logo-mark">B</div>
+    <span class="logo-name">Buy<span>-ineer</span></span>
+  </button>
+  <div class="nav-links">
+    <button class="nav-link active" data-page="home" onclick="showPage('home')">Accueil</button>
+    <button class="nav-link" data-page="annuaire" onclick="showPage('annuaire')">Annuaire</button>
+    <button class="nav-link" data-page="catalogue" onclick="showPage('catalogue')">Produits & Specs</button>
+    <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Tarifs</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn-pro-toggle" id="proToggle" onclick="togglePro()">⚡ Tester mode Pro</button>
+    <button class="btn-signup" onclick="showPage('pricing')">S'inscrire</button>
+  </div>
+</nav>
+
+<!-- ══════════ PAGE HOME ══════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <span class="hero-eyebrow">// Référentiel équipementiers industriels</span>
+      <h1>Sourcez les bons<br/><em>équipements industriels</em><br/>en minutes, pas en semaines.</h1>
+      <p>Batteries, OBC, PDU, vannes, actionneurs — fiches techniques détaillées, comparatifs côte-à-côte, contacts vérifiés. La base de référence pour ingénieurs et acheteurs industriels.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="showPage('annuaire')">Explorer l'annuaire →</button>
+        <button class="btn-hero-secondary" onclick="showPage('pricing')">Voir les offres</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band">
+    <div class="stats-band-inner">
+      <div class="stat-cell"><div class="stat-n" id="stat-c">34</div><div class="stat-l">Fabricants référencés</div></div>
+      <div class="stat-cell"><div class="stat-n" id="stat-p">20</div><div class="stat-l">Fiches produits</div></div>
+      <div class="stat-cell"><div class="stat-n">8</div><div class="stat-l">Catégories produits</div></div>
+      <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">Industries couvertes</div></div>
+    </div>
+  </div>
+
+  <section class="section" style="background:var(--paper)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Comment ça marche</span>
+      <h2 class="section-title">De la recherche au contact<br/>en trois étapes.</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num">01</div><div class="step-icon">🔍</div><h3 class="step-title">Recherchez</h3><p class="step-desc">Filtrez par industrie, catégorie ou fabricant. Accès à l'annuaire complet gratuitement.</p></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-icon">📊</div><h3 class="step-title">Comparez</h3><p class="step-desc">Sélectionnez jusqu'à 4 produits et comparez leurs specs techniques côte-à-côte.</p></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-icon">📩</div><h3 class="step-title">Contactez</h3><p class="step-desc">Les membres Pro accèdent aux coordonnées directes des fabricants vérifiés.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="value-section">
+    <div class="value-inner">
+      <div>
+        <span class="section-eyebrow">// Pour les fournisseurs</span>
+        <h2 style="font-family:var(--serif);font-size:34px;color:#fff;font-weight:400;margin:0 0 18px">Votre produit, visible<br/><em style="color:var(--rust)">par les bons décideurs.</em></h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.75;margin:0 0 26px">Accédez à des milliers d'ingénieurs et d'acheteurs industriels qui cherchent activement vos équipements. Un profil Premium, c'est votre fiche lisible, vos certifications mises en valeur, et des leads qualifiés.</p>
+        <button class="btn-hero-primary" onclick="showPage('pricing')">Référencer mon entreprise →</button>
+      </div>
+      <div class="value-list">
+        <div class="value-item"><span class="value-item-icon">📈</span><div><div class="value-item-title">Visibilité ciblée</div><div class="value-item-desc">Profil prioritaire dans les résultats de recherche pertinents.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">✅</span><div><div class="value-item-title">Badge Vérifié Premium</div><div class="value-item-desc">Certifications et datasheets mis en avant, signal de confiance.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📊</span><div><div class="value-item-title">Statistiques d'audience</div><div class="value-item-desc">Vues, clics et demandes de contact par mois.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📩</span><div><div class="value-item-title">Leads qualifiés</div><div class="value-item-desc">Recevez directement les demandes d'ingénieurs et d'acheteurs.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--white)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Ils utilisent Buy-ineer</span>
+      <h2 class="section-title">Ce que disent nos membres.</h2>
+      <div class="testimonials-grid">
+        <div class="testi-card"><p class="testi-quote">"Buy-ineer nous a économisé 3 semaines de sourcing sur notre projet d'OBC embarqué."</p><div class="testi-name">Thomas M.</div><div class="testi-role">Ingénieur systèmes, PME aéro</div></div>
+        <div class="testi-card"><p class="testi-quote">"Le comparatif de batteries lithium est exactement ce dont nos acheteurs avaient besoin."</p><div class="testi-name">Claire D.</div><div class="testi-role">Responsable achats, Tier 1 auto</div></div>
+        <div class="testi-card"><p class="testi-quote">"Enfin un outil qui parle la langue des ingénieurs et pas des commerciaux."</p><div class="testi-name">Romain V.</div><div class="testi-role">CTO, start-up mobilité</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <span class="section-eyebrow">// Commencer</span>
+    <h2 style="font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:400;margin:0 0 12px">Prêt à trouver vos équipements ?</h2>
+    <p style="font-size:14px;color:var(--muted)">Accès gratuit à l'annuaire. Specs complètes et contacts à partir du plan Pro.</p>
+    <div class="cta-btns">
+      <button class="btn-cta-primary" onclick="showPage('annuaire')">Explorer gratuitement</button>
+      <button class="btn-cta-secondary" onclick="showPage('pricing')">Voir le pricing</button>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════ PAGE ANNUAIRE ══════════ -->
+<div id="page-annuaire" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Annuaire des <span>fabricants</span> industriels</h1>
+        <p class="page-subtitle">Sourcez et évaluez les équipementiers mondiaux — batteries, PDU, OBC, vannes, actionneurs.</p>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div><div class="kpi-n" id="kpi-c">34</div><div class="kpi-l">Entreprises</div></div></div>
+        <div class="kpi"><div><div class="kpi-n" id="kpi-p">20</div><div class="kpi-l">Produits</div></div></div>
+        <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Industries</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="ann-industry-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie produit</div>
+        <div class="chip-group" id="ann-cat-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
+    </aside>
+    <main class="content">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
+        <span style="font-size:11px;color:var(--muted);font-style:italic">Profils Premium en premier</span>
+      </div>
+      <div class="grid-companies" id="companies-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE CATALOGUE ══════════ -->
+<div id="page-catalogue" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
+        <p class="page-subtitle">Fiches techniques détaillées — cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie</div>
+        <div class="chip-group" id="cat-cat-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="cat-ind-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetCatalogue()">↺ Réinitialiser</button>
+      <div class="pro-upsell" id="pro-upsell-sidebar" style="display:none">
+        <div class="pro-upsell-title">★ Passez Pro</div>
+        <p>Débloquez les specs complètes, contacts fabricants et export Excel.</p>
+        <button class="btn-upsell" onclick="showPage('pricing')">Voir les offres →</button>
+      </div>
+    </aside>
+    <main class="content" id="catalogue-main">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
+        <span id="pro-specs-badge" style="font-size:11px;color:var(--gold);background:var(--gold-soft);border:1px solid #E8C96A;border-radius:3px;padding:3px 8px;display:none">★ Specs complètes avec Pro</span>
+      </div>
+      <div class="grid-products" id="products-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE PRICING ══════════ -->
+<div id="page-pricing" class="page">
+  <div class="pricing-header">
+    <span class="section-eyebrow" style="margin-bottom:10px">// TARIFS</span>
+    <h1 style="font-family:var(--serif);font-size:40px;color:var(--ink);font-weight:400;margin:0 0 14px">Un accès adapté à <em style="color:var(--rust)">chaque usage.</em></h1>
+    <p style="font-size:15px;color:var(--muted);max-width:520px;margin:0 auto">Accès gratuit pour explorer. Specs complètes et contacts avec Pro. Leads qualifiés avec Premium Fournisseur.</p>
+  </div>
+  <div class="plans-grid" id="plans-grid"></div>
+  <div class="enterprise-band">
+    <div class="enterprise-card">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.10em;text-transform:uppercase;margin-bottom:6px">// ENTREPRISE</div>
+        <h3 style="font-family:var(--serif);font-size:22px;color:#fff;font-weight:400;margin:0 0 6px">Besoin d'un accès pour toute votre équipe ?</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);margin:0">Licences multi-utilisateurs, SSO, API, intégration ERP. Tarif sur mesure.</p>
+      </div>
+      <button class="btn-hero-primary" style="white-space:nowrap">Nous contacter →</button>
+    </div>
+  </div>
+  <section class="faq-section">
+    <span class="section-eyebrow">// FAQ</span>
+    <h2 style="font-family:var(--serif);font-size:28px;color:var(--ink);font-weight:400;margin:0 0 24px">Questions fréquentes.</h2>
+    <div id="faq-list"></div>
+  </section>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="company-overlay">
+  <div class="modal" id="company-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="modal-logo" id="m-logo"></div>
+          <div>
+            <div class="modal-name" id="m-name"></div>
+            <div class="modal-location" id="m-location"></div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('company-overlay')">✕</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap" id="m-badges"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Description</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0" id="m-desc"></p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Informations société</div>
+        <div class="detail-grid" id="m-details"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Gammes & Technologies</div>
+        <div class="modal-tags" id="m-tags"></div>
+      </div>
+      <div class="modal-section" id="m-prods-section">
+        <div class="modal-section-title">Produits référencés sur Buy-ineer</div>
+        <div class="modal-prod-grid" id="m-prods"></div>
+        <button class="btn-see-products" id="m-see-products-btn">🔧 Voir tous leurs produits →</button>
+      </div>
+      <div class="modal-actions">
+        <a class="btn-visit" id="m-site" href="#" target="_blank" rel="noopener">↗ Visiter le site officiel</a>
+        <div id="m-contact-wrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="compare-overlay">
+  <div class="cmp-modal">
+    <div class="cmp-head">
+      <h2>Comparaison technique</h2>
+      <button style="background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;border-radius:4px;padding:5px 12px" onclick="closeModal('compare-overlay')">✕ Fermer</button>
+    </div>
+    <div id="compare-lock-banner" style="display:none;background:var(--gold-soft);border:1px solid #E8C96A;border-radius:6px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:18px">🔒</span>
+      <div><div style="font-size:13px;font-weight:700;color:var(--gold)">Comparaison complète avec Pro</div><div style="font-size:12px;color:var(--text2)">Certaines specs sont masquées en mode gratuit.</div></div>
+      <button onclick="closeModal('compare-overlay');showPage('pricing')" style="margin-left:auto;padding:7px 14px;border-radius:4px;background:var(--gold);border:none;color:#fff;font-size:11px;font-weight:700;white-space:nowrap">Voir les offres</button>
+    </div>
+    <div style="overflow-x:auto" id="compare-table-wrap"></div>
+  </div>
+</div>
+
+<!-- COMPARE BANNER -->
+<div class="compare-banner" id="compare-banner">
+  <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5)" id="compare-count">0/4</span>
+  <div class="compare-pills" id="compare-pills"></div>
+  <button class="btn-compare" onclick="openCompareModal()">Comparer →</button>
+</div>
+
+<script>
+const INDUSTRIES = ["Automobile & Mobilité électrique","Aéronautique & Défense","Énergie & Utilities","Industrie & Manufacturing","Marine & Offshore","Ferroviaire","Spatial"];
+const PROD_CATS  = ["Batteries & Stockage","PDU (Power Distribution)","OBC (On-Board Charger)","Vannes & Actionneurs","Convertisseurs & Onduleurs","Câblage & Connecteurs","Capteurs & Instrumentation","Moteurs & Entraînements"];
+
+const COMPANIES = [
+  {name:"CATL",country:"🇨🇳 Chine",hq:"Ningde",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["LiFePO4","NMC","Pack 800V","BMS"],desc:"Leader mondial des batteries lithium (~38% de part de marché). Fournisseur de BMW, Tesla, Volkswagen, Hyundai.",site:"https://www.catl.com",logo:"⚡",verified:true,premium:true,employees:"100 000+",founded:"2011",contact:"contact@catl.com"},
+  {name:"Samsung SDI",country:"🇰🇷 Corée du Sud",hq:"Yongin",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["NMC","PRiMX","ESS"],desc:"Cellules prismatiques et cylindriques pour VE et ESS. Fournisseur BMW, Volkswagen, Stellantis.",site:"https://www.samsungsdi.com",logo:"🔷",verified:true,premium:false,employees:"30 000+",founded:"1970",contact:""},
+  {name:"LG Energy Solution",country:"🇰🇷 Corée du Sud",hq:"Séoul",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["NMC","Cylindrique 2170","Pouch"],desc:"Fournisseur de GM, Hyundai, Stellantis, Tesla. Gigafactories en Pologne et USA.",site:"https://www.lgenergysolution.com",logo:"🟩",verified:true,premium:false,employees:"20 000+",founded:"2020",contact:""},
+  {name:"Saft (TotalEnergies)",country:"🇫🇷 France",hq:"Levallois-Perret",industry:"Aéronautique & Défense",products:["Batteries & Stockage"],tags:["Li-ion","Spatial","Défense","DO-311A"],desc:"Référence mondiale des batteries haute-fiabilité pour spatial, défense et aviation. Fondée en 1918.",site:"https://www.saftbatteries.com",logo:"🇫🇷",verified:true,premium:true,employees:"4 000+",founded:"1918",contact:"info@saftbatteries.com"},
+  {name:"Forsee Power",country:"🇫🇷 France",hq:"Chasseneuil-du-Poitou",industry:"Ferroviaire",products:["Batteries & Stockage"],tags:["NMC","Bus","Train","Camion"],desc:"Intégrateur français de batteries lithium pour mobilité lourde. Leader européen sur son segment.",site:"https://www.forseepower.com",logo:"🚌",verified:true,premium:true,employees:"350+",founded:"2011",contact:"contact@forseepower.com"},
+  {name:"Blue Solutions",country:"🇫🇷 France",hq:"Ergué-Gabéric",industry:"Énergie & Utilities",products:["Batteries & Stockage"],tags:["Tout-solide","LMP","Bus"],desc:"Seule entreprise au monde à produire des batteries tout-solide en série. Technologie LMP brevetée.",site:"https://www.blue-solutions.com",logo:"🔵",verified:true,premium:false,employees:"500+",founded:"2011",contact:""},
+  {name:"Verkor",country:"🇫🇷 France",hq:"Grenoble / Dunkerque",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["NMC","Bas-carbone","Gigafactory"],desc:"Batteries bas-carbone pour VE premium. Soutenu par Renault. Gigafactory Dunkerque 2025.",site:"https://www.verkor.com",logo:"🟢",verified:true,premium:false,employees:"500+",founded:"2020",contact:""},
+  {name:"TYVA Energie",country:"🇫🇷 France",hq:"Annonay (Ardèche)",industry:"Industrie & Manufacturing",products:["Batteries & Stockage"],tags:["Moduloo 3D","TYVA Refill","245 Wh/kg","Made in France"],desc:"Batteries lithium modulaires sans soudure. Technologie TYVA Refill : cellules remplaçables. 245 Wh/kg.",site:"https://tyva-energie.com",logo:"🔋",verified:true,premium:true,employees:"50+",founded:"2013",contact:"hello@tyva-energie.com"},
+  {name:"Batconnect",country:"🇫🇷 France",hq:"Cugnaux (31)",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["IoT","LiFePO4","Fleet","GPS"],desc:"Batteries lithium connectées IoT : monitoring temps réel, GPS, maintenance prédictive IA. Made in France.",site:"https://batconnect.fr",logo:"📶",verified:true,premium:true,employees:"~15",founded:"2019",contact:"bonjour@batconnect.fr"},
+  {name:"Corvus Energy",country:"🇨🇦 Canada",hq:"Bergen / Richmond BC",industry:"Marine & Offshore",products:["Batteries & Stockage"],tags:["ESS marine","NMC","DNV GL","ABS"],desc:"Spécialiste ESS pour la marine. Packs pour ferries hybrides et navires offshore. Certifié DNV GL et ABS.",site:"https://www.corvusenergy.com",logo:"⚓",verified:true,premium:false,employees:"300+",founded:"2009",contact:""},
+  {name:"Eaton",country:"🇮🇪 Irlande",hq:"Dublin",industry:"Énergie & Utilities",products:["PDU (Power Distribution)","Convertisseurs & Onduleurs"],tags:["PDU rack","UPS","Switchgear"],desc:"Leader mondial de la gestion de puissance : PDU intelligents, UPS, disjoncteurs pour datacenter.",site:"https://www.eaton.com",logo:"🔌",verified:true,premium:true,employees:"85 000+",founded:"1911",contact:"eaton@eaton.com"},
+  {name:"Schneider Electric",country:"🇫🇷 France",hq:"Rueil-Malmaison",industry:"Énergie & Utilities",products:["PDU (Power Distribution)","Convertisseurs & Onduleurs"],tags:["APC","Galaxy UPS","EcoStruxure"],desc:"N°1 mondial de la gestion de l'énergie. PDU APC, UPS Galaxy. CA ~37 Md€.",site:"https://www.se.com",logo:"🟩",verified:true,premium:false,employees:"140 000+",founded:"1836",contact:""},
+  {name:"Safran Electrical & Power",country:"🇫🇷 France",hq:"Blagnac",industry:"Aéronautique & Défense",products:["PDU (Power Distribution)","Câblage & Connecteurs"],tags:["SSPC 270V","Avionique","DO-160G"],desc:"PDU SSPC avioniques sur bus 270V DC pour More Electric Aircraft. Certifié DO-160G.",site:"https://www.safran-group.com",logo:"🛩️",verified:true,premium:true,employees:"12 000+",founded:"2005",contact:"safran@safran-group.com"},
+  {name:"Delta Electronics",country:"🇹🇼 Taïwan",hq:"Taipei",industry:"Automobile & Mobilité électrique",products:["OBC (On-Board Charger)","Convertisseurs & Onduleurs"],tags:["OBC 22kW","V2G","ISO 15118"],desc:"OBC bidirectionnels jusqu'à 22 kW pour VE lourds. V2G supporté. Rendement >94%. IP67.",site:"https://www.deltaww.com",logo:"△",verified:true,premium:true,employees:"88 000+",founded:"1971",contact:"delta@deltaww.com"},
+  {name:"Victron Energy",country:"🇳🇱 Pays-Bas",hq:"Almere",industry:"Énergie & Utilities",products:["OBC (On-Board Charger)","Convertisseurs & Onduleurs"],tags:["MultiPlus","MPPT","Off-grid"],desc:"Onduleurs-chargeurs MultiPlus, MPPT, ESS. Référence du off-grid, marine et camping-car.",site:"https://www.victronenergy.com",logo:"☀️",verified:true,premium:false,employees:"1 000+",founded:"1975",contact:""},
+  {name:"Brusa Elektronik",country:"🇨🇭 Suisse",hq:"Sennwald",industry:"Automobile & Mobilité électrique",products:["OBC (On-Board Charger)"],tags:["NLG7","OBC 43kW","Haute puissance"],desc:"Pionnier des chargeurs embarqués haute puissance. Gamme NLG jusqu'à 43 kW pour constructeurs premium.",site:"https://www.brusa.biz",logo:"🔌",verified:true,premium:false,employees:"300+",founded:"1980",contact:""},
+  {name:"Moog",country:"🇺🇸 États-Unis",hq:"East Aurora, NY",industry:"Aéronautique & Défense",products:["Vannes & Actionneurs","Moteurs & Entraînements"],tags:["Servovalvules","EMA","Commandes de vol"],desc:"Actionneurs et vannes de précision pour commandes de vol, défense et simulation haute dynamique.",site:"https://www.moog.com",logo:"✈️",verified:true,premium:true,employees:"13 000+",founded:"1951",contact:"moog@moog.com"},
+  {name:"Parker Hannifin",country:"🇺🇸 États-Unis",hq:"Cleveland, OH",industry:"Industrie & Manufacturing",products:["Vannes & Actionneurs"],tags:["Hydraulique","Pneumatique","CETOP 5"],desc:"Leader mondial des technologies de mouvement : vannes proportionnelles, vérins, hydraulique.",site:"https://www.parker.com",logo:"⚙️",verified:true,premium:false,employees:"55 000+",founded:"1917",contact:""},
+  {name:"Rotork",country:"🇬🇧 Royaume-Uni",hq:"Bath",industry:"Énergie & Utilities",products:["Vannes & Actionneurs"],tags:["Actionneurs électriques","IP68","ATEX"],desc:"Actionneurs électriques, pneumatiques et hydrauliques pour oil & gas, eau et chimie.",site:"https://www.rotork.com",logo:"🔧",verified:true,premium:false,employees:"4 000+",founded:"1957",contact:""},
+  {name:"Bürkert",country:"🇩🇪 Allemagne",hq:"Ingelfingen",industry:"Industrie & Manufacturing",products:["Vannes & Actionneurs","Capteurs & Instrumentation"],tags:["Électrovannes","Microfluidique","Pharma"],desc:"Électrovannes, régulateurs et capteurs de débit. Leader en microfluidique et applications pharma.",site:"https://www.burkert.com",logo:"🔵",verified:true,premium:false,employees:"2 800+",founded:"1946",contact:""},
+  {name:"ABB",country:"🇨🇭 Suisse",hq:"Zurich",industry:"Industrie & Manufacturing",products:["Moteurs & Entraînements","Convertisseurs & Onduleurs"],tags:["ACS880","HVDC","IE4","Robotique"],desc:"Référence mondiale en automatisation et entraînements. Variateurs ACS, moteurs HXR. CA ~32 Md$.",site:"https://www.abb.com",logo:"🔩",verified:true,premium:true,employees:"105 000+",founded:"1988",contact:"abb@abb.com"},
+  {name:"Siemens",country:"🇩🇪 Allemagne",hq:"Munich",industry:"Industrie & Manufacturing",products:["Moteurs & Entraînements","Convertisseurs & Onduleurs"],tags:["SINAMICS","SIMOTICS","SIMATIC"],desc:"Variateurs SINAMICS, moteurs SIMOTICS, automates SIMATIC. Référence mondiale en automatisation.",site:"https://www.siemens.com",logo:"🔵",verified:true,premium:false,employees:"320 000+",founded:"1847",contact:""},
+  {name:"Nidec",country:"🇯🇵 Japon",hq:"Kyoto",industry:"Automobile & Mobilité électrique",products:["Moteurs & Entraînements"],tags:["eAxle","PMSM","Traction EV"],desc:"N°1 mondial des moteurs électriques. eAxle intégré pour VE jusqu'à 200 kW.",site:"https://www.nidec.com",logo:"🔄",verified:true,premium:false,employees:"110 000+",founded:"1973",contact:""},
+  {name:"Alstom",country:"🇫🇷 France",hq:"Saint-Ouen",industry:"Ferroviaire",products:["Batteries & Stockage","Convertisseurs & Onduleurs","Moteurs & Entraînements"],tags:["BESS","Traction","Coradia iLint"],desc:"Leader de la mobilité ferroviaire. Propulsion, traction, stockage embarqué BESS pour trains et trams.",site:"https://www.alstom.com",logo:"🚄",verified:true,premium:false,employees:"75 000+",founded:"1928",contact:""},
+  {name:"Danfoss",country:"🇩🇰 Danemark",hq:"Nordborg",industry:"Énergie & Utilities",products:["Convertisseurs & Onduleurs","Vannes & Actionneurs"],tags:["VLT","VACON","Pompes chaleur"],desc:"Variateurs VLT/VACON, hydraulique mobile et pompes à chaleur. Gestion de l'énergie industrielle.",site:"https://www.danfoss.com",logo:"🌡️",verified:true,premium:false,employees:"42 000+",founded:"1933",contact:""},
+  {name:"TE Connectivity",country:"🇨🇭 Suisse",hq:"Schaffhausen",industry:"Automobile & Mobilité électrique",products:["Câblage & Connecteurs","Capteurs & Instrumentation"],tags:["HVA280","IP67","HVIL","LV214"],desc:"Connecteurs haute tension et capteurs pour VE et aérospatial. Références HVA280, MQS.",site:"https://www.te.com",logo:"🔗",verified:true,premium:false,employees:"90 000+",founded:"1941",contact:""},
+  {name:"Sensata Technologies",country:"🇳🇱 Pays-Bas",hq:"Attleboro, MA",industry:"Automobile & Mobilité électrique",products:["Capteurs & Instrumentation"],tags:["Courant HV","ASIL-B","ISO 26262"],desc:"Capteurs courant, relais HV et pression pour VE. Certifié ISO 26262 ASIL-B.",site:"https://www.sensata.com",logo:"📡",verified:true,premium:false,employees:"20 000+",founded:"1916",contact:""},
+  {name:"Amphenol",country:"🇺🇸 États-Unis",hq:"Wallingford, CT",industry:"Aéronautique & Défense",products:["Câblage & Connecteurs"],tags:["MIL-DTL-38999","RF","Fibres optiques"],desc:"Leader mondial des connecteurs. MIL-DTL-38999, RF, fibre optique pour défense et aérospatial.",site:"https://www.amphenol.com",logo:"🔌",verified:true,premium:false,employees:"95 000+",founded:"1932",contact:""},
+  {name:"Infineon Technologies",country:"🇩🇪 Allemagne",hq:"Munich",industry:"Automobile & Mobilité électrique",products:["Convertisseurs & Onduleurs"],tags:["SiC MOSFET","IGBT","GaN","1200V"],desc:"Semi-conducteurs de puissance SiC, IGBT, GaN pour OBC et onduleurs de traction.",site:"https://www.infineon.com",logo:"🔬",verified:true,premium:false,employees:"58 000+",founded:"1999",contact:""},
+  {name:"Emerson (Fisher)",country:"🇺🇸 États-Unis",hq:"St. Louis, MO",industry:"Énergie & Utilities",products:["Vannes & Actionneurs"],tags:["Fisher","FIELDVUE","Anti-cavitation"],desc:"Marque Fisher : vannes de contrôle procédé. Positionneurs FIELDVUE numériques. Oil & gas, chimie.",site:"https://www.emerson.com",logo:"🌐",verified:true,premium:false,employees:"88 000+",founded:"1890",contact:""},
+  {name:"Neogy",country:"🇫🇷 France",hq:"Pompignac (33)",industry:"Automobile & Mobilité électrique",products:["Batteries & Stockage"],tags:["NMC","LFP","Na-ion","500 MWh/an"],desc:"Packs batterie sur-mesure B2B. Usine 3 000 m² à Pompignac, 500 MWh/an. Multi-chimie.",site:"https://www.neogy.fr",logo:"⚙️",verified:true,premium:false,employees:"100+",founded:"2015",contact:""},
+  {name:"Lemo",country:"🇨🇭 Suisse",hq:"Écublens",industry:"Aéronautique & Défense",products:["Câblage & Connecteurs"],tags:["Push-pull","IP68","Médical","Broadcast"],desc:"Connecteurs push-pull de précision. Référence médical, broadcast, militaire. Made in Switzerland.",site:"https://www.lemo.com",logo:"🇨🇭",verified:true,premium:false,employees:"2 000+",founded:"1946",contact:""},
+  {name:"Flowserve",country:"🇺🇸 États-Unis",hq:"Irving, TX",industry:"Énergie & Utilities",products:["Vannes & Actionneurs"],tags:["API 6D","Billes","Papillon","Pompes"],desc:"Pompes, vannes et actionneurs industriels dans plus de 50 pays. Certifié API 6D.",site:"https://www.flowserve.com",logo:"💧",verified:true,premium:false,employees:"16 000+",founded:"1997",contact:""},
+  {name:"Airbus Defence & Space",country:"🇫🇷 France / 🇩🇪 Allemagne",hq:"Toulouse / Ottobrunn",industry:"Spatial",products:["Batteries & Stockage","PDU (Power Distribution)"],tags:["COSMO-BATT","ASTRO-BATT","STELLAR-BATT","ESA","GEO/LEO","Ariane 6"],desc:"Division spatiale d'Airbus. Batteries de bord pour satellites GEO/LEO/MEO : COSMO-BATT, ASTRO-BATT et STELLAR-BATT. Plus de 100 modules en vol. Maître d'œuvre du Module de Service Européen (Artemis).",site:"https://www.airbus.com/en/products-services/space",logo:"🛰️",verified:true,premium:true,employees:"35 000+",founded:"2014",contact:"space@airbus.com"},
+  {name:"GS Yuasa Technology (Space)",country:"🇯🇵 Japon",hq:"Kyoto",industry:"Spatial",products:["Batteries & Stockage"],tags:["LSE112","LSE134","Li-ion spatial","NASA","JAXA","200+ satellites"],desc:"Leader mondial des cellules Li-ion pour l'espace. Gamme LSE (4 générations depuis 1998). Plus de 200 satellites alimentés, 550 millions d'heures sans anomalie. Fournisseur NASA, JAXA, ESA.",site:"https://gsyuasa-lp.com/satellites-and-rockets/",logo:"🇯🇵",verified:true,premium:false,employees:"18 000+",founded:"1917",contact:""},
+  {name:"EaglePicher Technologies",country:"🇺🇸 États-Unis",hq:"Joplin, Missouri",industry:"Spatial",products:["Batteries & Stockage","PDU (Power Distribution)"],tags:["Batteries satellite","BMS spatial","JPSS","MEV","GEOStar","NASA"],desc:"Fournisseur historique de batteries pour l'espace et la défense américaine. 100+ ans d'expérience. Programmes NASA JPSS-2, ICESat-2, MEV.",site:"https://www.eaglepicher.com",logo:"🦅",verified:true,premium:false,employees:"700+",founded:"1843",contact:""},
+  {name:"Bradford ECAPS",country:"🇸🇪 Suède",hq:"Solna, Stockholm",industry:"Spatial",products:["Vannes & Actionneurs"],tags:["HPGP","LMP-103S","Propulsion verte","1N","5N","22N","ADN","Smallsat"],desc:"Pionnier de la propulsion spatiale verte (HPGP). Propergol LMP-103S à base d'ADN non toxique. Vols qualifiés sur PRISMA (ESA), SkySat. Fournisseur NASA, ESA, opérateurs commerciaux.",site:"https://www.ecaps.se",logo:"🚀",verified:true,premium:false,employees:"50+",founded:"2000",contact:""},
+  {name:"Moog Space & Defense",country:"🇺🇸 États-Unis",hq:"East Aurora, NY",industry:"Spatial",products:["Vannes & Actionneurs","PDU (Power Distribution)"],tags:["Vannes propulsion spatiale","Actionneurs satellite","Launch vehicle","SLS","ISS"],desc:"Division spatiale de Moog. Vannes de propulsion, actionneurs de déploiement et systèmes de contrôle pour lanceurs et satellites. Présent sur ISS, SLS et nombreux satellites commerciaux.",site:"https://www.moog.com/markets/space.html",logo:"🛸",verified:true,premium:false,employees:"13 000+",founded:"1951",contact:""},
+];
+
+const PRODUCTS = [
+  {id:"p1",name:"LiFePO4 Pack 280Ah",maker:"CATL",cat:"Batteries & Stockage",industry:"Automobile & Mobilité électrique",icon:"⚡",desc:"Cellule prismatique LiFePO4 haute durée de vie. Standard ESS et véhicules commerciaux.",specs:[{l:"Chimie",v:"LiFePO4"},{l:"Capacité",v:"280 Ah"},{l:"Tension (16S)",v:"51,2 V"},{l:"Énergie pack",v:"~14,3 kWh"},{l:"Cycle de vie",v:"> 4 000 cycles"},{l:"Température",v:"-20 à +60 °C"},{l:"IP",v:"IP67"}],bars:[{l:"Densité énergie",v:78,c:"#3A5A78"},{l:"Durée de vie",v:95,c:"#2D6A4F"},{l:"Puissance spécifique",v:55,c:"#D4500A"}],certs:["CE","UN38.3","IEC 62619","UL 1973"],price:"~480 € / kWh"},
+  {id:"p2",name:"NMC Qilin 100Ah — 4C",maker:"CATL",cat:"Batteries & Stockage",industry:"Automobile & Mobilité électrique",icon:"⚡",desc:"Cellule NMC génération Qilin pour recharge ultra-rapide 4C. Cell-to-pack, immersion liquide.",specs:[{l:"Chimie",v:"NMC"},{l:"Capacité",v:"100 Ah"},{l:"Charge max",v:"4C (400 A)"},{l:"Énergie spécifique",v:"255 Wh/kg"},{l:"Température",v:"-30 à +55 °C"},{l:"Refroidissement",v:"Immersion liquide"}],bars:[{l:"Densité énergie",v:95,c:"#3A5A78"},{l:"Durée de vie",v:65,c:"#2D6A4F"},{l:"Puissance spécifique",v:92,c:"#D4500A"}],certs:["CE","UN38.3"],price:"~620 € / kWh"},
+  {id:"p3",name:"VL 45E — Li-ion Aviation",maker:"Saft (TotalEnergies)",cat:"Batteries & Stockage",industry:"Aéronautique & Défense",icon:"🇫🇷",desc:"Cellule Li-ion certifiée DO-311A pour aéronautique et défense. -55°C à +70°C.",specs:[{l:"Chimie",v:"NMC"},{l:"Capacité",v:"45 Ah"},{l:"Énergie spécifique",v:"~175 Wh/kg"},{l:"Température",v:"-55 à +70 °C"},{l:"Certif. aéro",v:"DO-311A"},{l:"Poids",v:"~1,1 kg"}],bars:[{l:"Fiabilité",v:99,c:"#2D6A4F"},{l:"Plage température",v:97,c:"#D4500A"},{l:"Densité énergie",v:68,c:"#3A5A78"}],certs:["DO-311A","MIL-PRF-32565","CE"],price:"Sur devis"},
+  {id:"p4",name:"ZEN Pack Bus 672V",maker:"Forsee Power",cat:"Batteries & Stockage",industry:"Ferroviaire",icon:"🚌",desc:"Pack 672V NMC haute densité pour bus électriques urbains. BMS propriétaire, liquide actif.",specs:[{l:"Tension pack",v:"672 V DC"},{l:"Énergie",v:"~150 kWh"},{l:"Puissance crête",v:"300 kW"},{l:"Cycle de vie",v:"> 3 000 cycles"},{l:"Refroidissement",v:"Liquide actif"}],bars:[{l:"Densité énergie",v:82,c:"#3A5A78"},{l:"Durée de vie",v:80,c:"#2D6A4F"},{l:"Puissance crête",v:75,c:"#D4500A"}],certs:["ECE R100","CE"],price:"Sur devis"},
+  {id:"p5",name:"Moduloo Ax — 48V 30Ah",maker:"TYVA Energie",cat:"Batteries & Stockage",industry:"Industrie & Manufacturing",icon:"🔋",desc:"Batterie NMC 48V format A4+, jusqu'à 245 Wh/kg. Sans soudure. Made in France.",specs:[{l:"Chimie",v:"NMC"},{l:"Tension",v:"51,8 V (14S)"},{l:"Capacité",v:"30 Ah"},{l:"Énergie",v:"~1 554 Wh"},{l:"Densité énergie",v:"245 Wh/kg"},{l:"Origine",v:"Made in France"}],bars:[{l:"Densité énergie",v:95,c:"#3A5A78"},{l:"Compacité",v:90,c:"#2D6A4F"},{l:"Modularité",v:98,c:"#D4500A"}],certs:["UN38.3","ISO 9001","CE"],price:"1 690 € HT"},
+  {id:"p6",name:"Moduloo 3D — Sur-mesure",maker:"TYVA Energie",cat:"Batteries & Stockage",industry:"Industrie & Manufacturing",icon:"🔋",desc:"Assemblage modulaire 3D sans soudure. Cellules remplaçables (TYVA Refill). Prototypage rapide.",specs:[{l:"Chimie",v:"NMC / LiFePO4"},{l:"Assemblage",v:"Sans soudure 3D"},{l:"Reconditionnement",v:"TYVA Refill"},{l:"BMS",v:"40 Wh – 1 MWh"}],bars:[{l:"Flexibilité",v:99,c:"#3A5A78"},{l:"Éco-conception",v:95,c:"#2D6A4F"},{l:"Densité énergie",v:70,c:"#D4500A"}],certs:["ISO 9001","CE"],price:"Sur devis"},
+  {id:"p7",name:"LFP 48V 100Ah IoT",maker:"Batconnect",cat:"Batteries & Stockage",industry:"Automobile & Mobilité électrique",icon:"📶",desc:"Pack LiFePO4 connecté IoT : monitoring temps réel, GPS, IA prédictive. Garantie 10 ans.",specs:[{l:"Chimie",v:"LiFePO4"},{l:"Tension",v:"48 V"},{l:"Capacité",v:"100 Ah"},{l:"Connectivité",v:"4G/BLE + GPS"},{l:"Garantie",v:"10 ans"},{l:"Durée de vie",v:"> 20 ans"}],bars:[{l:"Durée de vie",v:97,c:"#2D6A4F"},{l:"Connectivité",v:95,c:"#3A5A78"},{l:"Densité énergie",v:72,c:"#D4500A"}],certs:["CE","UN38.3"],price:"Sur devis"},
+  {id:"p8",name:"Orca Energy 2.1 MWh Marine",maker:"Corvus Energy",cat:"Batteries & Stockage",industry:"Marine & Offshore",icon:"⚓",desc:"ESS maritime 2,1 MWh pour propulsion hybride. Certifié DNV GL et ABS. SCADA embarqué.",specs:[{l:"Chimie",v:"NMC marine"},{l:"Énergie",v:"2,1 MWh"},{l:"Bus DC",v:"700 V"},{l:"Puissance continue",v:"1 200 kW"},{l:"Poids",v:"~22 tonnes"}],bars:[{l:"Densité énergie",v:70,c:"#3A5A78"},{l:"Durée de vie",v:80,c:"#2D6A4F"},{l:"Puissance spécifique",v:72,c:"#D4500A"}],certs:["DNV GL","ABS","CE"],price:"Sur devis (~400 k€)"},
+  {id:"p9",name:"ePDU G3 Advanced 32A",maker:"Eaton",cat:"PDU (Power Distribution)",industry:"Industrie & Manufacturing",icon:"🔌",desc:"PDU rack intelligent, monitoring par prise, SNMP v3 et Modbus TCP. Format 0U vertical.",specs:[{l:"Courant entrée",v:"32 A"},{l:"Tension",v:"200–240 V AC"},{l:"Prises",v:"24× C13 + 4× C19"},{l:"Puissance max",v:"7,2 kW"},{l:"Interface",v:"SNMP v3, Modbus TCP"}],bars:[{l:"Monitoring",v:95,c:"#2D6A4F"},{l:"Puissance max",v:72,c:"#3A5A78"},{l:"Connectivité",v:88,c:"#D4500A"}],certs:["CE","UL","IEC 60884-2-7"],price:"~1 200 €"},
+  {id:"p10",name:"SSPC PDU 270V DC",maker:"Safran Electrical & Power",cat:"PDU (Power Distribution)",industry:"Aéronautique & Défense",icon:"🛩️",desc:"PDU avionique SSPC sur bus 270V DC. Coupure <1 ms, zéro arc. Pour More Electric Aircraft.",specs:[{l:"Bus",v:"270 V DC"},{l:"Canaux SSPC",v:"32"},{l:"Temps coupure",v:"< 1 ms"},{l:"Poids",v:"3,8 kg"},{l:"Température",v:"-55 à +85 °C"}],bars:[{l:"Rapidité coupure",v:99,c:"#2D6A4F"},{l:"Plage température",v:97,c:"#D4500A"},{l:"Densité puissance",v:85,c:"#3A5A78"}],certs:["DO-160G","MIL-STD-461","EASA CS-25"],price:"Sur devis"},
+  {id:"p11",name:"OBC 22 kW Bidirectionnel V2G",maker:"Delta Electronics",cat:"OBC (On-Board Charger)",industry:"Automobile & Mobilité électrique",icon:"△",desc:"Chargeur embarqué bidirectionnel 22 kW pour bus et camions EV. V2G, ISO 15118, IP67.",specs:[{l:"Puissance",v:"22 kW"},{l:"Tension entrée",v:"3×400 V AC"},{l:"Plage sortie",v:"200–900 V DC"},{l:"Rendement",v:"> 94 %"},{l:"IP",v:"IP67"},{l:"Poids",v:"14 kg"}],bars:[{l:"Rendement",v:94,c:"#2D6A4F"},{l:"Densité puissance",v:85,c:"#3A5A78"},{l:"Flexibilité tension",v:90,c:"#D4500A"}],certs:["CE","ISO 15118","IEC 61851","UNECE R10"],price:"~3 800 €"},
+  {id:"p12",name:"MultiPlus-II 48/5000",maker:"Victron Energy",cat:"OBC (On-Board Charger)",industry:"Énergie & Utilities",icon:"☀️",desc:"Onduleur-chargeur 5 kVA pour off-grid et hybrides. PowerAssist intégré, rendement 96%.",specs:[{l:"Puissance",v:"5 000 VA"},{l:"Charge max",v:"120 A DC"},{l:"Tension batt.",v:"48 V DC"},{l:"Rendement",v:"96 %"},{l:"Température",v:"-40 à +65 °C"}],bars:[{l:"Rendement",v:96,c:"#2D6A4F"},{l:"Polyvalence",v:88,c:"#3A5A78"},{l:"Robustesse",v:82,c:"#D4500A"}],certs:["CE","VDE 0126-1-1"],price:"~1 650 €"},
+  {id:"p13",name:"D633 Servovanne 2 étages",maker:"Moog",cat:"Vannes & Actionneurs",industry:"Aéronautique & Défense",icon:"✈️",desc:"Servovanne électrohydraulique haute performance. 120 Hz, précision <0,1%. Référence commandes de vol.",specs:[{l:"Débit",v:"19 l/min @ 70 bar"},{l:"Pression max",v:"350 bar"},{l:"Bande passante",v:"120 Hz (-90°)"},{l:"Hystérésis",v:"< 0,1 %"},{l:"Masse",v:"0,97 kg"}],bars:[{l:"Bande passante",v:96,c:"#3A5A78"},{l:"Précision",v:99,c:"#2D6A4F"},{l:"Tenue pression",v:90,c:"#D4500A"}],certs:["EASA","MIL-H-5440","AS9100D"],price:"~8 500 €"},
+  {id:"p14",name:"ACS880 — 0,75–5 600 kW",maker:"ABB",cat:"Convertisseurs & Onduleurs",industry:"Industrie & Manufacturing",icon:"🔩",desc:"Variateur industriel DTC. Gamme 0,75–5 600 kW. Rendement >98%. Profibus, PROFINET.",specs:[{l:"Puissance",v:"0,75–5 600 kW"},{l:"Tension",v:"380–690 V AC"},{l:"Contrôle",v:"DTC"},{l:"Rendement",v:"> 98 %"},{l:"Surcharge",v:"150% / 1 min"}],bars:[{l:"Rendement",v:98,c:"#2D6A4F"},{l:"Plage puissance",v:96,c:"#3A5A78"},{l:"Précision couple",v:94,c:"#D4500A"}],certs:["CE","UL","cUL"],price:"800–150 000 €"},
+  {id:"p15",name:"CoolSiC MOSFET 1200V",maker:"Infineon Technologies",cat:"Convertisseurs & Onduleurs",industry:"Automobile & Mobilité électrique",icon:"🔬",desc:"Module SiC MOSFET 1200V pour OBC et onduleurs. -50% pertes vs IGBT, 300 kHz max.",specs:[{l:"Technologie",v:"SiC MOSFET 4e gén."},{l:"Tension",v:"1 200 V"},{l:"Courant",v:"30–300 A"},{l:"Fréquence max",v:"300 kHz"},{l:"Température jonction",v:"-40 à +175 °C"}],bars:[{l:"Efficacité",v:97,c:"#2D6A4F"},{l:"Tenue thermique",v:93,c:"#D4500A"},{l:"Densité puissance",v:95,c:"#3A5A78"}],certs:["AEC-Q101","CE","RoHS"],price:"15–350 € / module"},
+  {id:"p16",name:"CS-HV500 Capteur ±500A",maker:"Sensata Technologies",cat:"Capteurs & Instrumentation",industry:"Automobile & Mobilité électrique",icon:"📡",desc:"Capteur Hall HV ±500A pour packs batterie VE. ISO 26262 ASIL-B, isolation 5 kV DC.",specs:[{l:"Plage",v:"±500 A"},{l:"Isolation",v:"5 000 V DC"},{l:"Précision",v:"< ±0,5 %"},{l:"Bande passante",v:"50 kHz"},{l:"Température",v:"-40 à +125 °C"}],bars:[{l:"Précision",v:90,c:"#2D6A4F"},{l:"Isolation",v:95,c:"#D4500A"},{l:"Bande passante",v:75,c:"#3A5A78"}],certs:["CE","AEC-Q100","ISO 26262 ASIL-B"],price:"~85 € / u"},
+  {id:"p17",name:"HVA280 — Connecteur HV 250A",maker:"TE Connectivity",cat:"Câblage & Connecteurs",industry:"Automobile & Mobilité électrique",icon:"🔗",desc:"Connecteur HV 250A pour bus DC batterie VE. HVIL auto-ségrégant. IP67 assemblé.",specs:[{l:"Tension",v:"600 V DC"},{l:"Courant",v:"250 A"},{l:"Résistance contact",v:"< 0,2 mΩ"},{l:"IP",v:"IP67"},{l:"Température",v:"-40 à +125 °C"}],bars:[{l:"Tenue courant",v:85,c:"#3A5A78"},{l:"Résistance contact",v:95,c:"#2D6A4F"},{l:"Tenue thermique",v:88,c:"#D4500A"}],certs:["CE","LV214","USCAR-21"],price:"~32 € / u"},
+  {id:"p18",name:"MIL-DTL-38999 Série III",maker:"Amphenol",cat:"Câblage & Connecteurs",industry:"Aéronautique & Défense",icon:"🔌",desc:"Connecteur circulaire militaire. Standard de référence défense et aérospatial. Résistance MIL-STD-810.",specs:[{l:"Norme",v:"MIL-DTL-38999 III"},{l:"Nb contacts",v:"4–128"},{l:"Tension max",v:"1 500 V AC"},{l:"Température",v:"-65 à +200 °C"}],bars:[{l:"Fiabilité mécanique",v:98,c:"#2D6A4F"},{l:"Plage température",v:99,c:"#D4500A"},{l:"Densité contacts",v:88,c:"#3A5A78"}],certs:["MIL-DTL-38999","AS9100D"],price:"45–450 € / u"},
+  {id:"p19",name:"IQ3 Actionneur Électrique",maker:"Rotork",cat:"Vannes & Actionneurs",industry:"Énergie & Utilities",icon:"🔧",desc:"Actionneur électrique multi-tours IQ3. Diagnostic intégré, Profibus/Modbus. IP68. ATEX option.",specs:[{l:"Couple nominal",v:"50–2 000 N·m"},{l:"Interface",v:"Profibus / Modbus"},{l:"Protection",v:"IP68 (10m, 72h)"},{l:"Température",v:"-30 à +70 °C"}],bars:[{l:"Tenue environnement",v:95,c:"#2D6A4F"},{l:"Connectivité",v:85,c:"#3A5A78"},{l:"Couple volumique",v:80,c:"#D4500A"}],certs:["CE","ATEX","IECEx","IP68"],price:"~2 500 €"},
+  {id:"p20",name:"BESS TrainPack 800V",maker:"Alstom",cat:"Batteries & Stockage",industry:"Ferroviaire",icon:"🚄",desc:"BESS embarqué pour trains sans caténaire et récupération d'énergie freinage. Coradia iLint.",specs:[{l:"Chimie",v:"NMC"},{l:"Tension bus",v:"800 V DC"},{l:"Énergie",v:"50–200 kWh"},{l:"Puissance crête",v:"400 kW"},{l:"Cycle de vie",v:"> 6 000 cycles"}],bars:[{l:"Durée de vie",v:92,c:"#2D6A4F"},{l:"Puissance volumique",v:80,c:"#3A5A78"},{l:"Robustesse ferroviaire",v:95,c:"#D4500A"}],certs:["EN 50155","EN 50126","CE"],price:"Sur devis"},
+  {id:"p21",name:"COSMO-BATT — Satellite GEO/NAV",maker:"Airbus Defence & Space",cat:"Batteries & Stockage",industry:"Spatial",icon:"🛰️",desc:"Batterie modulaire pour satellites télécom et navigation GEO/MEO. Modules 500–3 000 Wh. Plus de 300 unités fabriquées, >100 en vol sur E3000-NEO, OneSat et Galileo.",specs:[{l:"Chimie",v:"Li-ion COTS qualifié spatial"},{l:"Énergie / module",v:"500 – 3 000 Wh"},{l:"Tension nominale",v:"4,2 V / cellule"},{l:"Application",v:"GEO / MEO Télécom & Nav"},{l:"Plateformes",v:"E3000-NEO, OneSat, Galileo"},{l:"Unités en vol",v:"> 100 modules"},{l:"Qualification",v:"ECSS Class 1"}],bars:[{l:"Fiabilité en vol",v:99,c:"#2D6A4F"},{l:"Héritage mission",v:95,c:"#3A5A78"},{l:"Ratio énergie/masse",v:72,c:"#D4500A"}],certs:["ECSS-E-ST-20-08","ESA qualifié","ISO 9001:2015"],price:"Sur devis"},
+  {id:"p22",name:"ASTRO-BATT — LEO 30/50/100V",maker:"Airbus Defence & Space",cat:"Batteries & Stockage",industry:"Spatial",icon:"🛰️",desc:"Batterie modulaire LEO pour missions optiques et radar jusqu'à 12,5 ans en orbite. Disponible en 30V, 50V et 100V avec même design mécanique. Qualifiée mi-2024.",specs:[{l:"Chimie",v:"Li-ion COTS qualifié spatial"},{l:"Configurations tension",v:"30V / 50V / 100V"},{l:"Application",v:"LEO optique & radar"},{l:"Durée de mission",v:"Jusqu'à 12,5 ans"},{l:"Montage",v:"Interne ou externe"},{l:"Qualification",v:"ECSS Class 1 — 2024"}],bars:[{l:"Fiabilité en vol",v:98,c:"#2D6A4F"},{l:"Flexibilité tension",v:95,c:"#3A5A78"},{l:"Adaptabilité mission",v:90,c:"#D4500A"}],certs:["ECSS Class 1","ESA qualifié","DO-311A"],price:"Sur devis"},
+  {id:"p23",name:"LSE134 Gen III — Cellule Li-ion Spatiale",maker:"GS Yuasa Technology (Space)",cat:"Batteries & Stockage",industry:"Spatial",icon:"🇯🇵",desc:"Cellule Li-ion Gen III pour l'espace. 40% DOD en LEO sur plus de 10 ans. Intégrée sur JPSS-2 (NASA/NOAA). Plus de 17 000 cellules livrées depuis 1998.",specs:[{l:"Chimie",v:"Li-ion NMC grade spatial"},{l:"Capacité",v:"110 – 134 Ah"},{l:"Tension nominale",v:"3,75 V"},{l:"DOD LEO",v:"40% sur > 10 ans"},{l:"Température",v:"-20 à +30 °C"},{l:"Certification",v:"ISO 9001 / AS9100"},{l:"Héritage",v:"> 200 satellites"}],bars:[{l:"Héritage en vol",v:99,c:"#2D6A4F"},{l:"Durée de vie LEO",v:96,c:"#3A5A78"},{l:"Fiabilité",v:99,c:"#D4500A"}],certs:["AS9100D","JIS Q9100","ISO 14001","NASA qualifié"],price:"Sur devis"},
+  {id:"p24",name:"JPSS-2 Battery — 7,9 kWh / 29,6V",maker:"EaglePicher Technologies",cat:"Batteries & Stockage",industry:"Spatial",icon:"🦅",desc:"Pack Li-ion 7,9 kWh / 29,6V pour satellite JPSS-2 (NASA/NOAA). Cellules GS Yuasa LSE134 Gen III. Basé sur plateformes GEOStar-3 et ICESat-2 éprouvées.",specs:[{l:"Chimie",v:"Li-ion (GS Yuasa LSE134)"},{l:"Énergie",v:"7,9 kWh"},{l:"Tension système",v:"29,6 V"},{l:"Programme",v:"JPSS-2 (NASA/NOAA)"},{l:"Plateforme base",v:"GEOStar-3 & ICESat-2"},{l:"Certification",v:"NASA GEVS / AS9100D"}],bars:[{l:"Héritage mission NASA",v:98,c:"#2D6A4F"},{l:"Fiabilité système",v:97,c:"#3A5A78"},{l:"Densité énergie",v:65,c:"#D4500A"}],certs:["NASA GEVS","AS9100D","MIL-STD-1540"],price:"Sur devis"},
+  {id:"p25",name:"1N HPGP — Propulseur vert LEO",maker:"Bradford ECAPS",cat:"Vannes & Actionneurs",industry:"Spatial",icon:"🚀",desc:"Propulseur monergol vert 1N. Propergol LMP-103S (ADN) non toxique, haute performance. 46 propulseurs volés sur PRISMA (ESA) et SkySat. Idéal smallsats.",specs:[{l:"Type",v:"Monopropulseur vert HPGP"},{l:"Propergol",v:"LMP-103S (ADN)"},{l:"Poussée nominale",v:"1 N"},{l:"Isp spécifique",v:"~220 s"},{l:"Tension alimentation",v:"28 V DC"},{l:"Masse propulseur",v:"~200 g"},{l:"Héritage vol",v:"PRISMA, SkySat — 46 unités"}],bars:[{l:"Héritage en vol",v:90,c:"#2D6A4F"},{l:"Performance Isp",v:82,c:"#3A5A78"},{l:"Sécurité non toxique",v:98,c:"#D4500A"}],certs:["ESA qualifié","NASA TRL 9","REACH compliant"],price:"Sur devis"},
+  {id:"p26",name:"5N HPGP — Contrôle d'orbite",maker:"Bradford ECAPS",cat:"Vannes & Actionneurs",industry:"Spatial",icon:"🚀",desc:"Propulseur 5N HPGP pour contrôle d'attitude et manœuvres orbitales. Étudié par NASA Goddard pour missions interplanétaires.",specs:[{l:"Type",v:"Monopropulseur vert HPGP"},{l:"Propergol",v:"LMP-103S (ADN)"},{l:"Poussée nominale",v:"5 N"},{l:"Isp spécifique",v:"~231 s"},{l:"Tension alimentation",v:"28 V DC"},{l:"Application",v:"Satellites < 750 kg"}],bars:[{l:"Héritage en vol",v:82,c:"#2D6A4F"},{l:"Performance Isp",v:88,c:"#3A5A78"},{l:"Polyvalence mission",v:85,c:"#D4500A"}],certs:["ESA qualifié","REACH compliant","TRL 8+"],price:"Sur devis"},
+];
+
+const TICKER_ITEMS = ["TYVA Energie — Moduloo Ax 48V 30Ah — 1 690 € HT","CATL — LiFePO4 280Ah — ~480 €/kWh","Delta Electronics — OBC 22 kW V2G — ~3 800 €","Moog — D633 Servovanne — ~8 500 €","Batconnect — LFP 48V 100Ah IoT — Sur devis","Eaton — ePDU G3 32A — ~1 200 €","ABB — ACS880 5 600 kW — 800–150 000 €","Airbus — COSMO-BATT Satellite GEO — Sur devis","GS Yuasa — LSE134 Li-ion Spatial — Sur devis","Bradford ECAPS — 1N HPGP Propulseur vert — Sur devis","EaglePicher — JPSS-2 Battery 7,9 kWh — Sur devis"];
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let isPro = false;
+let annIndustry = 'all';
+let annCat = 'all';
+let catCat = 'all';
+let catInd = 'all';
+let compareIds = [];
+let currentPage = 'home';
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initTicker();
+  initChips('ann-industry-chips', INDUSTRIES, () => annIndustry, v => { annIndustry = v; renderCompanies(); });
+  initChips('ann-cat-chips', PROD_CATS, () => annCat, v => { annCat = v; renderCompanies(); });
+  initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; renderProducts(); });
+  initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; renderProducts(); });
+  renderCompanies();
+  renderProducts();
+  renderPlans();
+  renderFAQ();
+  document.getElementById('stat-c').textContent = COMPANIES.length;
+  document.getElementById('stat-p').textContent = PRODUCTS.length;
+  document.getElementById('kpi-c').textContent = COMPANIES.length;
+  document.getElementById('kpi-p').textContent = PRODUCTS.length;
+  // Close modals on overlay click
+  document.querySelectorAll('.overlay').forEach(o => {
+    o.addEventListener('click', e => { if(e.target === o) o.classList.remove('open'); });
+  });
+});
+
+function initTicker() {
+  const text = TICKER_ITEMS.join('   ·   ');
+  const el = document.getElementById('tickerText');
+  el.textContent = text + '     ' + text;
+}
+
+function initChips(containerId, items, getState, setState) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'chip active';
+  allBtn.textContent = 'Tous';
+  allBtn.onclick = () => { setState('all'); updateChips(containerId, getState); };
+  el.appendChild(allBtn);
+  items.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = item;
+    btn.onclick = () => { setState(item); updateChips(containerId, getState); };
+    el.appendChild(btn);
+  });
+}
+
+function updateChips(containerId, getState) {
+  document.querySelectorAll('#' + containerId + ' .chip').forEach(c => {
+    const isAll = c.textContent === 'Tous';
+    c.classList.toggle('active', isAll ? getState() === 'all' : c.textContent === getState());
+  });
+}
+
+// ═══════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  const link = document.querySelector('[data-page="'+pageId+'"]');
+  if(link) link.classList.add('active');
+  currentPage = pageId;
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateProUI();
+}
+
+function togglePro() {
+  isPro = !isPro;
+  const btn = document.getElementById('proToggle');
+  btn.textContent = isPro ? '✓ Mode Pro actif' : '⚡ Tester mode Pro';
+  btn.classList.toggle('active', isPro);
+  renderCompanies();
+  renderProducts();
+  updateProUI();
+}
+
+function updateProUI() {
+  const upsell = document.getElementById('pro-upsell-sidebar');
+  const badge = document.getElementById('pro-specs-badge');
+  if(upsell) upsell.style.display = isPro ? 'none' : 'block';
+  if(badge) badge.style.display = isPro ? 'none' : 'inline';
+}
+
+// ═══════════════════════════════
+// RENDER COMPANIES
+// ═══════════════════════════════
+function renderCompanies() {
+  const q = (document.getElementById('ann-search')?.value || '').toLowerCase();
+  const filtered = COMPANIES.filter(c => {
+    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
+    return ms && (annIndustry === 'all' || c.industry === annIndustry) && (annCat === 'all' || c.products.includes(annCat));
+  }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
+
+  const count = document.getElementById('ann-count');
+  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
+
+  const grid = document.getElementById('companies-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  if(!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucune entreprise ne correspond.</p></div>';
+    return;
+  }
+
+  filtered.forEach(c => {
+    const prodCount = PRODUCTS.filter(p => p.maker === c.name).length;
+    const card = document.createElement('div');
+    card.className = 'company-card' + (c.premium ? ' premium' : '');
+    card.innerHTML = `
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="card-logo">${c.logo}</div>
+          <div>
+            <div class="card-name">${c.name}</div>
+            <div class="card-meta">${c.country} · ${c.hq}</div>
+          </div>
+        </div>
+        <div class="card-badges">
+          ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
+          ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+        </div>
+      </div>
+      <span class="tag tag-industry">${c.industry}</span>
+      <p class="card-desc">${c.desc}</p>
+      <div class="card-tags">${c.tags.slice(0,4).map(t => '<span class="tag">'+t+'</span>').join('')}</div>
+      <div class="card-footer">
+        <span class="card-site">↗ ${c.site.replace('https://','').replace('www.','')}</span>
+        ${prodCount > 0 ? '<span class="card-prod-count">'+prodCount+' produit'+(prodCount>1?'s':'')+'</span>' : ''}
+      </div>`;
+    card.onclick = () => openCompanyModal(c);
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════
+// RENDER PRODUCTS
+// ═══════════════════════════════
+function renderProducts() {
+  const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
+  const filtered = PRODUCTS.filter(p => {
+    const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    return ms && (catCat === 'all' || p.cat === catCat) && (catInd === 'all' || p.industry === catInd);
+  });
+
+  const count = document.getElementById('cat-count');
+  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
+
+  const grid = document.getElementById('products-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  if(!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucun produit ne correspond.</p></div>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const isSelected = compareIds.includes(p.id);
+    const showLock = !isPro && p.specs.length > 3;
+    const visibleSpecs = isPro ? p.specs : p.specs.slice(0,3);
+    const hiddenSpecs = isPro ? [] : p.specs.slice(3);
+
+    const card = document.createElement('div');
+    card.className = 'prod-card';
+    card.innerHTML = `
+      <div class="prod-card-top">
+        <div class="prod-card-header">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div class="prod-icon-wrap">${p.icon}</div>
+            <div>
+              <div class="prod-name">${p.name}</div>
+              <div class="prod-maker">
+                ${p.maker}
+                <span class="tag tag-industry" style="font-size:10px">${p.cat}</span>
+              </div>
+            </div>
+          </div>
+          <button class="compare-cb ${isSelected ? 'selected' : ''}" onclick="toggleCompare('${p.id}',this)" title="Comparer">${isSelected ? '✓' : ''}</button>
+        </div>
+        <p class="prod-desc">${p.desc}</p>
+      </div>
+      <div class="prod-card-body">
+        <table class="spec-table">
+          <tbody>
+            ${visibleSpecs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}
+            ${hiddenSpecs.map(s => `<tr class="spec-blurred"><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        ${p.bars.map(b => `
+          <div class="bar-row">
+            <div class="bar-labels"><span>${b.l}</span><span style="font-weight:700">${b.v}%</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${b.v}%;background:${b.c}"></div></div>
+          </div>`).join('')}
+        <div class="cert-row">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>
+        ${showLock ? `<div class="lock-overlay"><span style="font-size:22px">🔒</span><p>Specs complètes réservées aux membres Pro</p><button onclick="showPage('pricing')" style="padding:7px 14px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Voir les offres →</button></div>` : ''}
+      </div>
+      <div class="prod-card-footer">
+        <span class="price-tag">💰 ${p.price}</span>
+        ${isPro ? '<a href="#" style="font-size:11px;color:var(--steel);font-weight:600;text-decoration:none">↗ Contacter le fabricant</a>' : '<button onclick="showPage(\'pricing\')" style="font-size:11px;color:var(--gold);font-weight:700;background:transparent;border:none;cursor:pointer">🔒 Contact Pro</button>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════
+// COMPARE
+// ═══════════════════════════════
+function toggleCompare(id, btn) {
+  if(compareIds.includes(id)) {
+    compareIds = compareIds.filter(x => x !== id);
+  } else {
+    if(compareIds.length >= 4) { alert('Maximum 4 produits à la fois.'); return; }
+    compareIds.push(id);
+  }
+  renderProducts();
+  updateCompareBanner();
+}
+
+function updateCompareBanner() {
+  const banner = document.getElementById('compare-banner');
+  const n = compareIds.length;
+  document.getElementById('compare-count').textContent = n+'/4';
+  const pills = document.getElementById('compare-pills');
+  pills.innerHTML = compareIds.map(id => {
+    const p = PRODUCTS.find(x => x.id === id);
+    if(!p) return '';
+    const label = p.name.length > 20 ? p.name.slice(0,20)+'…' : p.name;
+    return `<div class="compare-pill">${p.icon} ${label}<button onclick="toggleCompare('${id}')">✕</button></div>`;
+  }).join('');
+  banner.classList.toggle('visible', n >= 2);
+}
+
+function openCompareModal() {
+  const prods = compareIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+  const allLabels = [...new Set(prods.flatMap(p => p.specs.map(s => s.l)))];
+  const allBars   = [...new Set(prods.flatMap(p => p.bars.map(b => b.l)))];
+
+  // lock banner
+  const lockBanner = document.getElementById('compare-lock-banner');
+  lockBanner.style.display = isPro ? 'none' : 'flex';
+
+  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${p.icon}</span><strong style="font-size:11px">${p.name}</strong><span style="font-size:10px;opacity:.8">${p.maker}</span></div></th>`).join('');
+
+  const specRows = allLabels.map((label,i) => {
+    const cells = prods.map(p => {
+      const s = p.specs.find(x => x.l === label);
+      const blurred = !isPro && i >= 3;
+      return `<td style="${blurred ? 'filter:blur(4px);user-select:none' : ''}">${s ? s.v : '—'}</td>`;
+    }).join('');
+    return `<tr><td class="row-label">${label}</td>${cells}</tr>`;
+  }).join('');
+
+  const barRows = allBars.map(label => {
+    const vals = prods.map(p => { const b = p.bars.find(x => x.l === label); return b ? b.v : null; });
+    const max = Math.max(...vals.filter(v => v !== null));
+    const min = Math.min(...vals.filter(v => v !== null));
+    const cells = prods.map((p,i) => {
+      const v = vals[i];
+      const cls = v === max ? 'cmp-best' : v === min ? 'cmp-worst' : '';
+      return `<td class="${cls}">${v !== null ? v+'%' : '—'}</td>`;
+    }).join('');
+    return `<tr><td class="row-label">📊 ${label}</td>${cells}</tr>`;
+  }).join('');
+
+  const certRow = `<tr><td class="row-label">Certifications</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.join(', ')+'</td>').join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">Prix indicatif</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+p.price+'</td>').join('')}</tr>`;
+
+  document.getElementById('compare-table-wrap').innerHTML = `
+    <table class="cmp-table">
+      <thead><tr><th style="min-width:150px">Critère</th>${hCols}</tr></thead>
+      <tbody>
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Spécifications techniques</td></tr>
+        ${specRows}
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Scores relatifs</td></tr>
+        ${barRows}
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Prix & Certifications</td></tr>
+        ${priceRow}${certRow}
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">🟢 Meilleure valeur · 🔴 Valeur la plus basse</p>`;
+
+  document.getElementById('compare-overlay').classList.add('open');
+}
+
+// ═══════════════════════════════
+// COMPANY MODAL
+// ═══════════════════════════════
+function openCompanyModal(c) {
+  document.getElementById('m-logo').textContent = c.logo;
+  document.getElementById('m-name').textContent = c.name;
+  document.getElementById('m-location').textContent = c.country + ' · ' + c.hq;
+
+  const badges = document.getElementById('m-badges');
+  badges.innerHTML = (c.premium ? '<span class="badge-premium">★ Premium</span>' : '') +
+    (c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : '') +
+    '<span class="tag tag-industry">'+c.industry+'</span>';
+
+  document.getElementById('m-desc').textContent = c.desc;
+
+  document.getElementById('m-details').innerHTML = [
+    ['Fondée en', c.founded], ['Effectifs', c.employees],
+    ['Secteur', c.industry], ['Siège', c.hq]
+  ].map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('');
+
+  document.getElementById('m-tags').innerHTML =
+    [...c.products, ...c.tags].map(t => '<span class="tag">'+t+'</span>').join('');
+
+  const compProds = PRODUCTS.filter(p => p.maker === c.name);
+  const prodsSection = document.getElementById('m-prods-section');
+  const prodsGrid = document.getElementById('m-prods');
+  const seeBtn = document.getElementById('m-see-products-btn');
+
+  if(compProds.length === 0) {
+    prodsSection.style.display = 'none';
+  } else {
+    prodsSection.style.display = 'block';
+    prodsGrid.innerHTML = compProds.map(p => `
+      <div class="modal-prod-card">
+        <div class="modal-prod-name">${p.icon} ${p.name}</div>
+        <div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div>
+        <div class="modal-prod-price">💰 ${p.price}</div>
+      </div>`).join('');
+    seeBtn.onclick = () => {
+      closeModal('company-overlay');
+      document.getElementById('cat-search').value = c.name;
+      catCat = 'all'; catInd = 'all';
+      renderProducts();
+      showPage('catalogue');
+    };
+  }
+
+  document.getElementById('m-site').href = c.site;
+  document.getElementById('m-site').textContent = '↗ Visiter le site officiel';
+
+  const contactWrap = document.getElementById('m-contact-wrap');
+  if(isPro && c.contact) {
+    contactWrap.innerHTML = `<a href="mailto:${c.contact}" class="btn-visit" style="background:var(--sage)">✉ ${c.contact}</a>`;
+  } else {
+    contactWrap.innerHTML = `<div class="btn-contact-locked">🔒 <span>Contact disponible avec <strong style="color:var(--gold)">Pro</strong></span></div>`;
+  }
+
+  document.getElementById('company-overlay').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ═══════════════════════════════
+// RENDER PLANS
+// ═══════════════════════════════
+function renderPlans() {
+  const grid = document.getElementById('plans-grid');
+  if(!grid) return;
+  grid.innerHTML = PLANS.map(plan => `
+    <div class="plan-card ${plan.highlight ? 'highlight' : ''}">
+      ${plan.highlight ? '<div class="plan-popular">LE PLUS POPULAIRE</div>' : ''}
+      <div class="plan-name">${plan.name}</div>
+      <div class="plan-price">${plan.price}</div>
+      <div class="plan-period">${plan.period}</div>
+      <p class="plan-desc">${plan.desc}</p>
+      <button class="plan-cta ${plan.ctaClass}" onclick="showPage('annuaire')">${plan.cta}</button>
+      <div class="plan-divider"></div>
+      <div class="plan-features">
+        ${plan.features.map(f => `<div class="plan-feature ${f.ok ? 'ok' : 'no'}"><span class="plan-feature-icon">${f.ok ? '✓' : '✕'}</span><span>${f.text}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderFAQ() {
+  const el = document.getElementById('faq-list');
+  if(!el) return;
+  el.innerHTML = FAQ.map(f => `
+    <div class="faq-item">
+      <div class="faq-q">${f.q}</div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
+}
+
+function resetAnnuaire() {
+  document.getElementById('ann-search').value = '';
+  annIndustry = 'all'; annCat = 'all';
+  updateChips('ann-industry-chips', () => annIndustry);
+  updateChips('ann-cat-chips', () => annCat);
+  renderCompanies();
+}
+
+function resetCatalogue() {
+  document.getElementById('cat-search').value = '';
+  catCat = 'all'; catInd = 'all';
+  updateChips('cat-cat-chips', () => catCat);
+  updateChips('cat-ind-chips', () => catInd);
+  renderProducts();
+}
+</script>
+</body>
+</html>
