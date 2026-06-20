@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Buy-ineer — Référentiel équipementiers industriels</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1C2B3A;--rust:#D4500A;--rust-soft:#FBF0EA;
+  --steel:#3A5A78;--steel-soft:#EAF0F6;
+  --sage:#2D6A4F;--sage-soft:#E8F4EE;
+  --gold:#B07D2A;--gold-soft:#FBF5E6;
+  --paper:#F5F4F0;--white:#fff;
+  --border:#DDD9D0;--border2:#C8C3B8;
+  --muted:#7A7568;--text2:#3D3A35;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--sans);cursor:pointer}
+
+/* TICKER */
+.ticker{background:var(--ink);height:30px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.07)}
+.ticker-label{font-family:var(--mono);font-size:10px;color:var(--rust);padding:0 14px;flex-shrink:0;letter-spacing:.1em;text-transform:uppercase}
+.ticker-track{flex:1;overflow:hidden;position:relative}
+.ticker-inner{display:inline-block;white-space:nowrap;animation:ticker 55s linear infinite;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* NAV */
+nav.main{background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:30px;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:none;padding:0}
+.logo-mark{width:32px;height:32px;background:var(--rust);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:18px;color:#fff}
+.logo-name{font-family:var(--serif);font-size:18px;color:var(--ink)}
+.logo-name span{color:var(--rust)}
+.nav-links{display:flex;height:100%;align-items:stretch;gap:0}
+.nav-link{padding:0 14px;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--sans)}
+.nav-link:hover{color:var(--ink)}
+.nav-link.active{color:var(--rust);border-bottom-color:var(--rust);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:8px}
+.free-pill{padding:5px 12px;border-radius:4px;border:1px solid #9ECFB5;background:var(--sage-soft);color:var(--sage);font-size:11px;font-weight:700;letter-spacing:.02em}
+.btn-signup{padding:7px 16px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:12px;font-weight:700}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* LAYOUT */
+.layout{display:flex;max-width:1280px;margin:0 auto}
+.sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);padding:18px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto;background:var(--white)}
+.sidebar-section{margin-bottom:16px}
+.sidebar-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.sidebar-label::before{content:'';display:block;width:2px;height:10px;background:var(--rust);border-radius:1px}
+.sidebar-divider{height:1px;background:var(--border);margin:10px 0 14px}
+.search-wrap{position:relative}
+.search-wrap span{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted)}
+.search-input{width:100%;padding:7px 8px 7px 26px;border:1px solid var(--border);border-radius:4px;font-size:12px;font-family:var(--sans);color:var(--ink);outline:none;background:var(--paper)}
+.search-input:focus{border-color:var(--steel)}
+.chip-group{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:3px 9px;border-radius:3px;border:1px solid var(--border);font-size:11px;font-weight:500;background:var(--white);color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:var(--sans)}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.reset-btn{width:100%;padding:7px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;margin-top:10px}
+.reset-btn:hover{border-color:var(--rust);color:var(--rust)}
+.content{flex:1;padding:18px 22px;min-width:0}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.toolbar-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.10em;text-transform:uppercase}
+.result-count{font-size:13px;color:var(--muted);margin-left:14px}
+.result-count strong{color:var(--ink)}
+
+/* TAGS / BADGES */
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:600;white-space:nowrap;border:1px solid var(--border);background:var(--paper);color:var(--muted)}
+.tag-industry{background:var(--steel-soft);color:var(--steel);border-color:#B8CCDE}
+.tag-sage{background:var(--sage-soft);color:var(--sage);border-color:#9ECFB5}
+.tag-gold{background:var(--gold-soft);color:var(--gold);border-color:#E8C96A}
+.badge-premium{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold-soft);color:var(--gold);border:1px solid #E8C96A}
+.badge-verified{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;background:var(--sage-soft);color:var(--sage);border:1px solid #9ECFB5}
+
+/* COMPANY CARDS */
+.grid-companies{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.company-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.company-card:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.09)}
+.company-card.premium{border-color:#E8C96A;box-shadow:0 2px 10px rgba(176,125,42,.12)}
+.company-card.premium:hover{border-color:#D4A828}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-logo{width:38px;height:38px;border-radius:6px;background:var(--paper);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.card-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.2}
+.card-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.card-badges{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.6;margin:10px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.card-site{font-size:11px;color:var(--steel);font-weight:600}
+.card-prod-count{font-size:11px;font-weight:700;color:var(--rust);background:var(--rust-soft);border:1px solid #F5C9AA;border-radius:3px;padding:2px 6px}
+
+/* PRODUCT CARDS */
+.grid-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.prod-card{background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);display:flex;flex-direction:column;transition:border-color .15s}
+.prod-card:hover{border-color:var(--steel)}
+.prod-card-top{padding:12px 16px;border-bottom:1px solid var(--border)}
+.prod-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+.prod-icon-wrap{width:36px;height:36px;border-radius:6px;background:var(--paper);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.prod-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}
+.prod-maker{font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.compare-cb{width:22px;height:22px;border-radius:4px;border:1.5px solid var(--border);background:transparent;color:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .12s}
+.compare-cb.selected{background:var(--ink);border-color:var(--ink);color:#fff}
+.prod-desc{font-size:12px;color:var(--text2);line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod-card-body{padding:10px 16px;flex:1;position:relative}
+.spec-table{width:100%;border-collapse:collapse;margin-bottom:10px}
+.spec-table td{padding:4px 0;font-size:12px;border-bottom:1px solid var(--paper)}
+.spec-table td:first-child{color:var(--muted);width:50%}
+.spec-table td:last-child{font-weight:700;text-align:right;color:var(--ink)}
+.bar-row{margin-bottom:6px}
+.bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
+.bar-track{height:4px;background:var(--paper);border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:2px}
+.cert-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.prod-card-footer{padding:8px 16px;background:var(--paper);border-top:1px solid var(--border);border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between}
+.price-tag{font-size:13px;font-weight:700;color:var(--sage)}
+
+/* PAGE HEADER */
+.page-header{background:var(--white);border-bottom:1px solid var(--border);padding:24px 24px 20px}
+.page-header-inner{max-width:1280px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.page-title{font-family:var(--serif);font-size:28px;color:var(--ink);font-weight:400;margin-bottom:6px}
+.page-title span{color:var(--rust);font-style:italic}
+.page-subtitle{font-size:13px;color:var(--muted)}
+.kpi-row{display:flex;gap:12px;flex-wrap:wrap}
+.kpi{background:var(--steel-soft);border:1px solid #B8CCDE;border-radius:6px;padding:8px 14px;display:flex;align-items:center;gap:10px}
+.kpi-n{font-family:var(--serif);font-size:24px;color:var(--steel);line-height:1}
+.kpi-l{font-size:10px;color:var(--steel);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:600}
+
+/* COMPARE BANNER */
+.compare-banner{position:fixed;bottom:0;left:0;right:0;z-index:150;background:var(--ink);border-top:3px solid var(--rust);padding:10px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .25s}
+.compare-banner.visible{transform:translateY(0)}
+.compare-pill{padding:4px 10px;border-radius:3px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:12px;color:#fff;display:flex;align-items:center;gap:6px}
+.compare-pill button{background:none;border:none;color:rgba(255,255,255,.5);font-size:12px;padding:0;line-height:1}
+.compare-pills{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+.btn-compare{padding:8px 20px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-weight:700;font-size:13px;white-space:nowrap}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(28,43,58,.72);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:12px;max-width:700px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.22)}
+.modal-head{background:var(--ink);border-radius:12px 12px 0 0;padding:22px 26px}
+.modal-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.modal-logo{width:50px;height:50px;border-radius:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.modal-name{font-family:var(--serif);font-size:22px;color:#fff;font-weight:400}
+.modal-location{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.modal-close{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-size:13px;border-radius:4px;padding:5px 12px}
+.modal-body{padding:22px 26px}
+.modal-section{margin-bottom:18px}
+.modal-section-title{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-item{background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:10px 14px}
+.detail-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.detail-value{font-size:13px;font-weight:700;color:var(--ink)}
+.modal-tags{display:flex;flex-wrap:wrap;gap:5px}
+.modal-prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-prod-card{background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.modal-prod-name{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.modal-prod-specs{font-size:11px;color:var(--muted);line-height:1.6}
+.modal-prod-price{font-size:11px;font-weight:700;color:var(--sage);margin-top:4px}
+.modal-actions{border-top:1px solid var(--border);padding-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn-visit{padding:10px 20px;border-radius:4px;background:var(--rust);color:#fff;font-weight:700;font-size:13px;border:none}
+.btn-see-products{padding:8px 16px;border-radius:4px;background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:12px;font-weight:700;margin-top:10px}
+
+/* COMPARE MODAL */
+.cmp-modal{position:absolute;inset:20px;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:auto;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.cmp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.cmp-head h2{font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:400;margin:0}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th,.cmp-table td{padding:8px 12px;border:1px solid var(--border);vertical-align:top}
+.cmp-table th{background:var(--ink);color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.cmp-table th.prod-col{background:var(--steel);text-align:center}
+.cmp-table td{text-align:center;font-weight:600}
+.cmp-table td.row-label{text-align:left;font-weight:400;color:var(--text2);background:var(--paper)}
+.cmp-section{background:var(--steel-soft)!important;color:var(--steel);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.cmp-best{color:var(--sage);font-weight:700}
+.cmp-worst{color:#C0392B}
+
+/* LANDING */
+.hero{background:var(--ink);padding:72px 24px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(212,80,10,.15) 0%,transparent 60%),radial-gradient(circle at 70% 30%,rgba(58,90,120,.22) 0%,transparent 60%);pointer-events:none}
+.hero-inner{position:relative;max-width:720px;margin:0 auto}
+.hero-eyebrow{font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:20px}
+.hero h1{font-family:var(--serif);font-size:clamp(34px,6vw,60px);color:#fff;line-height:1.1;margin:0 0 22px;font-weight:400}
+.hero h1 em{color:var(--rust)}
+.hero p{font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;max-width:520px;margin:0 auto 34px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-hero-primary{padding:13px 28px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:15px;font-weight:700}
+.btn-hero-secondary{padding:13px 28px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;font-size:15px;font-weight:500}
+.stats-band{background:var(--white);border-bottom:1px solid var(--border)}
+.stats-band-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-cell{padding:24px;text-align:center;border-right:1px solid var(--border)}
+.stat-n{font-family:var(--serif);font-size:40px;color:var(--ink);line-height:1}
+.stat-l{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.section{padding:64px 24px}
+.section-inner{max-width:960px;margin:0 auto}
+.section-eyebrow{font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.12em;text-transform:uppercase;display:block;margin-bottom:10px}
+.section-title{font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:400;margin:0 0 36px}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:24px}
+.step-num{font-family:var(--mono);font-size:11px;color:var(--rust);margin-bottom:10px;letter-spacing:.08em}
+.step-icon{font-size:26px;margin-bottom:10px}
+.step-title{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:400;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.65}
+.value-section{background:var(--ink);padding:64px 24px}
+.value-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.value-list{display:flex;flex-direction:column;gap:14px}
+.value-item{display:flex;gap:12px;align-items:flex-start}
+.value-item-icon{font-size:18px;flex-shrink:0}
+.value-item-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.value-item-desc{font-size:12px;color:rgba(255,255,255,.55);line-height:1.6}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.testi-card{background:var(--paper);border:1px solid var(--border);border-radius:8px;padding:22px}
+.testi-quote{font-size:13px;color:var(--text2);line-height:1.7;font-style:italic;margin:0 0 14px}
+.testi-name{font-size:12px;font-weight:700;color:var(--ink)}
+.testi-role{font-size:11px;color:var(--muted)}
+.cta-section{padding:56px 24px;background:var(--paper);text-align:center;border-top:1px solid var(--border)}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.btn-cta-primary{padding:13px 28px;border-radius:4px;background:var(--ink);border:none;color:#fff;font-size:14px;font-weight:700}
+.btn-cta-secondary{padding:13px 28px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--ink);font-size:14px;font-weight:600}
+
+/* PRICING */
+.pricing-header{background:var(--white);border-bottom:1px solid var(--border);padding:56px 24px 44px;text-align:center}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1020px;margin:0 auto;padding:44px 24px}
+.plan-card{background:var(--white);border:2px solid var(--border);border-radius:10px;padding:26px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.plan-card.highlight{border-color:var(--rust);box-shadow:0 8px 32px rgba(212,80,10,.15)}
+.plan-popular{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--rust);color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:0 0 6px 6px;letter-spacing:.06em}
+.plan-name{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.plan-price{font-family:var(--serif);font-size:36px;color:var(--ink);line-height:1;margin-bottom:4px}
+.plan-card.highlight .plan-price{color:var(--rust)}
+.plan-period{font-size:12px;color:var(--muted);margin-bottom:14px}
+.plan-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;min-height:38px}
+.plan-cta{width:100%;padding:10px;border-radius:4px;border:none;font-size:13px;font-weight:700;margin-bottom:20px}
+.plan-cta.primary{background:var(--rust);color:#fff}
+.plan-cta.secondary{background:var(--ink);color:#fff}
+.plan-divider{height:1px;background:var(--border);margin-bottom:18px}
+.plan-features{display:flex;flex-direction:column;gap:9px}
+.plan-feature{display:flex;gap:9px;align-items:flex-start;font-size:12px}
+.plan-feature.ok{color:var(--text2)}
+.plan-feature.no{color:var(--muted)}
+.plan-feature-icon{flex-shrink:0;font-weight:700;font-size:13px;line-height:1.5}
+.plan-feature.ok .plan-feature-icon{color:var(--sage)}
+.plan-feature.no .plan-feature-icon{color:#ccc}
+.enterprise-band{max-width:1020px;margin:0 auto 44px;padding:0 24px}
+.enterprise-card{background:var(--ink);border-radius:10px;padding:26px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.faq-section{max-width:720px;margin:0 auto;padding:0 24px 56px}
+.faq-item{border-top:1px solid var(--border);padding:16px 0}
+.faq-q{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* PRO UPSELL SIDEBAR */
+.pro-upsell{margin-top:18px;padding:12px;background:var(--gold-soft);border:1px solid #E8C96A;border-radius:6px}
+.pro-upsell-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.pro-upsell p{font-size:11px;color:var(--text2);line-height:1.6;margin:0 0 8px}
+.btn-upsell{width:100%;padding:7px;border-radius:4px;background:var(--gold);border:none;color:#fff;font-size:11px;font-weight:700}
+
+/* CLAIM LISTING BANNER */
+.claim-banner{display:flex;align-items:center;gap:10px;background:var(--steel-soft);border:1px solid #B8CCDE;border-radius:6px;padding:9px 12px;margin-bottom:14px}
+.claim-banner p{font-size:11px;color:var(--steel);line-height:1.5;margin:0;flex:1}
+.claim-banner button{flex-shrink:0;padding:6px 12px;border-radius:4px;background:var(--steel);border:none;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+
+/* REQUEST QUOTE / LEAD */
+.btn-quote{padding:10px 20px;border-radius:4px;background:var(--sage);border:none;color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.btn-quote-sm{font-size:11px;color:var(--sage);font-weight:700;background:transparent;border:none;cursor:pointer}
+.lead-modal{max-width:420px}
+.lead-intro{font-size:12px;color:var(--text2);line-height:1.65;margin:0 0 16px;padding:10px 12px;background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:6px}
+.lead-field{margin-bottom:12px}
+.lead-field label{display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.lead-field input,.lead-field textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:var(--sans);color:var(--ink);background:var(--paper);outline:none}
+.lead-field input:focus,.lead-field textarea:focus{border-color:var(--steel)}
+.lead-field textarea{resize:vertical;min-height:64px}
+.lead-success{text-align:center;padding:20px 4px}
+.lead-success .icon{font-size:34px;margin-bottom:10px}
+.lead-success h3{font-family:var(--serif);font-size:20px;color:var(--ink);font-weight:400;margin:0 0 8px}
+.lead-success p{font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 16px}
+
+/* SUPPLIER SUBMISSION FORM */
+.submit-wrap{max-width:760px;margin:0 auto;padding:32px 24px 64px}
+.submit-intro{background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:8px;padding:14px 18px;margin-bottom:28px;font-size:13px;color:var(--text2);line-height:1.65}
+.submit-section-title{font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.10em;text-transform:uppercase;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.submit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.product-block{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px;position:relative}
+.product-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.product-block-title{font-size:13px;font-weight:700;color:var(--ink)}
+.btn-remove-product{font-size:11px;color:var(--rust);background:transparent;border:none;font-weight:700}
+.spec-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.btn-add-spec,.btn-add-product{padding:7px 14px;border-radius:4px;background:transparent;border:1px dashed var(--border2);color:var(--muted);font-size:12px;font-weight:600;width:100%;text-align:center}
+.btn-add-spec:hover,.btn-add-product:hover{border-color:var(--steel);color:var(--steel)}
+.btn-remove-spec{background:transparent;border:none;color:var(--muted);font-size:14px;padding:4px}
+.submit-actions{margin-top:24px}
+.btn-submit-form{width:100%;padding:13px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:14px;font-weight:700}
+@media(max-width:700px){.submit-grid,.spec-row{grid-template-columns:1fr}}
+
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@media(max-width:900px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .steps-grid,.testimonials-grid,.plans-grid,.value-inner{grid-template-columns:1fr}
+  .stats-band-inner{grid-template-columns:1fr 1fr}
+  .detail-grid,.modal-prod-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-label">// NOUVEAU</span>
+  <div class="ticker-track">
+    <span class="ticker-inner" id="tickerText"></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="main">
+  <button class="logo" onclick="showPage('home')">
+    <div class="logo-mark">B</div>
+    <span class="logo-name">Buy<span>-ineer</span></span>
+  </button>
+  <div class="nav-links">
+    <button class="nav-link active" data-page="home" onclick="showPage('home')">Accueil</button>
+    <button class="nav-link" data-page="annuaire" onclick="showPage('annuaire')">Annuaire</button>
+    <button class="nav-link" data-page="catalogue" onclick="showPage('catalogue')">Produits & Specs</button>
+    <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Tarifs</button>
+  </div>
+  <div class="nav-right">
+    <span class="free-pill">✓ Annuaire & specs 100% gratuits</span>
+    <button class="btn-signup" onclick="showPage('submit')">Référencer mon entreprise</button>
+  </div>
+</nav>
+
+<!-- ══════════ PAGE HOME ══════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <span class="hero-eyebrow">// Référentiel équipementiers industriels</span>
+      <h1>Sourcez les bons<br/><em>équipements industriels</em><br/>en minutes, pas en semaines.</h1>
+      <p>Batteries, OBC, PDU, vannes, actionneurs — fiches techniques détaillées, comparatifs côte-à-côte, contacts vérifiés. La base de référence pour ingénieurs et acheteurs industriels.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="showPage('annuaire')">Explorer l'annuaire →</button>
+        <button class="btn-hero-secondary" onclick="showPage('pricing')">Voir les offres</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band">
+    <div class="stats-band-inner">
+      <div class="stat-cell"><div class="stat-n" id="stat-c">34</div><div class="stat-l">Fabricants référencés</div></div>
+      <div class="stat-cell"><div class="stat-n" id="stat-p">20</div><div class="stat-l">Fiches produits</div></div>
+      <div class="stat-cell"><div class="stat-n">8</div><div class="stat-l">Catégories produits</div></div>
+      <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">Industries couvertes</div></div>
+    </div>
+  </div>
+
+  <section class="section" style="background:var(--paper)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Comment ça marche</span>
+      <h2 class="section-title">De la recherche au contact<br/>en trois étapes.</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num">01</div><div class="step-icon">🔍</div><h3 class="step-title">Recherchez</h3><p class="step-desc">Filtrez par industrie, catégorie ou fabricant. Accès à l'annuaire complet gratuitement.</p></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-icon">📊</div><h3 class="step-title">Comparez</h3><p class="step-desc">Sélectionnez jusqu'à 4 produits et comparez leurs specs techniques côte-à-côte.</p></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-icon">📩</div><h3 class="step-title">Contactez</h3><p class="step-desc">Demandez un devis en un clic, gratuitement — aucun compte Pro, aucune carte bancaire.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="value-section">
+    <div class="value-inner">
+      <div>
+        <span class="section-eyebrow">// Pour les fournisseurs</span>
+        <h2 style="font-family:var(--serif);font-size:34px;color:#fff;font-weight:400;margin:0 0 18px">Votre produit, visible<br/><em style="color:var(--rust)">par les bons décideurs.</em></h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.75;margin:0 0 26px">Le référencement sur Buy-ineer est <strong style="color:#fff">gratuit</strong> — nous construisons votre fiche à partir de vos données publiques. Vous ne payez jamais pour être visible : vous payez uniquement quand un ingénieur demande à être mis en contact avec vous, et seulement si vous acceptez ce contact.</p>
+        <button class="btn-hero-primary" onclick="showPage('pricing')">Voir comment ça marche →</button>
+      </div>
+      <div class="value-list">
+        <div class="value-item"><span class="value-item-icon">🆓</span><div><div class="value-item-title">Référencement gratuit, sans engagement</div><div class="value-item-desc">Aucun paiement pour apparaître dans l'annuaire ou le catalogue.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📩</span><div><div class="value-item-title">Vous payez seulement le lead, sur acceptation</div><div class="value-item-desc">Un ingénieur demande un devis → on vous propose le contact → vous décidez de payer pour le recevoir, ou non.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">✅</span><div><div class="value-item-title">Badge Vérifié Premium (optionnel)</div><div class="value-item-desc">Visibilité prioritaire et certifications mises en avant pour les fournisseurs qui veulent aller plus loin.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📊</span><div><div class="value-item-title">Statistiques d'audience</div><div class="value-item-desc">Vues, clics et demandes de contact par mois sur votre fiche.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--white)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Ils utilisent Buy-ineer</span>
+      <h2 class="section-title">Ce que disent nos membres.</h2>
+      <div class="testimonials-grid">
+        <div class="testi-card"><p class="testi-quote">"Buy-ineer nous a économisé 3 semaines de sourcing sur notre projet d'OBC embarqué."</p><div class="testi-name">Thomas M.</div><div class="testi-role">Ingénieur systèmes, PME aéro</div></div>
+        <div class="testi-card"><p class="testi-quote">"Le comparatif de batteries lithium est exactement ce dont nos acheteurs avaient besoin."</p><div class="testi-name">Claire D.</div><div class="testi-role">Responsable achats, Tier 1 auto</div></div>
+        <div class="testi-card"><p class="testi-quote">"Enfin un outil qui parle la langue des ingénieurs et pas des commerciaux."</p><div class="testi-name">Romain V.</div><div class="testi-role">CTO, start-up mobilité</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <span class="section-eyebrow">// Commencer</span>
+    <h2 style="font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:400;margin:0 0 12px">Prêt à trouver vos équipements ?</h2>
+    <p style="font-size:14px;color:var(--muted)">Annuaire, fiches techniques complètes et demandes de devis — 100% gratuit pour les acheteurs.</p>
+    <div class="cta-btns">
+      <button class="btn-cta-primary" onclick="showPage('annuaire')">Explorer gratuitement</button>
+      <button class="btn-cta-secondary" onclick="showPage('pricing')">Voir le pricing</button>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════ PAGE ANNUAIRE ══════════ -->
+<div id="page-annuaire" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Annuaire des <span>fabricants</span> industriels</h1>
+        <p class="page-subtitle">Sourcez et évaluez les équipementiers mondiaux — batteries, PDU, OBC, vannes, actionneurs.</p>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div><div class="kpi-n" id="kpi-c">34</div><div class="kpi-l">Entreprises</div></div></div>
+        <div class="kpi"><div><div class="kpi-n" id="kpi-p">20</div><div class="kpi-l">Produits</div></div></div>
+        <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Industries</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="ann-industry-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie produit</div>
+        <div class="chip-group" id="ann-cat-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
+    </aside>
+    <main class="content">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
+        <span style="font-size:11px;color:var(--muted);font-style:italic">Profils Premium en premier</span>
+      </div>
+      <div class="grid-companies" id="companies-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE CATALOGUE ══════════ -->
+<div id="page-catalogue" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
+        <p class="page-subtitle">Fiches techniques détaillées — cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie</div>
+        <div class="chip-group" id="cat-cat-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="cat-ind-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetCatalogue()">↺ Réinitialiser</button>
+      <div class="pro-upsell">
+        <div class="pro-upsell-title">★ Vous êtes fournisseur ?</div>
+        <p>Référencement gratuit. Vous ne payez que si on vous transmet un contact qualifié.</p>
+        <button class="btn-upsell" onclick="showPage('submit')">Référencer mon entreprise →</button>
+      </div>
+    </aside>
+    <main class="content" id="catalogue-main">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
+        <span style="font-size:11px;color:var(--sage);background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:3px;padding:3px 8px">✓ Specs techniques complètes — gratuit</span>
+      </div>
+      <div class="grid-products" id="products-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE PRICING ══════════ -->
+<div id="page-pricing" class="page">
+  <div class="pricing-header">
+    <span class="section-eyebrow" style="margin-bottom:10px">// TARIFS</span>
+    <h1 style="font-family:var(--serif);font-size:40px;color:var(--ink);font-weight:400;margin:0 0 14px">Un accès adapté à <em style="color:var(--rust)">chaque usage.</em></h1>
+    <p style="font-size:15px;color:var(--muted);max-width:520px;margin:0 auto">Accès gratuit pour explorer. Specs complètes et contacts avec Pro. Leads qualifiés avec Premium Fournisseur.</p>
+  </div>
+  <div class="plans-grid" id="plans-grid"></div>
+  <div class="enterprise-band">
+    <div class="enterprise-card">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.10em;text-transform:uppercase;margin-bottom:6px">// ENTREPRISE</div>
+        <h3 style="font-family:var(--serif);font-size:22px;color:#fff;font-weight:400;margin:0 0 6px">Besoin d'un accès pour toute votre équipe ?</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);margin:0">Licences multi-utilisateurs, SSO, API, intégration ERP. Tarif sur mesure.</p>
+      </div>
+      <button class="btn-hero-primary" style="white-space:nowrap">Nous contacter →</button>
+    </div>
+  </div>
+  <section class="faq-section">
+    <span class="section-eyebrow">// FAQ</span>
+    <h2 style="font-family:var(--serif);font-size:28px;color:var(--ink);font-weight:400;margin:0 0 24px">Questions fréquentes.</h2>
+    <div id="faq-list"></div>
+  </section>
+</div>
+
+<!-- ══════════ PAGE SUBMIT (référencement fournisseur) ══════════ -->
+<div id="page-submit" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Référencer <span>mon entreprise</span></h1>
+        <p class="page-subtitle">Gratuit. Vos produits sont relus avant publication — comptez quelques jours.</p>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap" id="submit-wrap">
+    <p class="submit-intro">Vous ne payez jamais pour être référencé. Une fois validés, vos produits apparaissent dans l'annuaire et le catalogue. Vous ne serez sollicité pour un paiement que si un ingénieur demande un devis et que vous acceptez de recevoir ce contact.</p>
+    <form id="submit-form" onsubmit="submitSupplierForm(event)">
+      <div class="submit-section-title">Vos coordonnées</div>
+      <div class="submit-grid">
+        <div class="lead-field"><label>Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
+        <div class="lead-field"><label>Votre email</label><input type="email" id="sub-submitter-email" required/></div>
+      </div>
+
+      <div class="submit-section-title" style="margin-top:24px">Votre entreprise</div>
+      <div class="submit-grid">
+        <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
+        <div class="lead-field"><label>Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France"/></div>
+        <div class="lead-field"><label>Siège</label><input type="text" id="sub-company-hq"/></div>
+        <div class="lead-field"><label>Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense"/></div>
+        <div class="lead-field"><label>Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
+        <div class="lead-field"><label>Email de contact public</label><input type="email" id="sub-company-contact"/></div>
+      </div>
+      <div class="lead-field"><label>Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
+
+      <div class="submit-section-title" style="margin-top:24px">Vos produits</div>
+      <div id="product-blocks"></div>
+      <button type="button" class="btn-add-product" onclick="addProductBlock()">+ Ajouter un produit</button>
+
+      <div class="submit-actions">
+        <button type="submit" class="btn-submit-form">📩 Envoyer pour validation</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<datalist id="industry-list"></datalist>
+
+<!-- MODALS -->
+<div class="overlay" id="company-overlay">
+  <div class="modal" id="company-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="modal-logo" id="m-logo"></div>
+          <div>
+            <div class="modal-name" id="m-name"></div>
+            <div class="modal-location" id="m-location"></div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('company-overlay')">✕</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap" id="m-badges"></div>
+    </div>
+    <div class="modal-body">
+      <div class="claim-banner" id="m-claim-banner" style="display:none">
+        <span style="font-size:16px">ℹ️</span>
+        <p>Fiche non revendiquée — construite à partir de données publiques. Êtes-vous <strong id="m-claim-name"></strong> ?</p>
+        <button onclick="closeModal('company-overlay');showPage('submit')">Revendiquer</button>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Description</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0" id="m-desc"></p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Informations société</div>
+        <div class="detail-grid" id="m-details"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Gammes & Technologies</div>
+        <div class="modal-tags" id="m-tags"></div>
+      </div>
+      <div class="modal-section" id="m-prods-section">
+        <div class="modal-section-title">Produits référencés sur Buy-ineer</div>
+        <div class="modal-prod-grid" id="m-prods"></div>
+        <button class="btn-see-products" id="m-see-products-btn">🔧 Voir tous leurs produits →</button>
+      </div>
+      <div class="modal-actions">
+        <a class="btn-visit" id="m-site" href="#" target="_blank" rel="noopener">↗ Visiter le site officiel</a>
+        <button class="btn-quote" id="m-quote-btn">📩 Demander un devis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="compare-overlay">
+  <div class="cmp-modal">
+    <div class="cmp-head">
+      <h2>Comparaison technique</h2>
+      <button style="background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;border-radius:4px;padding:5px 12px" onclick="closeModal('compare-overlay')">✕ Fermer</button>
+    </div>
+    <div style="overflow-x:auto" id="compare-table-wrap"></div>
+  </div>
+</div>
+
+<!-- LEAD / REQUEST QUOTE MODAL -->
+<div class="overlay" id="lead-overlay">
+  <div class="modal lead-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div class="modal-name" style="font-size:18px">Demander un devis</div>
+        <button class="modal-close" onclick="closeModal('lead-overlay')">✕</button>
+      </div>
+      <div class="modal-location" id="lead-target" style="margin-top:6px"></div>
+    </div>
+    <div class="modal-body" id="lead-body">
+      <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non — vous ne serez jamais inscrit à une liste de diffusion.</p>
+      <form id="lead-form" onsubmit="submitLeadForm(event)">
+        <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" required/></div>
+        <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" required/></div>
+        <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" required/></div>
+        <div class="lead-field"><label>Votre besoin</label><textarea id="lead-need" required placeholder="Quantité, contraintes techniques, délai…"></textarea></div>
+        <button type="submit" class="btn-quote" style="width:100%;justify-content:center">📩 Envoyer la demande</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE BANNER -->
+<div class="compare-banner" id="compare-banner">
+  <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5)" id="compare-count">0/4</span>
+  <div class="compare-pills" id="compare-pills"></div>
+  <button class="btn-compare" onclick="openCompareModal()">Comparer →</button>
+</div>
+
+<script>
+// ═══════════════════════════════
+// CONFIGURATION SUPABASE
+// Remplace ces deux valeurs par tes vraies clés
+// (Settings → API dans ton projet Supabase)
+// ═══════════════════════════════
+const SUPABASE_URL    = 'https://pzejxwrtsglmiitbhpjr.supabase.co';  // ex: https://abcdef.supabase.co
+const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6ZWp4d3J0c2dsbWlpdGJocGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTEwNTMsImV4cCI6MjA5Njk4NzA1M30.-SpxNs7G_5nEuZCXL68lNVcCzFTyiaZc93dViix76Ok';     // clé publique anon
+
+// ═══════════════════════════════
+// DATA — chargée depuis Supabase
+// ═══════════════════════════════
+let INDUSTRIES = [];
+let PROD_CATS  = [];
+let COMPANIES  = [];
+let PRODUCTS   = [];
+const TICKER_ITEMS = ["TYVA Energie — Moduloo Ax 48V 30Ah — 1 690 € HT","CATL — LiFePO4 280Ah — ~480 €/kWh","Delta Electronics — OBC 22 kW V2G — ~3 800 €","Moog — D633 Servovanne — ~8 500 €","Batconnect — LFP 48V 100Ah IoT — Sur devis","Eaton — ePDU G3 32A — ~1 200 €","ABB — ACS880 5 600 kW — 800–150 000 €","Airbus — COSMO-BATT Satellite GEO — Sur devis","GS Yuasa — LSE134 Li-ion Spatial — Sur devis","Bradford ECAPS — 1N HPGP Propulseur vert — Sur devis"];
+const PLANS = [
+  {name:"Acheteur",price:"0 €",period:"pour toujours",highlight:false,target:"annuaire",desc:"Pour les ingénieurs et acheteurs qui sourcent des équipements.",cta:"Explorer gratuitement",ctaClass:"secondary",features:[
+    {ok:true, text:"Annuaire complet"},
+    {ok:true, text:"Fiches produits — specs techniques complètes"},
+    {ok:true, text:"Filtres par industrie et catégorie"},
+    {ok:true, text:"Comparaison illimitée (4 produits)"},
+    {ok:true, text:"Demandes de devis illimitées"},
+    {ok:true, text:"Aucune carte bancaire requise"}
+  ]},
+  {name:"Fournisseur — Référencement",price:"0 €",period:"pour toujours",highlight:true,target:"submit",desc:"Votre entreprise référencée gratuitement. Vous ne payez que sur résultat.",cta:"Référencer mon entreprise",ctaClass:"primary",features:[
+    {ok:true, text:"Fiche entreprise et produits dans l'annuaire"},
+    {ok:true, text:"Aucun paiement pour être listé ou visible"},
+    {ok:true, text:"Vous choisissez d'accepter ou refuser chaque demande de contact"},
+    {ok:true, text:"Payez uniquement le lead accepté (~80 €/lead qualifié)"},
+    {ok:false,text:"Badge Vérifié Premium"},
+    {ok:false,text:"Priorité dans les résultats de recherche"}
+  ]},
+  {name:"Fournisseur Premium",price:"1 500 €",period:"/an",highlight:false,target:"submit",desc:"Pour les fabricants qui veulent maximiser leur visibilité et leurs leads.",cta:"Devenir Premium",ctaClass:"secondary",features:[
+    {ok:true, text:"Tout le plan Référencement"},
+    {ok:true, text:"Badge ★ PREMIUM et mise en avant prioritaire"},
+    {ok:true, text:"Profil enrichi : vidéo, datasheets, certifications"},
+    {ok:true, text:"Dashboard analytics : vues, clics, demandes"},
+    {ok:true, text:"Fiches produits illimitées"},
+    {ok:true, text:"Support dédié à l'intégration"}
+  ]},
+];
+
+const FAQ = [
+  {q:"Dois-je payer pour que mon entreprise soit référencée ?",a:"Non. Le référencement de base est et restera toujours gratuit. Vous ne payez jamais pour être listé ou visible dans l'annuaire."},
+  {q:"Comment fonctionne le paiement par lead ?",a:"Quand un ingénieur demande un devis sur votre fiche, nous vous proposons le contact. Vous choisissez de l'accepter (paiement ~80 € par lead qualifié) ou de le refuser, sans frais. Aucune facture n'est jamais envoyée sans votre accord explicite."},
+  {q:"Les acheteurs doivent-ils payer pour voir les specs ou contacter un fournisseur ?",a:"Non. L'accès acheteur est entièrement gratuit : annuaire, fiches techniques complètes et demandes de devis illimitées, sans carte bancaire."},
+  {q:"Comment fonctionne le badge Premium fournisseur ?",a:"Votre entreprise apparaît en tête des résultats pertinents, avec un encadré doré et le badge ★ PREMIUM, pour 1 500 €/an."},
+  {q:"Que se passe-t-il si mon entreprise est listée sans que je le sache ?",a:"Les fiches non revendiquées sont construites à partir de données publiques (sites, datasheets). Vous pouvez les revendiquer gratuitement à tout moment, ou demander leur retrait."},
+  {q:"Le site est-il indexé sur Google ?",a:"Oui. Chaque fiche entreprise et produit est optimisée pour le référencement naturel (SEO)."},
+];
+
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+const FOUNDER_EMAIL = 'contact@buy-ineer.fr'; // reçoit toutes les demandes de devis (étape manuelle — voir README)
+let annIndustry = 'all';
+let annCat = 'all';
+let catCat = 'all';
+let catInd = 'all';
+let compareIds = [];
+let currentPage = 'home';
+let leadTarget = null;
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+// ═══════════════════════════════
+// HELPERS SUPABASE
+// ═══════════════════════════════
+
+// Requête générique vers l'API Supabase REST
+async function supabase(table, params = '') {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${params ? '?' + params : ''}`;
+  const res = await fetch(url, {
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'Content-Type': 'application/json',
+    }
+  });
+  if (!res.ok) throw new Error(`Supabase ${table}: HTTP ${res.status}`);
+  return res.json();
+}
+
+// Transforme une ligne company Supabase → format attendu par le HTML
+function mapCompany(row) {
+  return {
+    name:      row.name,
+    country:   row.country,
+    hq:        row.hq        || '',
+    industry:  row.industry,
+    products:  row.categories || [],
+    tags:      row.tags       || [],
+    desc:      row.description || '',
+    site:      row.site       || '#',
+    logo:      row.logo       || '🏭',
+    verified:  row.verified   || false,
+    premium:   row.premium    || false,
+    employees: row.employees  || 'N/A',
+    founded:   row.founded    || 'N/A',
+    contact:   row.contact_email || '',
+  };
+}
+
+// Transforme une ligne product Supabase → format attendu par le HTML
+function mapProduct(row) {
+  return {
+    id:       row.id,
+    name:     row.name,
+    maker:    row.company_name || '',
+    cat:      row.category,
+    industry: row.industry,
+    icon:     row.icon        || '🔧',
+    desc:     row.description || '',
+    specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium })),
+    bars:     (row.bars  || []).map(b => ({ l: b.label, v: b.value, c: b.color })),
+    certs:    row.certs  || [],
+    price:    row.price_label || 'Sur devis',
+  };
+}
+
+// ═══════════════════════════════
+// CHARGEMENT DES DONNÉES
+// ═══════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  initTicker();
+  showLoading();
+  try {
+    // Charger en parallèle les entreprises et les produits
+    const [companiesRaw, productsRaw, tagsRaw, catsRaw] = await Promise.all([
+      supabase('v_companies_summary', 'order=premium.desc,name.asc'),
+      supabase('v_products_full',     'order=company_name.asc,name.asc'),
+      supabase('company_tags',         'select=company_id,tag'),
+      supabase('company_product_categories', 'select=company_id,category'),
+    ]);
+
+    // Grouper tags et catégories par company_id
+    const tagsMap = {};
+    tagsRaw.forEach(t => {
+      if (!tagsMap[t.company_id]) tagsMap[t.company_id] = [];
+      tagsMap[t.company_id].push(t.tag);
+    });
+    const catsMap = {};
+    catsRaw.forEach(c => {
+      if (!catsMap[c.company_id]) catsMap[c.company_id] = [];
+      catsMap[c.company_id].push(c.category);
+    });
+
+    // Enrichir les entreprises avec leurs tags et catégories
+    COMPANIES = companiesRaw.map(row => {
+      row.tags       = tagsMap[row.id]  || [];
+      row.categories = catsMap[row.id]  || [];
+      return mapCompany(row);
+    });
+
+    PRODUCTS = productsRaw.map(mapProduct);
+
+    // Extraire dynamiquement les listes de filtres depuis les données
+    INDUSTRIES = [...new Set(COMPANIES.map(c => c.industry))].sort();
+    PROD_CATS  = [...new Set(COMPANIES.flatMap(c => c.products))].sort();
+
+    initApp();
+
+  } catch (err) {
+    console.error('Erreur Supabase:', err);
+    showLoadError();
+  }
+});
+
+function showLoading() {
+  const msg = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px">' +
+    '<div style="font-size:30px;display:inline-block;animation:spin 1s linear infinite">⚙️</div>' +
+    '<p style="color:var(--muted);margin-top:12px;font-size:13px">Chargement des données…</p></div>';
+  ['companies-grid','products-grid'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = msg;
+  });
+}
+
+function showLoadError() {
+  const msg = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;background:var(--white);border:1px solid var(--border);border-radius:8px">' +
+    '<div style="font-size:28px;margin-bottom:10px">⚠️</div>' +
+    '<p style="color:var(--rust);font-weight:700;font-size:14px;margin-bottom:6px">Impossible de se connecter à Supabase</p>' +
+    '<p style="color:var(--muted);font-size:12px;line-height:1.7">' +
+    'Vérifie que <code>SUPABASE_URL</code> et <code>SUPABASE_ANON</code> sont correctement renseignés dans le code.<br><br>' +
+    'Dans Supabase : <strong>Settings → API</strong> → copie le <em>Project URL</em> et la clé <em>anon public</em>.<br><br>' +
+    'Vérifie aussi que les politiques RLS autorisent la lecture publique (policy <em>companies_read_all</em>).' +
+    '</p></div>';
+  ['companies-grid','products-grid'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = msg;
+  });
+}
+
+function initApp() {
+  initChips('ann-industry-chips', INDUSTRIES, () => annIndustry, v => { annIndustry = v; renderCompanies(); });
+  initChips('ann-cat-chips', PROD_CATS, () => annCat, v => { annCat = v; renderCompanies(); });
+  initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; renderProducts(); });
+  initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; renderProducts(); });
+  renderCompanies();
+  renderProducts();
+  renderPlans();
+  renderFAQ();
+  document.getElementById('stat-c').textContent = COMPANIES.length;
+  document.getElementById('stat-p').textContent = PRODUCTS.length;
+  document.getElementById('kpi-c').textContent = COMPANIES.length;
+  document.getElementById('kpi-p').textContent = PRODUCTS.length;
+  document.querySelectorAll('.overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
+
+  const indList = document.getElementById('industry-list');
+  if (indList) indList.innerHTML = INDUSTRIES.map(i => `<option value="${i}">`).join('');
+  addProductBlock();
+}
+
+function initTicker() {
+  const text = TICKER_ITEMS.join('   ·   ');
+  const el = document.getElementById('tickerText');
+  el.textContent = text + '     ' + text;
+}
+
+function initChips(containerId, items, getState, setState) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'chip active';
+  allBtn.textContent = 'Tous';
+  allBtn.onclick = () => { setState('all'); updateChips(containerId, getState); };
+  el.appendChild(allBtn);
+  items.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = item;
+    btn.onclick = () => { setState(item); updateChips(containerId, getState); };
+    el.appendChild(btn);
+  });
+}
+
+function updateChips(containerId, getState) {
+  document.querySelectorAll('#' + containerId + ' .chip').forEach(c => {
+    const isAll = c.textContent === 'Tous';
+    c.classList.toggle('active', isAll ? getState() === 'all' : c.textContent === getState());
+  });
+}
+
+// ═══════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  const link = document.querySelector('[data-page="'+pageId+'"]');
+  if(link) link.classList.add('active');
+  currentPage = pageId;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══════════════════════════════
+// RENDER COMPANIES
+// ═══════════════════════════════
+function renderCompanies() {
+  const q = (document.getElementById('ann-search')?.value || '').toLowerCase();
+  const filtered = COMPANIES.filter(c => {
+    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
+    return ms && (annIndustry === 'all' || c.industry === annIndustry) && (annCat === 'all' || c.products.includes(annCat));
+  }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
+
+  const count = document.getElementById('ann-count');
+  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
+
+  const grid = document.getElementById('companies-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  if(!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucune entreprise ne correspond.</p></div>';
+    return;
+  }
+
+  filtered.forEach(c => {
+    const prodCount = PRODUCTS.filter(p => p.maker === c.name).length;
+    const card = document.createElement('div');
+    card.className = 'company-card' + (c.premium ? ' premium' : '');
+    card.innerHTML = `
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="card-logo">${c.logo}</div>
+          <div>
+            <div class="card-name">${c.name}</div>
+            <div class="card-meta">${c.country} · ${c.hq}</div>
+          </div>
+        </div>
+        <div class="card-badges">
+          ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
+          ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+        </div>
+      </div>
+      <span class="tag tag-industry">${c.industry}</span>
+      <p class="card-desc">${c.desc}</p>
+      <div class="card-tags">${c.tags.slice(0,4).map(t => '<span class="tag">'+t+'</span>').join('')}</div>
+      <div class="card-footer">
+        <span class="card-site">↗ ${c.site.replace('https://','').replace('www.','')}</span>
+        ${prodCount > 0 ? '<span class="card-prod-count">'+prodCount+' produit'+(prodCount>1?'s':'')+'</span>' : ''}
+      </div>`;
+    card.onclick = () => openCompanyModal(c);
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════
+// RENDER PRODUCTS
+// ═══════════════════════════════
+function renderProducts() {
+  const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
+  const filtered = PRODUCTS.filter(p => {
+    const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    return ms && (catCat === 'all' || p.cat === catCat) && (catInd === 'all' || p.industry === catInd);
+  });
+
+  const count = document.getElementById('cat-count');
+  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
+
+  const grid = document.getElementById('products-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  if(!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucun produit ne correspond.</p></div>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const isSelected = compareIds.includes(p.id);
+
+    const card = document.createElement('div');
+    card.className = 'prod-card';
+    card.innerHTML = `
+      <div class="prod-card-top">
+        <div class="prod-card-header">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div class="prod-icon-wrap">${p.icon}</div>
+            <div>
+              <div class="prod-name">${p.name}</div>
+              <div class="prod-maker">
+                ${p.maker}
+                <span class="tag tag-industry" style="font-size:10px">${p.cat}</span>
+              </div>
+            </div>
+          </div>
+          <button class="compare-cb ${isSelected ? 'selected' : ''}" onclick="toggleCompare('${p.id}',this)" title="Comparer">${isSelected ? '✓' : ''}</button>
+        </div>
+        <p class="prod-desc">${p.desc}</p>
+      </div>
+      <div class="prod-card-body">
+        <table class="spec-table">
+          <tbody>
+            ${p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        ${p.bars.map(b => `
+          <div class="bar-row">
+            <div class="bar-labels"><span>${b.l}</span><span style="font-weight:700">${b.v}%</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${b.v}%;background:${b.c}"></div></div>
+          </div>`).join('')}
+        <div class="cert-row">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>
+      </div>
+      <div class="prod-card-footer">
+        <span class="price-tag">💰 ${p.price}</span>
+        <button class="btn-quote-sm" onclick="openLeadModal('${p.name.replace(/'/g,"\\'")}',  '${p.maker.replace(/'/g,"\\'")}')">📩 Demander un devis</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════
+// COMPARE
+// ═══════════════════════════════
+function toggleCompare(id, btn) {
+  if(compareIds.includes(id)) {
+    compareIds = compareIds.filter(x => x !== id);
+  } else {
+    if(compareIds.length >= 4) { alert('Maximum 4 produits à la fois.'); return; }
+    compareIds.push(id);
+  }
+  renderProducts();
+  updateCompareBanner();
+}
+
+function updateCompareBanner() {
+  const banner = document.getElementById('compare-banner');
+  const n = compareIds.length;
+  document.getElementById('compare-count').textContent = n+'/4';
+  const pills = document.getElementById('compare-pills');
+  pills.innerHTML = compareIds.map(id => {
+    const p = PRODUCTS.find(x => x.id === id);
+    if(!p) return '';
+    const label = p.name.length > 20 ? p.name.slice(0,20)+'…' : p.name;
+    return `<div class="compare-pill">${p.icon} ${label}<button onclick="toggleCompare('${id}')">✕</button></div>`;
+  }).join('');
+  banner.classList.toggle('visible', n >= 2);
+}
+
+function openCompareModal() {
+  const prods = compareIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+  const allLabels = [...new Set(prods.flatMap(p => p.specs.map(s => s.l)))];
+  const allBars   = [...new Set(prods.flatMap(p => p.bars.map(b => b.l)))];
+
+  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${p.icon}</span><strong style="font-size:11px">${p.name}</strong><span style="font-size:10px;opacity:.8">${p.maker}</span></div></th>`).join('');
+
+  const specRows = allLabels.map((label) => {
+    const cells = prods.map(p => {
+      const s = p.specs.find(x => x.l === label);
+      return `<td>${s ? s.v : '—'}</td>`;
+    }).join('');
+    return `<tr><td class="row-label">${label}</td>${cells}</tr>`;
+  }).join('');
+
+  const barRows = allBars.map(label => {
+    const vals = prods.map(p => { const b = p.bars.find(x => x.l === label); return b ? b.v : null; });
+    const max = Math.max(...vals.filter(v => v !== null));
+    const min = Math.min(...vals.filter(v => v !== null));
+    const cells = prods.map((p,i) => {
+      const v = vals[i];
+      const cls = v === max ? 'cmp-best' : v === min ? 'cmp-worst' : '';
+      return `<td class="${cls}">${v !== null ? v+'%' : '—'}</td>`;
+    }).join('');
+    return `<tr><td class="row-label">📊 ${label}</td>${cells}</tr>`;
+  }).join('');
+
+  const certRow = `<tr><td class="row-label">Certifications</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.join(', ')+'</td>').join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">Prix indicatif</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+p.price+'</td>').join('')}</tr>`;
+
+  document.getElementById('compare-table-wrap').innerHTML = `
+    <table class="cmp-table">
+      <thead><tr><th style="min-width:150px">Critère</th>${hCols}</tr></thead>
+      <tbody>
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Spécifications techniques</td></tr>
+        ${specRows}
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Scores relatifs</td></tr>
+        ${barRows}
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Prix & Certifications</td></tr>
+        ${priceRow}${certRow}
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">🟢 Meilleure valeur · 🔴 Valeur la plus basse</p>`;
+
+  document.getElementById('compare-overlay').classList.add('open');
+}
+
+// ═══════════════════════════════
+// COMPANY MODAL
+// ═══════════════════════════════
+function openCompanyModal(c) {
+  document.getElementById('m-logo').textContent = c.logo;
+  document.getElementById('m-name').textContent = c.name;
+  document.getElementById('m-location').textContent = c.country + ' · ' + c.hq;
+
+  const badges = document.getElementById('m-badges');
+  badges.innerHTML = (c.premium ? '<span class="badge-premium">★ Premium</span>' : '') +
+    (c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : '') +
+    '<span class="tag tag-industry">'+c.industry+'</span>';
+
+  const claimBanner = document.getElementById('m-claim-banner');
+  if(!c.premium) {
+    document.getElementById('m-claim-name').textContent = c.name;
+    claimBanner.style.display = 'flex';
+  } else {
+    claimBanner.style.display = 'none';
+  }
+
+  document.getElementById('m-desc').textContent = c.desc;
+
+  document.getElementById('m-details').innerHTML = [
+    ['Fondée en', c.founded], ['Effectifs', c.employees],
+    ['Secteur', c.industry], ['Siège', c.hq]
+  ].map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('');
+
+  document.getElementById('m-tags').innerHTML =
+    [...c.products, ...c.tags].map(t => '<span class="tag">'+t+'</span>').join('');
+
+  const compProds = PRODUCTS.filter(p => p.maker === c.name);
+  const prodsSection = document.getElementById('m-prods-section');
+  const prodsGrid = document.getElementById('m-prods');
+  const seeBtn = document.getElementById('m-see-products-btn');
+
+  if(compProds.length === 0) {
+    prodsSection.style.display = 'none';
+  } else {
+    prodsSection.style.display = 'block';
+    prodsGrid.innerHTML = compProds.map(p => `
+      <div class="modal-prod-card">
+        <div class="modal-prod-name">${p.icon} ${p.name}</div>
+        <div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div>
+        <div class="modal-prod-price">💰 ${p.price}</div>
+      </div>`).join('');
+    seeBtn.onclick = () => {
+      closeModal('company-overlay');
+      document.getElementById('cat-search').value = c.name;
+      catCat = 'all'; catInd = 'all';
+      renderProducts();
+      showPage('catalogue');
+    };
+  }
+
+  document.getElementById('m-site').href = c.site;
+  document.getElementById('m-site').textContent = '↗ Visiter le site officiel';
+
+  document.getElementById('m-quote-btn').onclick = () => {
+    closeModal('company-overlay');
+    openLeadModal(c.name, null);
+  };
+
+  document.getElementById('company-overlay').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ═══════════════════════════════
+// LEAD / REQUEST QUOTE
+// (Étape manuelle : la demande part vers FOUNDER_EMAIL, qui la relaie au
+//  fournisseur et ne facture le lead que si le fournisseur l'accepte —
+//  jamais de facturation sans accord préalable.)
+// ═══════════════════════════════
+function openLeadModal(targetName, productName) {
+  leadTarget = { company: targetName, product: productName };
+  document.getElementById('lead-target').textContent = productName
+    ? `${productName} — ${targetName}`
+    : targetName;
+  resetLeadForm();
+  document.getElementById('lead-overlay').classList.add('open');
+}
+
+function resetLeadForm() {
+  document.getElementById('lead-body').innerHTML = `
+    <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non — vous ne serez jamais inscrit à une liste de diffusion.</p>
+    <form id="lead-form" onsubmit="submitLeadForm(event)">
+      <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" required/></div>
+      <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" required/></div>
+      <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" required/></div>
+      <div class="lead-field"><label>Votre besoin</label><textarea id="lead-need" required placeholder="Quantité, contraintes techniques, délai…"></textarea></div>
+      <button type="submit" class="btn-quote" style="width:100%;justify-content:center">📩 Envoyer la demande</button>
+    </form>`;
+}
+
+function submitLeadForm(e) {
+  e.preventDefault();
+  const name = document.getElementById('lead-name').value;
+  const email = document.getElementById('lead-email').value;
+  const company = document.getElementById('lead-company').value;
+  const need = document.getElementById('lead-need').value;
+
+  const subject = encodeURIComponent(`Demande de devis Buy-ineer — ${leadTarget.company}`);
+  const body = encodeURIComponent(
+    `Nouvelle demande de devis sur Buy-ineer.\n\n` +
+    `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
+    `Contact acheteur :\n- Nom : ${name}\n- Email : ${email}\n- Entreprise : ${company}\n\n` +
+    `Besoin :\n${need}\n\n` +
+    `— Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`
+  );
+  // Étape 1 (manuelle) : ouvre un email pré-rempli vers le founder, qui relaie au fournisseur.
+  window.location.href = `mailto:${FOUNDER_EMAIL}?subject=${subject}&body=${body}`;
+
+  document.getElementById('lead-body').innerHTML = `
+    <div class="lead-success">
+      <div class="icon">✅</div>
+      <h3>Demande envoyée</h3>
+      <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement — vous n'avez rien à payer.</p>
+      <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">Fermer</button>
+    </div>`;
+}
+
+// ═══════════════════════════════
+// SUPPLIER SELF-SERVICE SUBMISSION
+// Écrit dans product_submissions (file d'attente, pas dans companies/products
+// directement) — chaque ligne est relue avant publication. Voir
+// supabase_product_submissions.sql pour la table et la policy RLS.
+// ═══════════════════════════════
+let productBlockCount = 0;
+
+function addProductBlock() {
+  productBlockCount++;
+  const idx = productBlockCount;
+  const block = document.createElement('div');
+  block.className = 'product-block';
+  block.id = 'product-block-' + idx;
+  block.innerHTML = `
+    <div class="product-block-header">
+      <span class="product-block-title">Produit ${idx}</span>
+      <button type="button" class="btn-remove-product" onclick="removeProductBlock(${idx})">✕ Retirer</button>
+    </div>
+    <div class="submit-grid">
+      <div class="lead-field"><label>Nom du produit</label><input type="text" class="p-name" required/></div>
+      <div class="lead-field"><label>Catégorie</label><input type="text" class="p-category" required placeholder="ex: Batteries & Stockage"/></div>
+      <div class="lead-field"><label>Industrie</label><input type="text" class="p-industry" list="industry-list"/></div>
+      <div class="lead-field"><label>Prix indicatif</label><input type="text" class="p-price" placeholder="ex: ~500 € ou Sur devis"/></div>
+    </div>
+    <div class="lead-field"><label>Description</label><textarea class="p-desc"></textarea></div>
+    <div class="lead-field"><label>Certifications (séparées par des virgules)</label><input type="text" class="p-certs" placeholder="CE, UN38.3, ..."/></div>
+    <div class="lead-field">
+      <label>Specs techniques</label>
+      <div class="spec-rows" id="spec-rows-${idx}"></div>
+      <button type="button" class="btn-add-spec" onclick="addSpecRow(${idx})">+ Ajouter une spec</button>
+    </div>`;
+  document.getElementById('product-blocks').appendChild(block);
+  addSpecRow(idx);
+}
+
+function removeProductBlock(idx) {
+  const block = document.getElementById('product-block-' + idx);
+  if (block) block.remove();
+}
+
+function addSpecRow(blockIdx) {
+  const rows = document.getElementById('spec-rows-' + blockIdx);
+  const row = document.createElement('div');
+  row.className = 'spec-row';
+  row.innerHTML = `<input type="text" class="spec-label" placeholder="Label (ex: Tension)"/><input type="text" class="spec-value" placeholder="Valeur (ex: 48 V)"/><button type="button" class="btn-remove-spec" onclick="this.parentElement.remove()">✕</button>`;
+  rows.appendChild(row);
+}
+
+async function submitSupplierForm(e) {
+  e.preventDefault();
+
+  const submitterName = document.getElementById('sub-submitter-name').value;
+  const submitterEmail = document.getElementById('sub-submitter-email').value;
+  const companyName = document.getElementById('sub-company-name').value;
+  const companyCountry = document.getElementById('sub-company-country').value || null;
+  const companyHq = document.getElementById('sub-company-hq').value || null;
+  const companyIndustry = document.getElementById('sub-company-industry').value || null;
+  const companySite = document.getElementById('sub-company-site').value || null;
+  const companyContact = document.getElementById('sub-company-contact').value || null;
+  const companyDesc = document.getElementById('sub-company-desc').value || null;
+
+  const blocks = document.querySelectorAll('#product-blocks .product-block');
+  if (blocks.length === 0) { alert('Ajoutez au moins un produit.'); return; }
+
+  const rows = [];
+  blocks.forEach(block => {
+    const specs = [];
+    block.querySelectorAll('.spec-row').forEach(r => {
+      const l = r.querySelector('.spec-label').value.trim();
+      const v = r.querySelector('.spec-value').value.trim();
+      if (l && v) specs.push({ label: l, value: v });
+    });
+    const certs = block.querySelector('.p-certs').value.split(',').map(c => c.trim()).filter(Boolean);
+    rows.push({
+      status: 'pending',
+      submitter_name: submitterName,
+      submitter_email: submitterEmail,
+      company_name: companyName,
+      company_country: companyCountry,
+      company_hq: companyHq,
+      company_industry: companyIndustry,
+      company_site: companySite,
+      company_description: companyDesc,
+      company_contact_email: companyContact,
+      product_name: block.querySelector('.p-name').value,
+      product_category: block.querySelector('.p-category').value,
+      product_industry: companyIndustry,
+      product_description: block.querySelector('.p-desc').value || null,
+      product_price_label: block.querySelector('.p-price').value || null,
+      product_specs: specs,
+      product_certs: certs,
+    });
+  });
+
+  const submitBtn = document.querySelector('#submit-form .btn-submit-form');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi en cours…'; }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/product_submissions`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(rows),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    document.getElementById('submit-wrap').innerHTML = `
+      <div class="lead-success">
+        <div class="icon">✅</div>
+        <h3>Merci !</h3>
+        <p>${rows.length} produit(s) envoyé(s) pour validation. Vous serez recontacté à <strong>${submitterEmail}</strong> une fois la fiche publiée — gratuitement, aucune carte bancaire n'a été demandée.</p>
+        <button class="btn-quote" onclick="showPage('home')" style="width:100%;justify-content:center">Retour à l'accueil</button>
+      </div>`;
+  } catch (err) {
+    console.error('Erreur soumission Supabase:', err);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📩 Envoyer pour validation'; }
+    alert(`Erreur lors de l'envoi. Vérifiez votre connexion et réessayez, ou écrivez-nous directement à ${FOUNDER_EMAIL}.`);
+  }
+}
+
+// ═══════════════════════════════
+// RENDER PLANS
+// ═══════════════════════════════
+function renderPlans() {
+  const grid = document.getElementById('plans-grid');
+  if(!grid) return;
+  grid.innerHTML = PLANS.map(plan => `
+    <div class="plan-card ${plan.highlight ? 'highlight' : ''}">
+      ${plan.highlight ? '<div class="plan-popular">LE PLUS POPULAIRE</div>' : ''}
+      <div class="plan-name">${plan.name}</div>
+      <div class="plan-price">${plan.price}</div>
+      <div class="plan-period">${plan.period}</div>
+      <p class="plan-desc">${plan.desc}</p>
+      <button class="plan-cta ${plan.ctaClass}" onclick="showPage('${plan.target || 'annuaire'}')">${plan.cta}</button>
+      <div class="plan-divider"></div>
+      <div class="plan-features">
+        ${plan.features.map(f => `<div class="plan-feature ${f.ok ? 'ok' : 'no'}"><span class="plan-feature-icon">${f.ok ? '✓' : '✕'}</span><span>${f.text}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderFAQ() {
+  const el = document.getElementById('faq-list');
+  if(!el) return;
+  el.innerHTML = FAQ.map(f => `
+    <div class="faq-item">
+      <div class="faq-q">${f.q}</div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
+}
+
+function resetAnnuaire() {
+  document.getElementById('ann-search').value = '';
+  annIndustry = 'all'; annCat = 'all';
+  updateChips('ann-industry-chips', () => annIndustry);
+  updateChips('ann-cat-chips', () => annCat);
+  renderCompanies();
+}
+
+function resetCatalogue() {
+  document.getElementById('cat-search').value = '';
+  catCat = 'all'; catInd = 'all';
+  updateChips('cat-cat-chips', () => catCat);
+  updateChips('cat-ind-chips', () => catInd);
+  renderProducts();
+}
+</script>
+</body>
+</html>
