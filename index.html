@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Buy-ineer — Référentiel équipementiers industriels</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-label">// NOUVEAU</span>
+  <div class="ticker-track">
+    <span class="ticker-inner" id="tickerText"></span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="main">
+  <button class="logo" onclick="showPage('home')">
+    <div class="logo-mark">B</div>
+    <span class="logo-name">Buy<span>-ineer</span></span>
+  </button>
+  <div class="nav-links">
+    <button class="nav-link active" data-page="home" onclick="showPage('home')">Accueil</button>
+    <button class="nav-link" data-page="annuaire" onclick="showPage('annuaire')">Annuaire</button>
+    <button class="nav-link" data-page="catalogue" onclick="showPage('catalogue')">Produits & Specs</button>
+    <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Tarifs</button>
+  </div>
+  <div class="nav-right">
+    <span class="free-pill">✓ Annuaire & specs 100% gratuits</span>
+    <button class="nav-link" data-page="supplier" onclick="showPage('supplier')" style="font-size:12px">Espace fournisseur</button>
+    <button class="btn-signup" onclick="showPage('submit')">Référencer mon entreprise</button>
+  </div>
+</nav>
+
+<!-- ══════════ PAGE HOME ══════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <span class="hero-eyebrow">// Référentiel équipementiers industriels</span>
+      <h1>Sourcez les bons<br/><em>équipements industriels</em><br/>en minutes, pas en semaines.</h1>
+      <p>Batteries, OBC, PDU, vannes, actionneurs — fiches techniques détaillées, comparatifs côte-à-côte, contacts vérifiés. La base de référence pour ingénieurs et acheteurs industriels.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="showPage('annuaire')">Explorer l'annuaire →</button>
+        <button class="btn-hero-secondary" onclick="showPage('pricing')">Voir les offres</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band">
+    <div class="stats-band-inner">
+      <div class="stat-cell"><div class="stat-n" id="stat-c">34</div><div class="stat-l">Fabricants référencés</div></div>
+      <div class="stat-cell"><div class="stat-n" id="stat-p">20</div><div class="stat-l">Fiches produits</div></div>
+      <div class="stat-cell"><div class="stat-n">8</div><div class="stat-l">Catégories produits</div></div>
+      <div class="stat-cell"><div class="stat-n">6</div><div class="stat-l">Industries couvertes</div></div>
+    </div>
+  </div>
+
+  <section class="section" style="background:var(--paper)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Comment ça marche</span>
+      <h2 class="section-title">De la recherche au contact<br/>en trois étapes.</h2>
+      <div class="steps-grid">
+        <div class="step-card"><div class="step-num">01</div><div class="step-icon">🔍</div><h3 class="step-title">Recherchez</h3><p class="step-desc">Filtrez par industrie, catégorie ou fabricant. Accès à l'annuaire complet gratuitement.</p></div>
+        <div class="step-card"><div class="step-num">02</div><div class="step-icon">📊</div><h3 class="step-title">Comparez</h3><p class="step-desc">Sélectionnez jusqu'à 4 produits et comparez leurs specs techniques côte-à-côte.</p></div>
+        <div class="step-card"><div class="step-num">03</div><div class="step-icon">📩</div><h3 class="step-title">Contactez</h3><p class="step-desc">Demandez un devis en un clic, gratuitement — aucun compte Pro, aucune carte bancaire.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="value-section">
+    <div class="value-inner">
+      <div>
+        <span class="section-eyebrow">// Pour les fournisseurs</span>
+        <h2 style="font-family:var(--serif);font-size:34px;color:#fff;font-weight:400;margin:0 0 18px">Votre produit, visible<br/><em style="color:var(--rust)">par les bons décideurs.</em></h2>
+        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.75;margin:0 0 26px">Le référencement sur Buy-ineer est <strong style="color:#fff">gratuit</strong> — nous construisons votre fiche à partir de vos données publiques. Vous ne payez jamais pour être visible : vous payez uniquement quand un ingénieur demande à être mis en contact avec vous, et seulement si vous acceptez ce contact.</p>
+        <button class="btn-hero-primary" onclick="showPage('pricing')">Voir comment ça marche →</button>
+      </div>
+      <div class="value-list">
+        <div class="value-item"><span class="value-item-icon">🆓</span><div><div class="value-item-title">Référencement gratuit, sans engagement</div><div class="value-item-desc">Aucun paiement pour apparaître dans l'annuaire ou le catalogue.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📩</span><div><div class="value-item-title">Vous payez seulement le lead, sur acceptation</div><div class="value-item-desc">Un ingénieur demande un devis → on vous propose le contact → vous décidez de payer pour le recevoir, ou non.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">✅</span><div><div class="value-item-title">Badge Vérifié Premium (optionnel)</div><div class="value-item-desc">Visibilité prioritaire et certifications mises en avant pour les fournisseurs qui veulent aller plus loin.</div></div></div>
+        <div class="value-item"><span class="value-item-icon">📊</span><div><div class="value-item-title">Statistiques d'audience</div><div class="value-item-desc">Vues, clics et demandes de contact par mois sur votre fiche.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background:var(--white)">
+    <div class="section-inner">
+      <span class="section-eyebrow">// Ils utilisent Buy-ineer</span>
+      <h2 class="section-title">Ce que disent nos membres.</h2>
+      <div class="testimonials-grid">
+        <div class="testi-card"><p class="testi-quote">"Buy-ineer nous a économisé 3 semaines de sourcing sur notre projet d'OBC embarqué."</p><div class="testi-name">Thomas M.</div><div class="testi-role">Ingénieur systèmes, PME aéro</div></div>
+        <div class="testi-card"><p class="testi-quote">"Le comparatif de batteries lithium est exactement ce dont nos acheteurs avaient besoin."</p><div class="testi-name">Claire D.</div><div class="testi-role">Responsable achats, Tier 1 auto</div></div>
+        <div class="testi-card"><p class="testi-quote">"Enfin un outil qui parle la langue des ingénieurs et pas des commerciaux."</p><div class="testi-name">Romain V.</div><div class="testi-role">CTO, start-up mobilité</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <span class="section-eyebrow">// Commencer</span>
+    <h2 style="font-family:var(--serif);font-size:34px;color:var(--ink);font-weight:400;margin:0 0 12px">Prêt à trouver vos équipements ?</h2>
+    <p style="font-size:14px;color:var(--muted)">Annuaire, fiches techniques complètes et demandes de devis — 100% gratuit pour les acheteurs.</p>
+    <div class="cta-btns">
+      <button class="btn-cta-primary" onclick="showPage('annuaire')">Explorer gratuitement</button>
+      <button class="btn-cta-secondary" onclick="showPage('pricing')">Voir le pricing</button>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════ PAGE ANNUAIRE ══════════ -->
+<div id="page-annuaire" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Annuaire des <span>fabricants</span> industriels</h1>
+        <p class="page-subtitle">Sourcez et évaluez les équipementiers mondiaux — batteries, PDU, OBC, vannes, actionneurs.</p>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi"><div><div class="kpi-n" id="kpi-c">34</div><div class="kpi-l">Entreprises</div></div></div>
+        <div class="kpi"><div><div class="kpi-n" id="kpi-p">20</div><div class="kpi-l">Produits</div></div></div>
+        <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Industries</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="ann-industry-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie produit</div>
+        <div class="chip-group" id="ann-cat-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
+    </aside>
+    <main class="content">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
+        <span style="font-size:11px;color:var(--muted);font-style:italic">Profils Premium en premier</span>
+      </div>
+      <div class="grid-companies" id="companies-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE CATALOGUE ══════════ -->
+<div id="page-catalogue" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
+        <p class="page-subtitle">Fiches techniques détaillées — cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+      </div>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recherche</div>
+        <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie</div>
+        <div class="chip-group" id="cat-cat-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="cat-ind-chips"></div>
+      </div>
+      <button class="reset-btn" onclick="resetCatalogue()">↺ Réinitialiser</button>
+      <div class="pro-upsell">
+        <div class="pro-upsell-title">★ Vous êtes fournisseur ?</div>
+        <p>Référencement gratuit. Vous ne payez que si on vous transmet un contact qualifié.</p>
+        <button class="btn-upsell" onclick="showPage('submit')">Référencer mon entreprise →</button>
+      </div>
+    </aside>
+    <main class="content" id="catalogue-main">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
+        <span style="font-size:11px;color:var(--sage);background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:3px;padding:3px 8px">✓ Specs techniques complètes — gratuit</span>
+      </div>
+      <div class="grid-products" id="products-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE PRICING ══════════ -->
+<div id="page-pricing" class="page">
+  <div class="pricing-header">
+    <span class="section-eyebrow" style="margin-bottom:10px">// TARIFS</span>
+    <h1 style="font-family:var(--serif);font-size:40px;color:var(--ink);font-weight:400;margin:0 0 14px">Un accès adapté à <em style="color:var(--rust)">chaque usage.</em></h1>
+    <p style="font-size:15px;color:var(--muted);max-width:520px;margin:0 auto">Accès gratuit pour explorer. Specs complètes et contacts avec Pro. Leads qualifiés avec Premium Fournisseur.</p>
+  </div>
+  <div class="plans-grid" id="plans-grid"></div>
+  <div class="enterprise-band">
+    <div class="enterprise-card">
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--rust);letter-spacing:.10em;text-transform:uppercase;margin-bottom:6px">// ENTREPRISE</div>
+        <h3 style="font-family:var(--serif);font-size:22px;color:#fff;font-weight:400;margin:0 0 6px">Besoin d'un accès pour toute votre équipe ?</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,.6);margin:0">Licences multi-utilisateurs, SSO, API, intégration ERP. Tarif sur mesure.</p>
+      </div>
+      <button class="btn-hero-primary" style="white-space:nowrap">Nous contacter →</button>
+    </div>
+  </div>
+  <section class="faq-section">
+    <span class="section-eyebrow">// FAQ</span>
+    <h2 style="font-family:var(--serif);font-size:28px;color:var(--ink);font-weight:400;margin:0 0 24px">Questions fréquentes.</h2>
+    <div id="faq-list"></div>
+  </section>
+</div>
+
+<!-- ══════════ PAGE SUBMIT (référencement fournisseur) ══════════ -->
+<div id="page-submit" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Référencer <span>mon entreprise</span></h1>
+        <p class="page-subtitle">Gratuit. Vos produits sont relus avant publication — comptez quelques jours.</p>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap" id="submit-wrap">
+    <p class="submit-intro">Vous ne payez jamais pour être référencé. Une fois validés, vos produits apparaissent dans l'annuaire et le catalogue. Vous ne serez sollicité pour un paiement que si un ingénieur demande un devis et que vous acceptez de recevoir ce contact.</p>
+    <form id="submit-form" onsubmit="submitSupplierForm(event)">
+      <div class="submit-section-title">Vos coordonnées</div>
+      <div class="submit-grid">
+        <div class="lead-field"><label>Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
+        <div class="lead-field"><label>Votre email</label><input type="email" id="sub-submitter-email" required/></div>
+      </div>
+
+      <div class="submit-section-title" style="margin-top:24px">Votre entreprise</div>
+      <div class="submit-grid">
+        <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
+        <div class="lead-field"><label>Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France"/></div>
+        <div class="lead-field"><label>Siège</label><input type="text" id="sub-company-hq"/></div>
+        <div class="lead-field"><label>Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense"/></div>
+        <div class="lead-field"><label>Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
+        <div class="lead-field"><label>Email de contact public</label><input type="email" id="sub-company-contact"/></div>
+      </div>
+      <div class="lead-field"><label>Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
+
+      <div class="submit-section-title" style="margin-top:24px">Vos produits</div>
+      <div id="product-blocks"></div>
+      <button type="button" class="btn-add-product" onclick="addProductBlock()">+ Ajouter un produit</button>
+
+      <div class="submit-actions">
+        <button type="submit" class="btn-submit-form">📩 Envoyer pour validation</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<datalist id="industry-list"></datalist>
+
+<!-- ══════════ PAGE SUPPLIER (compte fournisseur) ══════════ -->
+<div id="page-supplier" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Espace <span>fournisseur</span></h1>
+        <p class="page-subtitle">Gérez vos produits. Chaque ajout/modification reste soumis à validation avant publication.</p>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap">
+
+    <!-- État: non connecté -->
+    <div id="sup-auth-box">
+      <div class="submit-grid" style="grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div class="submit-section-title">Se connecter</div>
+          <form onsubmit="supplierLogin(event)">
+            <div class="lead-field"><label>Email</label><input type="email" id="sup-login-email" required/></div>
+            <div class="lead-field"><label>Mot de passe</label><input type="password" id="sup-login-password" required/></div>
+            <button type="submit" class="btn-submit-form">Se connecter</button>
+          </form>
+        </div>
+        <div>
+          <div class="submit-section-title">Créer un compte</div>
+          <form onsubmit="supplierSignup(event)">
+            <div class="lead-field"><label>Email</label><input type="email" id="sup-signup-email" required/></div>
+            <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
+            <button type="submit" class="btn-submit-form">Créer mon compte</button>
+          </form>
+        </div>
+      </div>
+      <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
+    </div>
+
+    <!-- État: connecté, pas encore d'entreprise revendiquée -->
+    <div id="sup-claim-box" style="display:none">
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Cherchez votre entreprise dans l'annuaire Buy-ineer. La revendication est validée manuellement — comptez quelques jours.</p>
+      <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie"/></div>
+      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()">Chercher</button>
+      <div id="sup-claim-results" style="margin-top:14px"></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px">Votre entreprise n'existe pas encore sur Buy-ineer ? <a href="#submit" onclick="showPage('submit')" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
+    </div>
+
+    <!-- État: connecté, revendication en attente -->
+    <div id="sup-pending-box" style="display:none">
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <p style="font-size:13px;color:var(--text2)">Votre demande de revendication pour <strong id="sup-pending-company"></strong> est en attente de validation. Vous serez notifié une fois approuvée.</p>
+    </div>
+
+    <!-- État: connecté, entreprise revendiquée — tableau de bord -->
+    <div id="sup-dashboard" style="display:none">
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+
+      <div id="sup-products-list"></div>
+      <button type="button" class="btn-add-product" onclick="openSupplierProductForm()">+ Ajouter un produit</button>
+
+      <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
+
+      <div class="submit-section-title" style="margin-top:28px">Vos demandes en cours</div>
+      <div id="sup-submissions-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ PAGE ADMIN (validation des soumissions) ══════════ -->
+<div id="page-admin" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Admin — <span>Validation</span></h1>
+        <p class="page-subtitle">Accès réservé. Valide ou rejette les soumissions fournisseur avant publication.</p>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap">
+    <div id="admin-login-box">
+      <div class="submit-section-title">Connexion admin</div>
+      <form id="admin-login-form" onsubmit="adminLogin(event)">
+        <div class="lead-field"><label>Email</label><input type="email" id="admin-email" required/></div>
+        <div class="lead-field"><label>Mot de passe</label><input type="password" id="admin-password" required/></div>
+        <button type="submit" class="btn-submit-form">Se connecter</button>
+        <p id="admin-login-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+      </form>
+    </div>
+    <div id="admin-panel" style="display:none">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Soumissions en attente</span>
+        <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
+      </div>
+      <div id="admin-submissions-list"></div>
+
+      <div class="product-block-header" style="margin:28px 0 18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Revendications d'entreprise en attente</span>
+      </div>
+      <div id="admin-claims-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="company-overlay">
+  <div class="modal" id="company-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="modal-logo" id="m-logo"></div>
+          <div>
+            <div class="modal-name" id="m-name"></div>
+            <div class="modal-location" id="m-location"></div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('company-overlay')">✕</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap" id="m-badges"></div>
+    </div>
+    <div class="modal-body">
+      <div class="claim-banner" id="m-claim-banner" style="display:none">
+        <span style="font-size:16px">ℹ️</span>
+        <p>Fiche non revendiquée — construite à partir de données publiques. Êtes-vous <strong id="m-claim-name"></strong> ?</p>
+        <button onclick="closeModal('company-overlay');showPage('supplier')">Revendiquer</button>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Description</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0" id="m-desc"></p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Informations société</div>
+        <div class="detail-grid" id="m-details"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Gammes & Technologies</div>
+        <div class="modal-tags" id="m-tags"></div>
+      </div>
+      <div class="modal-section" id="m-prods-section">
+        <div class="modal-section-title">Produits référencés sur Buy-ineer</div>
+        <div class="modal-prod-grid" id="m-prods"></div>
+        <button class="btn-see-products" id="m-see-products-btn">🔧 Voir tous leurs produits →</button>
+      </div>
+      <div class="modal-actions">
+        <a class="btn-visit" id="m-site" href="#" target="_blank" rel="noopener">↗ Visiter le site officiel</a>
+        <button class="btn-quote" id="m-quote-btn">📩 Demander un devis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="compare-overlay">
+  <div class="cmp-modal">
+    <div class="cmp-head">
+      <h2>Comparaison technique</h2>
+      <button style="background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;border-radius:4px;padding:5px 12px" onclick="closeModal('compare-overlay')">✕ Fermer</button>
+    </div>
+    <div style="overflow-x:auto" id="compare-table-wrap"></div>
+  </div>
+</div>
+
+<!-- LEAD / REQUEST QUOTE MODAL -->
+<div class="overlay" id="lead-overlay">
+  <div class="modal lead-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div class="modal-name" style="font-size:18px">Demander un devis</div>
+        <button class="modal-close" onclick="closeModal('lead-overlay')">✕</button>
+      </div>
+      <div class="modal-location" id="lead-target" style="margin-top:6px"></div>
+    </div>
+    <div class="modal-body" id="lead-body">
+      <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non — vous ne serez jamais inscrit à une liste de diffusion.</p>
+      <form id="lead-form" onsubmit="submitLeadForm(event)">
+        <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" required/></div>
+        <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" required/></div>
+        <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" required/></div>
+        <div class="lead-field"><label>Votre besoin</label><textarea id="lead-need" required placeholder="Quantité, contraintes techniques, délai…"></textarea></div>
+        <button type="submit" class="btn-quote" style="width:100%;justify-content:center">📩 Envoyer la demande</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE BANNER -->
+<div class="compare-banner" id="compare-banner">
+  <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5)" id="compare-count">0/4</span>
+  <div class="compare-pills" id="compare-pills"></div>
+  <button class="btn-compare" onclick="openCompareModal()">Comparer →</button>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/leads.js"></script>
+<script src="js/submit.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/supplier.js"></script>
+</body>
+</html>
