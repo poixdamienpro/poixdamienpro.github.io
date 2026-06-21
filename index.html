@@ -27,6 +27,7 @@
     <button class="nav-link active" data-page="home" onclick="showPage('home')">Accueil</button>
     <button class="nav-link" data-page="annuaire" onclick="showPage('annuaire')">Annuaire</button>
     <button class="nav-link" data-page="catalogue" onclick="showPage('catalogue')">Produits & Specs</button>
+    <button class="nav-link" data-page="rfq" onclick="showPage('rfq')">RFQ/RFI</button>
     <button class="nav-link" data-page="pricing" onclick="showPage('pricing')">Tarifs</button>
   </div>
   <div class="nav-right">
@@ -198,6 +199,56 @@
   </div>
 </div>
 
+<!-- ══════════ PAGE RFQ/RFI ══════════ -->
+<div id="page-rfq" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">RFQ <span>& RFI</span></h1>
+        <p class="page-subtitle">Vous ne trouvez pas l'équipement qu'il vous faut dans le catalogue ? Publiez votre besoin — gratuit, illimité, et votre identité ne sera jamais visible des fournisseurs.</p>
+      </div>
+      <button class="btn-hero-primary" onclick="openRfqModal()">📩 Publier une RFQ/RFI →</button>
+    </div>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Industrie</div>
+        <div class="chip-group" id="rfq-ind-chips"></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégorie</div>
+        <div class="chip-group" id="rfq-cat-chips"></div>
+      </div>
+      <div class="pro-upsell">
+        <div class="pro-upsell-title">★ Vous êtes fournisseur Premium ?</div>
+        <p>Répondez directement aux RFQ/RFI ouvertes depuis votre espace fournisseur.</p>
+        <button class="btn-upsell" onclick="showPage('supplier')">Accéder à mon espace →</button>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="toolbar">
+        <div><span class="toolbar-label">// RFQ / RFI OUVERTES</span><span class="result-count" id="rfq-count"></span></div>
+      </div>
+      <div class="grid-products" id="rfq-grid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════ PAGE SUIVI RFQ (lien privé acheteur, ?rfq=&token=) ══════════ -->
+<div id="page-rfq-tracking" class="page">
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1 class="page-title">Vos <span>propales reçues</span></h1>
+        <p class="page-subtitle">Lien privé — gardez-le précieusement, c'est le seul moyen de retrouver vos réponses.</p>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap" id="rfq-tracking-body"></div>
+</div>
+
 <!-- ══════════ PAGE PRICING ══════════ -->
 <div id="page-pricing" class="page">
   <div class="pricing-header">
@@ -328,6 +379,11 @@
 
       <div class="submit-section-title" style="margin-top:28px">Vos demandes en cours</div>
       <div id="sup-submissions-list"></div>
+
+      <div class="submit-section-title" style="margin-top:28px">RFQ/RFI disponibles</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px" id="sup-rfq-premium-note"></p>
+      <div id="sup-rfq-list"></div>
+      <div id="sup-rfq-form-wrap" style="display:none;margin-top:20px"></div>
     </div>
 
   </div>
@@ -364,6 +420,11 @@
         <span class="submit-section-title" style="margin:0;border:none;padding:0">Revendications d'entreprise en attente</span>
       </div>
       <div id="admin-claims-list"></div>
+
+      <div class="product-block-header" style="margin:28px 0 18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">RFQ/RFI en attente de modération</span>
+      </div>
+      <div id="admin-rfqs-list"></div>
     </div>
   </div>
 </div>
@@ -448,6 +509,19 @@
   </div>
 </div>
 
+<!-- RFQ / RFI MODAL -->
+<div class="overlay" id="rfq-overlay">
+  <div class="modal lead-modal">
+    <div class="modal-head">
+      <div class="modal-head-row">
+        <div class="modal-name" style="font-size:18px">Publier une RFQ/RFI</div>
+        <button class="modal-close" onclick="closeModal('rfq-overlay')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="rfq-body"></div>
+  </div>
+</div>
+
 <!-- COMPARE BANNER -->
 <div class="compare-banner" id="compare-banner">
   <span style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5)" id="compare-count">0/4</span>
@@ -458,6 +532,7 @@
 <script src="js/data.js"></script>
 <script src="js/core.js"></script>
 <script src="js/leads.js"></script>
+<script src="js/rfq.js"></script>
 <script src="js/submit.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/supplier.js"></script>
