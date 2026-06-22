@@ -16,6 +16,32 @@ async function supabase(table, params = '') {
   return res.json();
 }
 
+// Récupère toutes les lignes d'une fonction RPC paginée (page par page),
+// au lieu d'un GET direct sur la vue — voir backend/supabase_anti_scraping_pagination.sql.
+// Le serveur plafonne chaque page à 50 lignes quoi qu'il arrive ; ça empêche
+// un scraper de dumper tout le catalogue en une seule requête.
+async function fetchAllPaged(rpcName, pageSize = 50) {
+  let all = [];
+  let offset = 0;
+  while (true) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_limit: pageSize, p_offset: offset }),
+    });
+    if (!res.ok) throw new Error(`Supabase RPC ${rpcName}: HTTP ${res.status}`);
+    const page = await res.json();
+    all = all.concat(page);
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+  return all;
+}
+
 function mapCompany(row) {
   return {
     name:      row.name,
@@ -56,8 +82,8 @@ function mapProduct(row) {
 // Appelé par les pages qui en ont besoin (annuaire, catalogue, submit, home) — pas par toutes.
 async function loadTaxonomy() {
   const [companiesRaw, productsRaw, tagsRaw, catsRaw] = await Promise.all([
-    supabase('v_companies_summary', 'order=premium.desc,name.asc'),
-    supabase('v_products_full',     'order=company_name.asc,name.asc'),
+    fetchAllPaged('get_companies_page'),
+    fetchAllPaged('get_products_page'),
     supabase('company_tags',         'select=company_id,tag'),
     supabase('company_product_categories', 'select=company_id,category'),
   ]);
