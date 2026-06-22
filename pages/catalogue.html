@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Catalogue produits & specs — Buy-ineer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'catalogue';</script>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
+      <p class="page-subtitle">Fiches techniques détaillées — cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+    </div>
+  </div>
+</div>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Catégorie</div>
+      <div class="chip-group" id="cat-cat-chips"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Industrie</div>
+      <div class="chip-group" id="cat-ind-chips"></div>
+    </div>
+    <button class="reset-btn" onclick="resetCatalogue()">↺ Réinitialiser</button>
+    <div class="pro-upsell">
+      <div class="pro-upsell-title">★ Vous êtes fournisseur ?</div>
+      <p>Référencement gratuit. Vous ne payez que si on vous transmet un contact qualifié.</p>
+      <a class="btn-upsell" href="submit.html">Référencer mon entreprise →</a>
+    </div>
+  </aside>
+  <main class="content" id="catalogue-main">
+    <div class="toolbar">
+      <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
+      <span style="font-size:11px;color:var(--sage);background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:3px;padding:3px 8px">✓ Specs techniques complètes — gratuit</span>
+    </div>
+    <div class="grid-products" id="products-grid"></div>
+  </main>
+</div>
+
+<div id="modals-slot"></div>
+
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/chips.js"></script>
+<script src="../js/modal.js"></script>
+<script src="../js/leads.js"></script>
+<script src="../js/pages/catalogue.js"></script>
+</body>
+</html>

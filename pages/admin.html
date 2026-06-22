@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin — Buy-ineer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'admin';</script>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Admin — <span>Validation</span></h1>
+      <p class="page-subtitle">Accès réservé. Valide ou rejette les soumissions fournisseur avant publication.</p>
+    </div>
+  </div>
+</div>
+<div class="submit-wrap">
+  <div id="admin-login-box">
+    <div class="submit-section-title">Connexion admin</div>
+    <form id="admin-login-form" onsubmit="adminLogin(event)">
+      <div class="lead-field"><label>Email</label><input type="email" id="admin-email" required/></div>
+      <div class="lead-field"><label>Mot de passe</label><input type="password" id="admin-password" required/></div>
+      <button type="submit" class="btn-submit-form">Se connecter</button>
+      <p id="admin-login-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+    </form>
+  </div>
+  <div id="admin-panel" style="display:none">
+    <div class="product-block-header" style="margin-bottom:18px">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">Soumissions en attente</span>
+      <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
+    </div>
+    <div id="admin-submissions-list"></div>
+
+    <div class="product-block-header" style="margin:28px 0 18px">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">Revendications d'entreprise en attente</span>
+    </div>
+    <div id="admin-claims-list"></div>
+  </div>
+</div>
+
+<div id="modals-slot"></div>
+
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/pages/admin.js"></script>
+</body>
+</html>

@@ -54,7 +54,7 @@ const FAQ = [
 // ═══════════════════════════════
 // STATE
 // ═══════════════════════════════
-const FOUNDER_EMAIL = 'poixdamien.pro@gmail.com'; // reçoit toutes les demandes de devis (étape manuelle — voir README)
+const FOUNDER_EMAIL = 'contact@buy-ineer.fr'; // reçoit toutes les demandes de devis (étape manuelle — voir README)
 let annIndustry = 'all';
 let annCat = 'all';
 let catCat = 'all';

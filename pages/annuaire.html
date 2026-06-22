@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Annuaire des fabricants — Buy-ineer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'annuaire';</script>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Annuaire des <span>fabricants</span> industriels</h1>
+      <p class="page-subtitle">Sourcez et évaluez les équipementiers mondiaux — batteries, PDU, OBC, vannes, actionneurs.</p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div><div class="kpi-n" id="kpi-c">34</div><div class="kpi-l">Entreprises</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-p">20</div><div class="kpi-l">Produits</div></div></div>
+      <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Industries</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Industrie</div>
+      <div class="chip-group" id="ann-industry-chips"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Catégorie produit</div>
+      <div class="chip-group" id="ann-cat-chips"></div>
+    </div>
+    <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
+  </aside>
+  <main class="content">
+    <div class="toolbar">
+      <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
+      <span style="font-size:11px;color:var(--muted);font-style:italic">Profils Premium en premier</span>
+    </div>
+    <div class="grid-companies" id="companies-grid"></div>
+  </main>
+</div>
+
+<div id="modals-slot"></div>
+
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/chips.js"></script>
+<script src="../js/modal.js"></script>
+<script src="../js/leads.js"></script>
+<script src="../js/pages/annuaire.js"></script>
+</body>
+</html>
