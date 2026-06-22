@@ -153,9 +153,6 @@ function initApp() {
     showPage('supplier');
     tryRestoreSupplierSession();
   }
-
-  loadRfqs();
-  tryShowRfqTrackingPage();
 }
 
 function initTicker() {

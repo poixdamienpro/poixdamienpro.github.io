@@ -108,7 +108,6 @@ async function supplierRouteAfterAuth() {
       document.getElementById('sup-dash-title').textContent = supplierCompany.name;
       loadSupplierProducts();
       loadSupplierSubmissions();
-      loadSupplierRfqs();
       return;
     }
     const claims = await supplierFetch(`company_claims?user_id=eq.${userId}&status=eq.pending&select=*,companies(name)&order=created_at.desc&limit=1`);
@@ -250,84 +249,6 @@ function openSupplierProductForm(productId) {
       document.getElementById('sup-p-desc').value = p.description || '';
       document.getElementById('sup-p-price').value = p.price_label || '';
     });
-  }
-}
-
-// ── RFQ/RFI — réservé aux fournisseurs Premium (companies.premium = true) ──
-// Lecture de v_rfqs_public (anon/authenticated autorisés), écriture dans
-// rfq_responses bloquée côté RLS si la société n'est pas Premium — voir
-// supabase_add_rfq_feature.sql, policy "premium_owner_can_respond".
-async function loadSupplierRfqs() {
-  const note = document.getElementById('sup-rfq-premium-note');
-  const list = document.getElementById('sup-rfq-list');
-  note.textContent = supplierCompany.premium
-    ? 'Vous pouvez répondre directement aux RFQ/RFI ouvertes ci-dessous.'
-    : "Réservé aux fournisseurs Premium. Vous pouvez consulter les besoins ouverts, mais l'envoi d'une propale nécessite le plan Premium.";
-  list.innerHTML = 'Chargement…';
-  try {
-    const rows = await supplierFetch('v_rfqs_public?order=created_at.desc');
-    if (!rows || !rows.length) { list.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucune RFQ/RFI ouverte pour le moment.</p>'; return; }
-    list.innerHTML = rows.map(r => `
-      <div class="admin-card">
-        <div class="admin-card-head">
-          <div>
-            <div class="admin-card-title">${r.rfq_type === 'RFI' ? '❔' : '📋'} ${r.title}</div>
-            <div class="admin-card-meta">${r.rfq_type} ${r.industry ? '· ' + r.industry : ''} ${r.category ? '· ' + r.category : ''} · publiée le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
-          </div>
-        </div>
-        <div class="admin-field-row"><span>Description</span><span>${r.description}</span></div>
-        ${r.specs_needed ? `<div class="admin-field-row"><span>Specs souhaitées</span><span>${r.specs_needed}</span></div>` : ''}
-        ${r.budget_range ? `<div class="admin-field-row"><span>Budget</span><span>${r.budget_range}</span></div>` : ''}
-        <div class="admin-actions">
-          ${supplierCompany.premium
-            ? `<button class="btn-approve" onclick="openSupplierRfqResponseForm('${r.id}','${r.title.replace(/'/g, "\\'")}')">📩 Répondre</button>`
-            : `<button class="btn-approve" onclick="showPage('pricing')" style="background:var(--muted)">★ Passer Premium pour répondre</button>`}
-        </div>
-      </div>`).join('');
-  } catch (err) {
-    list.innerHTML = `<p style="color:#C0392B;font-size:13px">${err.message}</p>`;
-  }
-}
-
-function openSupplierRfqResponseForm(rfqId, rfqTitle) {
-  const wrap = document.getElementById('sup-rfq-form-wrap');
-  wrap.style.display = 'block';
-  wrap.innerHTML = `
-    <div class="submit-section-title">Propale — ${rfqTitle}</div>
-    <form onsubmit="submitSupplierRfqResponse(event, '${rfqId}')">
-      <div class="submit-grid">
-        <div class="lead-field"><label>Prix proposé</label><input type="text" id="sup-rfq-price" placeholder="ex: 4 800 € HT ou Sur devis"/></div>
-        <div class="lead-field"><label>Délai</label><input type="text" id="sup-rfq-leadtime" placeholder="ex: 6 semaines"/></div>
-      </div>
-      <div class="lead-field"><label>Message / propale</label><textarea id="sup-rfq-message" required placeholder="Décrivez votre offre, vos références, vos conditions…"></textarea></div>
-      <div class="lead-field"><label>Document joint (URL, optionnel)</label><input type="url" id="sup-rfq-attachment" placeholder="https://…"/></div>
-      <div class="submit-actions">
-        <button type="submit" class="btn-submit-form">Envoyer ma propale</button>
-        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-rfq-form-wrap').style.display='none'">Annuler</button>
-      </div>
-    </form>`;
-}
-
-async function submitSupplierRfqResponse(e, rfqId) {
-  e.preventDefault();
-  try {
-    await supplierFetch('rfq_responses', {
-      method: 'POST',
-      headers: { 'Prefer': 'return=minimal' },
-      body: JSON.stringify([{
-        rfq_id: rfqId,
-        company_id: supplierCompany.id,
-        submitter_user_id: sessionStorage.getItem('sup_user_id'),
-        quote_price: document.getElementById('sup-rfq-price').value || null,
-        lead_time: document.getElementById('sup-rfq-leadtime').value || null,
-        message: document.getElementById('sup-rfq-message').value,
-        attachment_url: document.getElementById('sup-rfq-attachment').value || null,
-      }]),
-    });
-    document.getElementById('sup-rfq-form-wrap').style.display = 'none';
-    alert('Propale envoyée. L\'acheteur la consultera via son lien privé de suivi — vous ne recevrez jamais ses coordonnées directement.');
-  } catch (err) {
-    alert('Erreur : ' + err.message + (err.message.includes('403') ? ' (le plan Premium est requis pour répondre aux RFQ)' : ''));
   }
 }
 

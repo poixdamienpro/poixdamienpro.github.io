@@ -49,7 +49,6 @@ async function adminLogin(e) {
     document.getElementById('admin-panel').style.display = 'block';
     loadPendingSubmissions();
     loadPendingClaims();
-    loadPendingRfqs();
   } catch (err) {
     errBox.textContent = err.message;
     errBox.style.display = 'block';
@@ -69,7 +68,6 @@ function tryRestoreAdminSession() {
   document.getElementById('admin-panel').style.display = 'block';
   loadPendingSubmissions();
   loadPendingClaims();
-  loadPendingRfqs();
 }
 
 async function loadPendingSubmissions() {
@@ -352,85 +350,6 @@ async function rejectClaim(id) {
     delete adminClaimsCache[id];
     if (!Object.keys(adminClaimsCache).length) {
       document.getElementById('admin-claims-list').innerHTML = '<div class="admin-empty">Aucune revendication en attente.</div>';
-    }
-  } catch (err) {
-    alert('Erreur : ' + err.message);
-    card.querySelectorAll('button').forEach(b => b.disabled = false);
-  }
-}
-
-// ── Modération RFQ/RFI — seul l'admin lit buyer_name/email/company ──
-let adminRfqsCache = {};
-
-async function loadPendingRfqs() {
-  const list = document.getElementById('admin-rfqs-list');
-  list.innerHTML = '<div class="admin-empty">Chargement…</div>';
-  try {
-    const rows = await adminFetch('rfqs?status=eq.pending_review&order=created_at.asc');
-    adminRfqsCache = {};
-    (rows || []).forEach(r => { adminRfqsCache[r.id] = r; });
-    renderAdminRfqs(rows || []);
-  } catch (err) {
-    list.innerHTML = `<div class="admin-empty">${err.message}</div>`;
-  }
-}
-
-function renderAdminRfqs(rows) {
-  const list = document.getElementById('admin-rfqs-list');
-  if (!rows.length) {
-    list.innerHTML = '<div class="admin-empty">Aucune RFQ/RFI en attente. 🎉</div>';
-    return;
-  }
-  list.innerHTML = rows.map(r => `
-    <div class="admin-card" id="admin-rfq-${r.id}">
-      <div class="admin-card-head">
-        <div>
-          <div class="admin-card-title">${r.rfq_type === 'RFI' ? '❔' : '📋'} ${r.title}</div>
-          <div class="admin-card-meta">Posté par ${r.buyer_name} (${r.buyer_email})${r.buyer_company ? ' — ' + r.buyer_company : ''} le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
-        </div>
-      </div>
-      <div class="admin-field-row"><span>Industrie / Catégorie</span><span>${r.industry || '—'} / ${r.category || '—'}</span></div>
-      <div class="admin-field-row"><span>Description</span><span>${r.description}</span></div>
-      <div class="admin-field-row"><span>Specs souhaitées</span><span>${r.specs_needed || '—'}</span></div>
-      <div class="admin-field-row"><span>Budget / Échéance</span><span>${r.budget_range || '—'} / ${r.deadline || '—'}</span></div>
-      <div class="admin-actions">
-        <button class="btn-approve" onclick="approveRfq('${r.id}')">✓ Publier (ouvrir aux fournisseurs)</button>
-        <button class="btn-reject" onclick="rejectRfq('${r.id}')">✕ Rejeter</button>
-      </div>
-    </div>`).join('');
-}
-
-async function approveRfq(id) {
-  const card = document.getElementById(`admin-rfq-${id}`);
-  card.querySelectorAll('button').forEach(b => b.disabled = true);
-  try {
-    await adminFetch(`rfqs?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status: 'open' }),
-    });
-    card.remove();
-    delete adminRfqsCache[id];
-    if (!Object.keys(adminRfqsCache).length) {
-      document.getElementById('admin-rfqs-list').innerHTML = '<div class="admin-empty">Aucune RFQ/RFI en attente. 🎉</div>';
-    }
-  } catch (err) {
-    alert('Erreur : ' + err.message);
-    card.querySelectorAll('button').forEach(b => b.disabled = false);
-  }
-}
-
-async function rejectRfq(id) {
-  const card = document.getElementById(`admin-rfq-${id}`);
-  card.querySelectorAll('button').forEach(b => b.disabled = true);
-  try {
-    await adminFetch(`rfqs?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status: 'closed' }),
-    });
-    card.remove();
-    delete adminRfqsCache[id];
-    if (!Object.keys(adminRfqsCache).length) {
-      document.getElementById('admin-rfqs-list').innerHTML = '<div class="admin-empty">Aucune RFQ/RFI en attente. 🎉</div>';
     }
   } catch (err) {
     alert('Erreur : ' + err.message);
