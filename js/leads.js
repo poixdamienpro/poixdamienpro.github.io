@@ -1,8 +1,10 @@
 // ═══════════════════════════════
 // LEAD / REQUEST QUOTE
-// (Étape manuelle : la demande part vers FOUNDER_EMAIL, qui la relaie au
-//  fournisseur et ne facture le lead que si le fournisseur l'accepte —
-//  jamais de facturation sans accord préalable.)
+// L'email part automatiquement vers FOUNDER_EMAIL via Web3Forms (API
+// publique conçue pour être appelée depuis du JS client, comme la clé
+// anon Supabase). Le founder relaie ensuite au fournisseur et ne
+// facture le lead que si le fournisseur l'accepte — jamais de
+// facturation sans accord préalable.
 // ═══════════════════════════════
 function openLeadModal(targetName, productName) {
   leadTarget = { company: targetName, product: productName };
@@ -25,30 +27,48 @@ function resetLeadForm() {
     </form>`;
 }
 
-function submitLeadForm(e) {
+async function submitLeadForm(e) {
   e.preventDefault();
   const name = document.getElementById('lead-name').value;
   const email = document.getElementById('lead-email').value;
   const company = document.getElementById('lead-company').value;
   const need = document.getElementById('lead-need').value;
 
-  const subject = encodeURIComponent(`Demande de devis Buy-ineer — ${leadTarget.company}`);
-  const body = encodeURIComponent(
-    `Nouvelle demande de devis sur Buy-ineer.\n\n` +
-    `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
-    `Contact acheteur :\n- Nom : ${name}\n- Email : ${email}\n- Entreprise : ${company}\n\n` +
-    `Besoin :\n${need}\n\n` +
-    `— Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`
-  );
-  // Étape 1 (manuelle) : ouvre un email pré-rempli vers le founder, qui relaie au fournisseur.
-  window.location.href = `mailto:${FOUNDER_EMAIL}?subject=${subject}&body=${body}`;
+  const submitBtn = document.querySelector('#lead-form button[type=submit]');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi en cours…'; }
 
-  document.getElementById('lead-body').innerHTML = `
-    <div class="lead-success">
-      <div class="icon">✅</div>
-      <h3>Demande envoyée</h3>
-      <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement — vous n'avez rien à payer.</p>
-      <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">Fermer</button>
-    </div>`;
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_ACCESS_KEY,
+        subject: `Demande de devis Buy-ineer — ${leadTarget.company}`,
+        from_name: 'Buy-ineer',
+        to: FOUNDER_EMAIL,
+        name,
+        email,
+        company,
+        message:
+          `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
+          `Besoin :\n${need}\n\n` +
+          `— Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`,
+      }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Échec de l\'envoi.');
+
+    document.getElementById('lead-body').innerHTML = `
+      <div class="lead-success">
+        <div class="icon">✅</div>
+        <h3>Demande envoyée</h3>
+        <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement — vous n'avez rien à payer.</p>
+        <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">Fermer</button>
+      </div>`;
+  } catch (err) {
+    console.error('Erreur envoi lead:', err);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📩 Envoyer la demande'; }
+    alert(`Erreur lors de l'envoi. Vérifiez votre connexion et réessayez, ou écrivez-nous directement à ${FOUNDER_EMAIL}.`);
+  }
 }
 
