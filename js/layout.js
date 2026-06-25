@@ -17,6 +17,26 @@ async function loadLayout() {
   document.querySelectorAll('.overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
   });
+  logPageView();
+}
+
+// Log anonyme d'une vue de page (compté côté admin) — fire-and-forget,
+// pas de cookie, pas d'IP stockée. Voir backend/supabase_add_page_views.sql.
+function logPageView() {
+  fetch(`${SUPABASE_URL}/rest/v1/site_page_views`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal',
+    },
+    body: JSON.stringify([{
+      page: window.location.pathname,
+      referrer: document.referrer || null,
+      user_agent: navigator.userAgent,
+    }]),
+  }).catch(() => {});
 }
 
 function markActiveNavLink() {

@@ -52,6 +52,7 @@ async function adminLogin(e) {
     sessionStorage.setItem('admin_email', email);
     document.getElementById('admin-login-box').style.display = 'none';
     document.getElementById('admin-panel').style.display = 'block';
+    loadAnalytics();
     loadPendingSubmissions();
     loadPendingClaims();
   } catch (err) {
@@ -71,8 +72,44 @@ function tryRestoreAdminSession() {
   if (!sessionStorage.getItem('admin_access_token')) return;
   document.getElementById('admin-login-box').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
+  loadAnalytics();
   loadPendingSubmissions();
   loadPendingClaims();
+}
+
+// ── Analytics — vues de page anonymes loggées par js/layout.js ──
+async function loadAnalytics() {
+  const kpis = document.getElementById('admin-analytics-kpis');
+  const top = document.getElementById('admin-analytics-top');
+  kpis.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  top.innerHTML = '';
+  try {
+    const rows = await adminFetch('site_page_views?select=page,created_at&order=created_at.desc&limit=10000');
+    const now = Date.now();
+    const DAY = 24 * 60 * 60 * 1000;
+    const within = (r, days) => now - new Date(r.created_at).getTime() <= days * DAY;
+
+    const total = rows.length;
+    const last7 = rows.filter(r => within(r, 7)).length;
+    const last30 = rows.filter(r => within(r, 30)).length;
+
+    kpis.innerHTML = [
+      ['Vues — 7 derniers jours', last7],
+      ['Vues — 30 derniers jours', last30],
+      ['Vues — total enregistré', total],
+    ].map(([label, n]) => `<div class="kpi"><div><div class="kpi-n">${n}</div><div class="kpi-l">${label}</div></div></div>`).join('');
+
+    const pageCounts = {};
+    rows.filter(r => within(r, 30)).forEach(r => { pageCounts[r.page] = (pageCounts[r.page] || 0) + 1; });
+    const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+    top.innerHTML = !topPages.length
+      ? '<div class="admin-empty">Aucune vue enregistrée sur les 30 derniers jours.</div>'
+      : `<div class="submit-section-title" style="margin-top:0">Pages les plus vues (30 j)</div>` +
+        topPages.map(([page, n]) => `<div class="admin-field-row"><span>${page}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+  } catch (err) {
+    kpis.innerHTML = `<div class="admin-empty">${err.message}</div>`;
+  }
 }
 
 async function loadPendingSubmissions() {
