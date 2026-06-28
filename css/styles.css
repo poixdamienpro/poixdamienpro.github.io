@@ -375,6 +375,113 @@ nav.main{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.10);pos
 .btn-submit-form{width:100%;padding:13px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:14px;font-weight:700}
 @media(max-width:700px){.submit-grid,.spec-row{grid-template-columns:1fr}}
 
+/* ════════════════════════════════════════════════════════════════
+   ESPACE FOURNISSEUR — console (theme-dark) : stepper, gate valeur+auth,
+   bandeau de stats, cartes produits, timeline des demandes.
+   ════════════════════════════════════════════════════════════════ */
+/* Stepper du parcours */
+.sup-steps{display:flex;align-items:center;justify-content:center;max-width:560px;margin:14px auto 0;padding:0 24px}
+.sup-step{display:flex;align-items:center;gap:10px}
+.sup-step-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:13px;
+  border:1.5px solid rgba(255,255,255,.22);color:rgba(243,241,236,.5);background:transparent;transition:all .35s ease}
+.sup-step-label{font-size:13px;color:rgba(243,241,236,.5);font-weight:600;white-space:nowrap;transition:color .35s ease}
+.sup-step-bar{flex:1;height:2px;min-width:28px;margin:0 14px;background:rgba(255,255,255,.12);border-radius:2px;position:relative;overflow:hidden}
+.sup-step-bar::after{content:'';position:absolute;inset:0;width:0;background:var(--rust);border-radius:2px;transition:width .45s ease}
+/* étape franchie */
+.sup-steps[data-step="2"] .sup-step[data-n="1"] .sup-step-dot,
+.sup-steps[data-step="3"] .sup-step[data-n="1"] .sup-step-dot,
+.sup-steps[data-step="3"] .sup-step[data-n="2"] .sup-step-dot{background:rgba(63,154,114,.18);border-color:#3F9A72;color:#86D6AC}
+.sup-steps[data-step="2"] .sup-step[data-n="1"] .sup-step-label,
+.sup-steps[data-step="3"] .sup-step[data-n="1"] .sup-step-label,
+.sup-steps[data-step="3"] .sup-step[data-n="2"] .sup-step-label{color:rgba(243,241,236,.75)}
+/* étape courante */
+.sup-steps[data-step="1"] .sup-step[data-n="1"] .sup-step-dot,
+.sup-steps[data-step="2"] .sup-step[data-n="2"] .sup-step-dot,
+.sup-steps[data-step="3"] .sup-step[data-n="3"] .sup-step-dot{background:var(--rust);border-color:var(--rust);color:#fff;box-shadow:0 0 0 4px rgba(212,80,10,.18)}
+.sup-steps[data-step="1"] .sup-step[data-n="1"] .sup-step-label,
+.sup-steps[data-step="2"] .sup-step[data-n="2"] .sup-step-label,
+.sup-steps[data-step="3"] .sup-step[data-n="3"] .sup-step-label{color:#F3F1EC}
+/* remplissage des barres */
+.sup-steps[data-step="2"] .sup-step-bar:first-of-type::after,
+.sup-steps[data-step="3"] .sup-step-bar:first-of-type::after,
+.sup-steps[data-step="3"] .sup-step-bar:last-of-type::after{width:100%}
+
+/* Carte d'accès : panneau valeur + formulaires */
+.sup-gate{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.32)}
+.sup-gate-aside{padding:32px 30px;background:linear-gradient(155deg,rgba(212,80,10,.12),rgba(91,139,181,.06) 55%,transparent);
+  border-right:1px solid rgba(255,255,255,.10);position:relative;overflow:hidden}
+.sup-gate-aside::after{content:'';position:absolute;left:30px;bottom:0;top:84px;width:2px;
+  background:linear-gradient(180deg,var(--rust),transparent);opacity:.5}
+.sup-gate-title{font-family:var(--serif);font-size:26px;color:#F3F1EC;font-weight:400;line-height:1.15;margin:0 0 22px}
+.sup-gate-title em{color:var(--rust);font-style:italic}
+.sup-gate-points{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:14px}
+.sup-gate-points li{display:flex;gap:11px;align-items:flex-start;font-size:13px;color:rgba(243,241,236,.74);line-height:1.5}
+.sup-gate-points strong{color:#F3F1EC;font-weight:600}
+.sup-gate-ico{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:rgba(63,154,114,.18);color:#86D6AC;
+  display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px}
+.sup-gate-foot{font-size:12px;color:rgba(243,241,236,.5)}
+.sup-gate-foot a{color:var(--steel);font-weight:600;text-decoration:none}
+.sup-gate-foot a:hover{color:#8FB4D6}
+.sup-gate-card{padding:30px 30px;background:var(--white)}
+.sup-gate-sep{display:flex;align-items:center;text-align:center;margin:22px 0;color:rgba(243,241,236,.4);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.sup-gate-sep::before,.sup-gate-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.12)}
+.sup-gate-sep span{padding:0 12px}
+
+/* Panneaux génériques (claim, pending, dashboard sections) */
+.sup-panel{background:var(--white);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:24px;margin-bottom:18px}
+.sup-panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.sup-add-inline{width:auto;padding:8px 16px;font-size:12px;margin:0}
+.sup-empty{font-size:13px;color:rgba(243,241,236,.5);padding:6px 0}
+.sup-pending-note{display:flex;gap:14px;align-items:flex-start;background:rgba(210,162,63,.10);border:1px solid rgba(210,162,63,.35);border-radius:10px;padding:16px 18px}
+.sup-pending-ico{font-size:22px;line-height:1}
+
+/* Bandeau de stats */
+.sup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.sup-stat{background:var(--white);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+.sup-stat-n{font-family:var(--serif);font-size:30px;color:#F3F1EC;line-height:1}
+.sup-stat-n.sup-stat-pending{color:#E3C57E}
+.sup-stat-n.sup-stat-ok{color:#86D6AC}
+.sup-stat-l{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.5)}
+
+/* Cartes produits */
+.sup-prod{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid rgba(255,255,255,.10);border-radius:10px;
+  background:rgba(255,255,255,.02);margin-bottom:10px;transition:border-color .2s ease,background .2s ease}
+.sup-prod:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
+.sup-prod-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sup-prod-name{font-size:14px;font-weight:600;color:#F3F1EC}
+.sup-prod-cat{font-size:12px;color:rgba(243,241,236,.5)}
+.sup-prod-actions{display:flex;align-items:center;gap:8px}
+.sup-btn-sm{width:auto;padding:6px 13px;font-size:12px;margin:0}
+
+/* Pastilles de statut */
+.sup-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.04em;padding:4px 10px;border-radius:20px;white-space:nowrap;border:1px solid transparent}
+.sup-pill-ok{background:rgba(63,154,114,.15);border-color:rgba(63,154,114,.4);color:#86D6AC}
+.sup-pill-pending{background:rgba(210,162,63,.15);border-color:rgba(210,162,63,.45);color:#E3C57E}
+.sup-pill-no{background:rgba(192,57,43,.15);border-color:rgba(192,57,43,.45);color:#E58A7C}
+
+/* Timeline des demandes */
+.sup-timeline{position:relative;margin-top:6px}
+.sup-tl-row{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.sup-tl-row:last-child{border-bottom:none}
+.sup-tl-dot{flex-shrink:0;width:10px;height:10px;border-radius:50%;border:2px solid;background:transparent}
+.sup-tl-dot.sup-pill-ok{border-color:#3F9A72;background:rgba(63,154,114,.5)}
+.sup-tl-dot.sup-pill-pending{border-color:#D2A23F;background:rgba(210,162,63,.5)}
+.sup-tl-dot.sup-pill-no{border-color:#C0392B;background:rgba(192,57,43,.5)}
+.sup-tl-main{flex:1;min-width:0;font-size:13px;color:rgba(243,241,236,.72)}
+.sup-tl-main strong{color:#F3F1EC;font-weight:600}
+
+/* Résultats de revendication */
+#sup-claim-results .admin-field-row{border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:10px 14px;margin-bottom:8px;background:rgba(255,255,255,.02)}
+
+@media(max-width:760px){
+  .sup-gate{grid-template-columns:1fr}
+  .sup-gate-aside{border-right:none;border-bottom:1px solid rgba(255,255,255,.10)}
+  .sup-gate-aside::after{display:none}
+  .sup-stats{grid-template-columns:1fr}
+  .sup-step-label{display:none}
+  .sup-prod{flex-wrap:wrap}
+}
+
 /* ADMIN PANEL */
 .admin-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:16px}
 .admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
@@ -469,6 +576,7 @@ body.theme-dark::after{
 .theme-dark .detail-value,.theme-dark .modal-prod-name{color:#F3F1EC}
 .theme-dark .btn-see-products{color:#F3F1EC;border-color:rgba(255,255,255,.3)}
 .theme-dark .lead-field input,.theme-dark .lead-field textarea,.theme-dark .lead-success h3{color:#F3F1EC}
+.theme-dark .lead-field label{color:rgba(243,241,236,.82)}
 .theme-dark .lead-intro{background:rgba(63,154,114,.12);border-color:rgba(63,154,114,.4);color:rgba(243,241,236,.8)}
 
 /* ════════════════════════════════════════════════════════════════

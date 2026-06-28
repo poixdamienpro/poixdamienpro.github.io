@@ -12,70 +12,105 @@
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'supplier';</script>
 </head>
-<body>
+<body class="theme-dark">
 
 <div id="nav-slot"></div>
 
-<div class="page-header">
+<header class="page-header">
   <div class="page-header-inner">
     <div>
       <h1 class="page-title">Espace <span>fournisseur</span></h1>
       <p class="page-subtitle">Gérez vos produits. Chaque ajout/modification reste soumis à validation avant publication.</p>
     </div>
   </div>
-</div>
+</header>
+
+<!-- Stepper du parcours fournisseur -->
+<nav class="sup-steps" id="sup-steps" data-step="1" aria-label="Étapes du parcours fournisseur">
+  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label">Compte</span></div>
+  <span class="sup-step-bar"></span>
+  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label">Revendiquer</span></div>
+  <span class="sup-step-bar"></span>
+  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label">Publier</span></div>
+</nav>
+
 <div class="submit-wrap">
 
-  <!-- État: non connecté -->
+  <!-- État: non connecté → panneau valeur + carte d'accès -->
   <div id="sup-auth-box">
-    <div class="submit-grid" style="grid-template-columns:1fr 1fr;gap:24px">
-      <div>
+    <div class="sup-gate">
+      <aside class="sup-gate-aside">
+        <span class="section-eyebrow">// POURQUOI S'INSCRIRE</span>
+        <h2 class="sup-gate-title">Vos produits, devant les <em>bons acheteurs.</em></h2>
+        <ul class="sup-gate-points">
+          <li><span class="sup-gate-ico">✓</span><span>Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>Vous ne payez <strong>qu'un lead que vous avez accepté</strong> (~80&nbsp;€), jamais d'abonnement.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>Vous gardez la main : chaque modification passe par vous, puis validation.</span></li>
+        </ul>
+        <div class="sup-gate-foot">Pas encore sur Buy-ineer ? <a href="submit.html">Référencez votre entreprise →</a></div>
+      </aside>
+
+      <div class="sup-gate-card">
         <div class="submit-section-title">Se connecter</div>
         <form onsubmit="supplierLogin(event)">
           <div class="lead-field"><label>Email</label><input type="email" id="sup-login-email" required/></div>
           <div class="lead-field"><label>Mot de passe</label><input type="password" id="sup-login-password" required/></div>
           <button type="submit" class="btn-submit-form">Se connecter</button>
         </form>
-      </div>
-      <div>
+        <div class="sup-gate-sep"><span>nouveau&nbsp;?</span></div>
         <div class="submit-section-title">Créer un compte</div>
         <form onsubmit="supplierSignup(event)">
           <div class="lead-field"><label>Email</label><input type="email" id="sup-signup-email" required/></div>
           <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
           <button type="submit" class="btn-submit-form">Créer mon compte</button>
         </form>
+        <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
       </div>
     </div>
-    <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
   </div>
 
   <!-- État: connecté, pas encore d'entreprise revendiquée -->
   <div id="sup-claim-box" style="display:none">
-    <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Cherchez votre entreprise dans l'annuaire Buy-ineer. La revendication est validée manuellement, comptez quelques jours.</p>
-    <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie"/></div>
-    <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()">Chercher</button>
-    <div id="sup-claim-results" style="margin-top:14px"></div>
-    <p style="font-size:12px;color:var(--muted);margin-top:14px">Votre entreprise n'existe pas encore sur Buy-ineer ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
+    <div class="sup-panel">
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Cherchez votre entreprise dans l'annuaire Buy-ineer. La revendication est validée manuellement, comptez quelques jours.</p>
+      <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie"/></div>
+      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()">Chercher</button>
+      <div id="sup-claim-results" style="margin-top:14px"></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px">Votre entreprise n'existe pas encore sur Buy-ineer ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
+    </div>
   </div>
 
   <!-- État: connecté, revendication en attente -->
   <div id="sup-pending-box" style="display:none">
-    <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
-    <p style="font-size:13px;color:var(--text2)">Votre demande de revendication pour <strong id="sup-pending-company"></strong> est en attente de validation. Vous serez notifié une fois approuvée.</p>
+    <div class="sup-panel">
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <div class="sup-pending-note">
+        <span class="sup-pending-ico">⏳</span>
+        <p style="font-size:13px;color:var(--text2);margin:0">Votre demande de revendication pour <strong id="sup-pending-company"></strong> est en attente de validation. Vous serez notifié une fois approuvée.</p>
+      </div>
+    </div>
   </div>
 
   <!-- État: connecté, entreprise revendiquée — tableau de bord -->
   <div id="sup-dashboard" style="display:none">
     <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
 
-    <div id="sup-products-list"></div>
-    <button type="button" class="btn-add-product" onclick="openSupplierProductForm()">+ Ajouter un produit</button>
+    <div class="sup-stats" id="sup-stats"></div>
 
-    <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
+    <div class="sup-panel">
+      <div class="sup-panel-head">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Vos produits</span>
+        <button type="button" class="btn-add-product sup-add-inline" onclick="openSupplierProductForm()">+ Ajouter un produit</button>
+      </div>
+      <div id="sup-products-list"></div>
+      <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
+    </div>
 
-    <div class="submit-section-title" style="margin-top:28px">Vos demandes en cours</div>
-    <div id="sup-submissions-list"></div>
+    <div class="sup-panel">
+      <span class="submit-section-title" style="border:none;padding:0">Vos demandes en cours</span>
+      <div id="sup-submissions-list"></div>
+    </div>
   </div>
 
 </div>
