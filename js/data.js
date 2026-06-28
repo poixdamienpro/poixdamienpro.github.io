@@ -54,7 +54,7 @@ const FAQ = [
 // ═══════════════════════════════
 // STATE
 // ═══════════════════════════════
-const FOUNDER_EMAIL = 'contact@buy-ineer.fr'; // destinataire des demandes de devis, envoyées via Web3Forms (js/leads.js)
+const FOUNDER_EMAIL = 'poixdamien.pro@gmail.com'; // destinataire des demandes de devis, envoyées via Web3Forms (js/leads.js)
 const WEB3FORMS_ACCESS_KEY = '42d71ca2-5e99-4737-927b-4e5e9eee3ba9'; // clé publique Web3Forms — sans risque d'être exposée côté client, par design (web3forms.com)
 let annIndustry = 'all';
 let annCat = 'all';
