@@ -17,7 +17,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Erreur Supabase:', err);
   }
   addProductBlock();
+  initSubmitStepper();
 });
+
+// Le stepper suit la section traversée par le scroll (scroll-spy).
+function initSubmitStepper() {
+  const steps = document.getElementById('sub-steps');
+  const cards = document.querySelectorAll('.sub-card[data-step]');
+  if (!steps || !cards.length || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) steps.setAttribute('data-step', e.target.getAttribute('data-step')); });
+  }, { rootMargin: '-28% 0px -64% 0px', threshold: 0 });
+  cards.forEach(c => io.observe(c));
+}
+
+// Compteur de la barre d'envoi.
+function updateSubmitBar() {
+  const n = document.querySelectorAll('#product-blocks .product-block:not(.removing)').length;
+  const count = document.getElementById('sub-count');
+  const word = document.getElementById('sub-count-word');
+  if (count) count.textContent = n;
+  if (word) word.textContent = n > 1 ? 'produits' : 'produit';
+}
 
 async function handleImageSelect(e, idx) {
   const file = e.target.files[0];
@@ -93,12 +114,16 @@ function addProductBlock() {
     </div>`;
   document.getElementById('product-blocks').appendChild(block);
   addSpecRow(idx);
+  updateSubmitBar();
 }
 
 function removeProductBlock(idx) {
   const block = document.getElementById('product-block-' + idx);
-  if (block) block.remove();
   delete productImageUrls[idx];
+  if (!block) return;
+  block.classList.add('removing');           // déclenche l'animation de collapse
+  updateSubmitBar();                          // décompte immédiat
+  setTimeout(() => block.remove(), 380);      // retrait après transition
 }
 
 function addSpecRow(blockIdx) {
@@ -173,6 +198,8 @@ async function submitSupplierForm(e) {
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
+    const stepper = document.getElementById('sub-steps');
+    if (stepper) stepper.style.display = 'none';
     document.getElementById('submit-wrap').innerHTML = `
       <div class="lead-success">
         <div class="icon">✅</div>
