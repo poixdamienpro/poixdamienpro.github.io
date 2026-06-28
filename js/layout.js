@@ -6,12 +6,20 @@
 const ROOT_PREFIX = window.ROOT_PREFIX || '';
 
 async function loadLayout() {
-  const [navHtml, modalsHtml] = await Promise.all([
+  const [navHtml, modalsHtml, footerHtml] = await Promise.all([
     fetch(ROOT_PREFIX + 'partials/nav.html').then(r => r.text()),
     fetch(ROOT_PREFIX + 'partials/modals.html').then(r => r.text()),
+    fetch(ROOT_PREFIX + 'partials/footer.html').then(r => r.text()),
   ]);
   document.getElementById('nav-slot').innerHTML = navHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
-  document.getElementById('modals-slot').innerHTML = modalsHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
+  const modalsSlot = document.getElementById('modals-slot');
+  if (modalsSlot) modalsSlot.innerHTML = modalsHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
+  const footerSlot = document.getElementById('footer-slot');
+  if (footerSlot) {
+    footerSlot.innerHTML = footerHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
+    const yearEl = document.getElementById('footer-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  }
   markActiveNavLink();
   initTicker();
   document.querySelectorAll('.overlay').forEach(o => {
