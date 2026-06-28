@@ -1,9 +1,12 @@
 // ═══════════════════════════════
-// PAGE ANNUAIRE
+// PAGE ANNUAIRE — vue split (liste + aperçu live)
 // ═══════════════════════════════
+let dirCurrentId = null;
+const dirIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
-  showLoading(['companies-grid']);
+  showLoading(['companies-list']);
   try {
     await loadTaxonomy();
     initChips('ann-industry-chips', INDUSTRIES, () => annIndustry, v => { annIndustry = v; renderCompanies(); });
@@ -13,57 +16,118 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCompanies();
   } catch (err) {
     console.error('Erreur Supabase:', err);
-    showLoadError(['companies-grid']);
+    showLoadError(['companies-list']);
   }
 });
 
-function renderCompanies() {
+function filteredCompanies() {
   const q = (document.getElementById('ann-search')?.value || '').toLowerCase();
-  const filtered = COMPANIES.filter(c => {
+  return COMPANIES.filter(c => {
     const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
     return ms && (annIndustry === 'all' || c.industry === annIndustry) && (annCat === 'all' || c.products.includes(annCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
+}
+
+function renderCompanies() {
+  const filtered = filteredCompanies();
 
   const count = document.getElementById('ann-count');
   if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
 
-  const grid = document.getElementById('companies-grid');
-  if(!grid) return;
-  grid.innerHTML = '';
+  const list = document.getElementById('companies-list');
+  const preview = document.getElementById('company-preview');
+  if(!list) return;
+  list.innerHTML = '';
+  dirCurrentId = null;
 
   if(!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucune entreprise ne correspond.</p></div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucune entreprise ne correspond.</div>';
+    if(preview) preview.innerHTML = '';
     return;
   }
 
-  filtered.forEach(c => {
+  filtered.forEach((c, i) => {
     const prodCount = PRODUCTS.filter(p => p.maker === c.name).length;
-    const card = document.createElement('div');
-    card.className = 'company-card' + (c.premium ? ' premium' : '');
-    card.innerHTML = `
-      <div class="card-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="card-logo">${c.logo}</div>
-          <div>
-            <div class="card-name">${c.name}</div>
-            <div class="card-meta">${c.country} · ${c.hq}</div>
-          </div>
-        </div>
-        <div class="card-badges">
-          ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
-          ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'dir-row' + (c.premium ? ' is-premium' : '');
+    row.setAttribute('role', 'option');
+    row.style.animationDelay = (Math.min(i, 16) * 0.03) + 's';
+    row.innerHTML = `
+      <span class="dir-logo">${c.logo}</span>
+      <span class="dir-row-main">
+        <span class="dir-row-name">${c.name}</span>
+        <span class="dir-row-sub">${c.country} · ${c.industry}</span>
+      </span>
+      <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}${prodCount ? '<span class="n">'+prodCount+'</span>' : ''}</span>`;
+
+    const choose = () => { if(dirIsDesktop()) selectRow(row, c); else openCompanyModal(c); };
+    row.addEventListener('click', choose);
+    row.addEventListener('mouseenter', () => { if(dirIsDesktop()) selectRow(row, c); });
+    row.addEventListener('focus',      () => { if(dirIsDesktop()) selectRow(row, c); });
+    list.appendChild(row);
+  });
+
+  // sélection par défaut : 1er fabricant (desktop uniquement)
+  if(dirIsDesktop()) {
+    const first = list.querySelector('.dir-row');
+    if(first) selectRow(first, filtered[0]);
+  }
+}
+
+function selectRow(row, c) {
+  const prev = document.querySelector('.dir-row.active');
+  if(prev) prev.classList.remove('active');
+  row.classList.add('active');
+  if(dirCurrentId !== c.name) {
+    dirCurrentId = c.name;
+    renderCompanyPreview(c);
+  }
+}
+
+function renderCompanyPreview(c) {
+  const el = document.getElementById('company-preview');
+  if(!el) return;
+  const prods = PRODUCTS.filter(p => p.maker === c.name);
+
+  const details = [['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', c.industry], ['Siège', c.hq]]
+    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
+
+  const prodsBlock = prods.length ? `
+    <div class="dp-section-label">${prods.length} produit${prods.length>1?'s':''} référencé${prods.length>1?'s':''}</div>
+    <div class="dp-prods">
+      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${p.icon} ${p.name}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div><div class="modal-prod-price">💰 ${p.price}</div></div>`).join('')}
+    </div>
+    ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">Voir les '+prods.length+' produits →</button>' : ''}` : '';
+
+  el.innerHTML = `
+    <div class="dir-preview-card">
+      <div class="dp-head">
+        <div class="dp-logo">${c.logo}</div>
+        <div style="min-width:0">
+          <div class="dp-name">${c.name}</div>
+          <div class="dp-loc">${c.country} · ${c.hq}</div>
         </div>
       </div>
-      <span class="tag tag-industry">${c.industry}</span>
-      <p class="card-desc">${c.desc}</p>
-      <div class="card-tags">${c.tags.slice(0,4).map(t => '<span class="tag">'+t+'</span>').join('')}</div>
-      <div class="card-footer">
-        <span class="card-site">↗ ${c.site.replace('https://','').replace('www.','')}</span>
-        ${prodCount > 0 ? '<span class="card-prod-count">'+prodCount+' produit'+(prodCount>1?'s':'')+'</span>' : ''}
-      </div>`;
-    card.onclick = () => openCompanyModal(c);
-    grid.appendChild(card);
-  });
+      <div class="dp-badges">
+        ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
+        ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+        <span class="tag tag-industry">${c.industry}</span>
+      </div>
+      <p class="dp-desc">${c.desc}</p>
+      <div class="dp-section-label">Informations société</div>
+      <div class="dp-details">${details}</div>
+      ${prodsBlock}
+      <div class="dp-actions">
+        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">↗ Visiter le site</a>
+        <button class="btn-quote" id="dp-quote">✉ Demander un devis</button>
+      </div>
+    </div>`;
+
+  const quote = el.querySelector('#dp-quote');
+  if(quote) quote.onclick = () => openLeadModal(c.name, null);
+  const see = el.querySelector('#dp-see');
+  if(see) see.onclick = () => { window.location.href = ROOT_PREFIX + 'pages/catalogue.html?company=' + encodeURIComponent(c.name); };
 }
 
 function resetAnnuaire() {

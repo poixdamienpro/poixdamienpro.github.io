@@ -6,9 +6,13 @@
 <title>Annuaire des fabricants · Buy-ineer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'annuaire';</script>
 </head>
-<body>
+<body class="theme-dark">
 
 <div id="nav-slot"></div>
 
@@ -25,7 +29,7 @@
     </div>
   </div>
 </div>
-<div class="layout">
+<div class="dir">
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Recherche</div>
@@ -43,13 +47,14 @@
     </div>
     <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
   </aside>
-  <main class="content">
+  <div class="dir-list-col">
     <div class="toolbar">
       <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
-      <span style="font-size:11px;color:var(--muted);font-style:italic">Profils Premium en premier</span>
+      <span class="dir-hint">Survolez pour prévisualiser</span>
     </div>
-    <div class="grid-companies" id="companies-grid"></div>
-  </main>
+    <div class="dir-list" id="companies-list" role="listbox" aria-label="Fabricants"></div>
+  </div>
+  <aside class="dir-preview" id="company-preview" aria-live="polite"></aside>
 </div>
 
 <div id="modals-slot"></div>
