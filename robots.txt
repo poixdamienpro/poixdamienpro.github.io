@@ -48,3 +48,5 @@ Disallow: /
 
 User-agent: FacebookBot
 Disallow: /
+
+Sitemap: https://www.buy-inner.com/sitemap.xml

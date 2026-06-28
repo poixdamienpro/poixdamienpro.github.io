@@ -38,7 +38,10 @@ function renderCompanies() {
 
   filtered.forEach(c => {
     const prodCount = PRODUCTS.filter(p => p.maker === c.name).length;
-    const card = document.createElement('div');
+    const card = document.createElement('a');
+    card.href = `entreprise.html?id=${c.id}`;
+    card.style.textDecoration = 'none';
+    card.style.color = 'inherit';
     card.className = 'company-card' + (c.premium ? ' premium' : '');
     card.innerHTML = `
       <div class="card-header">
@@ -61,7 +64,6 @@ function renderCompanies() {
         <span class="card-site">↗ ${c.site.replace('https://','').replace('www.','')}</span>
         ${prodCount > 0 ? '<span class="card-prod-count">'+prodCount+' produit'+(prodCount>1?'s':'')+'</span>' : ''}
       </div>`;
-    card.onclick = () => openCompanyModal(c);
     grid.appendChild(card);
   });
 }

@@ -1,65 +1,8 @@
 // ═══════════════════════════════
-// COMPANY MODAL + COMPARE — réutilisés par annuaire et catalogue
+// COMPARE — réutilisé par catalogue (la fiche entreprise détaillée vit
+// maintenant sur sa propre page, pages/entreprise.html — voir
+// js/pages/entreprise.js — donc plus de modale company-overlay ici).
 // ═══════════════════════════════
-function openCompanyModal(c) {
-  document.getElementById('m-logo').textContent = c.logo;
-  document.getElementById('m-name').textContent = c.name;
-  document.getElementById('m-location').textContent = c.country + ' · ' + c.hq;
-
-  const badges = document.getElementById('m-badges');
-  badges.innerHTML = (c.premium ? '<span class="badge-premium">★ Premium</span>' : '') +
-    (c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : '') +
-    '<span class="tag tag-industry">'+c.industry+'</span>';
-
-  const claimBanner = document.getElementById('m-claim-banner');
-  if(!c.premium) {
-    document.getElementById('m-claim-name').textContent = c.name;
-    claimBanner.style.display = 'flex';
-  } else {
-    claimBanner.style.display = 'none';
-  }
-
-  document.getElementById('m-desc').textContent = c.desc;
-
-  document.getElementById('m-details').innerHTML = [
-    ['Fondée en', c.founded], ['Effectifs', c.employees],
-    ['Secteur', c.industry], ['Siège', c.hq]
-  ].map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('');
-
-  document.getElementById('m-tags').innerHTML =
-    [...c.products, ...c.tags].map(t => '<span class="tag">'+t+'</span>').join('');
-
-  const compProds = PRODUCTS.filter(p => p.maker === c.name);
-  const prodsSection = document.getElementById('m-prods-section');
-  const prodsGrid = document.getElementById('m-prods');
-  const seeBtn = document.getElementById('m-see-products-btn');
-
-  if(compProds.length === 0) {
-    prodsSection.style.display = 'none';
-  } else {
-    prodsSection.style.display = 'block';
-    prodsGrid.innerHTML = compProds.map(p => `
-      <div class="modal-prod-card">
-        <div class="modal-prod-name">${p.icon} ${p.name}</div>
-        <div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div>
-        <div class="modal-prod-price">💰 ${p.price}</div>
-      </div>`).join('');
-    seeBtn.onclick = () => {
-      window.location.href = ROOT_PREFIX + 'pages/catalogue.html?company=' + encodeURIComponent(c.name);
-    };
-  }
-
-  document.getElementById('m-site').href = c.site;
-  document.getElementById('m-site').textContent = '↗ Visiter le site officiel';
-
-  document.getElementById('m-quote-btn').onclick = () => {
-    closeModal('company-overlay');
-    openLeadModal(c.name, null);
-  };
-
-  document.getElementById('company-overlay').classList.add('open');
-}
-
 function toggleCompare(id, btn) {
   if(compareIds.includes(id)) {
     compareIds = compareIds.filter(x => x !== id);

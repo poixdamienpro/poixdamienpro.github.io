@@ -51,9 +51,9 @@ function renderProducts() {
           <div style="display:flex;align-items:flex-start;gap:10px">
             <div class="prod-icon-wrap">${p.image ? `<img src="${p.image}" alt=""/>` : p.icon}</div>
             <div>
-              <div class="prod-name">${p.name}</div>
+              <a class="prod-name" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">${p.name}</a>
               <div class="prod-maker">
-                ${p.maker}
+                <a href="entreprise.html?id=${p.companyId}" style="text-decoration:none;color:inherit">${p.maker}</a>
                 <span class="tag tag-industry" style="font-size:10px">${p.cat}</span>
               </div>
             </div>

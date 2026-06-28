@@ -42,8 +42,31 @@ async function fetchAllPaged(rpcName, pageSize = 50) {
   return all;
 }
 
+// Appelle une RPC Supabase et retourne ses lignes — voir
+// backend/supabase_add_detail_page_rpcs.sql.
+async function fetchRpc(rpcName, params) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) throw new Error(`Supabase RPC ${rpcName}: HTTP ${res.status}`);
+  return res.json();
+}
+
+// Variante pour les RPC qui retournent au plus une ligne (fiches dédiées).
+async function fetchOne(rpcName, params) {
+  const rows = await fetchRpc(rpcName, params);
+  return rows[0] || null;
+}
+
 function mapCompany(row) {
   return {
+    id:        row.id,
     name:      row.name,
     country:   row.country,
     hq:        row.hq        || '',
@@ -64,6 +87,7 @@ function mapCompany(row) {
 function mapProduct(row) {
   return {
     id:       row.id,
+    companyId: row.company_id,
     name:     row.name,
     maker:    row.company_name || '',
     cat:      row.category,
