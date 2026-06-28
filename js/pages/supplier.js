@@ -24,7 +24,7 @@ async function supplierFetch(path, options = {}) {
   });
   if (res.status === 401 || res.status === 403) {
     supplierLogout();
-    throw new Error('Session expirée ou accès refusé — reconnecte-toi.');
+    throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
   }
   if (!res.ok) throw new Error(`HTTP ${res.status} sur ${path}`);
   if (res.status === 204) return null;
@@ -175,7 +175,7 @@ async function loadSupplierProducts() {
     if (!products || !products.length) { list.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucun produit pour le moment.</p>'; return; }
     list.innerHTML = products.map(p => `
       <div class="admin-field-row">
-        <span>${p.name} — ${p.category}</span>
+        <span>${p.name} · ${p.category}</span>
         <span>
           <button class="btn-add-product" style="padding:6px 14px;font-size:12px" onclick="openSupplierProductForm('${p.id}')">Modifier</button>
           <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${p.name.replace(/'/g, "\\'")}')">Supprimer</button>
@@ -196,7 +196,7 @@ async function loadSupplierSubmissions() {
     const statusLabels = { pending: '⏳ En attente', approved: '✓ Approuvée', rejected: '✕ Rejetée' };
     list.innerHTML = rows.map(r => `
       <div class="admin-field-row">
-        <span>${labels[r.submission_type] || r.submission_type} — ${r.product_name || ''}</span>
+        <span>${labels[r.submission_type] || r.submission_type} · ${r.product_name || ''}</span>
         <span>${statusLabels[r.status] || r.status}</span>
       </div>`).join('');
   } catch (err) {

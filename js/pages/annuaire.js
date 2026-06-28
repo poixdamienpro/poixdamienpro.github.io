@@ -25,7 +25,7 @@ function renderCompanies() {
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 
   const count = document.getElementById('ann-count');
-  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
 
   const grid = document.getElementById('companies-grid');
   if(!grid) return;

@@ -28,7 +28,7 @@ function renderProducts() {
   });
 
   const count = document.getElementById('cat-count');
-  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
 
   const grid = document.getElementById('products-grid');
   if(!grid) return;

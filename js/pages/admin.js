@@ -24,7 +24,7 @@ async function adminFetch(path, options = {}) {
   });
   if (res.status === 401 || res.status === 403) {
     adminLogout();
-    throw new Error('Session expirée ou accès refusé — reconnecte-toi.');
+    throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
   }
   if (!res.ok) throw new Error(`HTTP ${res.status} sur ${path}`);
   if (res.status === 204) return null;
@@ -94,9 +94,9 @@ async function loadAnalytics() {
     const last30 = rows.filter(r => within(r, 30)).length;
 
     kpis.innerHTML = [
-      ['Vues — 7 derniers jours', last7],
-      ['Vues — 30 derniers jours', last30],
-      ['Vues — total enregistré', total],
+      ['Vues · 7 derniers jours', last7],
+      ['Vues · 30 derniers jours', last30],
+      ['Vues · total enregistré', total],
     ].map(([label, n]) => `<div class="kpi"><div><div class="kpi-n">${n}</div><div class="kpi-l">${label}</div></div></div>`).join('');
 
     const pageCounts = {};
@@ -135,7 +135,7 @@ function renderAdminSubmissions(rows) {
     <div class="admin-card" id="admin-card-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">${{new:'🆕',update:'✏️',delete:'🗑️'}[r.submission_type] || '🆕'} ${r.product_name || '(produit supprimé)'} — ${r.company_name || ''}</div>
+          <div class="admin-card-title">${{new:'🆕',update:'✏️',delete:'🗑️'}[r.submission_type] || '🆕'} ${r.product_name || '(produit supprimé)'} · ${r.company_name || ''}</div>
           <div class="admin-card-meta">Soumis par ${r.submitter_name || r.submitter_email} (${r.submitter_email}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')} ${r.submission_type !== 'new' ? ' · type: ' + r.submission_type : ''}</div>
         </div>
         ${r.product_image_url ? `<img src="${r.product_image_url}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0"/>` : ''}

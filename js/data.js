@@ -13,17 +13,17 @@ let INDUSTRIES = [];
 let PROD_CATS  = [];
 let COMPANIES  = [];
 let PRODUCTS   = [];
-const TICKER_ITEMS = ["TYVA Energie — Moduloo Ax 48V 30Ah — 1 690 € HT","CATL — LiFePO4 280Ah — ~480 €/kWh","Delta Electronics — OBC 22 kW V2G — ~3 800 €","Moog — D633 Servovanne — ~8 500 €","Batconnect — LFP 48V 100Ah IoT — Sur devis","Eaton — ePDU G3 32A — ~1 200 €","ABB — ACS880 5 600 kW — 800–150 000 €","Airbus — COSMO-BATT Satellite GEO — Sur devis","GS Yuasa — LSE134 Li-ion Spatial — Sur devis","Bradford ECAPS — 1N HPGP Propulseur vert — Sur devis"];
+const TICKER_ITEMS = ["TYVA Energie · Moduloo Ax 48V 30Ah · 1 690 € HT","CATL · LiFePO4 280Ah · ~480 €/kWh","Delta Electronics · OBC 22 kW V2G · ~3 800 €","Moog · D633 Servovanne · ~8 500 €","Batconnect · LFP 48V 100Ah IoT · Sur devis","Eaton · ePDU G3 32A · ~1 200 €","ABB · ACS880 5 600 kW · 800–150 000 €","Airbus · COSMO-BATT Satellite GEO · Sur devis","GS Yuasa · LSE134 Li-ion Spatial · Sur devis","Bradford ECAPS · 1N HPGP Propulseur vert · Sur devis"];
 const PLANS = [
   {name:"Acheteur",price:"0 €",period:"pour toujours",highlight:false,target:"annuaire",desc:"Pour les ingénieurs et acheteurs qui sourcent des équipements.",cta:"Explorer gratuitement",ctaClass:"secondary",features:[
     {ok:true, text:"Annuaire complet"},
-    {ok:true, text:"Fiches produits — specs techniques complètes"},
+    {ok:true, text:"Fiches produits, specs techniques complètes"},
     {ok:true, text:"Filtres par industrie et catégorie"},
     {ok:true, text:"Comparaison illimitée (4 produits)"},
     {ok:true, text:"Demandes de devis illimitées"},
     {ok:true, text:"Aucune carte bancaire requise"}
   ]},
-  {name:"Fournisseur — Référencement",price:"0 €",period:"pour toujours",highlight:true,target:"submit",desc:"Votre entreprise référencée gratuitement. Vous ne payez que sur résultat.",cta:"Référencer mon entreprise",ctaClass:"primary",features:[
+  {name:"Fournisseur · Référencement",price:"0 €",period:"pour toujours",highlight:true,target:"submit",desc:"Votre entreprise référencée gratuitement. Vous ne payez que sur résultat.",cta:"Référencer mon entreprise",ctaClass:"primary",features:[
     {ok:true, text:"Fiche entreprise et produits dans l'annuaire"},
     {ok:true, text:"Aucun paiement pour être listé ou visible"},
     {ok:true, text:"Vous choisissez d'accepter ou refuser chaque demande de contact"},
