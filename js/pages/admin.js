@@ -5,6 +5,7 @@
 // policies RLS restreignent l'écriture/lecture aux requêtes signées par is_admin().
 // ═══════════════════════════════
 let adminSubmissionsCache = {};
+let adminAnalyticsRows = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
@@ -85,6 +86,7 @@ async function loadAnalytics() {
   top.innerHTML = '';
   try {
     const rows = await adminFetch('site_page_views?select=page,created_at&order=created_at.desc&limit=10000');
+    adminAnalyticsRows = rows;
     const now = Date.now();
     const DAY = 24 * 60 * 60 * 1000;
     const within = (r, days) => now - new Date(r.created_at).getTime() <= days * DAY;
@@ -107,9 +109,71 @@ async function loadAnalytics() {
       ? '<div class="admin-empty">Aucune vue enregistrée sur les 30 derniers jours.</div>'
       : `<div class="submit-section-title" style="margin-top:0">Pages les plus vues (30 j)</div>` +
         topPages.map(([page, n]) => `<div class="admin-field-row"><span>${page}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+
+    const select = document.getElementById('admin-chart-page-filter');
+    const allPages = Object.keys(pageCounts).sort();
+    select.innerHTML = '<option value="__all__">Toutes les pages</option>' +
+      allPages.map(p => `<option value="${p}">${p}</option>`).join('');
+
+    renderAnalyticsChart();
   } catch (err) {
     kpis.innerHTML = `<div class="admin-empty">${err.message}</div>`;
   }
+}
+
+// ── Graphique courbe — visites/jour sur 30 jours, filtrable par page ──
+function renderAnalyticsChart() {
+  const wrap = document.getElementById('admin-analytics-chart');
+  const filter = document.getElementById('admin-chart-page-filter').value;
+  const rows = filter === '__all__' ? adminAnalyticsRows : adminAnalyticsRows.filter(r => r.page === filter);
+
+  const DAY = 24 * 60 * 60 * 1000;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const days = [];
+  for (let i = 29; i >= 0; i--) days.push(new Date(today.getTime() - i * DAY));
+
+  const counts = days.map(d => {
+    const dayStr = d.toISOString().slice(0, 10);
+    return rows.filter(r => r.created_at.slice(0, 10) === dayStr).length;
+  });
+
+  if (!rows.length) {
+    wrap.innerHTML = '<div class="admin-empty">Aucune vue enregistrée pour cette sélection.</div>';
+    return;
+  }
+
+  const W = 760, H = 220, padL = 36, padB = 26, padT = 10, padR = 10;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const max = Math.max(1, ...counts);
+
+  const x = i => padL + (i / (counts.length - 1)) * chartW;
+  const y = v => padT + chartH - (v / max) * chartH;
+
+  const points = counts.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  const areaPoints = `${padL},${padT + chartH} ${points} ${padL + chartW},${padT + chartH}`;
+
+  const gridLines = [0, 0.5, 1].map(f => {
+    const yy = padT + chartH - f * chartH;
+    return `<line x1="${padL}" y1="${yy}" x2="${padL + chartW}" y2="${yy}" stroke="var(--border)" stroke-width="1"/>
+            <text x="${padL - 8}" y="${yy + 4}" font-size="10" fill="var(--muted)" text-anchor="end">${Math.round(f * max)}</text>`;
+  }).join('');
+
+  const xLabels = counts.map((v, i) => {
+    if (i % 5 !== 0 && i !== counts.length - 1) return '';
+    const d = days[i];
+    return `<text x="${x(i)}" y="${H - 6}" font-size="9" fill="var(--muted)" text-anchor="middle">${d.getDate()}/${d.getMonth() + 1}</text>`;
+  }).join('');
+
+  const dots = counts.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="var(--accent, #2563eb)"><title>${days[i].toLocaleDateString('fr-FR')} : ${v} vue${v !== 1 ? 's' : ''}</title></circle>`).join('');
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--white);border:1px solid var(--border);border-radius:8px">
+      ${gridLines}
+      <polygon points="${areaPoints}" fill="var(--accent, #2563eb)" opacity="0.08"/>
+      <polyline points="${points}" fill="none" stroke="var(--accent, #2563eb)" stroke-width="2"/>
+      ${dots}
+      ${xLabels}
+    </svg>`;
 }
 
 async function loadPendingSubmissions() {

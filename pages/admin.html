@@ -36,6 +36,15 @@
       <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
     </div>
     <div id="admin-analytics-kpis" class="kpi-row" style="margin-bottom:18px"></div>
+
+    <div class="product-block-header" style="margin-bottom:10px">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0;font-size:13px">Évolution des visites</span>
+      <select id="admin-chart-page-filter" onchange="renderAnalyticsChart()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+        <option value="__all__">Toutes les pages</option>
+      </select>
+    </div>
+    <div id="admin-analytics-chart" style="margin-bottom:28px"></div>
+
     <div id="admin-analytics-top" style="margin-bottom:28px"></div>
 
     <div class="product-block-header" style="margin-bottom:18px">
