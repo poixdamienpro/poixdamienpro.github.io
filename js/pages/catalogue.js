@@ -1,9 +1,12 @@
 // ═══════════════════════════════
-// PAGE CATALOGUE
+// PAGE CATALOGUE — vue split (liste + fiche live), comparateur élevé
 // ═══════════════════════════════
+let catCurrentId = null;
+const catIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
-  showLoading(['products-grid']);
+  showLoading(['products-list']);
   try {
     await loadTaxonomy();
     initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; renderProducts(); });
@@ -16,71 +19,129 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCompareBanner();
   } catch (err) {
     console.error('Erreur Supabase:', err);
-    showLoadError(['products-grid']);
+    showLoadError(['products-list']);
   }
 });
 
-function renderProducts() {
+function filteredProducts() {
   const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
-  const filtered = PRODUCTS.filter(p => {
+  return PRODUCTS.filter(p => {
     const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
     return ms && (catCat === 'all' || p.cat === catCat) && (catInd === 'all' || p.industry === catInd);
   });
+}
+
+function renderProducts() {
+  const filtered = filteredProducts();
 
   const count = document.getElementById('cat-count');
-  if(count) count.innerHTML = ' — <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
 
-  const grid = document.getElementById('products-grid');
-  if(!grid) return;
-  grid.innerHTML = '';
+  const list = document.getElementById('products-list');
+  const preview = document.getElementById('product-preview');
+  if(!list) return;
+  list.innerHTML = '';
+  catCurrentId = null;
 
   if(!filtered.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;background:var(--white);border:1px solid var(--border);border-radius:8px"><div style="font-size:32px;margin-bottom:10px;opacity:.3">🔍</div><p style="color:var(--muted)">Aucun produit ne correspond.</p></div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucun produit ne correspond.</div>';
+    if(preview) preview.innerHTML = '';
     return;
   }
 
-  filtered.forEach(p => {
-    const isSelected = compareIds.includes(p.id);
+  filtered.forEach((p, i) => {
+    const inCompare = compareIds.includes(p.id);
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'dir-row';
+    row.setAttribute('role', 'option');
+    row.style.animationDelay = (Math.min(i, 16) * 0.03) + 's';
+    row.innerHTML = `
+      <span class="dir-logo">${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>` : p.icon}</span>
+      <span class="dir-row-main">
+        <span class="dir-row-name">${p.name}</span>
+        <span class="dir-row-sub">${p.maker} · ${p.cat}</span>
+      </span>
+      <button class="dir-cmp ${inCompare ? 'on' : ''}" data-cmp="${p.id}" title="Ajouter au comparateur">${inCompare ? '✓' : '＋'}</button>`;
 
-    const card = document.createElement('div');
-    card.className = 'prod-card';
-    card.innerHTML = `
-      ${p.image ? `<img class="prod-image" src="${p.image}" alt="${p.name}" loading="lazy"/>` : ''}
-      <div class="prod-card-top">
-        <div class="prod-card-header">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <div class="prod-icon-wrap">${p.image ? `<img src="${p.image}" alt=""/>` : p.icon}</div>
-            <div>
-              <a class="prod-name" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">${p.name}</a>
-              <div class="prod-maker">
-                <a href="entreprise.html?id=${p.companyId}" style="text-decoration:none;color:inherit">${p.maker}</a>
-                <span class="tag tag-industry" style="font-size:10px">${p.cat}</span>
-              </div>
-            </div>
-          </div>
-          <button class="compare-cb ${isSelected ? 'selected' : ''}" onclick="toggleCompare('${p.id}',this)" title="Comparer">${isSelected ? '✓' : ''}</button>
-        </div>
-        <p class="prod-desc">${p.desc}</p>
-      </div>
-      <div class="prod-card-body">
-        <table class="spec-table">
-          <tbody>
-            ${p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}
-          </tbody>
-        </table>
-        ${p.bars.map(b => `
-          <div class="bar-row">
-            <div class="bar-labels"><span>${b.l}</span><span style="font-weight:700">${b.v}%</span></div>
-            <div class="bar-track"><div class="bar-fill" style="width:${b.v}%;background:${b.c}"></div></div>
-          </div>`).join('')}
-        <div class="cert-row">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>
-      </div>
-      <div class="prod-card-footer">
-        <span class="price-tag">💰 ${p.price}</span>
-        <button class="btn-quote-sm" onclick="openLeadModal('${p.name.replace(/'/g,"\\'")}',  '${p.maker.replace(/'/g,"\\'")}')">📩 Demander un devis</button>
-      </div>`;
-    grid.appendChild(card);
+    row.addEventListener('click', () => selectRow(row, p));
+    row.addEventListener('mouseenter', () => { if(catIsDesktop()) selectRow(row, p); });
+    row.addEventListener('focus',      () => { if(catIsDesktop()) selectRow(row, p); });
+    const cmp = row.querySelector('.dir-cmp');
+    cmp.addEventListener('click', e => { e.stopPropagation(); toggleCompare(p.id, cmp); });
+    list.appendChild(row);
   });
+
+  if(catIsDesktop()) {
+    const first = list.querySelector('.dir-row');
+    if(first) selectRow(first, filtered[0]);
+  }
+}
+
+function selectRow(row, p) {
+  const prev = document.querySelector('.dir-row.active');
+  if(prev) prev.classList.remove('active');
+  row.classList.add('active');
+  if(catCurrentId !== p.id) {
+    catCurrentId = p.id;
+    renderProductPreview(p);
+  }
+  if(!catIsDesktop()) document.getElementById('product-preview').classList.add('open');
+}
+
+function renderProductPreview(p) {
+  const el = document.getElementById('product-preview');
+  if(!el) return;
+  const inCompare = compareIds.includes(p.id);
+
+  const specs = p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('');
+
+  const bars = (p.bars || []).length ? `
+    <div class="dp-section-label">Scores relatifs</div>
+    <div class="dir-bars">
+      ${p.bars.map(b => `
+        <div class="dir-bar">
+          <div class="dir-bar-top"><span>${b.l}</span><span class="dir-bar-val">${b.v}%</span></div>
+          <div class="dir-bar-track"><div class="dir-bar-fill" style="--w:${b.v}%;background:${b.c}"></div></div>
+        </div>`).join('')}
+    </div>` : '';
+
+  const certs = (p.certs || []).length ? `
+    <div class="dp-section-label">Certifications</div>
+    <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>` : '';
+
+  el.innerHTML = `
+    <div class="dir-preview-card">
+      <button class="dir-close" aria-label="Fermer l'aperçu">✕</button>
+      <div class="dp-head">
+        <div class="dp-logo">${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : p.icon}</div>
+        <div style="min-width:0">
+          <div class="dp-name">${p.name}</div>
+          <div class="dp-loc">${p.maker} · ${p.cat}</div>
+        </div>
+      </div>
+      <div class="dp-badges"><span class="tag tag-industry">${p.industry}</span></div>
+      <p class="dp-desc">${p.desc}</p>
+      <div class="dp-section-label">Spécifications</div>
+      <table class="spec-table"><tbody>${specs}</tbody></table>
+      ${bars}
+      ${certs}
+      <div class="dp-price"><span class="price-tag">💰 ${p.price}</span></div>
+      <div class="dp-actions">
+        <button class="btn-cmp-add ${inCompare ? 'on' : ''}" data-cmp="${p.id}">${inCompare ? '✓ Dans le comparateur' : '＋ Comparer'}</button>
+        <button class="btn-quote" id="dp-quote">✉ Demander un devis</button>
+      </div>
+    </div>`;
+
+  // animation des barres : on part de 0 puis on remplit vers la cible
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.querySelectorAll('.dir-bar-fill').forEach(f => { f.style.width = f.style.getPropertyValue('--w'); });
+  }));
+
+  el.querySelector('#dp-quote').onclick = () => openLeadModal(p.name, p.maker);
+  el.querySelector('.btn-cmp-add').onclick = function() { toggleCompare(p.id, this); };
+  const close = el.querySelector('.dir-close');
+  if(close) close.onclick = () => el.classList.remove('open');
 }
 
 function resetCatalogue() {

@@ -5,11 +5,29 @@
 // ═══════════════════════════════
 let supplierCompany = null; // entreprise revendiquée (si déjà approuvée)
 let supplierEditingProductId = null; // null = ajout, sinon id du produit en cours d'édition
+let supStatProducts = null, supStatPending = null, supStatApproved = null; // compteurs du bandeau
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   tryRestoreSupplierSession();
 });
+
+// Met en surbrillance l'étape courante du parcours (1 Compte, 2 Revendiquer, 3 Publier)
+function setSupplierStep(step) {
+  const el = document.getElementById('sup-steps');
+  if (el) el.setAttribute('data-step', step);
+}
+
+// Bandeau de stats du tableau de bord (valeurs réelles calculées côté client)
+function renderSupplierStats() {
+  const el = document.getElementById('sup-stats');
+  if (!el) return;
+  const fmt = v => (v === null ? '—' : v);
+  el.innerHTML = `
+    <div class="sup-stat"><span class="sup-stat-n">${fmt(supStatProducts)}</span><span class="sup-stat-l">Produits publiés</span></div>
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-pending">${fmt(supStatPending)}</span><span class="sup-stat-l">Demandes en attente</span></div>
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">Demandes approuvées</span></div>`;
+}
 
 async function supplierFetch(path, options = {}) {
   const token = sessionStorage.getItem('sup_access_token');
@@ -24,7 +42,7 @@ async function supplierFetch(path, options = {}) {
   });
   if (res.status === 401 || res.status === 403) {
     supplierLogout();
-    throw new Error('Session expirée ou accès refusé — reconnecte-toi.');
+    throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
   }
   if (!res.ok) throw new Error(`HTTP ${res.status} sur ${path}`);
   if (res.status === 204) return null;
@@ -89,10 +107,12 @@ function supplierLogout() {
   sessionStorage.removeItem('sup_email');
   sessionStorage.removeItem('sup_user_id');
   supplierCompany = null;
+  supStatProducts = supStatPending = supStatApproved = null;
   document.getElementById('sup-auth-box').style.display = 'block';
   document.getElementById('sup-claim-box').style.display = 'none';
   document.getElementById('sup-pending-box').style.display = 'none';
   document.getElementById('sup-dashboard').style.display = 'none';
+  setSupplierStep(1);
 }
 
 function tryRestoreSupplierSession() {
@@ -111,6 +131,8 @@ async function supplierRouteAfterAuth() {
       document.getElementById('sup-pending-box').style.display = 'none';
       document.getElementById('sup-dashboard').style.display = 'block';
       document.getElementById('sup-dash-title').textContent = supplierCompany.name;
+      setSupplierStep(3);
+      renderSupplierStats();
       loadSupplierProducts();
       loadSupplierSubmissions();
       return;
@@ -121,11 +143,13 @@ async function supplierRouteAfterAuth() {
       document.getElementById('sup-claim-box').style.display = 'none';
       document.getElementById('sup-pending-box').style.display = 'block';
       document.getElementById('sup-dashboard').style.display = 'none';
+      setSupplierStep(2);
       return;
     }
     document.getElementById('sup-claim-box').style.display = 'block';
     document.getElementById('sup-pending-box').style.display = 'none';
     document.getElementById('sup-dashboard').style.display = 'none';
+    setSupplierStep(2);
   } catch (err) {
     showSupplierMessage(err.message, true);
   }
@@ -162,6 +186,7 @@ async function requestCompanyClaim(companyId, companyName) {
     document.getElementById('sup-pending-company').textContent = companyName;
     document.getElementById('sup-claim-box').style.display = 'none';
     document.getElementById('sup-pending-box').style.display = 'block';
+    setSupplierStep(2);
   } catch (err) {
     alert('Erreur : ' + err.message);
   }
@@ -172,17 +197,23 @@ async function loadSupplierProducts() {
   list.innerHTML = 'Chargement…';
   try {
     const products = await supplierFetch(`products?company_id=eq.${supplierCompany.id}&select=*`);
-    if (!products || !products.length) { list.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucun produit pour le moment.</p>'; return; }
+    supStatProducts = (products && products.length) || 0;
+    renderSupplierStats();
+    if (!products || !products.length) { list.innerHTML = '<p class="sup-empty">Aucun produit pour le moment. Ajoutez-en un, il sera publié après validation.</p>'; return; }
     list.innerHTML = products.map(p => `
-      <div class="admin-field-row">
-        <span>${p.name} — ${p.category}</span>
-        <span>
-          <button class="btn-add-product" style="padding:6px 14px;font-size:12px" onclick="openSupplierProductForm('${p.id}')">Modifier</button>
+      <div class="sup-prod">
+        <div class="sup-prod-main">
+          <span class="sup-prod-name">${p.name}</span>
+          <span class="sup-prod-cat">${p.category}</span>
+        </div>
+        <span class="sup-pill sup-pill-ok">● Publié</span>
+        <div class="sup-prod-actions">
+          <button class="btn-add-product sup-btn-sm" onclick="openSupplierProductForm('${p.id}')">Modifier</button>
           <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${p.name.replace(/'/g, "\\'")}')">Supprimer</button>
-        </span>
+        </div>
       </div>`).join('');
   } catch (err) {
-    list.innerHTML = `<p style="color:#C0392B;font-size:13px">${err.message}</p>`;
+    list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
   }
 }
 
@@ -191,16 +222,27 @@ async function loadSupplierSubmissions() {
   list.innerHTML = 'Chargement…';
   try {
     const rows = await supplierFetch(`product_submissions?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=20`);
-    if (!rows || !rows.length) { list.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucune demande envoyée.</p>'; return; }
+    supStatPending = (rows || []).filter(r => r.status === 'pending').length;
+    supStatApproved = (rows || []).filter(r => r.status === 'approved').length;
+    renderSupplierStats();
+    if (!rows || !rows.length) { list.innerHTML = '<p class="sup-empty">Aucune demande envoyée.</p>'; return; }
     const labels = { new: 'Ajout', update: 'Modification', delete: 'Suppression' };
-    const statusLabels = { pending: '⏳ En attente', approved: '✓ Approuvée', rejected: '✕ Rejetée' };
-    list.innerHTML = rows.map(r => `
-      <div class="admin-field-row">
-        <span>${labels[r.submission_type] || r.submission_type} — ${r.product_name || ''}</span>
-        <span>${statusLabels[r.status] || r.status}</span>
-      </div>`).join('');
+    const statusMap = {
+      pending:  { cls: 'sup-pill-pending', txt: '⏳ En attente' },
+      approved: { cls: 'sup-pill-ok',      txt: '✓ Approuvée' },
+      rejected: { cls: 'sup-pill-no',      txt: '✕ Rejetée' },
+    };
+    list.innerHTML = `<div class="sup-timeline">` + rows.map(r => {
+      const st = statusMap[r.status] || { cls: '', txt: r.status };
+      return `
+      <div class="sup-tl-row">
+        <span class="sup-tl-dot ${st.cls}"></span>
+        <span class="sup-tl-main"><strong>${labels[r.submission_type] || r.submission_type}</strong> · ${r.product_name || ''}</span>
+        <span class="sup-pill ${st.cls}">${st.txt}</span>
+      </div>`;
+    }).join('') + `</div>`;
   } catch (err) {
-    list.innerHTML = `<p style="color:#C0392B;font-size:13px">${err.message}</p>`;
+    list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
   }
 }
 

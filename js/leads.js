@@ -9,7 +9,7 @@
 function openLeadModal(targetName, productName) {
   leadTarget = { company: targetName, product: productName };
   document.getElementById('lead-target').textContent = productName
-    ? `${productName} — ${targetName}`
+    ? `${productName} · ${targetName}`
     : targetName;
   resetLeadForm();
   document.getElementById('lead-overlay').classList.add('open');
@@ -17,7 +17,7 @@ function openLeadModal(targetName, productName) {
 
 function resetLeadForm() {
   document.getElementById('lead-body').innerHTML = `
-    <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non — vous ne serez jamais inscrit à une liste de diffusion.</p>
+    <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non, vous ne serez jamais inscrit à une liste de diffusion.</p>
     <form id="lead-form" onsubmit="submitLeadForm(event)">
       <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" required/></div>
       <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" required/></div>
@@ -43,7 +43,7 @@ async function submitLeadForm(e) {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
-        subject: `Demande de devis Buy-ineer — ${leadTarget.company}`,
+        subject: `Demande de devis Buy-ineer · ${leadTarget.company}`,
         from_name: 'Buy-ineer',
         to: FOUNDER_EMAIL,
         name,
@@ -52,7 +52,7 @@ async function submitLeadForm(e) {
         message:
           `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
           `Besoin :\n${need}\n\n` +
-          `— Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`,
+          `Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`,
       }),
     });
     const data = await res.json();
@@ -62,7 +62,7 @@ async function submitLeadForm(e) {
       <div class="lead-success">
         <div class="icon">✅</div>
         <h3>Demande envoyée</h3>
-        <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement — vous n'avez rien à payer.</p>
+        <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement, vous n'avez rien à payer.</p>
         <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">Fermer</button>
       </div>`;
   } catch (err) {

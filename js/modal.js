@@ -7,11 +7,29 @@ function toggleCompare(id, btn) {
   if(compareIds.includes(id)) {
     compareIds = compareIds.filter(x => x !== id);
   } else {
-    if(compareIds.length >= 4) { alert('Maximum 4 produits à la fois.'); return; }
+    if(compareIds.length >= 4) { flashCompareLimit(); return; }
     compareIds.push(id);
   }
-  renderProducts();
+  syncCompareButtons();   // pas de rebuild de la liste → l'aperçu/les animations restent
   updateCompareBanner();
+}
+
+// met à jour tous les boutons "comparer" (lignes + aperçu) sans reconstruire la liste
+function syncCompareButtons() {
+  document.querySelectorAll('[data-cmp]').forEach(b => {
+    const on = compareIds.includes(b.dataset.cmp);
+    b.classList.toggle('on', on);
+    if(b.classList.contains('btn-cmp-add')) b.textContent = on ? '✓ Dans le comparateur' : '＋ Comparer';
+    else if(b.classList.contains('dir-cmp')) b.textContent = on ? '✓' : '＋';
+  });
+}
+
+// flash non-bloquant quand on dépasse 4 produits (au lieu d'un alert qui gèle la page)
+function flashCompareLimit() {
+  const banner = document.getElementById('compare-banner');
+  if(!banner) return;
+  banner.classList.add('limit');
+  setTimeout(() => banner.classList.remove('limit'), 500);
 }
 
 function updateCompareBanner() {

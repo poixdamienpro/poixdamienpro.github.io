@@ -3,51 +3,90 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Référencer mon entreprise — Buy-ineer</title>
+<title>Référencer mon entreprise · Buy-ineer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'submit';</script>
 </head>
-<body>
+<body class="theme-dark">
 
 <div id="nav-slot"></div>
 
-<div class="page-header">
+<header class="page-header">
   <div class="page-header-inner">
     <div>
       <h1 class="page-title">Référencer <span>mon entreprise</span></h1>
-      <p class="page-subtitle">Gratuit. Vos produits sont relus avant publication — comptez quelques jours.</p>
+      <p class="page-subtitle">Gratuit. Vos produits sont relus avant publication, comptez quelques jours.</p>
     </div>
   </div>
-</div>
-<div class="submit-wrap" id="submit-wrap">
-  <p class="submit-intro">Vous ne payez jamais pour être référencé. Une fois validés, vos produits apparaissent dans l'annuaire et le catalogue. Vous ne serez sollicité pour un paiement que si un ingénieur demande un devis et que vous acceptez de recevoir ce contact.</p>
-  <form id="submit-form" onsubmit="submitSupplierForm(event)">
-    <div class="submit-section-title">Vos coordonnées</div>
-    <div class="submit-grid">
-      <div class="lead-field"><label>Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
-      <div class="lead-field"><label>Votre email</label><input type="email" id="sub-submitter-email" required/></div>
-    </div>
+</header>
 
-    <div class="submit-section-title" style="margin-top:24px">Votre entreprise</div>
-    <div class="submit-grid">
-      <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
-      <div class="lead-field"><label>Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France"/></div>
-      <div class="lead-field"><label>Siège</label><input type="text" id="sub-company-hq"/></div>
-      <div class="lead-field"><label>Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense"/></div>
-      <div class="lead-field"><label>Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
-      <div class="lead-field"><label>Email de contact public</label><input type="email" id="sub-company-contact"/></div>
-    </div>
-    <div class="lead-field"><label>Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
+<!-- Stepper (suit le scroll) -->
+<nav class="sup-steps" id="sub-steps" data-step="1" aria-label="Sections du formulaire">
+  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label">Coordonnées</span></div>
+  <span class="sup-step-bar"></span>
+  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label">Entreprise</span></div>
+  <span class="sup-step-bar"></span>
+  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label">Produits</span></div>
+</nav>
 
-    <div class="submit-section-title" style="margin-top:24px">Vos produits</div>
-    <div id="product-blocks"></div>
-    <button type="button" class="btn-add-product" onclick="addProductBlock()">+ Ajouter un produit</button>
+<datalist id="industry-list"></datalist>
 
-    <div class="submit-actions">
-      <button type="submit" class="btn-submit-form">📩 Envoyer pour validation</button>
-    </div>
-  </form>
+<div class="sub-page" id="submit-wrap">
+  <div class="sub-layout">
+    <form id="submit-form" onsubmit="submitSupplierForm(event)">
+
+      <section class="sub-card" data-step="1" style="--i:0">
+        <div class="sub-card-head"><span class="sub-card-num">1</span><div><div class="sub-card-title">Vos coordonnées</div><div class="sub-card-sub">Pour vous recontacter une fois la fiche publiée.</div></div></div>
+        <div class="submit-grid">
+          <div class="lead-field"><label>Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
+          <div class="lead-field"><label>Votre email</label><input type="email" id="sub-submitter-email" required/></div>
+        </div>
+      </section>
+
+      <section class="sub-card" data-step="2" style="--i:1">
+        <div class="sub-card-head"><span class="sub-card-num">2</span><div><div class="sub-card-title">Votre entreprise</div><div class="sub-card-sub">Les informations publiques de votre fiche annuaire.</div></div></div>
+        <div class="submit-grid">
+          <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
+          <div class="lead-field"><label>Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France"/></div>
+          <div class="lead-field"><label>Siège</label><input type="text" id="sub-company-hq"/></div>
+          <div class="lead-field"><label>Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense"/></div>
+          <div class="lead-field"><label>Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
+          <div class="lead-field"><label>Email de contact public</label><input type="email" id="sub-company-contact"/></div>
+        </div>
+        <div class="lead-field"><label>Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
+      </section>
+
+      <section class="sub-card" data-step="3" style="--i:2">
+        <div class="sub-card-head"><span class="sub-card-num">3</span><div><div class="sub-card-title">Vos produits</div><div class="sub-card-sub">Ajoutez-en autant que nécessaire. Specs et photo optionnelles.</div></div></div>
+        <div id="product-blocks"></div>
+        <button type="button" class="btn-add-product" onclick="addProductBlock()">+ Ajouter un produit</button>
+      </section>
+
+      <div class="sub-submitbar">
+        <span class="sub-bar-count"><strong id="sub-count">0</strong> <span id="sub-count-word">produit</span> prêt(s) à envoyer</span>
+        <button type="submit" class="btn-submit-form sub-bar-btn">📩 Envoyer pour validation</button>
+      </div>
+    </form>
+
+    <aside class="sub-aside">
+      <div class="sub-aside-card">
+        <span class="section-eyebrow">// C'EST GRATUIT</span>
+        <h2 class="sup-gate-title">Référencé en quelques jours, <em>sans payer.</em></h2>
+        <ul class="sup-gate-points">
+          <li><span class="sup-gate-ico">✓</span><span>Référencement et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>Chaque fiche est <strong>relue par un humain</strong> avant publication.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>Vous ne payez <strong>qu'un lead accepté</strong> (~80&nbsp;€). Aucune carte bancaire ici.</span></li>
+        </ul>
+        <div class="sup-gate-foot">Déjà référencé ? <a href="supplier.html">Accéder à mon espace →</a></div>
+      </div>
+    </aside>
+
+  </div>
 </div>
 
 <div id="modals-slot"></div>

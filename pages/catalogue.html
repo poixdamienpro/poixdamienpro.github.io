@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Catalogue produits & specs — Buy-ineer</title>
+<title>Catalogue produits & specs · Buy-ineer</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'catalogue';</script>
 </head>
-<body>
+<body class="theme-dark">
 
 <div id="nav-slot"></div>
 
@@ -16,11 +20,11 @@
   <div class="page-header-inner">
     <div>
       <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
-      <p class="page-subtitle">Fiches techniques détaillées — cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+      <p class="page-subtitle">Fiches techniques détaillées. Cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
     </div>
   </div>
 </div>
-<div class="layout">
+<div class="dir">
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Recherche</div>
@@ -43,13 +47,14 @@
       <a class="btn-upsell" href="submit.html">Référencer mon entreprise →</a>
     </div>
   </aside>
-  <main class="content" id="catalogue-main">
+  <div class="dir-list-col">
     <div class="toolbar">
       <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
-      <span style="font-size:11px;color:var(--sage);background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:3px;padding:3px 8px">✓ Specs techniques complètes — gratuit</span>
+      <span class="dir-hint">Survolez pour la fiche · ＋ pour comparer</span>
     </div>
-    <div class="grid-products" id="products-grid"></div>
-  </main>
+    <div class="dir-list" id="products-list" role="listbox" aria-label="Produits"></div>
+  </div>
+  <aside class="dir-preview is-sheet" id="product-preview" aria-live="polite"></aside>
 </div>
 
 <div id="modals-slot"></div>
