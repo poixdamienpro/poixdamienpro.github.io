@@ -108,8 +108,8 @@ async function loadTaxonomy() {
   const [companiesRaw, productsRaw, tagsRaw, catsRaw] = await Promise.all([
     fetchAllPaged('get_companies_page'),
     fetchAllPaged('get_products_page'),
-    supabase('company_tags',         'select=company_id,tag'),
-    supabase('company_product_categories', 'select=company_id,category'),
+    supabase('company_tags',         'select=company_id,tag&limit=5000'),
+    supabase('company_product_categories', 'select=company_id,category&limit=5000'),
   ]);
 
   const tagsMap = {};
