@@ -38,26 +38,31 @@ const TRANSLATIONS = {
     st1_h2:              'Tout part de la <em>cellule</em>.',
     st1_p:               'Batteries LFP, Li-ion, packs spatiaux. On référence les fabricants à la source (TYVA, CATL, Saft, GS Yuasa) avec la chimie, la tension et la densité réelles.',
     st1_link:            'Voir les batteries →',
+    st1_guide:           'Comment choisir une batterie ?',
 
     st2_tag:             'Distribution',
     st2_h2:              'Le courant se <em>répartit</em>.',
     st2_p:               'Unités de distribution (PDU), bornes, contacteurs. Comparez les specs côte à côte, ampérage, nombre de sorties, protocole, sans ouvrir dix fiches PDF.',
     st2_link:            'Comparer les PDU →',
+    st2_guide:           'Comment choisir un PDU ?',
 
     st3_tag:             'Contrôle',
     st3_h2:              'L\'intelligence <em>embarquée</em>.',
     st3_p:               'Calculateurs, OBC, cartes de gestion. Les specs au détail près (FPGA, tension d\'entrée, normes) pour choisir le bon cerveau sans appeler trois commerciaux.',
     st3_link:            'Voir les calculateurs →',
+    st3_guide:           'Comment choisir un OBC ?',
 
     st4_tag:             'Action',
     st4_h2:              'La puissance passe à <em>l\'acte</em>.',
     st4_p:               'Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, sans compte, directement au fabricant.',
-    st4_link:            'Demander un devis →',
+    st4_link:            'Voir les actionneurs →',
+    st4_guide:           'Comment choisir un actionneur ?',
 
     st5_tag:             'Régulation',
     st5_h2:              'Le flux, <em>maîtrisé</em>.',
     st5_p:               'Vannes, servovalves, régulateurs. Contacts vérifiés et fiches certifiées (Moog, Bürkert) pour fermer la boucle avec le bon partenaire, en confiance.',
     st5_link:            'Voir les fournisseurs →',
+    st5_guide:           'Comment choisir une vanne ?',
 
     // Outro
     outro_eyebrow:       'Fin du circuit',
@@ -164,26 +169,31 @@ const TRANSLATIONS = {
     st1_h2:              'Everything starts at the <em>cell</em>.',
     st1_p:               'LFP, Li-ion, space packs. We list manufacturers at the source (TYVA, CATL, Saft, GS Yuasa) with real chemistry, voltage, and energy density.',
     st1_link:            'Browse batteries →',
+    st1_guide:           'How to choose a battery?',
 
     st2_tag:             'Distribution',
     st2_h2:              'Current gets <em>distributed</em>.',
     st2_p:               'Power distribution units (PDU), terminals, contactors. Compare specs side by side — amperage, number of outputs, protocol — without opening ten PDF datasheets.',
     st2_link:            'Compare PDUs →',
+    st2_guide:           'How to choose a PDU?',
 
     st3_tag:             'Control',
     st3_h2:              '<em>Embedded</em> intelligence.',
     st3_p:               'OBCs, controllers, management boards. Specs down to the last detail (FPGA, input voltage, standards) to pick the right brain without calling three sales reps.',
     st3_link:            'Browse OBCs →',
+    st3_guide:           'How to choose an OBC?',
 
     st4_tag:             'Action',
     st4_h2:              'Power becomes <em>action</em>.',
     st4_p:               'Actuators, cylinders, eAxles. Once you\'ve found the right one, request a quote in one click, for free, no account needed, directly from the manufacturer.',
-    st4_link:            'Request a quote →',
+    st4_link:            'Browse actuators →',
+    st4_guide:           'How to choose an actuator?',
 
     st5_tag:             'Regulation',
     st5_h2:              'Flow, <em>mastered</em>.',
     st5_p:               'Valves, servo valves, regulators. Verified contacts and certified datasheets (Moog, Bürkert) to close the loop with the right partner, with confidence.',
     st5_link:            'Browse suppliers →',
+    st5_guide:           'How to choose a valve?',
 
     // Outro
     outro_eyebrow:       'End of circuit',
