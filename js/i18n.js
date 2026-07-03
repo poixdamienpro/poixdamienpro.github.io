@@ -5,6 +5,7 @@ const TRANSLATIONS = {
   fr: {
     // Nav
     nav_annuaire:        'Annuaire',
+    nav_composants:      'Composants',
     nav_produits:        'Produits & Specs',
     nav_tarifs:          'Tarifs',
     nav_fournisseur:     'Espace fournisseur',
@@ -130,6 +131,7 @@ const TRANSLATIONS = {
   en: {
     // Nav
     nav_annuaire:        'Directory',
+    nav_composants:      'Components',
     nav_produits:        'Products & Specs',
     nav_tarifs:          'Pricing',
     nav_fournisseur:     'Supplier Portal',

@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     initChips('ann-cat-chips', PROD_CATS, () => annCat, v => { annCat = v; renderCompanies(); });
     document.getElementById('kpi-c').textContent = COMPANIES.length;
     document.getElementById('kpi-p').textContent = PRODUCTS.length;
+
+    // Préremplissage de la recherche via ?q= (liens fabricants depuis les pages composants)
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) document.getElementById('ann-search').value = q;
+
     renderCompanies();
   } catch (err) {
     console.error('Erreur Supabase:', err);
