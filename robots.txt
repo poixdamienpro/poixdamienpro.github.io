@@ -3,6 +3,7 @@
 # l'annuaire est public et doit rester indexable, c'est le modèle du site.
 User-agent: *
 Allow: /
+Disallow: /pages/admin.html
 
 # Crawlers IA connus (entraînement de modèles / agents de navigation) —
 # bloqués explicitement. Note : ceci est une déclaration respectée
