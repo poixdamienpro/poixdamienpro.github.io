@@ -17,6 +17,54 @@ const TRANSLATIONS = {
     hud_submit:          'Référencer mon entreprise',
     hud_explore:         'Explorer l\'annuaire',
 
+    // Index hero
+    hero_eyebrow:        'Référentiel équipementiers · Le Circuit',
+    hero_l1:             'Suivez le courant',
+    hero_l2:             'au cœur des',
+    hero_l3:             '<em>systèmes industriels.</em>',
+    hero_p:              'De la cellule batterie à la servovanne, chaque composant a son fabricant, ses specs, son contact. Descendez le câble, on vous montre où sourcer.',
+    hero_meta:           '05 stations · Source → Régulation',
+    hero_scroll:         'Descendez le circuit',
+
+    // Statband
+    stat_makers:         'Fabricants référencés',
+    stat_products:       'Fiches produits',
+    stat_categories:     'Catégories produits',
+    stat_industries:     'Industries couvertes',
+
+    // Stations
+    st1_tag:             'Source',
+    st1_h2:              'Tout part de la <em>cellule</em>.',
+    st1_p:               'Batteries LFP, Li-ion, packs spatiaux. On référence les fabricants à la source (TYVA, CATL, Saft, GS Yuasa) avec la chimie, la tension et la densité réelles.',
+    st1_link:            'Voir les batteries →',
+
+    st2_tag:             'Distribution',
+    st2_h2:              'Le courant se <em>répartit</em>.',
+    st2_p:               'Unités de distribution (PDU), bornes, contacteurs. Comparez les specs côte à côte, ampérage, nombre de sorties, protocole, sans ouvrir dix fiches PDF.',
+    st2_link:            'Comparer les PDU →',
+
+    st3_tag:             'Contrôle',
+    st3_h2:              'L\'intelligence <em>embarquée</em>.',
+    st3_p:               'Calculateurs, OBC, cartes de gestion. Les specs au détail près (FPGA, tension d\'entrée, normes) pour choisir le bon cerveau sans appeler trois commerciaux.',
+    st3_link:            'Voir les calculateurs →',
+
+    st4_tag:             'Action',
+    st4_h2:              'La puissance passe à <em>l\'acte</em>.',
+    st4_p:               'Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, sans compte, directement au fabricant.',
+    st4_link:            'Demander un devis →',
+
+    st5_tag:             'Régulation',
+    st5_h2:              'Le flux, <em>maîtrisé</em>.',
+    st5_p:               'Vannes, servovalves, régulateurs. Contacts vérifiés et fiches certifiées (Moog, Bürkert) pour fermer la boucle avec le bon partenaire, en confiance.',
+    st5_link:            'Voir les fournisseurs →',
+
+    // Outro
+    outro_eyebrow:       'Fin du circuit',
+    outro_h2:            'Le système complet vous <em>attend</em>.',
+    outro_p:             'Vous avez suivi le courant. Maintenant, parcourez les fabricants et fiches produits : filtrez, comparez, contactez. Gratuit pour les acheteurs.',
+    outro_btn1:          'Explorer l\'annuaire complet',
+    outro_btn2:          'Parcourir le catalogue',
+
     // Page annuaire
     ann_title:           'Annuaire des fabricants industriels',
     ann_subtitle:        'Sourcez et évaluez les équipementiers mondiaux : batteries, PDU, OBC, vannes, actionneurs.',
@@ -93,6 +141,54 @@ const TRANSLATIONS = {
     hud_tagline:         'SOURCE IN MINUTES, NOT WEEKS',
     hud_submit:          'List my company',
     hud_explore:         'Explore directory',
+
+    // Index hero
+    hero_eyebrow:        'OEM Reference · The Circuit',
+    hero_l1:             'Follow the current',
+    hero_l2:             'through the heart of',
+    hero_l3:             '<em>industrial systems.</em>',
+    hero_p:              'From the battery cell to the servo valve, every component has its manufacturer, specs, and contact. Follow the wire — we show you where to source.',
+    hero_meta:           '05 stations · Source → Regulation',
+    hero_scroll:         'Scroll down the circuit',
+
+    // Statband
+    stat_makers:         'Listed manufacturers',
+    stat_products:       'Product datasheets',
+    stat_categories:     'Product categories',
+    stat_industries:     'Industries covered',
+
+    // Stations
+    st1_tag:             'Source',
+    st1_h2:              'Everything starts at the <em>cell</em>.',
+    st1_p:               'LFP, Li-ion, space packs. We list manufacturers at the source (TYVA, CATL, Saft, GS Yuasa) with real chemistry, voltage, and energy density.',
+    st1_link:            'Browse batteries →',
+
+    st2_tag:             'Distribution',
+    st2_h2:              'Current gets <em>distributed</em>.',
+    st2_p:               'Power distribution units (PDU), terminals, contactors. Compare specs side by side — amperage, number of outputs, protocol — without opening ten PDF datasheets.',
+    st2_link:            'Compare PDUs →',
+
+    st3_tag:             'Control',
+    st3_h2:              '<em>Embedded</em> intelligence.',
+    st3_p:               'OBCs, controllers, management boards. Specs down to the last detail (FPGA, input voltage, standards) to pick the right brain without calling three sales reps.',
+    st3_link:            'Browse OBCs →',
+
+    st4_tag:             'Action',
+    st4_h2:              'Power becomes <em>action</em>.',
+    st4_p:               'Actuators, cylinders, eAxles. Once you\'ve found the right one, request a quote in one click, for free, no account needed, directly from the manufacturer.',
+    st4_link:            'Request a quote →',
+
+    st5_tag:             'Regulation',
+    st5_h2:              'Flow, <em>mastered</em>.',
+    st5_p:               'Valves, servo valves, regulators. Verified contacts and certified datasheets (Moog, Bürkert) to close the loop with the right partner, with confidence.',
+    st5_link:            'Browse suppliers →',
+
+    // Outro
+    outro_eyebrow:       'End of circuit',
+    outro_h2:            'The complete system <em>awaits</em>.',
+    outro_p:             'You\'ve followed the current. Now browse manufacturers and product datasheets: filter, compare, contact. Free for buyers.',
+    outro_btn1:          'Explore the full directory',
+    outro_btn2:          'Browse catalogue',
 
     // Page annuaire
     ann_title:           'Industrial Manufacturer Directory',
@@ -183,11 +279,19 @@ function applyLang() {
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
     if (val !== undefined) el.textContent = val;
   });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
+    if (val !== undefined) el.innerHTML = val;
+  });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
     if (val !== undefined) el.placeholder = val;
   });
+  // Re-rendu du contenu dynamique (liste entreprises / produits)
+  if (typeof renderCompanies === 'function') renderCompanies();
+  if (typeof renderProducts === 'function') renderProducts();
   // Mettre à jour le switcher
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
