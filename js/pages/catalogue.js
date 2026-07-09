@@ -44,7 +44,7 @@ function renderProducts() {
   catCurrentId = null;
 
   if(!filtered.length) {
-    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucun produit ne correspond.</div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>' + (typeof t==='function'?t('cat_empty'):'Aucun produit ne correspond.') + '</div>';
     if(preview) preview.innerHTML = '';
     return;
   }
@@ -96,8 +96,9 @@ function renderProductPreview(p) {
 
   const specs = p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('');
 
+  const _t = typeof t==='function' ? t : k=>k;
   const bars = (p.bars || []).length ? `
-    <div class="dp-section-label">Scores relatifs</div>
+    <div class="dp-section-label">${_t('prod_scores')}</div>
     <div class="dir-bars">
       ${p.bars.map(b => `
         <div class="dir-bar">
@@ -107,7 +108,7 @@ function renderProductPreview(p) {
     </div>` : '';
 
   const certs = (p.certs || []).length ? `
-    <div class="dp-section-label">Certifications</div>
+    <div class="dp-section-label">${_t('prod_certs')}</div>
     <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
@@ -122,14 +123,14 @@ function renderProductPreview(p) {
       </div>
       <div class="dp-badges"><span class="tag tag-industry">${p.industry}</span></div>
       <p class="dp-desc">${p.desc}</p>
-      <div class="dp-section-label">Spécifications</div>
+      <div class="dp-section-label">${_t('prod_specs')}</div>
       <table class="spec-table"><tbody>${specs}</tbody></table>
       ${bars}
       ${certs}
       <div class="dp-price"><span class="price-tag">💰 ${p.price}</span></div>
       <div class="dp-actions">
-        <button class="btn-cmp-add ${inCompare ? 'on' : ''}" data-cmp="${p.id}">${inCompare ? '✓ Dans le comparateur' : '＋ Comparer'}</button>
-        <button class="btn-quote" id="dp-quote">✉ Demander un devis</button>
+        <button class="btn-cmp-add ${inCompare ? 'on' : ''}" data-cmp="${p.id}">${inCompare ? _t('prod_compare_in') : _t('prod_compare_add')}</button>
+        <button class="btn-quote" id="dp-quote">${_t('prod_quote')}</button>
       </div>
     </div>`;
 

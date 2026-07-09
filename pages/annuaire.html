@@ -19,38 +19,38 @@
 <div class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Annuaire des <span>fabricants</span> industriels</h1>
-      <p class="page-subtitle">Sourcez et évaluez les équipementiers mondiaux : batteries, PDU, OBC, vannes, actionneurs.</p>
+      <h1 class="page-title" data-i18n="ann_title">Annuaire des <span>fabricants</span> industriels</h1>
+      <p class="page-subtitle" data-i18n="ann_subtitle">Sourcez et évaluez les équipementiers mondiaux : batteries, PDU, OBC, vannes, actionneurs.</p>
     </div>
     <div class="kpi-row">
-      <div class="kpi"><div><div class="kpi-n" id="kpi-c">34</div><div class="kpi-l">Entreprises</div></div></div>
-      <div class="kpi"><div><div class="kpi-n" id="kpi-p">20</div><div class="kpi-l">Produits</div></div></div>
-      <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Industries</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-c">—</div><div class="kpi-l" data-i18n="ann_kpi_companies">Entreprises</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-p">—</div><div class="kpi-l" data-i18n="ann_kpi_products">Produits</div></div></div>
+      <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l" data-i18n="ann_kpi_industries">Industries</div></div></div>
     </div>
   </div>
 </div>
 <div class="dir">
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-label">Recherche</div>
-      <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
+      <div class="sidebar-label" data-i18n="ann_label_search">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="ann-search" type="text" data-i18n-placeholder="ann_placeholder" placeholder="Nom, pays, produit…" oninput="renderCompanies()"/></div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Industrie</div>
+      <div class="sidebar-label" data-i18n="ann_label_industry">Industrie</div>
       <div class="chip-group" id="ann-industry-chips"></div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Catégorie produit</div>
+      <div class="sidebar-label" data-i18n="ann_label_category">Catégorie produit</div>
       <div class="chip-group" id="ann-cat-chips"></div>
     </div>
-    <button class="reset-btn" onclick="resetAnnuaire()">↺ Réinitialiser</button>
+    <button class="reset-btn" onclick="resetAnnuaire()" data-i18n="ann_reset">↺ Réinitialiser</button>
   </aside>
   <div class="dir-list-col">
     <div class="toolbar">
-      <div><span class="toolbar-label">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
-      <span class="dir-hint">Survolez pour prévisualiser</span>
+      <div><span class="toolbar-label" data-i18n="ann_toolbar">// ANNUAIRE</span><span class="result-count" id="ann-count"></span></div>
+      <span class="dir-hint" data-i18n="ann_hint">Survolez pour prévisualiser</span>
     </div>
     <div class="dir-list" id="companies-list" role="listbox" aria-label="Fabricants"></div>
   </div>
@@ -60,6 +60,7 @@
 <div id="modals-slot"></div>
 <div id="footer-slot"></div>
 
+<script src="../js/i18n.js"></script>
 <script src="../js/data.js"></script>
 <script src="../js/layout.js"></script>
 <script src="../js/api.js"></script>

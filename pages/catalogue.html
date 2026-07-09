@@ -19,38 +19,38 @@
 <div class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Catalogue <span>produits & specs</span></h1>
-      <p class="page-subtitle">Fiches techniques détaillées. Cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
+      <h1 class="page-title" data-i18n="cat_title">Catalogue <span>produits & specs</span></h1>
+      <p class="page-subtitle" data-i18n="cat_subtitle">Fiches techniques détaillées. Cochez jusqu'à 4 produits et comparez-les côte-à-côte.</p>
     </div>
   </div>
 </div>
 <div class="dir">
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-label">Recherche</div>
-      <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+      <div class="sidebar-label" data-i18n="cat_label_search">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" data-i18n-placeholder="cat_placeholder" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Catégorie</div>
+      <div class="sidebar-label" data-i18n="cat_label_category">Catégorie</div>
       <div class="chip-group" id="cat-cat-chips"></div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Industrie</div>
+      <div class="sidebar-label" data-i18n="cat_label_industry">Industrie</div>
       <div class="chip-group" id="cat-ind-chips"></div>
     </div>
-    <button class="reset-btn" onclick="resetCatalogue()">↺ Réinitialiser</button>
+    <button class="reset-btn" onclick="resetCatalogue()" data-i18n="cat_reset">↺ Réinitialiser</button>
     <div class="pro-upsell">
-      <div class="pro-upsell-title">★ Vous êtes fournisseur ?</div>
-      <p>Référencement gratuit. Vous ne payez que si on vous transmet un contact qualifié.</p>
-      <a class="btn-upsell" href="submit.html">Référencer mon entreprise →</a>
+      <div class="pro-upsell-title" data-i18n="cat_upsell_title">★ Vous êtes fournisseur ?</div>
+      <p data-i18n="cat_upsell_body">Référencement gratuit. Vous ne payez que si on vous transmet un contact qualifié.</p>
+      <a class="btn-upsell" href="submit.html" data-i18n="cat_upsell_btn">Référencer mon entreprise →</a>
     </div>
   </aside>
   <div class="dir-list-col">
     <div class="toolbar">
-      <div><span class="toolbar-label">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
-      <span class="dir-hint">Survolez pour la fiche · ＋ pour comparer</span>
+      <div><span class="toolbar-label" data-i18n="cat_toolbar">// CATALOGUE</span><span class="result-count" id="cat-count"></span></div>
+      <span class="dir-hint" data-i18n="cat_hint">Survolez pour la fiche · ＋ pour comparer</span>
     </div>
     <div class="dir-list" id="products-list" role="listbox" aria-label="Produits"></div>
   </div>
@@ -60,6 +60,7 @@
 <div id="modals-slot"></div>
 <div id="footer-slot"></div>
 
+<script src="../js/i18n.js"></script>
 <script src="../js/data.js"></script>
 <script src="../js/layout.js"></script>
 <script src="../js/api.js"></script>

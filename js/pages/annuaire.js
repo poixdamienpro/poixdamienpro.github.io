@@ -41,7 +41,7 @@ function renderCompanies() {
   dirCurrentId = null;
 
   if(!filtered.length) {
-    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucune entreprise ne correspond.</div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>' + (typeof t==='function'?t('ann_empty'):'Aucune entreprise ne correspond.') + '</div>';
     if(preview) preview.innerHTML = '';
     return;
   }
@@ -90,15 +90,17 @@ function renderCompanyPreview(c) {
   if(!el) return;
   const prods = PRODUCTS.filter(p => p.maker === c.name);
 
-  const details = [['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', c.industry], ['Siège', c.hq]]
+  const _t = typeof t==='function' ? t : k=>k;
+  const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industry], [_t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
 
+  const prodLabel = prods.length===1 ? _t('prev_products_1') : _t('prev_products_n');
   const prodsBlock = prods.length ? `
-    <div class="dp-section-label">${prods.length} produit${prods.length>1?'s':''} référencé${prods.length>1?'s':''}</div>
+    <div class="dp-section-label">${prods.length} ${prodLabel}</div>
     <div class="dp-prods">
       ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${p.icon} ${p.name}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div><div class="modal-prod-price">💰 ${p.price}</div></div>`).join('')}
     </div>
-    ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">Voir les '+prods.length+' produits →</button>' : ''}` : '';
+    ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">'+_t('prev_see')+' '+prods.length+' '+_t('prev_see_suffix')+'</button>' : ''}` : '';
 
   el.innerHTML = `
     <div class="dir-preview-card">
@@ -115,12 +117,12 @@ function renderCompanyPreview(c) {
         <span class="tag tag-industry">${c.industry}</span>
       </div>
       <p class="dp-desc">${c.desc}</p>
-      <div class="dp-section-label">Informations société</div>
+      <div class="dp-section-label">${_t('prev_info')}</div>
       <div class="dp-details">${details}</div>
       ${prodsBlock}
       <div class="dp-actions">
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">↗ Visiter le site</a>
-        <button class="btn-quote" id="dp-quote">✉ Demander un devis</button>
+        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${_t('prev_visit')}</a>
+        <button class="btn-quote" id="dp-quote">${_t('prev_quote')}</button>
       </div>
     </div>`;
 

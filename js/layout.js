@@ -22,6 +22,7 @@ async function loadLayout() {
   }
   markActiveNavLink();
   initTicker();
+  if (typeof applyLang === 'function') applyLang();
   document.querySelectorAll('.overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
   });
