@@ -12,6 +12,11 @@ const TRANSLATIONS = {
     nav_pill:            '✓ Annuaire & specs 100% gratuits',
     ticker_label:        '// NOUVEAU',
 
+    // Index HUD
+    hud_tagline:         'SOURCER EN MINUTES, PAS EN SEMAINES',
+    hud_submit:          'Référencer mon entreprise',
+    hud_explore:         'Explorer l\'annuaire',
+
     // Page annuaire
     ann_title:           'Annuaire des fabricants industriels',
     ann_subtitle:        'Sourcez et évaluez les équipementiers mondiaux : batteries, PDU, OBC, vannes, actionneurs.',
@@ -83,6 +88,11 @@ const TRANSLATIONS = {
     nav_referencer:      'List my company',
     nav_pill:            '✓ Directory & specs 100% free',
     ticker_label:        '// NEW',
+
+    // Index HUD
+    hud_tagline:         'SOURCE IN MINUTES, NOT WEEKS',
+    hud_submit:          'List my company',
+    hud_explore:         'Explore directory',
 
     // Page annuaire
     ann_title:           'Industrial Manufacturer Directory',
