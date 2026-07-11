@@ -15,8 +15,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('kpi-p').textContent = PRODUCTS.length;
 
     // Préremplissage de la recherche via ?q= (liens fabricants depuis les pages composants)
-    const q = new URLSearchParams(window.location.search).get('q');
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
     if (q) document.getElementById('ann-search').value = q;
+
+    // Préfiltrage par secteur via ?industry= (liens depuis les pages secteurs)
+    const ind = params.get('industry');
+    if (ind && INDUSTRIES.includes(ind)) {
+      annIndustry = ind;
+      updateChips('ann-industry-chips', () => annIndustry);
+    }
 
     renderCompanies();
   } catch (err) {
