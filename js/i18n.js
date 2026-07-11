@@ -13,6 +13,15 @@ const TRANSLATIONS = {
     nav_pill:            '✓ Annuaire & specs 100% gratuits',
     ticker_label:        '// NOUVEAU',
 
+    // Footer
+    footer_about:        'Qui sommes-nous',
+    footer_industries:   'Secteurs',
+    footer_how:          'Comment ça marche',
+    footer_quote:        'Demande de devis',
+    footer_supplier:     'Devenir fournisseur',
+    footer_legal:        'Mentions légales',
+    footer_privacy:      'Politique de confidentialité',
+
     // Index HUD
     hud_tagline:         'SOURCER EN MINUTES, PAS EN SEMAINES',
     hud_submit:          'Référencer mon entreprise',
@@ -143,6 +152,15 @@ const TRANSLATIONS = {
     nav_referencer:      'List my company',
     nav_pill:            '✓ Directory & specs 100% free',
     ticker_label:        '// NEW',
+
+    // Footer
+    footer_about:        'About us',
+    footer_industries:   'Industries',
+    footer_how:          'How it works',
+    footer_quote:        'Request a quote',
+    footer_supplier:     'Become a supplier',
+    footer_legal:        'Legal notice',
+    footer_privacy:      'Privacy policy',
 
     // Index HUD
     hud_tagline:         'SOURCE IN MINUTES, NOT WEEKS',
