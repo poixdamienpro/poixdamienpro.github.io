@@ -884,3 +884,6 @@ body.theme-dark::after{
 
 /* FAQ : aère les enchaînements question/réponse (motif propre à la FAQ) */
 .cat-intro + .cat-h2{margin-top:46px}
+
+/* Pages secteurs : aère le paragraphe qui précède la grille de fabricants */
+.cat-intro + .cat-makers{margin-top:20px}
