@@ -132,7 +132,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
     <div class="cat-eyebrow">Catégorie produit</div>
     <h1>OBC — <em>Calculateur Embarqué</em> & Ordinateur de Bord</h1>
     <p class="cat-hero-desc">
-      Un On-Board Computer (OBC) fait une chose : exécuter du code au plus près du système qu'il pilote. C'est tout. Le reste — durcissement aux radiations, certification de sécurité, interfaces de communication, redondance, traitement IA — ce sont des <strong style="color:var(--t-hi)">options que chaque fabricant empile</strong> pour répondre aux contraintes de son domaine.
+      Un On-Board Computer (OBC) fait une chose : exécuter du code. C'est un cerveau. Rien de plus. Ce qui différencie les produits, c'est <strong style="color:var(--t-hi)">ce qu'on y branche</strong> (les interfaces), <strong style="color:var(--t-hi)">ce qui tourne dessus</strong> (le logiciel, l'OS, la certification) et <strong style="color:var(--t-hi)">quel type de processeur</strong> il embarque. Le reste — durcissement, redondance, boîtier — ce sont des contraintes de domaine qui viennent en plus.
     </p>
     <div class="cat-tags">
       <span class="cat-tag">On-Board Computer</span>
@@ -291,51 +291,71 @@ body { background: var(--ink-3); color: var(--t-hi); }
     <p class="diagram-caption">Figure 1 — Architecture générique d'un OBC. Le CPU/mémoire est invariant ; chaque bloc optionnel répond à une contrainte applicative.</p>
   </div>
 
-  <!-- ── OPTIONS ───────────────────────────────────────────────── -->
+  <!-- ── TYPES / INTERFACES / LOGICIEL ────────────────────────── -->
   <div class="cat-section">
-    <div class="cat-section-label">Options fabricants</div>
-    <h2>Les options que les <em>fabricants ajoutent</em></h2>
-    <p>Un OBC nu exécute du code. Chaque option ci-dessous répond à une contrainte précise. Un OBC spatial en activera six sur sept. Un SBC industriel standard n'en intégrera peut-être que deux. C'est ce choix d'options — et leur niveau de qualification — qui différencie les produits et fixe le prix.</p>
+    <div class="cat-section-label">Types · Interfaces · Logiciel</div>
+    <h2>Trois questions pour <em>choisir un OBC</em></h2>
+    <p>Un OBC est un cerveau. Pour le choisir, il faut répondre à trois questions : de quel type de processeur a-t-on besoin, quelles interfaces doit-il exposer pour parler aux sous-systèmes, et quel logiciel (OS, certification) doit tourner dessus. Tout le reste — boîtier, radiations, redondance — est une contrainte de domaine qui vient en plus.</p>
+
+    <div class="cat-section-label" style="margin-top:36px">Type de calculateur</div>
+    <div class="functions-grid">
+      <div class="func-card">
+        <div class="func-icon">🖥️</div>
+        <div class="func-title">CPU / MCU — le généraliste</div>
+        <div class="func-desc">ARM Cortex-M/A, x86 industriel, LEON3/4 (spatial), PowerPC. Exécute un logiciel séquentiel, gère les interruptions, pilote les périphériques. <em style="color:var(--t-low)">Le choix par défaut quand le traitement est logiciel et que les flux de données sont modérés.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">⚙️</div>
+        <div class="func-title">FPGA — le parallèle déterministe</div>
+        <div class="func-desc">Xilinx/AMD, Intel/Altera, Microsemi (rad-hard). Logique reconfigurable qui exécute des opérations en parallèle avec une latence fixe et prévisible. <em style="color:var(--t-low)">Choisi pour la synthèse radar, le traitement d'image, le contrôle moteur à haute fréquence, ou quand le timing doit être garanti à la nanoseconde.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🤖</div>
+        <div class="func-title">GPU / NPU — le moteur IA</div>
+        <div class="func-desc">NVIDIA Jetson, Hailo, Qualcomm SA, processeurs d'inférence dédiés. Calcul massivement parallèle optimisé pour les réseaux de neurones et la fusion de capteurs. <em style="color:var(--t-low)">Indispensable pour la perception autonome, le traitement vidéo embarqué, la navigation sans GPS.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔀</div>
+        <div class="func-title">SoC hybride CPU + FPGA</div>
+        <div class="func-desc">Xilinx Zynq, Intel SoC FPGA. Un CPU gère l'OS et le logiciel applicatif ; le FPGA traite les flux temps réel en parallèle. <em style="color:var(--t-low)">Le meilleur des deux mondes : flexibilité logicielle + déterminisme matériel, sur une seule puce.</em></div>
+      </div>
+    </div>
+
+    <div class="cat-section-label" style="margin-top:36px">Interfaces</div>
+    <div class="functions-grid">
+      <div class="func-card">
+        <div class="func-icon">📡</div>
+        <div class="func-title">Bus de communication système</div>
+        <div class="func-desc">SpaceWire (ESA/spatial), MIL-STD-1553 (défense/aéro), ARINC 429 (avionique civile), CAN FD (automobile/industrie), Ethernet TSN (industrie/mobilité). <em style="color:var(--t-low)">Le bus choisi verrouille l'écosystème : chaque domaine a ses standards, et ses équipements ne parlent souvent qu'un seul protocole.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔌</div>
+        <div class="func-title">I/O physiques & capteurs</div>
+        <div class="func-desc">GPIO, ADC/DAC, UART, SPI, I²C, RS-422, PWM. Ce sont les interfaces bas niveau qui connectent l'OBC aux capteurs (IMU, température, pression) et aux actionneurs directement. <em style="color:var(--t-low)">Le nombre et le type de broches I/O disponibles déterminent ce qu'on peut raccorder sans carte d'expansion.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🛰️</div>
+        <div class="func-title">Interfaces de télécommande / télémétrie</div>
+        <div class="func-desc">CCSDS (spatial), MAVLink (drones), NMEA (GPS), SNMP (réseau). Protocoles applicatifs qui structurent les échanges entre l'OBC et l'opérateur ou le segment sol. <em style="color:var(--t-low)">À distinguer des bus physiques : un même SpaceWire peut transporter du CCSDS ou du protocole propriétaire.</em></div>
+      </div>
+    </div>
+
+    <div class="cat-section-label" style="margin-top:36px">Logiciel & OS</div>
     <div class="functions-grid">
       <div class="func-card">
         <div class="func-icon">⏱️</div>
-        <div class="func-title">Option · Exécution temps réel (RTOS)</div>
-        <div class="func-desc">Système d'exploitation temps réel (FreeRTOS, VxWorks, RTEMS, PX4) garantissant des délais d'exécution déterministes. Critique dès que l'OBC doit réagir à des événements dans une fenêtre de temps garantie. <em style="color:var(--t-low)">Présente dès qu'il y a une boucle de contrôle asservie.</em></div>
-      </div>
-      <div class="func-card">
-        <div class="func-icon">🔁</div>
-        <div class="func-title">Option · Redondance & watchdog</div>
-        <div class="func-desc">Double OBC actif/passif (cold ou warm standby), moniteur de défaillance, reset automatique, vote majoritaire TMR (Triple Modular Redundancy). <em style="color:var(--t-low)">Indispensable dès qu'une panne ne doit pas être fatale (spatial, avionique, médical).</em></div>
-      </div>
-      <div class="func-card">
-        <div class="func-icon">📡</div>
-        <div class="func-title">Option · Interfaces de communication</div>
-        <div class="func-desc">SpaceWire, MIL-STD-1553, ARINC 429, CAN FD, Ethernet TSN, UART, I²C, SPI. Le nombre et le type d'interfaces déterminent avec quels sous-systèmes l'OBC peut dialoguer. <em style="color:var(--t-low)">Chaque domaine a ses bus standards.</em></div>
-      </div>
-      <div class="func-card">
-        <div class="func-icon">☢️</div>
-        <div class="func-title">Option · Durcissement aux radiations</div>
-        <div class="func-desc">Composants qualifiés TID/SEE (Total Ionizing Dose, Single Event Effects), EDAC sur les mémoires, scrubbing de la configuration FPGA. <em style="color:var(--t-low)">Exclusif au spatial et à certains systèmes nucléaires — multiplie le coût des composants par 10 à 100.</em></div>
+        <div class="func-title">OS & RTOS</div>
+        <div class="func-desc">FreeRTOS, RTEMS, VxWorks, LynxOS, Linux RT, AUTOSAR Adaptive, Zephyr. Le choix de l'OS détermine les garanties de timing, l'écosystème de bibliothèques, et la facilité de certification. <em style="color:var(--t-low)">Bare-metal pour les applications les plus simples ou les plus contraintes ; RTOS dès qu'il y a plusieurs tâches concurrentes.</em></div>
       </div>
       <div class="func-card">
         <div class="func-icon">🛡️</div>
-        <div class="func-title">Option · Certification de sécurité</div>
-        <div class="func-desc">DO-178C (logiciel avionique), DO-254 (matériel avionique), ISO 26262 ASIL-D (automobile), IEC 61508 SIL-3 (industrie). Détermine les processus de développement, tests et traçabilité exigés. <em style="color:var(--t-low)">Représente souvent 30 à 70 % du coût total du projet.</em></div>
+        <div class="func-title">Certification logicielle</div>
+        <div class="func-desc">DO-178C DAL-A (avionique), ISO 26262 ASIL-D (automobile), ECSS-E-ST-40 (spatial), IEC 61508 SIL-3 (industrie). La certification n'est pas une option logicielle — c'est un processus de développement entier qui contraint l'architecture, les tests et la traçabilité. <em style="color:var(--t-low)">Représente souvent 40 à 70 % du coût total d'un projet critique.</em></div>
       </div>
       <div class="func-card">
-        <div class="func-icon">🧮</div>
-        <div class="func-title">Option · Traitement intensif (FPGA / GPU / NPU)</div>
-        <div class="func-desc">FPGA (Xilinx, Intel, Microsemi), DSP, GPU embarqué ou NPU pour le traitement d'images, la navigation autonome, la fusion de capteurs ou l'inférence IA. <em style="color:var(--t-low)">Ajouté quand le CPU seul n'est pas assez rapide pour traiter les flux de données.</em></div>
-      </div>
-      <div class="func-card">
-        <div class="func-icon">🌡️</div>
-        <div class="func-title">Option · Durcissement environnemental</div>
-        <div class="func-desc">Tenue aux vibrations, chocs, températures extrêmes (−55 °C à +125 °C), humidité, conformal coating. Boîtier MIL-SPEC, connecteurs qualifiés, composants en grade industriel ou militaire. <em style="color:var(--t-low)">Requis hors des environnements contrôlés.</em></div>
-      </div>
-      <div class="func-card">
-        <div class="func-icon">🔋</div>
-        <div class="func-title">Option · Gestion d'alimentation embarquée</div>
-        <div class="func-desc">Régulateurs DC/DC intégrés, protection contre les inversions de polarité et surtensions, modes veille basse consommation, monitoring de la tension d'alimentation. <em style="color:var(--t-low)">Simplifie l'intégration et réduit les composants externes.</em></div>
+        <div class="func-icon">🧩</div>
+        <div class="func-title">Middleware & framework applicatif</div>
+        <div class="func-desc">ARINC 653 (partitionnement avionique), AUTOSAR Classic (ECU auto), ROS 2 (robotique), PX4/ArduPilot (drones), TASTE/POHIC (spatial ESA). Couche entre l'OS et le logiciel métier qui normalise la gestion des tâches, des messages et des ressources. <em style="color:var(--t-low)">Un middleware certifié simplifie la qualification du logiciel applicatif qui tourne au-dessus.</em></div>
       </div>
     </div>
   </div>
