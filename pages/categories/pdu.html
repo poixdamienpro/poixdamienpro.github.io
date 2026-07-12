@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PDU — Unité de Distribution d'Énergie | Buy-ineer</title>
+<meta name="description" content="Tout savoir sur les PDU (Power Distribution Unit) : fonctions, architecture, normes. Comparez les fabricants et fournisseurs de PDU industriels, PCDU spatiaux et PDU embarqués."/>
+<meta name="keywords" content="PDU, Power Distribution Unit, PCDU, unité distribution énergie, PDU spatial, PDU industriel, PDU embarqué, fabricant PDU, fournisseur PDU"/>
+<meta property="og:title" content="PDU — Unité de Distribution d'Énergie | Buy-ineer"/>
+<meta property="og:description" content="Fonctions, architecture et normes des PDU. Comparez les fabricants référencés sur Buy-ineer."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://buy-ineer.com/pages/categories/pdu.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "PDU — Unité de Distribution d'Énergie",
+  "description": "Guide technique complet sur les Power Distribution Units : fonctions, architecture, normes et fournisseurs.",
+  "url": "https://buy-ineer.com/pages/categories/pdu.html",
+  "publisher": { "@type": "Organization", "name": "Buy-ineer", "url": "https://buy-ineer.com" },
+  "about": { "@type": "Product", "name": "PDU — Power Distribution Unit" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'catalogue';</script>
+<style>
+/* ── Page catégorie ─────────────────────────────────────────────── */
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 56px}
+.cat-hero-inner{max-width:1080px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,62px);line-height:1.06;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);max-width:680px;line-height:1.7;margin-bottom:32px}
+.cat-tags{display:flex;flex-wrap:wrap;gap:8px}
+.cat-tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 12px;border-radius:20px;border:1px solid var(--border);color:var(--t-mid);background:rgba(255,255,255,.03)}
+
+/* ── Contenu ────────────────────────────────────────────────────── */
+.cat-body{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+
+/* Section */
+.cat-section{margin-top:72px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.5vw,40px);margin-bottom:16px;line-height:1.1}
+.cat-section h2 em{font-style:italic;color:var(--steel)}
+.cat-section>p{color:var(--t-mid);font-size:16px;line-height:1.75;max-width:760px;margin-bottom:32px}
+
+/* Diagramme fonctionnel */
+.diagram-wrap{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:40px 24px;overflow-x:auto;margin-bottom:8px}
+.diagram-caption{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--t-low);text-align:center;margin-top:12px}
+
+/* Fonctions clés */
+.functions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:8px}
+.func-card{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:22px;transition:border-color .2s}
+.func-card:hover{border-color:var(--steel)}
+.func-icon{font-size:24px;margin-bottom:12px}
+.func-title{font-weight:700;font-size:15px;margin-bottom:8px;color:var(--t-hi)}
+.func-desc{font-size:14px;color:var(--t-mid);line-height:1.6}
+
+/* Domaines */
+.domains-tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid var(--border);overflow-x:auto}
+.domain-tab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:10px 18px;background:none;border:none;color:var(--t-low);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .2s,border-color .2s}
+.domain-tab:hover{color:var(--t-mid)}
+.domain-tab.active{color:var(--t-hi);border-bottom-color:var(--rust)}
+.domain-panel{display:none;padding:28px 0 0}
+.domain-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:700px){.domain-panel.active{grid-template-columns:1fr}}
+.domain-specs{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px}
+.domain-specs h3{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:6px}
+.domain-specs .badge{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:3px 8px;border-radius:12px;border:1px solid var(--border);color:var(--t-low);margin-bottom:16px;display:inline-block}
+.domain-specs ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.domain-specs li{font-size:14px;color:var(--t-mid);display:flex;gap:10px;line-height:1.5}
+.domain-specs li::before{content:'→';color:var(--rust);flex-shrink:0;font-family:var(--mono)}
+.domain-norms{padding-top:4px}
+.domain-norms h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--t-low);margin-bottom:12px}
+.norm-badge{display:inline-flex;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:4px;border:1px solid var(--border);color:var(--steel);margin:3px 3px 3px 0;background:rgba(91,139,181,.06)}
+
+/* Specs table */
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.specs-table th{text-align:left;padding:10px 16px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.08em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500;white-space:nowrap}
+.specs-table tr:last-child td{border-bottom:0}
+
+/* Produits */
+.products-section{margin-top:72px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}
+.prod-card{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:20px;transition:border-color .2s,transform .2s;cursor:pointer;text-align:left}
+.prod-card:hover{border-color:var(--steel);transform:translateY(-2px)}
+.prod-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.prod-card-icon{width:40px;height:40px;border-radius:8px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prod-card-name{font-weight:700;font-size:15px;line-height:1.3;color:var(--t-hi)}
+.prod-card-maker{font-size:13px;color:var(--t-low)}
+.prod-card-desc{font-size:13px;color:var(--t-mid);line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod-card-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.prod-card-spec{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--t-low)}
+.prod-card-spec b{color:var(--steel)}
+.prod-card-price{font-family:var(--mono);font-size:12px;color:var(--gold)}
+.prod-loading{grid-column:1/-1;text-align:center;color:var(--t-low);padding:40px;font-family:var(--mono);font-size:13px}
+
+/* CTA bas de page */
+.cat-cta{margin-top:72px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:48px 40px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(26px,3.5vw,40px);font-weight:400;margin-bottom:12px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<!-- ── HERO ──────────────────────────────────────────────────────── -->
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../catalogue.html">Catalogue</a><span>/</span>
+      <span style="color:var(--t-mid)">PDU</span>
+    </nav>
+    <div class="cat-eyebrow">Catégorie produit</div>
+    <h1>PDU — <em>Unité de Distribution</em> d'Énergie</h1>
+    <p class="cat-hero-desc">
+      Un Power Distribution Unit (PDU) reçoit l'énergie d'une ou plusieurs sources, la protège, la commute et la distribue vers les charges d'un système. Nœud central de toute chaîne d'alimentation, il se décline de la baie datacenter à la PCDU de satellite, en passant par le PDU de véhicule militaire ou l'armoire industrielle.
+    </p>
+    <div class="cat-tags">
+      <span class="cat-tag">Power Distribution Unit</span>
+      <span class="cat-tag">PCDU</span>
+      <span class="cat-tag">ePDU</span>
+      <span class="cat-tag">PDU embarqué</span>
+      <span class="cat-tag">distribution d'énergie</span>
+      <span class="cat-tag">protection de bus</span>
+    </div>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <!-- ── DIAGRAMME FONCTIONNEL ──────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Architecture</div>
+    <h2>Diagramme <em>fonctionnel</em></h2>
+    <p>Un PDU s'insère entre la source d'énergie (batterie, génératrice, réseau) et les charges consommatrices. Il assure la protection, la commutation, le monitoring et le filtrage sur chaque sortie.</p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto" aria-label="Diagramme fonctionnel d'un PDU">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" fill="#5B8BB5"/>
+          </marker>
+          <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" fill="#3F9A72"/>
+          </marker>
+          <linearGradient id="srcGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3F9A72" stop-opacity=".3"/>
+            <stop offset="1" stop-color="#3F9A72" stop-opacity=".08"/>
+          </linearGradient>
+          <linearGradient id="pduGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5B8BB5" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#5B8BB5" stop-opacity=".06"/>
+          </linearGradient>
+          <linearGradient id="loadGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#D4500A" stop-opacity=".2"/>
+            <stop offset="1" stop-color="#D4500A" stop-opacity=".05"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Source -->
+        <rect x="20" y="90" width="110" height="120" rx="8" fill="url(#srcGrad)" stroke="#3F9A72" stroke-width="1.5"/>
+        <text x="75" y="128" text-anchor="middle" font-family="DM Sans,Arial" font-size="12" font-weight="700" fill="#3F9A72">SOURCE</text>
+        <text x="75" y="146" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(243,241,236,.45)">Batterie</text>
+        <text x="75" y="160" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(243,241,236,.45)">Panneau solaire</text>
+        <text x="75" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(243,241,236,.45)">Réseau secteur</text>
+        <text x="75" y="188" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="rgba(243,241,236,.45)">Génératrice</text>
+
+        <!-- Flèche source → PDU -->
+        <line x1="130" y1="150" x2="168" y2="150" stroke="#3F9A72" stroke-width="2.5" marker-end="url(#arr2)"/>
+        <text x="149" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">V_in / I_in</text>
+
+        <!-- PDU principal -->
+        <rect x="170" y="30" width="480" height="240" rx="10" fill="url(#pduGrad)" stroke="#5B8BB5" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="410" y="56" text-anchor="middle" font-family="DM Sans,Arial" font-size="13" font-weight="700" fill="#5B8BB5" letter-spacing="2">PDU — Power Distribution Unit</text>
+
+        <!-- Sous-blocs internes -->
+        <!-- EMI Filter -->
+        <rect x="186" y="70" width="100" height="60" rx="6" fill="rgba(91,139,181,.12)" stroke="rgba(91,139,181,.4)" stroke-width="1"/>
+        <text x="236" y="96" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="600" fill="rgba(243,241,236,.8)">Filtre EMI</text>
+        <text x="236" y="112" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">CEM / EMC</text>
+
+        <!-- Protection -->
+        <rect x="306" y="70" width="100" height="60" rx="6" fill="rgba(91,139,181,.12)" stroke="rgba(91,139,181,.4)" stroke-width="1"/>
+        <text x="356" y="90" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="600" fill="rgba(243,241,236,.8)">Protection</text>
+        <text x="356" y="106" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Fusibles / SSPC</text>
+        <text x="356" y="119" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Disjoncteurs</text>
+
+        <!-- Switching matrix -->
+        <rect x="426" y="70" width="100" height="60" rx="6" fill="rgba(91,139,181,.12)" stroke="rgba(91,139,181,.4)" stroke-width="1"/>
+        <text x="476" y="90" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="600" fill="rgba(243,241,236,.8)">Switching</text>
+        <text x="476" y="106" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Relais / MOSFET</text>
+        <text x="476" y="119" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Séquencement</text>
+
+        <!-- Monitoring -->
+        <rect x="546" y="70" width="88" height="60" rx="6" fill="rgba(210,162,63,.1)" stroke="rgba(210,162,63,.35)" stroke-width="1"/>
+        <text x="590" y="90" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="600" fill="rgba(210,162,63,.9)">Monitoring</text>
+        <text x="590" y="106" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">V / I / T</text>
+        <text x="590" y="119" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Télémétrie</text>
+
+        <!-- Flèches internes -->
+        <line x1="286" y1="100" x2="304" y2="100" stroke="rgba(91,139,181,.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="406" y1="100" x2="424" y2="100" stroke="rgba(91,139,181,.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="526" y1="100" x2="544" y2="100" stroke="rgba(91,139,181,.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- Bus de sortie interne -->
+        <line x1="236" y1="190" x2="590" y2="190" stroke="rgba(91,139,181,.35)" stroke-width="1.5"/>
+        <text x="410" y="185" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(91,139,181,.6)">BUS DE DISTRIBUTION</text>
+
+        <!-- Sorties individuelles -->
+        <line x1="250" y1="190" x2="250" y2="210" stroke="rgba(91,139,181,.5)" stroke-width="1.5"/>
+        <line x1="330" y1="190" x2="330" y2="210" stroke="rgba(91,139,181,.5)" stroke-width="1.5"/>
+        <line x1="410" y1="190" x2="410" y2="210" stroke="rgba(91,139,181,.5)" stroke-width="1.5"/>
+        <line x1="490" y1="190" x2="490" y2="210" stroke="rgba(91,139,181,.5)" stroke-width="1.5"/>
+        <line x1="570" y1="190" x2="570" y2="210" stroke="rgba(91,139,181,.5)" stroke-width="1.5"/>
+
+        <!-- Flèche bus vers sorties -->
+        <text x="410" y="220" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(91,139,181,.45)">Sorties protégées &amp; commutées</text>
+
+        <!-- Lien monitoring ↑ -->
+        <line x1="590" y1="130" x2="590" y2="188" stroke="rgba(210,162,63,.35)" stroke-width="1" stroke-dasharray="3,2"/>
+
+        <!-- Flèches PDU → Charges -->
+        <line x1="650" y1="150" x2="688" y2="150" stroke="#5B8BB5" stroke-width="2.5" marker-end="url(#arr)"/>
+
+        <!-- Charges -->
+        <rect x="690" y="30" width="110" height="240" rx="8" fill="url(#loadGrad)" stroke="rgba(212,80,10,.5)" stroke-width="1.5"/>
+        <text x="745" y="58" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="700" fill="rgba(212,80,10,.9)">CHARGES</text>
+        <text x="745" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Calculateur</text>
+        <text x="745" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Capteurs</text>
+        <text x="745" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Actionneur</text>
+        <text x="745" y="136" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Communication</text>
+        <text x="745" y="154" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Contrôle moteur</text>
+        <text x="745" y="172" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Éclairage</text>
+        <text x="745" y="190" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.45)">Charge thermique</text>
+
+        <!-- Flèche retour monitoring (optionnel) -->
+        <path d="M745 240 Q745 265 590 265 Q575 265 575 252" fill="none" stroke="rgba(210,162,63,.25)" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="670" y="278" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(210,162,63,.35)">Retour télémétrie (optionnel)</text>
+
+        <!-- Labels flux -->
+        <text x="660" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(91,139,181,.5)">V_out / I_out</text>
+      </svg>
+    </div>
+    <p class="diagram-caption">Figure 1 — Architecture générique d'un PDU. La complexité de chaque bloc varie selon le domaine d'application.</p>
+  </div>
+
+  <!-- ── FONCTIONS CLÉS ─────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Fonctions</div>
+    <h2>Ce que fait <em>un PDU</em></h2>
+    <p>Quelle que soit l'application, un PDU remplit les mêmes fonctions fondamentales. Leur niveau de sophistication et les technologies employées diffèrent selon les contraintes de l'environnement.</p>
+    <div class="functions-grid">
+      <div class="func-card">
+        <div class="func-icon">⚡</div>
+        <div class="func-title">Protection de surintensité</div>
+        <div class="func-desc">Fusibles, disjoncteurs magnéto-thermiques ou SSPC (Solid-State Power Controllers) limitent le courant sur chaque sortie. En cas de défaut, seule la charge fautive est isolée, sans couper les autres.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔀</div>
+        <div class="func-title">Commutation & séquencement</div>
+        <div class="func-desc">Relais électromécaniques ou MOSFETs commutent les sorties selon des ordres logiques. Le séquencement de mise sous tension (power sequencing) évite les pics de courant d'appel et protège les charges sensibles.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">📊</div>
+        <div class="func-title">Monitoring & télémétrie</div>
+        <div class="func-desc">Mesure en temps réel de la tension, du courant et de la température sur chaque sortie. Les données sont remontées par un bus de communication (CAN, Modbus, SNMP, MIL-STD-1553, SpaceWire…).</div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔇</div>
+        <div class="func-title">Filtrage EMI / CEM</div>
+        <div class="func-desc">Filtre les perturbations conduites et rayonnées en entrée et en sortie. Indispensable pour satisfaire les normes CEM (MIL-STD-461, CISPR, DO-160) et protéger les équipements sensibles.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔁</div>
+        <div class="func-title">Redondance & tolérance aux fautes</div>
+        <div class="func-desc">Entrées multiples en redondance (bus primaire / secondaire), bypass automatique, ou architecture à deux voies (cross-strapping). Critique pour les applications spatiales, défense et safety-critical.</div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🌡️</div>
+        <div class="func-title">Protection thermique</div>
+        <div class="func-desc">Surveillance de la température interne et des composants de puissance. Déclenchement de protections ou réduction de charge (derating) en cas de dépassement des limites thermiques.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SPÉCIFICATIONS TYPIQUES ───────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Spécifications</div>
+    <h2>Plages de <em>spécifications</em> typiques</h2>
+    <p>Ces plages couvrent l'ensemble des PDU du marché. Les valeurs exactes dépendent du domaine d'application et de la version choisie.</p>
+    <table class="specs-table">
+      <thead>
+        <tr>
+          <th>Paramètre</th>
+          <th>Plage typique</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Tension d'entrée</td><td>12 V — 600 V DC / 110–480 V AC</td><td>28 V (aéro/défense), 28–100 V (spatial), 48 V (télécom), 400–800 V (EV)</td></tr>
+        <tr><td>Courant max d'entrée</td><td>10 A — 3 000 A</td><td>Dépend de la puissance totale à distribuer</td></tr>
+        <tr><td>Nombre de sorties</td><td>2 — 64+</td><td>PDU simples 4–8 sorties, PDU datacenters jusqu'à 64</td></tr>
+        <tr><td>Courant par sortie</td><td>1 A — 400 A</td><td>SSPC typiquement 1–30 A ; contacteurs haute puissance > 100 A</td></tr>
+        <tr><td>Rendement</td><td>85 % — 99 %</td><td>Les pertes sont principalement dues à la protection et au filtrage</td></tr>
+        <tr><td>Température de fonctionnement</td><td>−55 °C — +125 °C</td><td>Spatial/défense : plages étendues ; industriel : −20/+70 °C</td></tr>
+        <tr><td>Bus de communication</td><td>CAN, Modbus, SNMP, 1553, SpaceWire, CAN FD, LIN</td><td>Dépend du domaine</td></tr>
+        <tr><td>Temps de commutation</td><td>&lt; 1 µs (SSPC) — 10 ms (relais)</td><td>Les SSPC permettent une coupure ultra-rapide sans arc électrique</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── PAR DOMAINE ───────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Domaines d'application</div>
+    <h2>PDU selon <em>le domaine</em></h2>
+    <p>La fonction est identique, mais les contraintes d'environnement, de fiabilité et de certification varient radicalement selon le secteur d'utilisation.</p>
+
+    <div class="domains-tabs" role="tablist">
+      <button class="domain-tab active" role="tab" onclick="switchDomain('spatial', this)">Spatial / PCDU</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('defense', this)">Défense & Aéro</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('industrie', this)">Industrie</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('mobilite', this)">Mobilité & EV</button>
+    </div>
+
+    <div id="panel-spatial" class="domain-panel active">
+      <div class="domain-specs">
+        <h3>PCDU — Power Conditioning & Distribution Unit</h3>
+        <span class="badge">Spatial · Satellite · Lanceur</span>
+        <ul>
+          <li>Gère l'énergie du panneau solaire vers les batteries et les charges du satellite</li>
+          <li>Régulation du bus d'alimentation (28 V, 50 V ou 100 V régulés)</li>
+          <li>SSPC pour l'isolation de charge sans arc ni contamination</li>
+          <li>Tenue aux radiations (TID, SEE) — qualification spatiale ECSS</li>
+          <li>Redondance chaude (hot redundancy) sur les fonctions critiques</li>
+          <li>Télémétrie sur bus SpaceWire, CAN ou MIL-STD-1553</li>
+          <li>Masse optimisée — composants COTS qualifiés espace ou full mil-spec</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes & standards</h4>
+        <span class="norm-badge">ECSS-E-ST-20</span>
+        <span class="norm-badge">ECSS-Q-ST-60</span>
+        <span class="norm-badge">MIL-STD-461</span>
+        <span class="norm-badge">MIL-STD-1553</span>
+        <span class="norm-badge">SpaceWire</span>
+        <span class="norm-badge">GEVS NASA</span>
+        <span class="norm-badge">ESA PSS-01</span>
+        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Bus 28 V, 50 V ou 100 V régulés typiques</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Durée de vie > 15 ans (GEO), > 5 ans (LEO)</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification vibratoire et thermique sous vide</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Budget de masse < 3–8 kg pour un nano/microsatellite</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-defense" class="domain-panel">
+      <div class="domain-specs">
+        <h3>PDU Défense & Aéronautique</h3>
+        <span class="badge">Avion · Hélicoptère · Véhicule militaire · Drone</span>
+        <ul>
+          <li>Alimentation 28 V DC (avion/hélico) ou 270 V DC HVDC (avions modernes)</li>
+          <li>Architecture primaire / secondaire avec bus de secours</li>
+          <li>Disjoncteurs ou SSPC pour isolation rapide des défauts</li>
+          <li>Tenue aux vibrations, chocs et altitude (Mil-Std-810)</li>
+          <li>Tenue EMI sévère pour éviter les interférences radio-navigation</li>
+          <li>Qualification DO-178C (logiciel) et DO-254 (électronique)</li>
+          <li>Versions ruggedisées pour véhicules terrestres (MIL-STD-1275)</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes & standards</h4>
+        <span class="norm-badge">MIL-STD-704</span>
+        <span class="norm-badge">MIL-STD-810</span>
+        <span class="norm-badge">MIL-STD-461</span>
+        <span class="norm-badge">MIL-STD-1275</span>
+        <span class="norm-badge">DO-160</span>
+        <span class="norm-badge">DO-254</span>
+        <span class="norm-badge">ARINC 429</span>
+        <span class="norm-badge">MIL-STD-1553</span>
+        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>28 V DC (avion léger/hélico) ou 270 V DC (HVDC)</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Indice de protection IP54 minimum, IP67 pour usage extérieur</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Certifié TEMPEST pour applications classifiées</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-industrie" class="domain-panel">
+      <div class="domain-specs">
+        <h3>PDU Industriel</h3>
+        <span class="badge">Datacenter · Industrie · Énergie · Télécom</span>
+        <ul>
+          <li>Rack PDU 19" pour distribution en baie serveur (1U à 2U)</li>
+          <li>Monitored / Metered / Switched selon le niveau de contrôle</li>
+          <li>Alimentation 230 V AC monophasé ou 400 V AC triphasé</li>
+          <li>Monitoring SNMP/Modbus pour intégration aux systèmes BMS/SCADA</li>
+          <li>PDU DIN rail pour armoires industrielles (24 V DC ou 48 V DC)</li>
+          <li>Versions IP65/67 pour environnements humides ou poussiéreux</li>
+          <li>Certification UL, CE, IEC 62368</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes & standards</h4>
+        <span class="norm-badge">IEC 62368</span>
+        <span class="norm-badge">IEC 60204-1</span>
+        <span class="norm-badge">EN 55032</span>
+        <span class="norm-badge">SNMP v3</span>
+        <span class="norm-badge">Modbus TCP</span>
+        <span class="norm-badge">UL 60950</span>
+        <span class="norm-badge">IP65 / IP67</span>
+        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Jusqu'à 64 prises commutables individuellement</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Interface web intégrée + API REST pour monitoring</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Mesure de la puissance active (W) et du cos φ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-mobilite" class="domain-panel">
+      <div class="domain-specs">
+        <h3>PDU Mobilité & Véhicule Électrique</h3>
+        <span class="badge">EV · Véhicule autonome · Drone · Rail</span>
+        <ul>
+          <li>Distribution haute tension (400 V — 800 V DC) sur bus HV</li>
+          <li>Précharge et contactor de service / maintenance</li>
+          <li>BMS intégré ou interfacé pour la gestion batterie</li>
+          <li>Isolation galvanique entre bus HV et 12/48 V basse tension</li>
+          <li>Communication CAN, CAN FD, LIN, Ethernet 100BASE-T1</li>
+          <li>Certification ISO 26262 (ASIL-B/D) pour applications fonctionnellement sûres</li>
+          <li>Tenue aux vibrations et cycles thermiques automobiles (AEC-Q100)</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes & standards</h4>
+        <span class="norm-badge">ISO 26262</span>
+        <span class="norm-badge">IEC 61851</span>
+        <span class="norm-badge">UNECE R100</span>
+        <span class="norm-badge">ISO 6469</span>
+        <span class="norm-badge">AEC-Q100</span>
+        <span class="norm-badge">AUTOSAR</span>
+        <span class="norm-badge">CAN FD</span>
+        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Bus HV 400 V ou 800 V DC avec protection IP67</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Résistance à l'humidité, sel, vibrations (classe automobile)</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Temps de réponse < 2 ms pour la coupure sécurité</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRODUITS SUPABASE ─────────────────────────────────────── -->
+  <div class="products-section">
+    <div class="cat-section-label">Fournisseurs référencés</div>
+    <h2>PDU disponibles <em>sur Buy-ineer</em></h2>
+    <p>Ces produits sont directement référencés dans notre catalogue. Cliquez sur une fiche pour accéder aux spécifications complètes et contacter le fabricant.</p>
+    <div class="products-grid" id="pdu-products-grid">
+      <div class="prod-loading">Chargement des produits…</div>
+    </div>
+  </div>
+
+  <!-- ── CTA ──────────────────────────────────────────────────── -->
+  <div class="cat-cta">
+    <h2>Vous cherchez un <em>PDU spécifique</em> ?</h2>
+    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, sans inscription.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../catalogue.html?cat=PDU">Voir tous les PDU →</a>
+      <a class="btn ghost" href="../annuaire.html">Annuaire fabricants</a>
+    </div>
+  </div>
+
+</div><!-- /cat-body -->
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+
+<script>
+// Onglets domaine
+function switchDomain(id, btn) {
+  document.querySelectorAll('.domain-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.domain-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Chargement des produits PDU depuis Supabase
+async function loadPDUProducts() {
+  const grid = document.getElementById('pdu-products-grid');
+  try {
+    await loadTaxonomy();
+    const products = PRODUCTS.filter(p => p.cat && p.cat.toUpperCase().includes('PDU'));
+    grid.innerHTML = '';
+    if (!products.length) {
+      grid.innerHTML = '<div class="prod-loading">Aucun PDU référencé pour le moment — <a href="../submit.html" style="color:var(--rust)">référencez votre produit</a></div>';
+      return;
+    }
+    products.forEach(p => {
+      const card = document.createElement('button');
+      card.className = 'prod-card';
+      card.innerHTML = `
+        <div class="prod-card-head">
+          <div class="prod-card-icon">${p.image ? '<img src="'+p.image+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>' : p.icon}</div>
+          <div><div class="prod-card-name">${p.name}</div><div class="prod-card-maker">${p.maker}</div></div>
+        </div>
+        <div class="prod-card-desc">${p.desc}</div>
+        <div class="prod-card-specs">${(p.specs||[]).slice(0,3).map(s=>'<span class="prod-card-spec"><b>'+s.l+'</b> '+s.v+'</span>').join('')}</div>
+        <div class="prod-card-price">💰 ${p.price}</div>`;
+      card.onclick = () => { window.location.href = '../catalogue.html?product=' + encodeURIComponent(p.name); };
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Impossible de charger les produits.</div>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLayout().then(() => loadPDUProducts());
+});
+</script>
+</body>
+</html>
