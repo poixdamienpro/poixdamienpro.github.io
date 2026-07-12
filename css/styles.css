@@ -795,3 +795,95 @@ body.theme-dark::after{
     background:#15202A;border-color:rgba(255,255,255,.14);box-shadow:0 -14px 44px rgba(0,0,0,.55)}
   .dir-preview.is-sheet .dir-close{display:grid;place-items:center}
 }
+
+/* ════════════════════════════════════════════════════════════════
+   PAGES COMPOSANTS (catégories SEO) — hub + landing par famille.
+   Utilise les variables de surface : s'adapte au theme-dark en place.
+   ════════════════════════════════════════════════════════════════ */
+.cat-wrap{max-width:1000px;margin:0 auto}
+.cat-crumb{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--muted);margin-bottom:14px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.cat-crumb a{color:var(--muted);text-decoration:none}
+.cat-crumb a:hover{color:var(--rust)}
+.cat-crumb span{color:rgba(243,241,236,.28)}
+.cat-sec{padding:0 24px;margin:38px auto 0}
+.cat-sec:first-of-type{margin-top:30px}
+.cat-h2{font-family:var(--serif);font-size:23px;font-weight:400;color:#F3F1EC;margin:0 0 18px;line-height:1.25}
+.cat-intro{font-size:15px;line-height:1.75;color:var(--text2);max-width:74ch}
+.cat-intro strong{color:#F3F1EC;font-weight:600}
+
+/* Critères de sélection */
+.cat-crit{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cat-crit li{background:var(--white);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.cat-crit-l{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--rust)}
+.cat-crit-v{font-size:13px;line-height:1.55;color:var(--text2)}
+
+/* Produits référencés */
+.cat-prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:22px}
+.cat-prod{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:16px;transition:border-color .15s}
+.cat-prod:hover{border-color:var(--steel)}
+.cat-prod-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:10px}
+.cat-prod-ico{width:36px;height:36px;flex-shrink:0;border-radius:8px;background:var(--paper);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px}
+.cat-prod-name{font-size:14px;font-weight:700;color:#F3F1EC;line-height:1.25;margin:0}
+.cat-prod-maker{font-size:11px;color:var(--steel);font-weight:600;margin-top:2px}
+.cat-prod-desc{font-size:12.5px;line-height:1.6;color:var(--text2);margin:0 0 12px}
+.cat-prod-specs{display:flex;flex-wrap:wrap;gap:6px}
+.cat-prod-spec{font-size:11px;color:var(--muted);background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:3px 8px}
+.cat-prod-spec strong{color:var(--text2);font-weight:600}
+
+/* CTA */
+.cat-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#F3F1EC;border:1px solid var(--border2);border-radius:6px;padding:9px 16px;text-decoration:none;transition:all .15s}
+.cat-cta:hover{border-color:var(--rust);color:var(--rust)}
+.cat-cta-solid{background:var(--rust);border-color:var(--rust);color:#fff}
+.cat-cta-solid:hover{color:#fff;box-shadow:0 8px 22px rgba(212,80,10,.32)}
+
+/* Fabricants */
+.cat-makers{display:flex;flex-wrap:wrap;gap:8px}
+.cat-maker{font-size:13px;font-weight:500;color:var(--text2);background:var(--white);border:1px solid var(--border);border-radius:6px;padding:7px 13px;text-decoration:none;transition:all .15s}
+.cat-maker:hover{border-color:var(--steel);color:#F3F1EC}
+
+/* Applications + CTA final */
+.cat-usecases{display:grid;grid-template-columns:1fr 1fr;gap:22px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px}
+.cat-uc{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px}
+.cat-uc li{font-size:14px;color:var(--text2);padding-left:18px;position:relative}
+.cat-uc li::before{content:'▸';position:absolute;left:0;color:var(--rust)}
+.cat-final .cat-h2{font-size:19px;margin-bottom:10px}
+
+/* Hub */
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.hub-card{display:flex;flex-direction:column;gap:7px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;transition:all .15s}
+.hub-card:hover{border-color:var(--rust);transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.hub-card-title{font-family:var(--serif);font-size:19px;font-weight:400;color:#F3F1EC;margin:0;line-height:1.25}
+.hub-card-sub{font-size:13px;line-height:1.6;color:var(--text2);margin:0;flex:1}
+.hub-card-count{font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--rust);margin-top:4px}
+
+@media(max-width:760px){
+  .cat-crit,.cat-usecases,.cat-prod-grid{grid-template-columns:1fr}
+}
+
+/* ── Animations des pages statiques (instrumentées par js/animations.js) ── */
+.sr{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--sr-d,0s)}
+.sr.sr-in{opacity:1;transform:none}
+.cat-prod{transition:border-color .2s,transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s,opacity .7s cubic-bezier(.2,.7,.2,1)}
+.cat-prod:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(0,0,0,.38)}
+.cat-prod.sr{transition:border-color .2s,box-shadow .28s,opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.cat-prod.sr.sr-in{transition:border-color .2s,transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s,opacity .7s}
+.cat-maker{transition:border-color .15s,color .15s,transform .22s cubic-bezier(.2,.7,.2,1),opacity .7s,box-shadow .22s}
+.cat-maker:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.cat-crit li{transition:background .22s,transform .22s cubic-bezier(.2,.7,.2,1),opacity .7s;border-radius:6px}
+.cat-crit li:hover{background:rgba(255,255,255,.035);transform:translateX(5px)}
+.cat-cta{transition:border-color .15s,color .15s,transform .2s,box-shadow .2s,opacity .7s}
+.cat-cta:hover{transform:translateX(3px)}
+.cat-cta-solid:hover{transform:translateY(-2px)}
+.hub-card{transition:border-color .2s,transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s,opacity .7s}
+.cat-intro a,.cat-crit-v a{background-image:linear-gradient(currentColor,currentColor);background-repeat:no-repeat;background-size:0% 1px;background-position:0 100%;transition:background-size .25s ease}
+.cat-intro a:hover,.cat-crit-v a:hover{background-size:100% 1px}
+@media(prefers-reduced-motion:reduce){
+  .sr{opacity:1;transform:none;transition:none}
+  .cat-prod:hover,.cat-maker:hover,.cat-crit li:hover,.cat-cta:hover,.cat-cta-solid:hover{transform:none}
+}
+
+/* FAQ : aère les enchaînements question/réponse (motif propre à la FAQ) */
+.cat-intro + .cat-h2{margin-top:46px}
+
+/* Pages secteurs : aère le paragraphe qui précède la grille de fabricants */
+.cat-intro + .cat-makers{margin-top:20px}

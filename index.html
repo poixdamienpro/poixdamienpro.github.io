@@ -5,16 +5,47 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Le Circuit Buy-ineer : voyagez au cœur des systèmes industriels</title>
 <meta name="description" content="Suivez le courant à travers un système industriel : batteries, PDU, calculateurs, actionneurs, vannes. La base de référence des équipementiers pour ingénieurs et acheteurs."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://www.buy-inner.com/"/>
 <meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Buy-ineer"/>
 <meta property="og:title" content="Le Circuit Buy-ineer"/>
 <meta property="og:description" content="Voyagez au cœur des systèmes industriels. Sourcez les bons équipements en minutes, pas en semaines."/>
 <meta property="og:locale" content="fr_FR"/>
-<meta property="og:image" content="https://buy-ineer.com/assets/logo-512.png"/>
+<meta property="og:url" content="https://www.buy-inner.com/"/>
+<meta property="og:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Le Circuit Buy-ineer"/>
+<meta name="twitter:description" content="Voyagez au cœur des systèmes industriels. Sourcez les bons équipements en minutes, pas en semaines."/>
+<meta name="twitter:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
 <link rel="icon" href="assets/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png"/>
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
-<link rel="canonical" href="https://buy-ineer.com/circuit.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.buy-inner.com/#organization",
+      "name": "Buy-ineer",
+      "url": "https://www.buy-inner.com/",
+      "logo": "https://www.buy-inner.com/assets/logo-512.png"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.buy-inner.com/#website",
+      "url": "https://www.buy-inner.com/",
+      "name": "Buy-ineer",
+      "description": "La base de référence des équipementiers industriels pour ingénieurs et acheteurs.",
+      "inLanguage": "fr-FR",
+      "publisher": { "@id": "https://www.buy-inner.com/#organization" }
+    }
+  ]
+}
+</script>
+<script src="js/analytics.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
@@ -174,10 +205,16 @@ a{color:inherit;text-decoration:none}
 .spec{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--t-mid);
   border:1px solid var(--line-2);border-radius:4px;padding:5px 10px;background:rgba(255,255,255,.02)}
 .spec b{color:var(--accent);font-weight:700}
+.st-links{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
 .st-link{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:13px;
   color:var(--t-hi);border-bottom:1.5px solid var(--accent);padding-bottom:3px;
   transition:gap .25s,color .25s}
 .st-link:hover{gap:15px;color:var(--accent)}
+.st-guide{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;
+  color:var(--t-mid);transition:color .25s,gap .25s}
+.st-guide::before{content:'?';display:grid;place-items:center;width:18px;height:18px;flex-shrink:0;
+  border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);font-size:11px;font-weight:700}
+.st-guide:hover{color:var(--t-hi);gap:11px}
 
 /* bloc schéma : le composant qui « zoome » à l'entrée */
 .schematic{display:grid;place-items:center;position:relative}
@@ -380,7 +417,10 @@ a{color:inherit;text-decoration:none}
           <span class="spec">LFP / <b>Li-ion</b></span>
           <span class="spec"><b>~480</b> €/kWh</span>
         </div>
-        <a class="st-link reveal d4" href="pages/catalogue.html?cat=batteries" data-i18n="st1_link">Voir les batteries →</a>
+        <div class="st-links reveal d4">
+          <a class="st-link" href="pages/catalogue.html?cat=Batteries%20%26%20Stockage" data-i18n="st1_link">Voir les batteries →</a>
+          <a class="st-guide" href="pages/batteries-industrielles.html" data-i18n="st1_guide">Comment choisir une batterie ?</a>
+        </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="SRC-01">
         <span class="focus-ring"></span>
@@ -408,7 +448,10 @@ a{color:inherit;text-decoration:none}
           <span class="spec"><b>24</b> sorties</span>
           <span class="spec">monitoring <b>IP</b></span>
         </div>
-        <a class="st-link reveal d4" href="pages/catalogue.html?cat=pdu" data-i18n="st2_link">Comparer les PDU →</a>
+        <div class="st-links reveal d4">
+          <a class="st-link" href="pages/catalogue.html?cat=PDU%20(Power%20Distribution)" data-i18n="st2_link">Comparer les PDU →</a>
+          <a class="st-guide" href="pages/pdu-power-distribution.html" data-i18n="st2_guide">Comment choisir un PDU ?</a>
+        </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="DST-02">
         <span class="focus-ring"></span>
@@ -436,7 +479,10 @@ a{color:inherit;text-decoration:none}
           <span class="spec"><b>22 kW</b> V2G</span>
           <span class="spec">ECSS <b>Q-ST</b></span>
         </div>
-        <a class="st-link reveal d4" href="pages/catalogue.html?cat=obc" data-i18n="st3_link">Voir les calculateurs →</a>
+        <div class="st-links reveal d4">
+          <a class="st-link" href="pages/catalogue.html?cat=OBC%20(On-Board%20Charger)" data-i18n="st3_link">Voir les calculateurs →</a>
+          <a class="st-guide" href="pages/obc-chargeur-embarque.html" data-i18n="st3_guide">Comment choisir un OBC ?</a>
+        </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="CTL-03">
         <span class="focus-ring"></span>
@@ -464,7 +510,10 @@ a{color:inherit;text-decoration:none}
           <span class="spec">course <b>±50mm</b></span>
           <span class="spec">devis <b>1-clic</b></span>
         </div>
-        <a class="st-link reveal d4" href="pages/catalogue.html?cat=actionneurs" data-i18n="st4_link">Demander un devis →</a>
+        <div class="st-links reveal d4">
+          <a class="st-link" href="pages/catalogue.html?cat=Vannes%20%26%20Actionneurs" data-i18n="st4_link">Voir les actionneurs →</a>
+          <a class="st-guide" href="pages/vannes-actionneurs.html" data-i18n="st4_guide">Comment choisir un actionneur ?</a>
+        </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="ACT-04">
         <span class="focus-ring"></span>
@@ -492,7 +541,10 @@ a{color:inherit;text-decoration:none}
           <span class="spec"><b>±10</b> mA</span>
           <span class="spec">contact <b>vérifié</b></span>
         </div>
-        <a class="st-link reveal d4" href="pages/annuaire.html" data-i18n="st5_link">Voir les fournisseurs →</a>
+        <div class="st-links reveal d4">
+          <a class="st-link" href="pages/annuaire.html" data-i18n="st5_link">Voir les fournisseurs →</a>
+          <a class="st-guide" href="pages/vannes-actionneurs.html" data-i18n="st5_guide">Comment choisir une vanne ?</a>
+        </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="REG-05">
         <span class="focus-ring"></span>

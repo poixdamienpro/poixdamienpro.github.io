@@ -12,8 +12,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; renderProducts(); });
     initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; renderProducts(); });
 
-    const company = new URLSearchParams(window.location.search).get('company');
+    const params = new URLSearchParams(window.location.search);
+    const company = params.get('company');
     if (company) document.getElementById('cat-search').value = company;
+
+    // Préselection de catégorie via ?cat= (liens depuis les pages composants)
+    const cat = params.get('cat');
+    if (cat && PROD_CATS.includes(cat)) { catCat = cat; updateChips('cat-cat-chips', () => catCat); }
 
     renderProducts();
     updateCompareBanner();
