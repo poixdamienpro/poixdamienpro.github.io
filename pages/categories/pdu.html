@@ -125,7 +125,7 @@
     <div class="cat-eyebrow">Catégorie produit</div>
     <h1>PDU — <em>Unité de Distribution</em> d'Énergie</h1>
     <p class="cat-hero-desc">
-      Un Power Distribution Unit (PDU) reçoit l'énergie d'une ou plusieurs sources, la protège, la commute et la distribue vers les charges d'un système. Nœud central de toute chaîne d'alimentation, il se décline de la baie datacenter à la PCDU de satellite, en passant par le PDU de véhicule militaire ou l'armoire industrielle.
+      Un Power Distribution Unit (PDU) fait une chose : recevoir du courant d'une source et le répartir vers plusieurs charges. C'est tout. Le reste — protection, monitoring, filtrage, redondance, tenue aux radiations — ce sont des <strong style="color:var(--t-hi)">options que chaque fabricant empile</strong> pour répondre aux contraintes de son domaine.
     </p>
     <div class="cat-tags">
       <span class="cat-tag">Power Distribution Unit</span>
@@ -143,8 +143,8 @@
   <!-- ── DIAGRAMME FONCTIONNEL ──────────────────────────────────── -->
   <div class="cat-section">
     <div class="cat-section-label">Architecture</div>
-    <h2>Diagramme <em>fonctionnel</em></h2>
-    <p>Un PDU s'insère entre la source d'énergie (batterie, génératrice, réseau) et les charges consommatrices. Il assure la protection, la commutation, le monitoring et le filtrage sur chaque sortie.</p>
+    <h2>Ce que fait <em>vraiment</em> un PDU</h2>
+    <p>Dans sa version la plus simple, un PDU est un nœud de distribution : une entrée, plusieurs sorties. Les blocs en pointillés ci-dessous sont des <strong style="color:var(--t-hi)">options</strong> — certains fabricants les intègrent tous, d'autres seulement ceux nécessaires à leur application.</p>
 
     <div class="diagram-wrap">
       <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto" aria-label="Diagramme fonctionnel d'un PDU">
@@ -256,43 +256,115 @@
     <p class="diagram-caption">Figure 1 — Architecture générique d'un PDU. La complexité de chaque bloc varie selon le domaine d'application.</p>
   </div>
 
-  <!-- ── FONCTIONS CLÉS ─────────────────────────────────────────── -->
+  <!-- ── OPTIONS ───────────────────────────────────────────────── -->
   <div class="cat-section">
-    <div class="cat-section-label">Fonctions</div>
-    <h2>Ce que fait <em>un PDU</em></h2>
-    <p>Quelle que soit l'application, un PDU remplit les mêmes fonctions fondamentales. Leur niveau de sophistication et les technologies employées diffèrent selon les contraintes de l'environnement.</p>
+    <div class="cat-section-label">Options fabricants</div>
+    <h2>Les options que les <em>fabricants ajoutent</em></h2>
+    <p>Un PDU nu distribue le courant. Chaque option ci-dessous répond à une contrainte précise. Un fabricant spatial en activera six sur six. Un PDU de rack datacenter standard n'en intégrera peut-être que deux. C'est ce choix d'options — et leur niveau de qualité — qui différencie les produits et fixe le prix.</p>
     <div class="functions-grid">
       <div class="func-card">
         <div class="func-icon">⚡</div>
-        <div class="func-title">Protection de surintensité</div>
-        <div class="func-desc">Fusibles, disjoncteurs magnéto-thermiques ou SSPC (Solid-State Power Controllers) limitent le courant sur chaque sortie. En cas de défaut, seule la charge fautive est isolée, sans couper les autres.</div>
+        <div class="func-title">Option · Protection de surintensité</div>
+        <div class="func-desc">Fusibles passifs, disjoncteurs magnéto-thermiques ou SSPC (Solid-State Power Controllers) actifs. En cas de défaut sur une charge, seule cette sortie est coupée. <em style="color:var(--t-low)">Présente sur pratiquement tous les PDU.</em></div>
       </div>
       <div class="func-card">
         <div class="func-icon">🔀</div>
-        <div class="func-title">Commutation & séquencement</div>
-        <div class="func-desc">Relais électromécaniques ou MOSFETs commutent les sorties selon des ordres logiques. Le séquencement de mise sous tension (power sequencing) évite les pics de courant d'appel et protège les charges sensibles.</div>
+        <div class="func-title">Option · Commutation & séquencement</div>
+        <div class="func-desc">Relais ou MOSFETs permettent d'allumer/éteindre chaque sortie par commande logique. Le séquencement évite les pics de courant au démarrage. <em style="color:var(--t-low)">Ajouté quand les charges doivent être pilotées indépendamment.</em></div>
       </div>
       <div class="func-card">
         <div class="func-icon">📊</div>
-        <div class="func-title">Monitoring & télémétrie</div>
-        <div class="func-desc">Mesure en temps réel de la tension, du courant et de la température sur chaque sortie. Les données sont remontées par un bus de communication (CAN, Modbus, SNMP, MIL-STD-1553, SpaceWire…).</div>
+        <div class="func-title">Option · Monitoring & télémétrie</div>
+        <div class="func-desc">Capteurs de tension, courant et température par sortie, remontés sur un bus (CAN, Modbus, SNMP, 1553, SpaceWire…). <em style="color:var(--t-low)">Indispensable dès que le système doit se surveiller lui-même.</em></div>
       </div>
       <div class="func-card">
         <div class="func-icon">🔇</div>
-        <div class="func-title">Filtrage EMI / CEM</div>
-        <div class="func-desc">Filtre les perturbations conduites et rayonnées en entrée et en sortie. Indispensable pour satisfaire les normes CEM (MIL-STD-461, CISPR, DO-160) et protéger les équipements sensibles.</div>
+        <div class="func-title">Option · Filtrage EMI / CEM</div>
+        <div class="func-desc">Filtre les perturbations conduites et rayonnées pour satisfaire les normes (MIL-STD-461, CISPR, DO-160). <em style="color:var(--t-low)">Requis dans les environnements RF sensibles ou certifiés.</em></div>
       </div>
       <div class="func-card">
         <div class="func-icon">🔁</div>
-        <div class="func-title">Redondance & tolérance aux fautes</div>
-        <div class="func-desc">Entrées multiples en redondance (bus primaire / secondaire), bypass automatique, ou architecture à deux voies (cross-strapping). Critique pour les applications spatiales, défense et safety-critical.</div>
+        <div class="func-title">Option · Redondance</div>
+        <div class="func-desc">Double entrée, bus primaire/secondaire, bypass automatique ou cross-strapping. Si un chemin tombe, l'autre prend le relais sans coupure. <em style="color:var(--t-low)">Réservé aux applications critiques : spatial, défense, médical.</em></div>
       </div>
       <div class="func-card">
-        <div class="func-icon">🌡️</div>
-        <div class="func-title">Protection thermique</div>
-        <div class="func-desc">Surveillance de la température interne et des composants de puissance. Déclenchement de protections ou réduction de charge (derating) en cas de dépassement des limites thermiques.</div>
+        <div class="func-icon">🛡️</div>
+        <div class="func-title">Option · Durcissement environnemental</div>
+        <div class="func-desc">Tenue aux vibrations, chocs, températures extrêmes, humidité, radiations. Boîtier conformal coating, connecteurs MIL, composants qualifiés espace. <em style="color:var(--t-low)">Le facteur de coût le plus élevé — chaque contrainte a un prix.</em></div>
       </div>
     </div>
+  </div>
+
+  <!-- ── MATRICE OPTIONS × DOMAINES ───────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Synthèse</div>
+    <h2>Quelles options <em>pour quel domaine</em></h2>
+    <p>C'est le même PDU de base. Ce sont les options sélectionnées par le fabricant — et les niveaux de qualification exigés — qui font la différence entre un rack PDU à 300 € et une PCDU spatiale à 200 000 €.</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:600px">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th style="text-align:center">Spatial / PCDU</th>
+          <th style="text-align:center">Défense & Aéro</th>
+          <th style="text-align:center">Industrie</th>
+          <th style="text-align:center">Mobilité / EV</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Protection surintensité</td>
+          <td style="text-align:center;color:#3F9A72">SSPC rad-hard</td>
+          <td style="text-align:center;color:#3F9A72">SSPC / disjoncteur</td>
+          <td style="text-align:center;color:#3F9A72">Disjoncteur / fusible</td>
+          <td style="text-align:center;color:#3F9A72">MOSFET / fusible HV</td>
+        </tr>
+        <tr>
+          <td>Commutation</td>
+          <td style="text-align:center;color:#3F9A72">Oui — SSPC</td>
+          <td style="text-align:center;color:#3F9A72">Oui — relay/SSPC</td>
+          <td style="text-align:center;color:#D2A23F">Selon modèle</td>
+          <td style="text-align:center;color:#3F9A72">Oui — contacteur HV</td>
+        </tr>
+        <tr>
+          <td>Monitoring / télémétrie</td>
+          <td style="text-align:center;color:#3F9A72">SpaceWire / 1553</td>
+          <td style="text-align:center;color:#3F9A72">1553 / ARINC</td>
+          <td style="text-align:center;color:#D2A23F">SNMP (si monitored)</td>
+          <td style="text-align:center;color:#3F9A72">CAN FD</td>
+        </tr>
+        <tr>
+          <td>Filtrage EMI</td>
+          <td style="text-align:center;color:#3F9A72">MIL-STD-461</td>
+          <td style="text-align:center;color:#3F9A72">DO-160 / MIL-STD-461</td>
+          <td style="text-align:center;color:#D2A23F">CISPR (si requis)</td>
+          <td style="text-align:center;color:#D2A23F">UNECE R10</td>
+        </tr>
+        <tr>
+          <td>Redondance</td>
+          <td style="text-align:center;color:#3F9A72">Hot redundancy</td>
+          <td style="text-align:center;color:#3F9A72">Double bus</td>
+          <td style="text-align:center;color:#6B7280">Rare</td>
+          <td style="text-align:center;color:#D2A23F">Partielle</td>
+        </tr>
+        <tr>
+          <td>Durcissement environnemental</td>
+          <td style="text-align:center;color:#3F9A72">Radiations + vide</td>
+          <td style="text-align:center;color:#3F9A72">MIL-STD-810</td>
+          <td style="text-align:center;color:#D2A23F">IP65 selon usage</td>
+          <td style="text-align:center;color:#D2A23F">IP67, −40/+85 °C</td>
+        </tr>
+        <tr>
+          <td>Niveau de certification</td>
+          <td style="text-align:center;color:#3F9A72">ECSS — très élevé</td>
+          <td style="text-align:center;color:#3F9A72">DO-254 / MIL — élevé</td>
+          <td style="text-align:center;color:#D2A23F">IEC — standard</td>
+          <td style="text-align:center;color:#3F9A72">ISO 26262 — élevé</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="font-size:13px;color:var(--t-low);margin-top:12px;font-family:var(--mono)">🟢 Systématique &nbsp;·&nbsp; 🟡 Selon modèle &nbsp;·&nbsp; ⚫ Rare ou absent</p>
   </div>
 
   <!-- ── SPÉCIFICATIONS TYPIQUES ───────────────────────────────── -->
@@ -324,8 +396,8 @@
   <!-- ── PAR DOMAINE ───────────────────────────────────────────── -->
   <div class="cat-section">
     <div class="cat-section-label">Domaines d'application</div>
-    <h2>PDU selon <em>le domaine</em></h2>
-    <p>La fonction est identique, mais les contraintes d'environnement, de fiabilité et de certification varient radicalement selon le secteur d'utilisation.</p>
+    <h2>Le même outil, <em>des options différentes</em></h2>
+    <p>Le PDU de base ne change pas. Ce sont les contraintes du domaine qui dictent quelles options le fabricant va intégrer, à quel niveau de qualité, et sous quelle certification.</p>
 
     <div class="domains-tabs" role="tablist">
       <button class="domain-tab active" role="tab" onclick="switchDomain('spatial', this)">Spatial / PCDU</button>
@@ -336,130 +408,125 @@
 
     <div id="panel-spatial" class="domain-panel active">
       <div class="domain-specs">
-        <h3>PCDU — Power Conditioning & Distribution Unit</h3>
-        <span class="badge">Spatial · Satellite · Lanceur</span>
+        <h3>Spatial — le PDU devient PCDU</h3>
+        <span class="badge">Satellite · Lanceur · Sonde</span>
         <ul>
-          <li>Gère l'énergie du panneau solaire vers les batteries et les charges du satellite</li>
-          <li>Régulation du bus d'alimentation (28 V, 50 V ou 100 V régulés)</li>
-          <li>SSPC pour l'isolation de charge sans arc ni contamination</li>
-          <li>Tenue aux radiations (TID, SEE) — qualification spatiale ECSS</li>
-          <li>Redondance chaude (hot redundancy) sur les fonctions critiques</li>
-          <li>Télémétrie sur bus SpaceWire, CAN ou MIL-STD-1553</li>
-          <li>Masse optimisée — composants COTS qualifiés espace ou full mil-spec</li>
+          <li><strong>Toutes les options activées</strong>, au niveau de qualité maximal</li>
+          <li>Protection par SSPC rad-hard — pas d'arc, pas de contamination en orbite</li>
+          <li>Monitoring complet sur SpaceWire ou MIL-STD-1553 — chaque ampère est compté</li>
+          <li>Redondance chaude (hot redundancy) — une panne ne doit jamais être fatale</li>
+          <li>Durcissement radiations (TID, SEE) — les composants doivent survivre des années en orbite</li>
+          <li>Masse et volume minimisés — chaque gramme a un coût de lancement</li>
+          <li>Qualification ECSS complète — tests vibratoires, thermiques sous vide, radiations</li>
         </ul>
       </div>
       <div class="domain-norms">
-        <h4>Normes & standards</h4>
+        <h4>Normes exigées par les clients</h4>
         <span class="norm-badge">ECSS-E-ST-20</span>
         <span class="norm-badge">ECSS-Q-ST-60</span>
         <span class="norm-badge">MIL-STD-461</span>
         <span class="norm-badge">MIL-STD-1553</span>
         <span class="norm-badge">SpaceWire</span>
         <span class="norm-badge">GEVS NASA</span>
-        <span class="norm-badge">ESA PSS-01</span>
-        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
         <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Bus 28 V, 50 V ou 100 V régulés typiques</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Durée de vie > 15 ans (GEO), > 5 ans (LEO)</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification vibratoire et thermique sous vide</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Budget de masse < 3–8 kg pour un nano/microsatellite</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Composants rad-hard : 10× à 100× plus chers que COTS</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification ECSS : plusieurs mois de tests dédiés</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 50 000 € – 500 000 € selon puissance et orbite</li>
         </ul>
       </div>
     </div>
 
     <div id="panel-defense" class="domain-panel">
       <div class="domain-specs">
-        <h3>PDU Défense & Aéronautique</h3>
+        <h3>Défense & Aéro — robustesse avant tout</h3>
         <span class="badge">Avion · Hélicoptère · Véhicule militaire · Drone</span>
         <ul>
-          <li>Alimentation 28 V DC (avion/hélico) ou 270 V DC HVDC (avions modernes)</li>
-          <li>Architecture primaire / secondaire avec bus de secours</li>
-          <li>Disjoncteurs ou SSPC pour isolation rapide des défauts</li>
-          <li>Tenue aux vibrations, chocs et altitude (Mil-Std-810)</li>
-          <li>Tenue EMI sévère pour éviter les interférences radio-navigation</li>
-          <li>Qualification DO-178C (logiciel) et DO-254 (électronique)</li>
+          <li><strong>Options prioritaires : durcissement + EMI + redondance</strong></li>
+          <li>Protection SSPC ou disjoncteurs certifiés DO-254</li>
+          <li>Double bus primaire/secondaire — la mission continue en cas de panne partielle</li>
+          <li>Filtrage EMI sévère — pas d'interférence avec la radio-navigation</li>
+          <li>Tenue vibrations/chocs/altitude selon MIL-STD-810</li>
+          <li>Monitoring sur 1553 ou ARINC 429 — protocoles aéro standards</li>
           <li>Versions ruggedisées pour véhicules terrestres (MIL-STD-1275)</li>
         </ul>
       </div>
       <div class="domain-norms">
-        <h4>Normes & standards</h4>
+        <h4>Normes exigées par les clients</h4>
         <span class="norm-badge">MIL-STD-704</span>
         <span class="norm-badge">MIL-STD-810</span>
         <span class="norm-badge">MIL-STD-461</span>
-        <span class="norm-badge">MIL-STD-1275</span>
         <span class="norm-badge">DO-160</span>
         <span class="norm-badge">DO-254</span>
         <span class="norm-badge">ARINC 429</span>
         <span class="norm-badge">MIL-STD-1553</span>
-        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
         <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>28 V DC (avion léger/hélico) ou 270 V DC (HVDC)</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Indice de protection IP54 minimum, IP67 pour usage extérieur</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Certifié TEMPEST pour applications classifiées</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Boîtier MIL + connecteurs qualifiés : surcoût significatif</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification DO-254 : audit logiciel + électronique obligatoire</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 5 000 € – 80 000 € selon application</li>
         </ul>
       </div>
     </div>
 
     <div id="panel-industrie" class="domain-panel">
       <div class="domain-specs">
-        <h3>PDU Industriel</h3>
+        <h3>Industrie — praticité et intégration</h3>
         <span class="badge">Datacenter · Industrie · Énergie · Télécom</span>
         <ul>
-          <li>Rack PDU 19" pour distribution en baie serveur (1U à 2U)</li>
-          <li>Monitored / Metered / Switched selon le niveau de contrôle</li>
-          <li>Alimentation 230 V AC monophasé ou 400 V AC triphasé</li>
-          <li>Monitoring SNMP/Modbus pour intégration aux systèmes BMS/SCADA</li>
-          <li>PDU DIN rail pour armoires industrielles (24 V DC ou 48 V DC)</li>
-          <li>Versions IP65/67 pour environnements humides ou poussiéreux</li>
-          <li>Certification UL, CE, IEC 62368</li>
+          <li><strong>Options prioritaires : monitoring + commutation</strong></li>
+          <li>Protection par disjoncteurs ou fusibles — technologie éprouvée, facile à remplacer</li>
+          <li>Commutation par sortie pour allumer/éteindre les équipements à distance</li>
+          <li>Monitoring SNMP ou Modbus — intégration aux systèmes BMS/SCADA existants</li>
+          <li>Durcissement limité à l'indice IP (IP65/67) si environnement humide ou poussiéreux</li>
+          <li>Redondance rare — la continuité de service est assurée par UPS externe</li>
+          <li>Format rack 19" ou DIN rail selon l'installation</li>
         </ul>
       </div>
       <div class="domain-norms">
-        <h4>Normes & standards</h4>
+        <h4>Normes exigées par les clients</h4>
         <span class="norm-badge">IEC 62368</span>
         <span class="norm-badge">IEC 60204-1</span>
         <span class="norm-badge">EN 55032</span>
         <span class="norm-badge">SNMP v3</span>
         <span class="norm-badge">Modbus TCP</span>
-        <span class="norm-badge">UL 60950</span>
         <span class="norm-badge">IP65 / IP67</span>
-        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
         <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Jusqu'à 64 prises commutables individuellement</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Interface web intégrée + API REST pour monitoring</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Mesure de la puissance active (W) et du cos φ</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Produits de série — volumes importants, coûts maîtrisés</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Certification CE/UL sur gammes standard</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 200 € – 5 000 € selon niveau de monitoring</li>
         </ul>
       </div>
     </div>
 
     <div id="panel-mobilite" class="domain-panel">
       <div class="domain-specs">
-        <h3>PDU Mobilité & Véhicule Électrique</h3>
-        <span class="badge">EV · Véhicule autonome · Drone · Rail</span>
+        <h3>Mobilité & EV — haute tension, sécurité fonctionnelle</h3>
+        <span class="badge">Véhicule électrique · Drone · Rail · Mobilité autonome</span>
         <ul>
-          <li>Distribution haute tension (400 V — 800 V DC) sur bus HV</li>
-          <li>Précharge et contactor de service / maintenance</li>
-          <li>BMS intégré ou interfacé pour la gestion batterie</li>
-          <li>Isolation galvanique entre bus HV et 12/48 V basse tension</li>
-          <li>Communication CAN, CAN FD, LIN, Ethernet 100BASE-T1</li>
-          <li>Certification ISO 26262 (ASIL-B/D) pour applications fonctionnellement sûres</li>
-          <li>Tenue aux vibrations et cycles thermiques automobiles (AEC-Q100)</li>
+          <li><strong>Options prioritaires : commutation HV + monitoring + durcissement auto</strong></li>
+          <li>Contacteurs haute tension (400–800 V DC) avec précharge pour éviter les arcs</li>
+          <li>Isolation galvanique entre bus HV et réseau 12/48 V basse tension</li>
+          <li>Monitoring sur CAN FD — intégration au BMS et à l'ECU véhicule</li>
+          <li>Durcissement automobile : vibrations, sel, humidité, cycles −40/+85 °C</li>
+          <li>Redondance partielle sur les circuits critiques (freinage, direction)</li>
+          <li>Certification ISO 26262 (ASIL-B/D) pour la sécurité fonctionnelle</li>
         </ul>
       </div>
       <div class="domain-norms">
-        <h4>Normes & standards</h4>
+        <h4>Normes exigées par les clients</h4>
         <span class="norm-badge">ISO 26262</span>
         <span class="norm-badge">IEC 61851</span>
         <span class="norm-badge">UNECE R100</span>
-        <span class="norm-badge">ISO 6469</span>
         <span class="norm-badge">AEC-Q100</span>
         <span class="norm-badge">AUTOSAR</span>
         <span class="norm-badge">CAN FD</span>
-        <h4 style="margin-top:24px">Caractéristiques clés</h4>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
         <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Bus HV 400 V ou 800 V DC avec protection IP67</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Résistance à l'humidité, sel, vibrations (classe automobile)</li>
-          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Temps de réponse < 2 ms pour la coupure sécurité</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Composants AEC-Q100 : qualifiés pour la durée de vie véhicule</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Certification ISO 26262 : analyse FMEA + ASIL obligatoire</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 500 € – 15 000 € selon puissance et niveau ASIL</li>
         </ul>
       </div>
     </div>
