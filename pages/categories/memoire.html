@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mémoires embarquées — RAM, Flash, MRAM | Buy-ineer</title>
+<meta name="description" content="Tout savoir sur les mémoires embarquées : types (SRAM, DRAM, Flash, MRAM), interfaces, critères de sélection. Comparez les fabricants et fournisseurs de mémoires industrielles, spatiales et automobiles."/>
+<meta name="keywords" content="mémoire embarquée, SRAM rad-hard, Flash embarqué, MRAM, DRAM industrielle, mémoire spatiale, mémoire EDAC, mémoire rad-hard, eMMC, NVMe embarqué, fabricant mémoire"/>
+<meta property="og:title" content="Mémoires embarquées — RAM, Flash, MRAM | Buy-ineer"/>
+<meta property="og:description" content="Types, interfaces et normes des mémoires embarquées. Comparez les fabricants référencés sur Buy-ineer."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://buy-ineer.com/pages/categories/memoire.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Mémoires embarquées — RAM, Flash, MRAM",
+  "description": "Guide technique complet sur les mémoires embarquées : types, interfaces, normes et fournisseurs.",
+  "url": "https://buy-ineer.com/pages/categories/memoire.html",
+  "publisher": { "@type": "Organization", "name": "Buy-ineer", "url": "https://buy-ineer.com" },
+  "about": { "@type": "Product", "name": "Mémoires embarquées" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'catalogue';</script>
+<style>
+:root {
+  --ink-2: #16222E;
+  --ink-3: #0F1820;
+  --t-hi:  #F3F1EC;
+  --t-mid: rgba(243,241,236,.62);
+  --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10);
+  --steel: #5B8BB5;
+  --gold:  #D2A23F;
+  --sage:  #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 56px}
+.cat-hero-inner{max-width:1080px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--sage);margin-bottom:16px}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,62px);line-height:1.06;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);max-width:680px;line-height:1.7;margin-bottom:32px}
+.cat-tags{display:flex;flex-wrap:wrap;gap:8px}
+.cat-tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 12px;border-radius:20px;border:1px solid var(--border);color:var(--t-mid);background:rgba(255,255,255,.03)}
+
+.cat-body{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.cat-section{margin-top:72px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.5vw,40px);margin-bottom:16px;line-height:1.1}
+.cat-section h2 em{font-style:italic;color:var(--sage)}
+.cat-section>p{color:var(--t-mid);font-size:16px;line-height:1.75;max-width:760px;margin-bottom:32px}
+
+.diagram-wrap{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:40px 24px;overflow-x:auto;margin-bottom:8px}
+.diagram-caption{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--t-low);text-align:center;margin-top:12px}
+
+.functions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:8px}
+.func-card{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:22px;transition:border-color .2s}
+.func-card:hover{border-color:var(--sage)}
+.func-icon{font-size:24px;margin-bottom:12px}
+.func-title{font-weight:700;font-size:15px;margin-bottom:8px;color:var(--t-hi)}
+.func-desc{font-size:14px;color:var(--t-mid);line-height:1.6}
+
+.domains-tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid var(--border);overflow-x:auto}
+.domain-tab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;padding:10px 18px;background:none;border:none;color:var(--t-low);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .2s,border-color .2s}
+.domain-tab:hover{color:var(--t-mid)}
+.domain-tab.active{color:var(--t-hi);border-bottom-color:var(--rust)}
+.domain-panel{display:none;padding:28px 0 0}
+.domain-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:700px){.domain-panel.active{grid-template-columns:1fr}}
+.domain-specs{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px}
+.domain-specs h3{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:6px}
+.domain-specs .badge{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:3px 8px;border-radius:12px;border:1px solid var(--border);color:var(--t-low);margin-bottom:16px;display:inline-block}
+.domain-specs ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.domain-specs li{font-size:14px;color:var(--t-mid);display:flex;gap:10px;line-height:1.5}
+.domain-specs li::before{content:'→';color:var(--rust);flex-shrink:0;font-family:var(--mono)}
+.domain-norms{padding-top:4px}
+.domain-norms h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--t-low);margin-bottom:12px}
+.norm-badge{display:inline-flex;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:4px;border:1px solid var(--border);color:var(--sage);margin:3px 3px 3px 0;background:rgba(63,154,114,.06)}
+
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.specs-table th{text-align:left;padding:10px 16px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.08em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500;white-space:nowrap}
+.specs-table tr:last-child td{border-bottom:0}
+
+.products-section{margin-top:72px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:24px}
+.prod-card{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:20px;transition:border-color .2s,transform .2s;cursor:pointer;text-align:left}
+.prod-card:hover{border-color:var(--sage);transform:translateY(-2px)}
+.prod-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.prod-card-icon{width:40px;height:40px;border-radius:8px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prod-card-name{font-weight:700;font-size:15px;line-height:1.3;color:var(--t-hi)}
+.prod-card-maker{font-size:13px;color:var(--t-low)}
+.prod-card-desc{font-size:13px;color:var(--t-mid);line-height:1.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prod-card-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.prod-card-spec{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--t-low)}
+.prod-card-spec b{color:var(--sage)}
+.prod-card-price{font-family:var(--mono);font-size:12px;color:var(--gold)}
+.prod-loading{grid-column:1/-1;text-align:center;color:var(--t-low);padding:40px;font-family:var(--mono);font-size:13px}
+
+.cat-cta{margin-top:72px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:48px 40px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(26px,3.5vw,40px);font-weight:400;margin-bottom:12px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../catalogue.html">Catalogue</a><span>/</span>
+      <span style="color:var(--t-mid)">Mémoires embarquées</span>
+    </nav>
+    <div class="cat-eyebrow">Catégorie produit</div>
+    <h1>Mémoires embarquées — <em>RAM, Flash & MRAM</em></h1>
+    <p class="cat-hero-desc">
+      Une mémoire embarquée fait une chose : stocker des données ou du code. C'est tout. Ce qui différencie les produits, c'est <strong style="color:var(--t-hi)">ce qu'elle stocke</strong> (volatil ou non-volatil), <strong style="color:var(--t-hi)">comment elle est connectée</strong> (sur la carte ou déportée) et <strong style="color:var(--t-hi)">dans quel environnement elle doit survivre</strong> (radiations, température, vibrations). Le reste — débit, capacité, endurance — sont les paramètres à optimiser en fonction de l'application.
+    </p>
+    <div class="cat-tags">
+      <span class="cat-tag">SRAM rad-hard</span>
+      <span class="cat-tag">DRAM / LPDDR</span>
+      <span class="cat-tag">Flash NAND / NOR</span>
+      <span class="cat-tag">MRAM</span>
+      <span class="cat-tag">EEPROM</span>
+      <span class="cat-tag">eMMC / UFS</span>
+      <span class="cat-tag">SSD NVMe embarqué</span>
+      <span class="cat-tag">mémoire spatiale</span>
+    </div>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <!-- ── DIAGRAMME ─────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Architecture</div>
+    <h2>Embarquée sur la carte <em>ou déportée</em> ?</h2>
+    <p>La première question à poser n'est pas "quelle capacité ?" mais "où va la mémoire ?". Une mémoire soudée directement sur la carte de l'OBC ou du PDU offre compacité et fiabilité mécanique. Une mémoire de masse déportée permet d'étendre la capacité en opération et de remplacer le module sans retoucher la carte principale.</p>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 880 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:880px;display:block;margin:0 auto" aria-label="Schéma mémoire embarquée vs déportée">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0,8 3,0 6" fill="#3F9A72"/>
+          </marker>
+          <linearGradient id="cpuGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#D2A23F" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#D2A23F" stop-opacity=".06"/>
+          </linearGradient>
+          <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#3F9A72" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#3F9A72" stop-opacity=".06"/>
+          </linearGradient>
+          <linearGradient id="extGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5B8BB5" stop-opacity=".25"/>
+            <stop offset="1" stop-color="#5B8BB5" stop-opacity=".06"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Carte principale -->
+        <rect x="10" y="20" width="530" height="220" rx="10" fill="rgba(255,255,255,.015)" stroke="rgba(255,255,255,.12)" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="265" y="44" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing="2" fill="rgba(255,255,255,.3)">CARTE PRINCIPALE (OBC / ECU / PDU)</text>
+
+        <!-- CPU -->
+        <rect x="40" y="70" width="130" height="130" rx="8" fill="url(#cpuGrad)" stroke="#D2A23F" stroke-width="1.5"/>
+        <text x="105" y="118" text-anchor="middle" font-family="DM Sans,Arial" font-size="13" font-weight="700" fill="#D2A23F">CPU / SoC</text>
+        <text x="105" y="136" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Processeur</text>
+        <text x="105" y="150" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">principal</text>
+
+        <!-- Mémoires on-board -->
+        <rect x="220" y="60" width="290" height="60" rx="6" fill="url(#memGrad)" stroke="#3F9A72" stroke-width="1.2"/>
+        <text x="365" y="84" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="700" fill="#3F9A72">Mémoires ON-BOARD (soudées)</text>
+        <text x="260" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">SRAM</text>
+        <text x="320" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">DRAM</text>
+        <text x="380" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">NOR Flash</text>
+        <text x="450" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">MRAM</text>
+        <text x="500" y="104" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">EEPROM</text>
+
+        <!-- Mémoires de masse on-board -->
+        <rect x="220" y="150" width="290" height="60" rx="6" fill="rgba(63,154,114,.08)" stroke="rgba(63,154,114,.3)" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="365" y="174" text-anchor="middle" font-family="DM Sans,Arial" font-size="11" font-weight="600" fill="rgba(63,154,114,.8)">Masse ON-BOARD (optionnel)</text>
+        <text x="290" y="194" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">NAND Flash</text>
+        <text x="380" y="194" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">eMMC</text>
+        <text x="450" y="194" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">UFS</text>
+        <text x="500" y="194" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">SD</text>
+
+        <!-- Liaisons CPU → mémoires -->
+        <line x1="170" y1="110" x2="220" y2="95" stroke="rgba(63,154,114,.5)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="170" y1="140" x2="220" y2="175" stroke="rgba(63,154,114,.4)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="190" y="108" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(63,154,114,.5)">bus mem</text>
+        <text x="190" y="158" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(63,154,114,.4)">SPI/eMMC</text>
+
+        <!-- Flèche vers déporté -->
+        <line x1="540" y1="135" x2="598" y2="135" stroke="#5B8BB5" stroke-width="2" marker-end="url(#arr)"/>
+        <text x="562" y="128" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(91,139,181,.6)">PCIe / NVMe</text>
+        <text x="562" y="148" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(91,139,181,.6)">SATA / USB</text>
+
+        <!-- Mémoire déportée -->
+        <rect x="600" y="60" width="260" height="150" rx="10" fill="url(#extGrad)" stroke="#5B8BB5" stroke-width="1.5"/>
+        <text x="730" y="90" text-anchor="middle" font-family="DM Sans,Arial" font-size="12" font-weight="700" fill="#5B8BB5">Mémoire DÉPORTÉE</text>
+        <text x="730" y="108" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">(module remplaçable)</text>
+        <text x="660" y="132" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">SSD NVMe</text>
+        <text x="730" y="132" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">SSD SATA</text>
+        <text x="800" y="132" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">CF card</text>
+        <text x="680" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">Module DDR</text>
+        <text x="780" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">SO-DIMM</text>
+        <text x="730" y="184" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.5)">NAND externe</text>
+
+        <!-- Légende -->
+        <rect x="10" y="248" width="10" height="6" rx="1" fill="#3F9A72" opacity=".6"/>
+        <text x="26" y="254" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">On-board soudé</text>
+        <rect x="140" y="248" width="10" height="6" rx="1" fill="#5B8BB5" opacity=".6"/>
+        <text x="156" y="254" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Déporté / remplaçable</text>
+        <rect x="320" y="248" width="10" height="6" rx="1" fill="rgba(63,154,114,.3)" opacity=".6"/>
+        <text x="336" y="254" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">En pointillés = optionnel</text>
+      </svg>
+    </div>
+    <p class="diagram-caption">Figure 1 — Mémoires on-board (soudées, fiables, non remplaçables) vs déportées (extensibles, remplaçables, via interface dédiée).</p>
+  </div>
+
+  <!-- ── TYPES DE MÉMOIRES ──────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Types de mémoires</div>
+    <h2>Volatile ou non-volatile — <em>laquelle choisir</em> ?</h2>
+    <p>Le premier critère est simple : la donnée doit-elle survivre à une coupure de courant ? À partir de là, chaque technologie répond à un compromis spécifique entre vitesse, capacité, endurance et coût.</p>
+    <div class="functions-grid">
+      <div class="func-card">
+        <div class="func-icon">⚡</div>
+        <div class="func-title">SRAM — la plus rapide</div>
+        <div class="func-desc">Volatile. Accès aléatoire en quelques nanosecondes, pas de temps de rafraîchissement, robuste aux radiations (pas de bit-flip par charge piégée). <em style="color:var(--t-low)">Utilisée comme cache CPU, mémoire de travail temps réel et mémoire de scratchpad dans les OBC spatiaux. Chère et de faible densité.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🌊</div>
+        <div class="func-title">DRAM / SDRAM / LPDDR — la haute densité</div>
+        <div class="func-desc">Volatile. Haute densité (jusqu'à 64 Go par module), bonne bande passante, mais nécessite un rafraîchissement périodique et un contrôleur EDAC en environnement radiatif. <em style="color:var(--t-low)">Mémoire principale des SBC industriels, SoC automobiles et OBC haute performance. Sensible aux SEU en orbite sans EDAC.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔷</div>
+        <div class="func-title">NOR Flash — le code immuable</div>
+        <div class="func-desc">Non-volatile. Lecture aléatoire rapide (exécution directe du code en XIP — eXecute In Place), écriture lente par secteurs. Endurance modérée (~100 k cycles d'écriture). <em style="color:var(--t-low)">Stockage du bootloader, du firmware et des paramètres de configuration. Standard dans l'embarqué simple.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">📦</div>
+        <div class="func-title">NAND Flash — la masse</div>
+        <div class="func-desc">Non-volatile. Haute densité et faible coût, lecture séquentielle rapide, mais pas d'accès aléatoire direct — nécessite un contrôleur FTL. Endurance variable selon le type (SLC &gt; MLC &gt; TLC &gt; QLC). <em style="color:var(--t-low)">Stockage de masse des données de mission, logs, images. Base des eMMC, UFS et SSD embarqués.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🧲</div>
+        <div class="func-title">MRAM — la polyvalente</div>
+        <div class="func-desc">Non-volatile. Combine les avantages de la SRAM (vitesse, endurance quasi-infinie) et de la Flash (non-volatilité). Naturellement résistante aux radiations — pas de charge piégée. <em style="color:var(--t-low)">Technologie de référence pour les mémoires spatiales critiques (mémoire de configuration, tables de bord). Coût encore élevé mais densité en progression.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔑</div>
+        <div class="func-title">EEPROM — les paramètres</div>
+        <div class="func-desc">Non-volatile. Faible capacité, écriture octet par octet, très haute endurance (1 M cycles). Interface simple (I²C, SPI). <em style="color:var(--t-low)">Stockage de numéros de série, clés de calibration, configuration persistante. Présente sur pratiquement tous les systèmes embarqués.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">💿</div>
+        <div class="func-title">eMMC / UFS / SSD NVMe — le stockage de masse</div>
+        <div class="func-desc">Non-volatile. Mémoire de masse intégrée (eMMC, UFS soudés) ou déportée (SSD NVMe, SATA). Le contrôleur FTL gère le wear-leveling et la correction d'erreurs. <em style="color:var(--t-low)">Système de fichiers des Linux embarqués, stockage de données mission volumineuses, enregistreurs de vol. Existent en grades industriel (-40/+85 °C) et spatial (rad-hard).</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CRITÈRES DE SÉLECTION ─────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Sélection</div>
+    <h2>Les critères <em>qui font la différence</em></h2>
+    <p>Au-delà du type de technologie, plusieurs paramètres distinguent une mémoire embarquée standard d'une mémoire qualifiée pour un environnement critique.</p>
+    <table class="specs-table">
+      <thead>
+        <tr><th>Critère</th><th>Plage typique</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Capacité</td><td>1 Ko — 2 To</td><td>EEPROM : Ko à Mo ; DRAM : Mo à Go ; NAND/SSD : Go à To</td></tr>
+        <tr><td>Débit lecture</td><td>1 Mo/s — 7 Go/s</td><td>SPI Flash : ~50 Mo/s ; LPDDR5 : ~6,4 Go/s par canal</td></tr>
+        <tr><td>Débit écriture</td><td>0,1 Mo/s — 5 Go/s</td><td>Flash NAND : 10–300 Mo/s ; NVMe PCIe Gen4 : > 5 Go/s</td></tr>
+        <tr><td>Latence accès</td><td>< 1 ns — quelques ms</td><td>SRAM : < 10 ns ; NAND : ~100 µs par page ; SSD : ~100 µs</td></tr>
+        <tr><td>Endurance (cycles écriture)</td><td>1 k — infinie</td><td>QLC NAND : ~1 k ; SLC : ~100 k ; MRAM : > 10¹⁴ cycles</td></tr>
+        <tr><td>Rétention des données</td><td>10 ans — 20 ans</td><td>Flash : 10 ans à 25 °C ; MRAM / EEPROM : > 20 ans</td></tr>
+        <tr><td>Température fonctionnement</td><td>−55 °C — +125 °C</td><td>Comm. : 0/70 °C ; industriel : −40/85 °C ; MIL : −55/125 °C</td></tr>
+        <tr><td>Tolérance aux radiations (TID)</td><td>0 — 300 krad</td><td>COTS non qualifié : < 1 krad ; MRAM rad-hard : 100–300 krad</td></tr>
+        <tr><td>Interface</td><td>I²C, SPI, QSPI, DDR, PCIe, ONFI, Toggle</td><td>Choisie par l'OBC — la mémoire doit être compatible</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── EDAC & PROTECTION ─────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Protection des données</div>
+    <h2>EDAC, scrubbing — <em>protéger les bits</em></h2>
+    <p>En environnement radiatif ou dans les systèmes critiques, la donnée stockée peut être corrompue par un événement externe. Deux mécanismes complémentaires permettent de s'en prémunir.</p>
+    <div class="functions-grid">
+      <div class="func-card">
+        <div class="func-icon">🔍</div>
+        <div class="func-title">EDAC — Error Detection And Correction</div>
+        <div class="func-desc">Code correcteur d'erreurs (typiquement Hamming SEC-DED) ajouté aux données stockées. Permet de détecter une erreur sur 2 bits et d'en corriger une sur 1 bit à la volée, sans interruption du système. <em style="color:var(--t-low)">Implémenté dans le contrôleur mémoire de l'OBC ou directement dans le composant mémoire. Standard sur tous les OBC spatiaux qualifiés.</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🔄</div>
+        <div class="func-title">Scrubbing — nettoyage périodique</div>
+        <div class="func-desc">Tâche logicielle ou matérielle qui relève régulièrement toute la mémoire, corrige les erreurs détectées par l'EDAC et réécrit les données corrigées. Sans scrubbing, plusieurs SEU accumulés peuvent dépasser la capacité de correction. <em style="color:var(--t-low)">Cadence de scrubbing calculée selon le flux de radiations attendu (orbite LEO vs GEO vs interplanétaire).</em></div>
+      </div>
+      <div class="func-card">
+        <div class="func-icon">🪞</div>
+        <div class="func-title">Mirroring & redondance</div>
+        <div class="func-desc">Duplication de la mémoire critique sur deux bancs indépendants. Si une banque est corrompue au-delà de ce que l'EDAC peut corriger, la banque miroir prend le relais. <em style="color:var(--t-low)">Utilisé pour la mémoire de configuration FPGA et les tableaux de bord critiques dans les satellites. Coût : doubler le volume de mémoire.</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAR DOMAINE ───────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Domaines d'application</div>
+    <h2>La même fonction, <em>des contraintes différentes</em></h2>
+    <p>Le besoin de base — stocker des bits — ne change pas. Ce sont les contraintes d'environnement et de certification qui déterminent quelle technologie, quel grade et quelle qualification sont nécessaires.</p>
+
+    <div class="domains-tabs" role="tablist">
+      <button class="domain-tab active" role="tab" onclick="switchDomain('spatial', this)">Spatial</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('defense', this)">Défense & Aéro</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('industrie', this)">Industrie</button>
+      <button class="domain-tab" role="tab" onclick="switchDomain('mobilite', this)">Mobilité / EV</button>
+    </div>
+
+    <div id="panel-spatial" class="domain-panel active">
+      <div class="domain-specs">
+        <h3>Spatial — résister aux radiations avant tout</h3>
+        <span class="badge">Satellite · CubeSat · Lanceur · Sonde</span>
+        <ul>
+          <li><strong>SRAM rad-hard</strong> comme mémoire de travail — EDAC obligatoire</li>
+          <li><strong>MRAM ou NOR Flash rad-hard</strong> pour le firmware et la configuration</li>
+          <li>Scrubbing cadencé sur toutes les mémoires volatiles</li>
+          <li>Tolérance TID ≥ 30 krad (LEO) à 300 krad (GEO, interplanétaire)</li>
+          <li>SEE (SEU, SEL, SEFI) qualifiés selon ECSS-Q-ST-60-15</li>
+          <li>Qualification vibrations et cycles thermiques sous vide</li>
+          <li>Disponibilité 10–15 ans garantie par le fabricant</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes exigées</h4>
+        <span class="norm-badge">ECSS-Q-ST-60-15</span>
+        <span class="norm-badge">MIL-STD-883</span>
+        <span class="norm-badge">JEDEC JESD89</span>
+        <span class="norm-badge">NASA EEE-INST-002</span>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>SRAM rad-hard 1 Mo : 500 € – 5 000 € selon grade</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>MRAM 16 Mo rad-hard : 2 000 € – 20 000 €</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification ECSS : tests TID + SEE dédiés par lot</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-defense" class="domain-panel">
+      <div class="domain-specs">
+        <h3>Défense & Aéro — grade MIL et longévité</h3>
+        <span class="badge">Avion · Drone · Véhicule militaire · Radar</span>
+        <ul>
+          <li><strong>SRAM ou MRAM grade militaire</strong> pour les données critiques</li>
+          <li><strong>NOR Flash grade MIL</strong> pour le firmware certifié</li>
+          <li>Plage de température étendue : −55 °C à +125 °C</li>
+          <li>Tenue aux vibrations et chocs selon MIL-STD-883 / DO-160</li>
+          <li>Disponibilité composants garantie 15 à 20 ans</li>
+          <li>Parfois durcissement radiations partiel pour systèmes avioniques à haute altitude</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes exigées</h4>
+        <span class="norm-badge">MIL-STD-883</span>
+        <span class="norm-badge">MIL-PRF-38535</span>
+        <span class="norm-badge">DO-160</span>
+        <span class="norm-badge">JEDEC</span>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Composant grade MIL : 3× à 10× le prix du grade commercial</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Gestion des obsolescences : plan LTB (Last Time Buy) requis</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique composant : 50 € – 2 000 € selon type et capacité</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-industrie" class="domain-panel">
+      <div class="domain-specs">
+        <h3>Industrie — longévité et disponibilité</h3>
+        <span class="badge">Automates · Robotique · IIoT · Énergie</span>
+        <ul>
+          <li><strong>eMMC ou SSD industriel</strong> pour le stockage de masse</li>
+          <li><strong>NOR Flash industrielle</strong> pour le firmware</li>
+          <li>Grade industriel : −40 °C à +85 °C</li>
+          <li>Disponibilité 10 ans garantie — cycle de vie long de l'industrie</li>
+          <li>Wear-leveling et gestion des erreurs intégrés dans le contrôleur</li>
+          <li>Certification CE / UL standard — pas de qualification spécifique</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes exigées</h4>
+        <span class="norm-badge">JEDEC JESD47</span>
+        <span class="norm-badge">IEC 60068</span>
+        <span class="norm-badge">eMMC 5.1</span>
+        <span class="norm-badge">UFS 3.1</span>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>eMMC 32 Go industriel : 15 € – 50 €</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>SSD NVMe industriel 256 Go : 80 € – 300 €</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>LPDDR4 industrielle 4 Go : 10 € – 40 €</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="panel-mobilite" class="domain-panel">
+      <div class="domain-specs">
+        <h3>Mobilité & EV — durabilité automobile</h3>
+        <span class="badge">Véhicule électrique · ADAS · Infodivertissement</span>
+        <ul>
+          <li><strong>LPDDR5 AEC-Q100</strong> pour l'inférence IA et le traitement ADAS</li>
+          <li><strong>eMMC ou UFS automotive</strong> pour l'OS embarqué</li>
+          <li>Certification AEC-Q100 grade 1 : −40 °C à +125 °C (jonction)</li>
+          <li>Endurance cycles thermiques conforme au cycle de vie véhicule (15 ans, 300 k km)</li>
+          <li>Conformité fonctionnelle avec ISO 26262 selon le domaine d'utilisation</li>
+          <li>Sécurité données : chiffrement matériel (Secure Element) pour OTA et clés</li>
+        </ul>
+      </div>
+      <div class="domain-norms">
+        <h4>Normes exigées</h4>
+        <span class="norm-badge">AEC-Q100</span>
+        <span class="norm-badge">ISO 26262</span>
+        <span class="norm-badge">JEDEC LPDDR5</span>
+        <span class="norm-badge">UFS 4.0</span>
+        <span class="norm-badge">eMMC 5.1 Auto</span>
+        <h4 style="margin-top:24px">Ce que ça implique pour le prix</h4>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>LPDDR5 AEC-Q100 8 Go : 30 € – 100 €</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>UFS 3.1 automotive 64 Go : 40 € – 120 €</li>
+          <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification AEC-Q100 : tests de durée de vie accélérés (HTOL)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PRODUITS SUPABASE ─────────────────────────────────────── -->
+  <div class="products-section">
+    <div class="cat-section-label">Fournisseurs référencés</div>
+    <h2>Mémoires disponibles <em>sur Buy-ineer</em></h2>
+    <p>Ces produits sont directement référencés dans notre catalogue. Cliquez sur une fiche pour accéder aux spécifications complètes et contacter le fabricant.</p>
+    <div class="products-grid" id="mem-products-grid">
+      <div class="prod-loading">Chargement des produits…</div>
+    </div>
+  </div>
+
+  <!-- ── CTA ──────────────────────────────────────────────────── -->
+  <div class="cat-cta">
+    <h2>Vous cherchez une <em>mémoire spécifique</em> ?</h2>
+    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, sans inscription.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../catalogue.html?cat=memoire">Voir toutes les mémoires →</a>
+      <a class="btn ghost" href="obc.html">← OBC / Calculateurs</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+
+<script>
+function switchDomain(id, btn) {
+  document.querySelectorAll('.domain-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.domain-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+async function loadMemProducts() {
+  const grid = document.getElementById('mem-products-grid');
+  try {
+    await loadTaxonomy();
+    const products = PRODUCTS.filter(p => {
+      if (!p.cat) return false;
+      const cat = p.cat.toUpperCase();
+      return cat.includes('MEMOIRE') || cat.includes('MÉMOIRE') || cat.includes('MEMORY') ||
+             cat.includes('SRAM') || cat.includes('DRAM') || cat.includes('FLASH') ||
+             cat.includes('MRAM') || cat.includes('EEPROM') || cat.includes('EMMC') || cat.includes('SSD');
+    });
+    grid.innerHTML = '';
+    if (!products.length) {
+      grid.innerHTML = '<div class="prod-loading">Aucune mémoire référencée pour le moment — <a href="../submit.html" style="color:var(--rust)">référencez votre produit</a></div>';
+      return;
+    }
+    products.forEach(p => {
+      const card = document.createElement('button');
+      card.className = 'prod-card';
+      card.innerHTML = `
+        <div class="prod-card-head">
+          <div class="prod-card-icon">${p.image ? '<img src="'+p.image+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>' : p.icon}</div>
+          <div><div class="prod-card-name">${p.name}</div><div class="prod-card-maker">${p.maker}</div></div>
+        </div>
+        <div class="prod-card-desc">${p.desc}</div>
+        <div class="prod-card-specs">${(p.specs||[]).slice(0,3).map(s=>'<span class="prod-card-spec"><b>'+s.l+'</b> '+s.v+'</span>').join('')}</div>
+        <div class="prod-card-price">💰 ${p.price}</div>`;
+      card.onclick = () => { window.location.href = '../catalogue.html?product=' + encodeURIComponent(p.name); };
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Impossible de charger les produits.</div>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLayout().then(() => loadMemProducts());
+});
+</script>
+</body>
+</html>
