@@ -881,3 +881,6 @@ body.theme-dark::after{
   .sr{opacity:1;transform:none;transition:none}
   .cat-prod:hover,.cat-maker:hover,.cat-crit li:hover,.cat-cta:hover,.cat-cta-solid:hover{transform:none}
 }
+
+/* FAQ : aère les enchaînements question/réponse (motif propre à la FAQ) */
+.cat-intro + .cat-h2{margin-top:46px}
