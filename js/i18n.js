@@ -289,6 +289,19 @@ function getLang() {
 
 function setLang(lang) {
   localStorage.setItem('bi_lang', lang);
+
+  // Si la page a une version dédiée dans la langue demandée (balise hreflang,
+  // présente sur les pages statiques traduites), on y navigue au lieu de
+  // traduire sur place — le contenu de ces pages est écrit en dur.
+  const alt = document.querySelector('link[rel="alternate"][hreflang="' + lang + '"]');
+  if (alt) {
+    const target = new URL(alt.href).pathname;
+    if (target !== window.location.pathname) {
+      window.location.href = target;
+      return;
+    }
+  }
+
   document.documentElement.lang = lang;
   applyLang();
   // Mettre à jour le visuel du switcher
