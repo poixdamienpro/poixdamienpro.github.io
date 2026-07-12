@@ -629,12 +629,13 @@ async function loadOBCProducts() {
   const grid = document.getElementById('obc-products-grid');
   try {
     await loadTaxonomy();
-    const products = PRODUCTS.filter(p => p.cat && (
-      p.cat.toUpperCase().includes('OBC') ||
-      p.cat.toUpperCase().includes('CALCULATEUR') ||
-      p.cat.toUpperCase().includes('COMPUTER') ||
-      p.cat.toUpperCase().includes('ECU')
-    ));
+    const products = PRODUCTS.filter(p => {
+      if (!p.cat) return false;
+      const cat = p.cat.toUpperCase();
+      // Exclure les chargeurs embarqués (On-Board Charger)
+      if (cat.includes('CHARGEUR') || cat.includes('CHARGER')) return false;
+      return cat.includes('OBC') || cat.includes('CALCULATEUR') || cat.includes('COMPUTER') || cat.includes('ECU');
+    });
     grid.innerHTML = '';
     if (!products.length) {
       grid.innerHTML = '<div class="prod-loading">Aucun OBC référencé pour le moment — <a href="../submit.html" style="color:var(--rust)">référencez votre produit</a></div>';
