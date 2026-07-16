@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mesurer le courant dans un système industriel : shunt, effet Hall, TC, Rogowski | Buy-ineer</title>
+<meta name="description" content="Shunt résistif (montage 4 fils), capteur à effet Hall (boucle ouverte/fermée), transformateur de courant, bobine de Rogowski : principes, isolement galvanique, bande passante, précision — comment choisir la bonne technique de mesure de courant."/>
+<meta name="keywords" content="mesure de courant industriel, shunt résistif 4 fils Kelvin, capteur effet Hall boucle ouverte fermée, transformateur de courant TC, bobine de Rogowski, isolement galvanique mesure courant"/>
+<meta property="og:title" content="Mesurer le courant dans un système industriel : shunt, effet Hall, TC, Rogowski"/>
+<meta property="og:description" content="Principes, isolement galvanique, bande passante, précision — comment choisir la bonne technique de mesure de courant."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/articles/mesure-courant-industriel.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Mesurer le courant dans un système industriel : shunt, effet Hall, TC, Rogowski",
+  "description": "Principes, isolement galvanique, bande passante, précision de chaque technique de mesure de courant — et comment choisir.",
+  "url": "https://www.buy-inner.com/blog/articles/mesure-courant-industriel.html",
+  "publisher": { "@type": "Organization", "name": "Buy-ineer", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.buy-inner.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides techniques", "item": "https://www.buy-inner.com/blog/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "Mesurer le courant dans un système industriel", "item": "https://www.buy-inner.com/blog/articles/mesure-courant-industriel.html" }
+  ]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'blog';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 48px}
+.cat-hero-inner{max-width:820px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,44px);line-height:1.15;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);line-height:1.7}
+.article-meta{font-family:var(--mono);font-size:11px;color:var(--t-low);margin-top:20px;display:flex;gap:16px}
+
+.cat-body{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.cat-section{margin-top:56px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3vw,32px);margin-bottom:16px;line-height:1.15}
+.cat-section h2 em{font-style:italic;color:var(--steel)}
+.cat-section h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--t-hi)}
+.cat-section p{color:var(--t-mid);font-size:16px;line-height:1.8;margin-bottom:20px}
+.cat-section p strong{color:var(--t-hi)}
+.cat-section ul,.cat-section ol{color:var(--t-mid);font-size:15px;line-height:1.8;margin:0 0 20px;padding-left:22px}
+.cat-section li{margin-bottom:8px}
+.cat-section li::marker{color:var(--rust)}
+
+.formula-box{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:22px 24px;margin:20px 0;font-family:var(--mono);font-size:15px;color:var(--gold);overflow-x:auto}
+.formula-box .comment{display:block;font-size:12px;color:var(--t-low);margin-top:8px}
+
+.worked-example{background:rgba(63,154,114,.06);border:1px solid rgba(63,154,114,.25);border-radius:10px;padding:20px 24px;margin:20px 0}
+.worked-example-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.worked-example p{margin-bottom:8px;font-size:14px}
+
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 24px}
+.specs-table th{text-align:left;padding:10px 14px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.06em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500}
+.specs-table tr:last-child td{border-bottom:0}
+
+.pitfall-box{background:rgba(212,80,10,.06);border:1px solid rgba(212,80,10,.3);border-radius:10px;padding:18px 22px;margin:20px 0}
+.pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.pitfall-box p{margin:0;font-size:14px}
+
+.checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
+.checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
+.checklist label:last-child{margin-bottom:0}
+.checklist input{margin-top:3px;accent-color:var(--rust)}
+
+.diagram-wrap{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:28px 20px;overflow-x:auto;margin:20px 0 6px}
+.diagram-caption{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--t-low);text-align:center;margin:10px 0 20px;line-height:1.7}
+
+.cat-cta{margin-top:56px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(22px,3vw,30px);font-weight:400;margin-bottom:10px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:15px;margin-bottom:24px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../index.html">Guides techniques</a><span>/</span>
+      <span style="color:var(--t-mid)">Mesurer le courant</span>
+    </nav>
+    <div class="cat-eyebrow">Guide technique · Instrumentation</div>
+    <h1>Mesurer le courant dans un système industriel : <em>shunt, effet Hall, TC, Rogowski</em></h1>
+    <p class="cat-hero-desc">
+      Quatre technologies permettent de mesurer un courant : par shunt résistif, à effet Hall, par transformateur, ou par bobine à air. Aucune n'est universellement supérieure — chacune fait un compromis différent entre isolement galvanique, bande passante, précision et perte insérée. Voici comment elles fonctionnent et comment choisir.
+    </p>
+    <div class="article-meta"><span>16 min de lecture</span><span>Niveau : ingénieur / bureau d'études</span></div>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <div class="cat-section" style="margin-top:48px">
+    <p>Ce guide ne compare pas de marques et ne recommande aucun produit. La mesure de courant conditionne trois choses distinctes dans un système industriel : les décisions de coupure d'une protection (SSPC, relais de protection), le monitoring et la télémétrie, et parfois le comptage d'énergie à des fins de facturation — chacune avec des exigences de précision et de bande passante différentes.</p>
+  </div>
+
+  <!-- SHUNT -->
+  <div class="cat-section">
+    <div class="cat-section-label">Technique 1</div>
+    <h2>Shunt <em>résistif</em></h2>
+    <p>Une résistance de très faible valeur (de quelques micro-ohms à quelques milliohms) est placée en série dans le circuit. Le courant qui la traverse crée une chute de tension proportionnelle, mesurée à ses bornes.</p>
+    <div class="formula-box">
+      U_shunt = R_shunt × I
+      <span class="comment">// R_shunt typiquement 50 µΩ à 5 mΩ selon le courant nominal et la perte acceptable</span>
+    </div>
+    <h3>Montage 4 fils (Kelvin)</h3>
+    <p>Pour des courants élevés, la résistance des soudures et des pistes de connexion (quelques milliohms) devient comparable à celle du shunt lui-même et fausse la mesure si elle n'en est pas exclue. Le montage Kelvin sépare les bornes : deux bornes de force font passer le courant de charge, deux bornes de mesure (sense), non traversées par ce courant, captent la tension exactement aux bornes de l'élément résistif.</p>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto" aria-label="Schéma du montage 4 fils (Kelvin) d'un shunt résistif">
+        <line x1="30" y1="70" x2="270" y2="70" stroke="#5B8BB5" stroke-width="3"/>
+        <rect x="270" y="45" width="90" height="50" rx="6" fill="rgba(210,162,63,.1)" stroke="#D2A23F" stroke-width="2"/>
+        <text x="315" y="75" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="#D2A23F">R_shunt</text>
+        <line x1="360" y1="70" x2="600" y2="70" stroke="#5B8BB5" stroke-width="3"/>
+        <text x="30" y="55" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Borne de force (+)</text>
+        <text x="600" y="55" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.4)">Borne de force (−)</text>
+        <text x="315" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">Courant de charge I</text>
+
+        <line x1="278" y1="95" x2="278" y2="130" stroke="#3F9A72" stroke-width="1.5"/>
+        <line x1="352" y1="95" x2="352" y2="130" stroke="#3F9A72" stroke-width="1.5"/>
+        <line x1="278" y1="130" x2="352" y2="130" stroke="#3F9A72" stroke-width="1.5"/>
+        <rect x="255" y="130" width="120" height="34" rx="6" fill="rgba(63,154,114,.08)" stroke="#3F9A72" stroke-width="1.5"/>
+        <text x="315" y="151" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#3F9A72">Ampli. instrumentation</text>
+        <text x="315" y="180" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">Bornes de mesure (sense) — pas de courant de charge</text>
+      </svg>
+      <p class="diagram-caption">Figure — Les bornes de mesure captent la tension au plus près de l'élément résistif, sans y faire circuler le courant de charge : la résistance des connexions n'entre plus dans la mesure.</p>
+    </div>
+    <p>Le choix de la valeur du shunt est un compromis : une résistance faible limite la perte thermique (P = R × I², dissipée en continu) mais réduit l'amplitude du signal à amplifier, dégradant le rapport signal/bruit ; une résistance plus élevée produit l'effet inverse. Un amplificateur d'instrumentation différentiel est presque toujours nécessaire pour porter ce signal de quelques millivolts à une échelle exploitable par l'ADC.</p>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>Isolement galvanique</td><td>Aucun, nativement — à ajouter en aval (amplificateur isolé) si requis</td></tr>
+        <tr><td>Bande passante</td><td>Très large ; limitée aux hautes fréquences par l'inductance parasite du composant et du câblage (shunts coaxiaux à faible inductance pour les transitoires rapides)</td></tr>
+        <tr><td>Précision typique</td><td>Parmi les plus élevées (classe 0,1–1 %), stable si l'alliage résistif a un faible coefficient de température (manganine, constantan)</td></tr>
+        <tr><td>Cas d'usage typiques</td><td>Mesure de précision, métrologie, boucles de régulation rapides (convertisseurs, chargeurs)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EFFET HALL -->
+  <div class="cat-section">
+    <div class="cat-section-label">Technique 2</div>
+    <h2>Capteur à <em>effet Hall</em></h2>
+    <p>Un courant génère un champ magnétique. Un noyau magnétique refermé autour du conducteur concentre ce champ dans un entrefer, où un élément Hall produit une tension proportionnelle au champ — donc au courant, sans aucun contact électrique avec le circuit de puissance.</p>
+    <h3>Boucle ouverte vs boucle fermée (compensée)</h3>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto" aria-label="Schéma comparatif du capteur à effet Hall, boucle ouverte vs boucle fermée">
+        <!-- BOUCLE OUVERTE -->
+        <text x="220" y="26" text-anchor="middle" font-family="DM Sans,Arial" font-size="12.5" font-weight="700" fill="#F3F1EC" letter-spacing="1">BOUCLE OUVERTE</text>
+        <line x1="40" y1="110" x2="400" y2="110" stroke="#5B8BB5" stroke-width="3"/>
+        <path d="M160,60 A60,60 0 1 1 159,60" fill="none" stroke="#5B8BB5" stroke-width="10" stroke-linecap="round"/>
+        <rect x="150" y="118" width="20" height="26" fill="#D2A23F" rx="3"/>
+        <text x="160" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#D2A23F">élément Hall</text>
+        <line x1="180" y1="130" x2="280" y2="130" stroke="#D2A23F" stroke-width="1.5"/>
+        <rect x="280" y="112" width="90" height="36" rx="6" fill="rgba(210,162,63,.08)" stroke="#D2A23F" stroke-width="1.5"/>
+        <text x="325" y="134" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#D2A23F">Sortie ∝ B</text>
+        <text x="220" y="185" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="rgba(243,241,236,.55)">Mesure directe du champ</text>
+        <text x="220" y="200" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">Simple, moins précis, dérive thermique</text>
+
+        <!-- SEPARATEUR -->
+        <line x1="450" y1="15" x2="450" y2="210" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="2,4"/>
+
+        <!-- BOUCLE FERMEE -->
+        <text x="680" y="26" text-anchor="middle" font-family="DM Sans,Arial" font-size="12.5" font-weight="700" fill="#F3F1EC" letter-spacing="1">BOUCLE FERMÉE (compensée)</text>
+        <line x1="500" y1="110" x2="860" y2="110" stroke="#5B8BB5" stroke-width="3"/>
+        <path d="M620,60 A60,60 0 1 1 619,60" fill="none" stroke="#5B8BB5" stroke-width="10" stroke-linecap="round"/>
+        <path d="M620,45 A75,75 0 1 1 619,45" fill="none" stroke="#3F9A72" stroke-width="2" stroke-dasharray="4,3"/>
+        <rect x="610" y="118" width="20" height="26" fill="#D2A23F" rx="3"/>
+        <text x="620" y="163" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#D2A23F">Hall (détecteur de zéro)</text>
+        <line x1="640" y1="130" x2="720" y2="130" stroke="#D2A23F" stroke-width="1.5"/>
+        <rect x="720" y="105" width="110" height="50" rx="6" fill="rgba(63,154,114,.08)" stroke="#3F9A72" stroke-width="1.5"/>
+        <text x="775" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#3F9A72">Ampli. de</text>
+        <text x="775" y="138" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#3F9A72">compensation</text>
+        <text x="775" y="151" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="rgba(243,241,236,.4)">→ I_secondaire</text>
+        <text x="680" y="185" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="rgba(243,241,236,.55)">Flux annulé par compensation</text>
+        <text x="680" y="200" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.35)">Meilleure précision et bande passante</text>
+      </svg>
+      <p class="diagram-caption">Figure — En boucle fermée, un enroulement secondaire injecte un courant de compensation qui annule le flux dans le noyau ; l'élément Hall se contente de détecter le zéro, ce qui élimine une grande partie de sa propre imprécision.</p>
+    </div>
+    <table class="specs-table">
+      <thead><tr><th>Critère</th><th>Boucle ouverte</th><th>Boucle fermée (compensée)</th></tr></thead>
+      <tbody>
+        <tr><td>Précision typique</td><td>Modérée (1–3 %), sensible à la dérive thermique</td><td>Élevée, bien meilleure immunité au bruit et à la température</td></tr>
+        <tr><td>Bande passante</td><td>Limitée</td><td>Plus large</td></tr>
+        <tr><td>Consommation</td><td>Faible</td><td>Plus élevée (courant de compensation)</td></tr>
+        <tr><td>Coût / encombrement</td><td>Faible / compact</td><td>Plus élevé / plus volumineux</td></tr>
+      </tbody>
+    </table>
+    <div class="pitfall-box">
+      <div class="pitfall-box-label">Erreur fréquente</div>
+      <p>Dimensionner un capteur à effet Hall sur le seul courant nominal sans vérifier le courant de saturation du noyau magnétique. Un pic de courant transitoire (courant d'appel, défaut) au-delà du seuil de saturation fait sortir le capteur de sa plage linéaire — la mesure devient fausse précisément au moment où elle compte le plus.</p>
+    </div>
+    <p>Isolement natif, aucune perte insérée dans le circuit de puissance : deux avantages qui expliquent son usage répandu dans le monitoring de PDU, de batteries et dans le contrôle d'onduleurs et de chargeurs, partout où la mesure doit être isolée sans dissiper de puissance.</p>
+  </div>
+
+  <!-- TC -->
+  <div class="cat-section">
+    <div class="cat-section-label">Technique 3</div>
+    <h2>Transformateur de <em>courant</em> (TC)</h2>
+    <p>Le conducteur parcouru par le courant à mesurer agit comme un enroulement primaire à une seule spire. Il induit, dans un enroulement secondaire bobiné autour d'un noyau magnétique, un courant secondaire proportionnel au courant primaire selon le rapport de transformation — converti en tension par une résistance de charge (burden resistor).</p>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>Limite fondamentale</td><td>AC uniquement — un courant continu pur ne produit pas de variation de flux, donc pas d'induction</td></tr>
+        <tr><td>Saturation</td><td>Une composante continue superposée (offset DC, courant d'appel asymétrique) peut saturer le noyau et fausser la mesure</td></tr>
+        <tr><td>Isolement galvanique</td><td>Natif, par couplage magnétique</td></tr>
+        <tr><td>Précision / coût</td><td>Très bon rapport précision/coût pour l'AC ; classes de précision normalisées disponibles pour le comptage d'énergie</td></tr>
+      </tbody>
+    </table>
+    <p>Cas d'usage typiques : comptage d'énergie, protection sur réseaux AC industriels, mesure de courant différentiel. Sur un bus PDU en courant continu, le TC est tout simplement inadapté — c'est l'erreur de spécification la plus facile à éviter : il suffit de vérifier la nature du courant (DC/AC) avant même de comparer les fournisseurs.</p>
+  </div>
+
+  <!-- ROGOWSKI -->
+  <div class="cat-section">
+    <div class="cat-section-label">Technique 4</div>
+    <h2>Bobine de <em>Rogowski</em></h2>
+    <p>Une bobine torique à air — sans noyau magnétique — s'enroule autour du conducteur. La tension induite à ses bornes est proportionnelle à la dérivée du courant (di/dt) et non au courant lui-même : un intégrateur électronique ou numérique est nécessaire pour reconstituer la forme d'onde réelle.</p>
+    <div class="formula-box">
+      U_bobine ∝ dI/dt  →  I(t) = ∫ U_bobine dt
+      <span class="comment">// l'intégration est réalisée par le circuit de conditionnement, analogique ou numérique</span>
+    </div>
+    <p>L'absence de noyau magnétique élimine tout phénomène de saturation, même pour des courants très élevés ou des transitoires très rapides — c'est le principal avantage de la technique. Elle est souple et non intrusive : elle peut s'enrouler autour d'un conducteur existant sans l'interrompre, contrairement à un TC ou un capteur Hall fermé, qui exige d'ouvrir le circuit pour l'installer.</p>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>DC</td><td>Le courant continu n'est pas restitué nativement, sans intégrateur dédié et compensation de dérive ; la technique est surtout utilisée en AC et en régime transitoire</td></tr>
+        <tr><td>Saturation</td><td>Aucune (pas de noyau magnétique)</td></tr>
+        <tr><td>Bande passante</td><td>Très large — bien adaptée aux transitoires rapides</td></tr>
+        <tr><td>Isolement galvanique</td><td>Natif, par couplage magnétique</td></tr>
+        <tr><td>Cas d'usage typiques</td><td>Courants de défaut, caractérisation de courants d'appel et de commutation rapide (variateurs, convertisseurs de puissance), applications haute tension où l'absence de noyau simplifie l'isolement diélectrique</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- VUE D'ENSEMBLE -->
+  <div class="cat-section">
+    <div class="cat-section-label">Vue d'ensemble</div>
+    <h2>Les quatre techniques <em>sur le même bus</em></h2>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 900 205" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto" aria-label="Schéma des quatre techniques de mesure de courant raccordées à un même bus">
+        <text x="450" y="24" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" letter-spacing=".08em" fill="rgba(243,241,236,.4)">BUS DE PUISSANCE</text>
+        <line x1="30" y1="50" x2="870" y2="50" stroke="#5B8BB5" stroke-width="2.5"/>
+        <circle cx="140" cy="50" r="4" fill="#5B8BB5"/>
+        <circle cx="360" cy="50" r="4" fill="#5B8BB5"/>
+        <circle cx="580" cy="50" r="4" fill="#5B8BB5"/>
+        <circle cx="800" cy="50" r="4" fill="#5B8BB5"/>
+
+        <line x1="140" y1="50" x2="140" y2="88" stroke="#5B8BB5" stroke-width="1.5"/>
+        <rect x="95" y="88" width="90" height="52" rx="6" fill="rgba(91,139,181,.08)" stroke="#5B8BB5" stroke-width="1.5"/>
+        <text x="140" y="112" text-anchor="middle" font-family="DM Sans,Arial" font-size="10" font-weight="700" fill="#F3F1EC">SHUNT</text>
+        <text x="140" y="127" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="rgba(243,241,236,.5)">contact direct</text>
+        <text x="140" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.55)">DC + AC</text>
+        <text x="140" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(243,241,236,.35)">non isolé, pertes</text>
+
+        <line x1="360" y1="50" x2="360" y2="88" stroke="#3F9A72" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect x="315" y="88" width="90" height="52" rx="6" fill="rgba(63,154,114,.08)" stroke="#3F9A72" stroke-width="1.5"/>
+        <text x="360" y="112" text-anchor="middle" font-family="DM Sans,Arial" font-size="9.5" font-weight="700" fill="#F3F1EC">EFFET HALL</text>
+        <text x="360" y="127" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="rgba(243,241,236,.5)">sans contact</text>
+        <text x="360" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.55)">DC + AC</text>
+        <text x="360" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(243,241,236,.35)">isolé, saturable</text>
+
+        <line x1="580" y1="50" x2="580" y2="88" stroke="#D2A23F" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect x="535" y="88" width="90" height="52" rx="6" fill="rgba(210,162,63,.08)" stroke="#D2A23F" stroke-width="1.5"/>
+        <text x="580" y="112" text-anchor="middle" font-family="DM Sans,Arial" font-size="10.5" font-weight="700" fill="#F3F1EC">TC</text>
+        <text x="580" y="127" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="rgba(243,241,236,.5)">transfo.</text>
+        <text x="580" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.55)">AC uniquement</text>
+        <text x="580" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(243,241,236,.35)">isolé, saturable</text>
+
+        <line x1="800" y1="50" x2="800" y2="88" stroke="#D4500A" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <rect x="750" y="88" width="100" height="52" rx="6" fill="rgba(212,80,10,.06)" stroke="#D4500A" stroke-width="1.5"/>
+        <text x="800" y="112" text-anchor="middle" font-family="DM Sans,Arial" font-size="9.5" font-weight="700" fill="#F3F1EC">ROGOWSKI</text>
+        <text x="800" y="127" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7.5" fill="rgba(243,241,236,.5)">bobine à air</text>
+        <text x="800" y="158" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="rgba(243,241,236,.55)">AC / transitoires</text>
+        <text x="800" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="rgba(243,241,236,.35)">isolé, non saturable</text>
+      </svg>
+      <p class="diagram-caption">Figure — Trait plein = contact galvanique direct ; trait pointillé = isolement natif par couplage magnétique.</p>
+    </div>
+    <table class="specs-table">
+      <thead><tr><th>Critère</th><th>Shunt</th><th>Effet Hall</th><th>TC</th><th>Rogowski</th></tr></thead>
+      <tbody>
+        <tr><td>DC</td><td>Oui</td><td>Oui</td><td>Non</td><td>Non (sans intégrateur dédié)</td></tr>
+        <tr><td>Isolement galvanique natif</td><td>Non</td><td>Oui</td><td>Oui</td><td>Oui</td></tr>
+        <tr><td>Bande passante</td><td>Très large (limitée par l'inductance parasite)</td><td>Modérée à large selon boucle ouverte/fermée</td><td>Large (AC)</td><td>Très large (transitoires)</td></tr>
+        <tr><td>Précision typique</td><td>Très élevée (0,1–1 %)</td><td>Modérée à élevée</td><td>Élevée (classes normalisées)</td><td>Modérée à élevée selon intégrateur</td></tr>
+        <tr><td>Perte insérée</td><td>Oui (P = R × I²)</td><td>Non</td><td>Non</td><td>Non</td></tr>
+        <tr><td>Saturation</td><td>Non</td><td>Oui (noyau)</td><td>Oui (noyau, offset DC)</td><td>Non (pas de noyau)</td></tr>
+        <tr><td>Coût typique</td><td>Faible</td><td>Modéré à élevé</td><td>Faible à modéré</td><td>Modéré à élevé</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="cat-section">
+    <div class="cat-section-label">Synthèse</div>
+    <h2>Checklist de <em>choix</em></h2>
+    <p>Dans l'ordre, les questions qui éliminent la plupart des options :</p>
+    <div class="checklist">
+      <label><input type="checkbox" disabled/> Le courant à mesurer a-t-il une composante continue ? Si oui, le TC et la Rogowski (sans intégrateur dédié) sont exclus</label>
+      <label><input type="checkbox" disabled/> Un isolement galvanique est-il requis entre le circuit de puissance et le circuit de contrôle ? Si non, le shunt reste souvent le choix le plus précis et le moins cher</label>
+      <label><input type="checkbox" disabled/> Quelle bande passante est nécessaire — supervision lente, ou détection rapide de défaut / caractérisation de courant d'appel ?</label>
+      <label><input type="checkbox" disabled/> Quelle classe de précision est exigée — comptage/facturation, ou simple monitoring ?</label>
+      <label><input type="checkbox" disabled/> Quelle perte insérée est acceptable ? Le shunt dissipe de la puissance en continu, les trois autres techniques quasiment aucune</label>
+      <label><input type="checkbox" disabled/> Le courant de crête attendu (y compris courant d'appel) a-t-il été comparé au seuil de saturation du capteur choisi ?</label>
+    </div>
+  </div>
+
+  <div class="cat-cta">
+    <h2>Besoin de <em>composants référencés</em> ?</h2>
+    <p>Retrouvez PDU, convertisseurs et capteurs d'instrumentation référencés sur Buy-ineer, avec leurs spécifications complètes.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../../pages/categories/pdu.html">Guide catégorie PDU →</a>
+      <a class="btn ghost" href="../../pages/annuaire.html">Annuaire fabricants</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+</body>
+</html>

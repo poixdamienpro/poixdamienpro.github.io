@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Guides techniques — Composants industriels | Buy-ineer</title>
+<meta name="description" content="Guides d'ingénierie sur les composants industriels : méthodes de dimensionnement, choix de technologie, normes applicables. Pas de contenu commercial — que du technique."/>
+<meta property="og:title" content="Guides techniques — Buy-ineer"/>
+<meta property="og:description" content="Méthodes de dimensionnement et choix de composants industriels, écrits pour des ingénieurs."/>
+<meta property="og:type" content="website"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/index.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Guides techniques Buy-ineer",
+  "url": "https://www.buy-inner.com/blog/index.html",
+  "publisher": { "@type": "Organization", "name": "Buy-ineer", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'blog';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 56px}
+.cat-hero-inner{max-width:1080px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,62px);line-height:1.06;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);max-width:680px;line-height:1.7}
+.cat-body{max-width:1080px;margin:0 auto;padding:56px 24px 80px}
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.blog-card{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:28px;transition:border-color .2s,transform .2s}
+.blog-card:hover{border-color:var(--steel);transform:translateY(-2px)}
+.blog-card-cat{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-bottom:12px}
+.blog-card h2{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.25;margin-bottom:10px}
+.blog-card h2 a{color:var(--t-hi);text-decoration:none}
+.blog-card h2 a:hover{color:var(--rust)}
+.blog-card p{color:var(--t-mid);font-size:14px;line-height:1.65;margin-bottom:16px}
+.blog-card-meta{font-family:var(--mono);font-size:11px;color:var(--t-low);display:flex;gap:12px}
+.blog-empty-note{color:var(--t-low);font-size:14px;margin-top:32px;font-family:var(--mono)}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../index.html">Accueil</a><span>/</span>
+      <span style="color:var(--t-mid)">Guides techniques</span>
+    </nav>
+    <div class="cat-eyebrow">Guides d'ingénierie</div>
+    <h1>Comprendre <em>avant d'acheter</em></h1>
+    <p class="cat-hero-desc">
+      Des guides écrits pour des ingénieurs et des acheteurs techniques : méthodes de dimensionnement, critères de choix objectifs, normes applicables. Pas de contenu commercial — si un guide ne vous apprend rien, on ne l'a pas publié.
+    </p>
+  </div>
+</section>
+
+<div class="cat-body">
+  <div class="blog-grid">
+    <article class="blog-card">
+      <div class="blog-card-cat">Instrumentation · Mesure</div>
+      <h2><a href="articles/mesure-courant-industriel.html">Mesurer le courant dans un système industriel : shunt, effet Hall, TC, Rogowski</a></h2>
+      <p>Principes, montage 4 fils (Kelvin), boucle ouverte vs fermée, isolement galvanique, bande passante, précision — comment choisir la bonne technique de mesure de courant.</p>
+      <div class="blog-card-meta"><span>16 min de lecture</span></div>
+    </article>
+  </div>
+  <p class="blog-empty-note">D'autres guides arrivent — OBC, batteries industrielles, vannes & actionneurs, convertisseurs.</p>
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/modal.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+</body>
+</html>
