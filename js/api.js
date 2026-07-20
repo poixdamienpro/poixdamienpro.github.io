@@ -42,6 +42,26 @@ async function fetchAllPaged(rpcName, pageSize = 50) {
   return all;
 }
 
+// Récupère toutes les lignes d'une TABLE (pas une RPC) en paginant avec
+// offset/limit, pour contourner le plafond serveur PostgREST (db-max-rows)
+// qui tronque silencieusement toute requête directe à 50 lignes — le
+// paramètre `limit=` du client ne suffit pas à le dépasser. Voir
+// backend/supabase_lock_base_tables.sql : companies/products avaient déjà
+// ce traitement via fetchAllPaged() + RPC ; company_product_categories et
+// company_tags ne l'avaient pas, d'où la troncature silencieuse une fois
+// passé 50 lignes au total.
+async function fetchAllPagedTable(table, selectParams, pageSize = 50) {
+  let all = [];
+  let offset = 0;
+  while (true) {
+    const page = await supabase(table, `${selectParams}&limit=${pageSize}&offset=${offset}`);
+    all = all.concat(page);
+    if (page.length < pageSize) break;
+    offset += pageSize;
+  }
+  return all;
+}
+
 // Appelle une RPC Supabase et retourne ses lignes — voir
 // backend/supabase_add_detail_page_rpcs.sql.
 async function fetchRpc(rpcName, params) {
@@ -108,8 +128,8 @@ async function loadTaxonomy() {
   const [companiesRaw, productsRaw, tagsRaw, catsRaw] = await Promise.all([
     fetchAllPaged('get_companies_page'),
     fetchAllPaged('get_products_page'),
-    supabase('company_tags',         'select=company_id,tag&limit=5000'),
-    supabase('company_product_categories', 'select=company_id,category&limit=5000'),
+    fetchAllPagedTable('company_tags',               'select=company_id,tag'),
+    fetchAllPagedTable('company_product_categories', 'select=company_id,category'),
   ]);
 
   const tagsMap = {};
