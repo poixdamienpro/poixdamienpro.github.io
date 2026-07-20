@@ -368,10 +368,10 @@ a{color:inherit;text-decoration:none}
 <!-- BANDEAU CHIFFRES CLÉS -->
 <section class="statband" aria-label="Chiffres clés">
   <div class="statband-inner">
-    <div class="stat"><span class="n">73</span><span class="l" data-i18n="stat_makers">Fabricants référencés</span></div>
-    <div class="stat"><span class="n">251</span><span class="l" data-i18n="stat_products">Fiches produits</span></div>
-    <div class="stat"><span class="n">8</span><span class="l" data-i18n="stat_categories">Catégories produits</span></div>
-    <div class="stat"><span class="n">6</span><span class="l" data-i18n="stat_industries">Industries couvertes</span></div>
+    <div class="stat"><span class="n" id="stat-makers">…</span><span class="l" data-i18n="stat_makers">Fabricants référencés</span></div>
+    <div class="stat"><span class="n" id="stat-products">…</span><span class="l" data-i18n="stat_products">Fiches produits</span></div>
+    <div class="stat"><span class="n" id="stat-categories">…</span><span class="l" data-i18n="stat_categories">Catégories produits</span></div>
+    <div class="stat"><span class="n" id="stat-industries">…</span><span class="l" data-i18n="stat_industries">Industries couvertes</span></div>
   </div>
 </section>
 
@@ -580,9 +580,22 @@ a{color:inherit;text-decoration:none}
 </section>
 
 <script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/api.js"></script>
 <script>
 (() => {
   if (typeof applyLang === 'function') applyLang();
+
+  // Chiffres clés en direct depuis Supabase (voir js/api.js -> loadTaxonomy)
+  loadTaxonomy().then(() => {
+    const setStat = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+    setStat('stat-makers',     COMPANIES.length);
+    setStat('stat-products',   PRODUCTS.length);
+    setStat('stat-categories', PROD_CATS.length);
+    setStat('stat-industries', INDUSTRIES.length);
+  }).catch(() => {
+    // Si Supabase est injoignable, on garde le texte "…" plutôt qu'un chiffre faux.
+  });
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const circuit = document.getElementById('circuit');
   const svg   = document.getElementById('cable');
