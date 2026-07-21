@@ -277,28 +277,96 @@ body { background: var(--ink-3); color: var(--t-hi); }
     </div>
   </div>
 
-  <!-- ── CRITÈRES DE SÉLECTION ─────────────────────────────────── -->
+  <!-- ── COMPARATIF TECHNOLOGIES ────────────────────────────────── -->
   <div class="cat-section">
-    <div class="cat-section-label">Sélection</div>
-    <h2>Les critères <em>qui font la différence</em></h2>
-    <p>Au-delà du type de technologie, plusieurs paramètres distinguent une mémoire embarquée standard d'une mémoire qualifiée pour un environnement critique.</p>
-    <table class="specs-table">
+    <div class="cat-section-label">Comparatif · Tradeoffs</div>
+    <h2>Les 6 technologies <em>côte à côte</em></h2>
+    <p>Pour arbitrer entre technologies sans relire chaque description séparément, voici le compromis vitesse / densité / endurance / coût de chacune.</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:720px">
       <thead>
-        <tr><th>Critère</th><th>Plage typique</th><th>Notes</th></tr>
+        <tr>
+          <th>Critère</th>
+          <th style="text-align:center">SRAM</th>
+          <th style="text-align:center">DRAM</th>
+          <th style="text-align:center">NOR Flash</th>
+          <th style="text-align:center">NAND Flash</th>
+          <th style="text-align:center">MRAM</th>
+          <th style="text-align:center">EEPROM</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>Capacité</td><td>1 Ko — 2 To</td><td>EEPROM : Ko à Mo ; DRAM : Mo à Go ; NAND/SSD : Go à To</td></tr>
-        <tr><td>Débit lecture</td><td>1 Mo/s — 7 Go/s</td><td>SPI Flash : ~50 Mo/s ; LPDDR5 : ~6,4 Go/s par canal</td></tr>
-        <tr><td>Débit écriture</td><td>0,1 Mo/s — 5 Go/s</td><td>Flash NAND : 10–300 Mo/s ; NVMe PCIe Gen4 : > 5 Go/s</td></tr>
-        <tr><td>Latence accès</td><td>< 1 ns — quelques ms</td><td>SRAM : < 10 ns ; NAND : ~100 µs par page ; SSD : ~100 µs</td></tr>
-        <tr><td>Endurance (cycles écriture)</td><td>1 k — infinie</td><td>QLC NAND : ~1 k ; SLC : ~100 k ; MRAM : > 10¹⁴ cycles</td></tr>
-        <tr><td>Rétention des données</td><td>10 ans — 20 ans</td><td>Flash : 10 ans à 25 °C ; MRAM / EEPROM : > 20 ans</td></tr>
-        <tr><td>Température fonctionnement</td><td>−55 °C — +125 °C</td><td>Comm. : 0/70 °C ; industriel : −40/85 °C ; MIL : −55/125 °C</td></tr>
-        <tr><td>Tolérance aux radiations (TID)</td><td>0 — 300 krad</td><td>COTS non qualifié : < 1 krad ; MRAM rad-hard : 100–300 krad</td></tr>
-        <tr><td>Interface</td><td>I²C, SPI, QSPI, DDR, PCIe, ONFI, Toggle</td><td>Choisie par l'OBC — la mémoire doit être compatible</td></tr>
+        <tr>
+          <td>Volatile ?</td>
+          <td style="text-align:center;color:#D4500A">Oui</td>
+          <td style="text-align:center;color:#D4500A">Oui</td>
+          <td style="text-align:center;color:#3F9A72">Non</td>
+          <td style="text-align:center;color:#3F9A72">Non</td>
+          <td style="text-align:center;color:#3F9A72">Non</td>
+          <td style="text-align:center;color:#3F9A72">Non</td>
+        </tr>
+        <tr>
+          <td>Vitesse d'accès</td>
+          <td style="text-align:center;color:#3F9A72">Très rapide</td>
+          <td style="text-align:center">Rapide</td>
+          <td style="text-align:center">Rapide en lecture (XIP)</td>
+          <td style="text-align:center;color:#D4500A">Lente, séquentielle</td>
+          <td style="text-align:center;color:#3F9A72">Très rapide</td>
+          <td style="text-align:center">Modérée</td>
+        </tr>
+        <tr>
+          <td>Densité / coût au bit</td>
+          <td style="text-align:center;color:#D4500A">Faible densité, cher</td>
+          <td style="text-align:center;color:#3F9A72">Haute densité</td>
+          <td style="text-align:center">Modérée</td>
+          <td style="text-align:center;color:#3F9A72">Très haute densité</td>
+          <td style="text-align:center;color:#D4500A">Densité en progression, cher</td>
+          <td style="text-align:center;color:#D4500A">Faible densité</td>
+        </tr>
+        <tr>
+          <td>Endurance en écriture</td>
+          <td style="text-align:center;color:#3F9A72">Illimitée</td>
+          <td style="text-align:center;color:#3F9A72">Illimitée</td>
+          <td style="text-align:center">Modérée</td>
+          <td style="text-align:center;color:#D4500A">Faible à modérée (selon type)</td>
+          <td style="text-align:center;color:#3F9A72">Quasi illimitée</td>
+          <td style="text-align:center;color:#3F9A72">Très élevée</td>
+        </tr>
+        <tr>
+          <td>Accès aléatoire direct</td>
+          <td style="text-align:center;color:#3F9A72">Oui</td>
+          <td style="text-align:center;color:#3F9A72">Oui</td>
+          <td style="text-align:center;color:#3F9A72">Oui</td>
+          <td style="text-align:center;color:#D4500A">Non (via FTL)</td>
+          <td style="text-align:center;color:#3F9A72">Oui</td>
+          <td style="text-align:center;color:#3F9A72">Oui (octet)</td>
+        </tr>
+        <tr>
+          <td>Sensibilité radiations</td>
+          <td style="text-align:center;color:#3F9A72">Faible (pas de charge piégée)</td>
+          <td style="text-align:center;color:#D4500A">Sensible aux SEU (besoin EDAC)</td>
+          <td style="text-align:center">Modérée</td>
+          <td style="text-align:center">Modérée</td>
+          <td style="text-align:center;color:#3F9A72">Faible (native)</td>
+          <td style="text-align:center">Modérée</td>
+        </tr>
+        <tr>
+          <td>Cas d'usage typique</td>
+          <td style="text-align:center">Cache CPU, scratchpad</td>
+          <td style="text-align:center">Mémoire principale</td>
+          <td style="text-align:center">Bootloader, firmware</td>
+          <td style="text-align:center">Stockage de masse</td>
+          <td style="text-align:center">Config critique spatiale</td>
+          <td style="text-align:center">Paramètres, calibration</td>
+        </tr>
       </tbody>
     </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">En pratique</strong> : la première question est volatile ou non. Ensuite, l'accès aléatoire (SRAM/DRAM/NOR/MRAM/EEPROM) élimine le NAND dès que le code doit s'exécuter directement en place. La MRAM est le seul compromis qui coche presque toutes les cases — mais son coût au bit reste le facteur limitant en 2026.
+    </p>
   </div>
+
 
   <!-- ── EDAC & PROTECTION ─────────────────────────────────────── -->
   <div class="cat-section">

@@ -316,6 +316,67 @@ body { background: var(--ink-3); color: var(--t-hi); }
     </div>
   </div>
 
+  <!-- ── COMPARATIF PROTECTION ─────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Comparatif · Tradeoffs</div>
+    <h2>Fusible, disjoncteur ou SSPC : <em>comment choisir</em></h2>
+    <p>La protection de surintensité est la seule option quasi universelle d'un PDU — mais trois technologies s'y disputent chaque sortie, avec des compromis très différents. Voici la comparaison directe pour trancher.</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:640px">
+      <thead>
+        <tr>
+          <th>Critère</th>
+          <th style="text-align:center">Fusible</th>
+          <th style="text-align:center">Disjoncteur</th>
+          <th style="text-align:center">SSPC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Temps de coupure sur défaut</td>
+          <td style="text-align:center">Rapide, non réglable</td>
+          <td style="text-align:center">Modéré, non réglable</td>
+          <td style="text-align:center;color:#3F9A72">Très rapide, réglable</td>
+        </tr>
+        <tr>
+          <td>Réarmement après défaut</td>
+          <td style="text-align:center;color:#D4500A">Remplacement (usage unique)</td>
+          <td style="text-align:center">Manuel ou télécommandé</td>
+          <td style="text-align:center;color:#3F9A72">Automatique, à distance</td>
+        </tr>
+        <tr>
+          <td>Cyclabilité</td>
+          <td style="text-align:center;color:#D4500A">Aucune (destructif)</td>
+          <td style="text-align:center">Qq milliers de cycles</td>
+          <td style="text-align:center;color:#3F9A72">Illimitée (sans contact)</td>
+        </tr>
+        <tr>
+          <td>Diagnostic / télémétrie</td>
+          <td style="text-align:center;color:#D4500A">Aucun</td>
+          <td style="text-align:center">Limité (contact auxiliaire)</td>
+          <td style="text-align:center;color:#3F9A72">Complet (I, V, historique)</td>
+        </tr>
+        <tr>
+          <td>Coût unitaire</td>
+          <td style="text-align:center;color:#3F9A72">Faible</td>
+          <td style="text-align:center">Modéré</td>
+          <td style="text-align:center;color:#D4500A">Élevé</td>
+        </tr>
+        <tr>
+          <td>Tenue charges inductives</td>
+          <td style="text-align:center">Bonne</td>
+          <td style="text-align:center">Bonne à très bonne</td>
+          <td style="text-align:center;color:#3F9A72">Excellente (sans arc)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">En pratique</strong> : le fusible reste pertinent pour une protection de dernier recours peu coûteuse et rarement sollicitée. Le disjoncteur convient dès qu'un réarmement manuel est acceptable. Le SSPC s'impose quand le système doit se reconfigurer seul après un défaut — spatial, défense, architectures redondantes.
+      <a href="../../blog/articles/mesure-courant-industriel.html" style="color:var(--steel)">Guide technique complet sur la mesure de courant associée →</a>
+    </p>
+  </div>
+
   <!-- ── MATRICE OPTIONS × DOMAINES ───────────────────────────── -->
   <div class="cat-section">
     <div class="cat-section-label">Synthèse</div>
@@ -393,32 +454,6 @@ body { background: var(--ink-3); color: var(--t-hi); }
     </table>
     </div>
     <p style="font-size:13px;color:var(--t-low);margin-top:12px;font-family:var(--mono)">🟢 Systématique &nbsp;·&nbsp; 🟡 Selon modèle &nbsp;·&nbsp; ⚫ Rare ou absent</p>
-  </div>
-
-  <!-- ── SPÉCIFICATIONS TYPIQUES ───────────────────────────────── -->
-  <div class="cat-section">
-    <div class="cat-section-label">Spécifications</div>
-    <h2>Plages de <em>spécifications</em> typiques</h2>
-    <p>Ces plages couvrent l'ensemble des PDU du marché. Les valeurs exactes dépendent du domaine d'application et de la version choisie.</p>
-    <table class="specs-table">
-      <thead>
-        <tr>
-          <th>Paramètre</th>
-          <th>Plage typique</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Tension d'entrée</td><td>12 V — 600 V DC / 110–480 V AC</td><td>28 V (aéro/défense), 28–100 V (spatial), 48 V (télécom), 400–800 V (EV)</td></tr>
-        <tr><td>Courant max d'entrée</td><td>10 A — 3 000 A</td><td>Dépend de la puissance totale à distribuer</td></tr>
-        <tr><td>Nombre de sorties</td><td>2 — 64+</td><td>PDU simples 4–8 sorties, PDU datacenters jusqu'à 64</td></tr>
-        <tr><td>Courant par sortie</td><td>1 A — 400 A</td><td>SSPC typiquement 1–30 A ; contacteurs haute puissance > 100 A</td></tr>
-        <tr><td>Rendement</td><td>85 % — 99 %</td><td>Les pertes sont principalement dues à la protection et au filtrage</td></tr>
-        <tr><td>Température de fonctionnement</td><td>−55 °C — +125 °C</td><td>Spatial/défense : plages étendues ; industriel : −20/+70 °C</td></tr>
-        <tr><td>Bus de communication</td><td>CAN, Modbus, SNMP, 1553, SpaceWire, CAN FD, LIN</td><td>Dépend du domaine</td></tr>
-        <tr><td>Temps de commutation</td><td>&lt; 1 µs (SSPC) — 10 ms (relais)</td><td>Les SSPC permettent une coupure ultra-rapide sans arc électrique</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <!-- ── PAR DOMAINE ───────────────────────────────────────────── -->

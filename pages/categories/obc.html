@@ -323,6 +323,70 @@ body { background: var(--ink-3); color: var(--t-hi); }
       </div>
     </div>
 
+    <div class="cat-section-label" style="margin-top:36px">Comparatif · Tradeoffs</div>
+    <h3 style="font-family:var(--serif);font-weight:400;font-size:22px;margin-bottom:12px">CPU, FPGA, GPU ou SoC hybride : <em style="color:var(--steel)">le bon compromis</em></h3>
+    <p>Les quatre types de calculateur ne sont pas interchangeables — chacun optimise une dimension différente au détriment des autres. Comparaison directe pour arbitrer :</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:680px">
+      <thead>
+        <tr>
+          <th>Critère</th>
+          <th style="text-align:center">CPU / MCU</th>
+          <th style="text-align:center">FPGA</th>
+          <th style="text-align:center">GPU / NPU</th>
+          <th style="text-align:center">SoC hybride</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Déterminisme temps réel</td>
+          <td style="text-align:center">Bon (RTOS)</td>
+          <td style="text-align:center;color:#3F9A72">Excellent (latence fixe)</td>
+          <td style="text-align:center;color:#D4500A">Faible à modéré</td>
+          <td style="text-align:center;color:#3F9A72">Excellent (partie FPGA)</td>
+        </tr>
+        <tr>
+          <td>Flexibilité logicielle</td>
+          <td style="text-align:center;color:#3F9A72">Élevée</td>
+          <td style="text-align:center;color:#D4500A">Faible (reconfig. matérielle)</td>
+          <td style="text-align:center">Modérée (frameworks IA)</td>
+          <td style="text-align:center;color:#3F9A72">Élevée (partie CPU)</td>
+        </tr>
+        <tr>
+          <td>Calcul parallèle massif</td>
+          <td style="text-align:center;color:#D4500A">Faible</td>
+          <td style="text-align:center;color:#3F9A72">Élevé, déterministe</td>
+          <td style="text-align:center;color:#3F9A72">Très élevé (SIMD/tenseurs)</td>
+          <td style="text-align:center">Élevé (selon partition)</td>
+        </tr>
+        <tr>
+          <td>Consommation typique</td>
+          <td style="text-align:center;color:#3F9A72">Faible (mW–W)</td>
+          <td style="text-align:center">Modérée (W)</td>
+          <td style="text-align:center;color:#D4500A">Élevée (W–dizaines de W)</td>
+          <td style="text-align:center">Modérée à élevée</td>
+        </tr>
+        <tr>
+          <td>Temps / coût de développement</td>
+          <td style="text-align:center;color:#3F9A72">Faible</td>
+          <td style="text-align:center;color:#D4500A">Élevé (VHDL/Verilog)</td>
+          <td style="text-align:center">Modéré (frameworks matures)</td>
+          <td style="text-align:center;color:#D4500A">Élevé (double compétence)</td>
+        </tr>
+        <tr>
+          <td>Cas d'usage typique</td>
+          <td style="text-align:center">Séquentiel, I/O modérées</td>
+          <td style="text-align:center">Radar, contrôle moteur HF</td>
+          <td style="text-align:center">Vision, fusion capteurs, IA</td>
+          <td style="text-align:center">Systèmes critiques mixtes</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">En pratique</strong> : partez du besoin le plus contraignant. Un timing garanti à la nanoseconde élimine le CPU seul et le GPU. Un besoin d'inférence IA élimine le FPGA seul (sauf accélérateurs dédiés). Le SoC hybride n'a de sens que si les deux contraintes coexistent — sinon c'est un surcoût de développement inutile.
+    </p>
+
     <div class="cat-section-label" style="margin-top:36px">Interfaces</div>
     <div class="functions-grid">
       <div class="func-card">
