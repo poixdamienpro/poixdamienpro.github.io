@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Prestataires de services industriels · Buy-inner</title>
+<meta name="description" content="Annuaire des prestataires de services industriels : talents en régie, développement d'équipements, fabrication de faisceaux électriques, essais & qualification, usinage, intégration système."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://www.buy-inner.com/pages/prestations.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Buy-inner"/>
+<meta property="og:title" content="Prestataires de services industriels · Buy-inner"/>
+<meta property="og:description" content="Talents en régie, développement d'équipements, faisceaux électriques, essais & qualification, usinage, intégration système."/>
+<meta property="og:locale" content="fr_FR"/>
+<meta property="og:url" content="https://www.buy-inner.com/pages/prestations.html"/>
+<meta property="og:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Prestataires de services industriels · Buy-inner"/>
+<meta name="twitter:description" content="Talents en régie, développement d'équipements, faisceaux électriques, essais & qualification, usinage, intégration système."/>
+<meta name="twitter:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Prestataires de services industriels",
+  "url": "https://www.buy-inner.com/pages/prestations.html",
+  "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'prestations';</script>
+<script src="../js/analytics.js"></script>
+</head>
+<body class="theme-dark">
+
+<div id="nav-slot"></div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Prestataires de <span>services</span> industriels</h1>
+      <p class="page-subtitle">Talents en régie, développement d'équipements, fabrication de faisceaux électriques, essais & qualification, usinage, intégration système.</p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div><div class="kpi-n" id="kpi-c">—</div><div class="kpi-l">Prestataires</div></div></div>
+      <div class="kpi"><div><div class="kpi-n">6</div><div class="kpi-l">Types de prestation</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="dir">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="presta-search" type="text" placeholder="Nom, pays, prestation…" oninput="renderCompanies()"/></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Industrie</div>
+      <div class="chip-group" id="presta-industry-chips"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Type de prestation</div>
+      <div class="chip-group" id="presta-cat-chips"></div>
+    </div>
+    <button class="reset-btn" onclick="resetPrestations()">↺ Réinitialiser</button>
+  </aside>
+  <div class="dir-list-col">
+    <div class="toolbar">
+      <div><span class="toolbar-label">// PRESTATIONS</span><span class="result-count" id="presta-count"></span></div>
+      <span class="dir-hint">Survolez pour prévisualiser</span>
+    </div>
+    <div class="dir-list" id="companies-list" role="listbox" aria-label="Prestataires"></div>
+  </div>
+  <aside class="dir-preview" id="company-preview" aria-live="polite"></aside>
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/chips.js"></script>
+<script src="../js/pages/prestations.js"></script>
+</body>
+</html>
