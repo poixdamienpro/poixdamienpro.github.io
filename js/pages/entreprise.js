@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function renderCompany(c, products) {
-  document.title = `${c.name} — ${c.industry} — Buy-ineer`;
+  document.title = `${c.name} — ${c.industry} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', (c.desc || `${c.name}, équipementier ${c.industry}`).slice(0, 160));
 
@@ -70,7 +70,7 @@ function renderCompany(c, products) {
     </div>
     ${products.length ? `
     <div class="modal-section">
-      <div class="modal-section-title">Produits référencés sur Buy-ineer</div>
+      <div class="modal-section-title">Produits référencés sur Buy-inner</div>
       <div class="modal-prod-grid">
         ${products.map(p => `
           <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">

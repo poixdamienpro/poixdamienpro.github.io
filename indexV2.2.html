@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Buy-ineer — Référentiel équipementiers industriels</title>
+<title>Buy-inner — Référentiel équipementiers industriels</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -334,7 +334,7 @@ nav.main{background:var(--white);border-bottom:1px solid var(--border);position:
 <nav class="main">
   <button class="logo" onclick="showPage('home')">
     <div class="logo-mark">B</div>
-    <span class="logo-name">Buy<span>-ineer</span></span>
+    <span class="logo-name">Buy<span>-inner</span></span>
   </button>
   <div class="nav-links">
     <button class="nav-link active" data-page="home" onclick="showPage('home')">Accueil</button>
@@ -389,7 +389,7 @@ nav.main{background:var(--white);border-bottom:1px solid var(--border);position:
       <div>
         <span class="section-eyebrow">// Pour les fournisseurs</span>
         <h2 style="font-family:var(--serif);font-size:34px;color:#fff;font-weight:400;margin:0 0 18px">Votre produit, visible<br/><em style="color:var(--rust)">par les bons décideurs.</em></h2>
-        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.75;margin:0 0 26px">Le référencement sur Buy-ineer est <strong style="color:#fff">gratuit</strong> — nous construisons votre fiche à partir de vos données publiques. Vous ne payez jamais pour être visible : vous payez uniquement quand un ingénieur demande à être mis en contact avec vous, et seulement si vous acceptez ce contact.</p>
+        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.75;margin:0 0 26px">Le référencement sur Buy-inner est <strong style="color:#fff">gratuit</strong> — nous construisons votre fiche à partir de vos données publiques. Vous ne payez jamais pour être visible : vous payez uniquement quand un ingénieur demande à être mis en contact avec vous, et seulement si vous acceptez ce contact.</p>
         <button class="btn-hero-primary" onclick="showPage('pricing')">Voir comment ça marche →</button>
       </div>
       <div class="value-list">
@@ -403,10 +403,10 @@ nav.main{background:var(--white);border-bottom:1px solid var(--border);position:
 
   <section class="section" style="background:var(--white)">
     <div class="section-inner">
-      <span class="section-eyebrow">// Ils utilisent Buy-ineer</span>
+      <span class="section-eyebrow">// Ils utilisent Buy-inner</span>
       <h2 class="section-title">Ce que disent nos membres.</h2>
       <div class="testimonials-grid">
-        <div class="testi-card"><p class="testi-quote">"Buy-ineer nous a économisé 3 semaines de sourcing sur notre projet d'OBC embarqué."</p><div class="testi-name">Thomas M.</div><div class="testi-role">Ingénieur systèmes, PME aéro</div></div>
+        <div class="testi-card"><p class="testi-quote">"Buy-inner nous a économisé 3 semaines de sourcing sur notre projet d'OBC embarqué."</p><div class="testi-name">Thomas M.</div><div class="testi-role">Ingénieur systèmes, PME aéro</div></div>
         <div class="testi-card"><p class="testi-quote">"Le comparatif de batteries lithium est exactement ce dont nos acheteurs avaient besoin."</p><div class="testi-name">Claire D.</div><div class="testi-role">Responsable achats, Tier 1 auto</div></div>
         <div class="testi-card"><p class="testi-quote">"Enfin un outil qui parle la langue des ingénieurs et pas des commerciaux."</p><div class="testi-name">Romain V.</div><div class="testi-role">CTO, start-up mobilité</div></div>
       </div>
@@ -643,7 +643,7 @@ nav.main{background:var(--white);border-bottom:1px solid var(--border);position:
         <div class="modal-tags" id="m-tags"></div>
       </div>
       <div class="modal-section" id="m-prods-section">
-        <div class="modal-section-title">Produits référencés sur Buy-ineer</div>
+        <div class="modal-section-title">Produits référencés sur Buy-inner</div>
         <div class="modal-prod-grid" id="m-prods"></div>
         <button class="btn-see-products" id="m-see-products-btn">🔧 Voir tous leurs produits →</button>
       </div>
@@ -752,7 +752,7 @@ const FAQ = [
 // ═══════════════════════════════
 // STATE
 // ═══════════════════════════════
-const FOUNDER_EMAIL = 'contact@buy-ineer.fr'; // reçoit toutes les demandes de devis (étape manuelle — voir README)
+const FOUNDER_EMAIL = 'contact@buy-inner.fr'; // reçoit toutes les demandes de devis (étape manuelle — voir README)
 let annIndustry = 'all';
 let annCat = 'all';
 let catCat = 'all';
@@ -1258,9 +1258,9 @@ function submitLeadForm(e) {
   const company = document.getElementById('lead-company').value;
   const need = document.getElementById('lead-need').value;
 
-  const subject = encodeURIComponent(`Demande de devis Buy-ineer — ${leadTarget.company}`);
+  const subject = encodeURIComponent(`Demande de devis Buy-inner — ${leadTarget.company}`);
   const body = encodeURIComponent(
-    `Nouvelle demande de devis sur Buy-ineer.\n\n` +
+    `Nouvelle demande de devis sur Buy-inner.\n\n` +
     `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
     `Contact acheteur :\n- Nom : ${name}\n- Email : ${email}\n- Entreprise : ${company}\n\n` +
     `Besoin :\n${need}\n\n` +

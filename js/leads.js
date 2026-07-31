@@ -43,8 +43,8 @@ async function submitLeadForm(e) {
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
-        subject: `Demande de devis Buy-ineer · ${leadTarget.company}`,
-        from_name: 'Buy-ineer',
+        subject: `Demande de devis Buy-inner · ${leadTarget.company}`,
+        from_name: 'Buy-inner',
         to: FOUNDER_EMAIL,
         name,
         email,

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function renderProduct(p) {
-  document.title = `${p.name} — ${p.maker} — Buy-ineer`;
+  document.title = `${p.name} — ${p.maker} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', (p.desc || `${p.name} par ${p.maker}`).slice(0, 160));
 
