@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error('Erreur Supabase:', err);
   }
+  // Filet de securite : une fois tout le layout asynchrone retombe (nav,
+  // header, chips), on revalide une derniere fois la taille reelle du
+  // conteneur, au cas ou elle aurait change depuis l'initialisation.
+  setTimeout(() => { sizeMapWrap(); if (map) map.invalidateSize(); }, 300);
 });
 
 function isPrestataire(c) {
@@ -77,6 +81,15 @@ function applyMapType() {
 function sizeMapWrap() {
   const wrap = document.querySelector('.map-wrap');
   if (!wrap) return;
+  // Sous 760px, la sidebar passe au-dessus de la carte (voir CSS) : sa
+  // hauteur variable (nombre de chips industrie) casserait un calcul en
+  // vh base sur nav+header seuls. On laisse la regle CSS `65vh` dediee
+  // au mobile s'appliquer a la place.
+  if (window.matchMedia('(max-width: 760px)').matches) {
+    wrap.style.height = '';
+    if (map) map.invalidateSize();
+    return;
+  }
   const nav = document.getElementById('nav-slot');
   const header = document.querySelector('.page-header');
   const offset = (nav ? nav.offsetHeight : 86) + (header ? header.offsetHeight : 106);
@@ -93,6 +106,23 @@ function initMap() {
     subdomains: 'abcd',
     maxZoom: 19,
   }).addTo(map);
+
+  // Recale la taille interne de Leaflet a chaque changement de dimensions
+  // reel du conteneur (rotation d'ecran, changement d'orientation...) --
+  // plus fiable qu'un seul listener window 'resize', qui ne se declenche
+  // pas toujours sur mobile.
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('map-canvas'));
+  }
+
+  // Recentre explicitement sur le marqueur a l'ouverture d'une popup : sur
+  // un conteneur etroit (mobile), l'autoPan integre de Leaflet ne suffit
+  // pas toujours a ramener toute la popup (et donc le nom) dans le cadre
+  // visible -- on le fait nous-memes de façon fiable.
+  map.on('popupopen', e => {
+    const latlng = e.popup.getLatLng();
+    setTimeout(() => map.setView(latlng, map.getZoom(), { animate: false }), 0);
+  });
 
   markerCluster = L.markerClusterGroup({
     maxClusterRadius: 40,
@@ -122,7 +152,7 @@ function renderMarkers() {
         <div class="map-popup-industry">${c.industry}</div>
         <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche →</a>
       </div>
-    `);
+    `, { maxWidth: 210, autoPan: false });
     markerCluster.addLayer(marker);
   });
 

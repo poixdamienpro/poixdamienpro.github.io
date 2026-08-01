@@ -29,7 +29,12 @@
 .dir-map{grid-template-columns:225px 1fr}
 .map-wrap{position:relative;height:calc(100vh - 192px);min-height:520px}
 @media(max-width:1100px){.dir-map{grid-template-columns:210px 1fr}}
-@media(max-width:760px){.dir-map{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .dir-map{grid-template-columns:1fr}
+  .dir-map .dir-list-col{order:1}
+  .dir-map .sidebar{order:2;height:auto}
+  .dir-map .map-wrap{height:65vh;min-height:360px}
+}
 .map-empty-note{display:none;position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:1000;
   background:rgba(14,22,29,.92);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 18px;
   font-family:var(--mono);font-size:12px;color:rgba(243,241,236,.7)}
