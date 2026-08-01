@@ -26,7 +26,10 @@
 <script src="../js/analytics.js"></script>
 <style>
 #map-canvas{position:absolute;inset:0;background:#0E161D}
-.map-wrap{position:relative;height:calc(100vh - 140px);min-height:480px}
+.dir-map{grid-template-columns:225px 1fr}
+.map-wrap{position:relative;height:calc(100vh - 192px);min-height:520px}
+@media(max-width:1100px){.dir-map{grid-template-columns:210px 1fr}}
+@media(max-width:760px){.dir-map{grid-template-columns:1fr}}
 .map-empty-note{display:none;position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:1000;
   background:rgba(14,22,29,.92);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 18px;
   font-family:var(--mono);font-size:12px;color:rgba(243,241,236,.7)}
@@ -63,7 +66,7 @@
   </div>
 </div>
 
-<div class="dir">
+<div class="dir dir-map">
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label">Type</div>
@@ -83,7 +86,7 @@
       <span class="toolbar-label">// CARTE</span><span class="result-count" id="map-count"></span>
     </div>
   </aside>
-  <div class="dir-list-col" style="flex:1">
+  <div class="dir-list-col">
     <div class="map-wrap">
       <div id="map-canvas"></div>
       <div class="map-empty-note" id="map-empty-note">Aucune entreprise géolocalisée pour l'instant.</div>

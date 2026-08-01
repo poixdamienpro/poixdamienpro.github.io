@@ -20,6 +20,8 @@ const MAP_TYPE_EMPTY = {
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  sizeMapWrap();
+  window.addEventListener('resize', sizeMapWrap);
   initMap();
   try {
     await loadTaxonomy();
@@ -66,6 +68,20 @@ function applyMapType() {
   initChips('map-industry-chips', industries, () => mapIndustry, v => { mapIndustry = v; renderMarkers(); });
 
   renderMarkers();
+}
+
+// Dimensionne le conteneur de carte a l'espace vertical reellement
+// disponible (nav + page-header mesures en vrai, pas une constante CSS
+// figee qui casserait des que le header change de hauteur -- ex: kpi-row
+// qui passe sur 2 lignes en dessous de 1100px).
+function sizeMapWrap() {
+  const wrap = document.querySelector('.map-wrap');
+  if (!wrap) return;
+  const nav = document.getElementById('nav-slot');
+  const header = document.querySelector('.page-header');
+  const offset = (nav ? nav.offsetHeight : 86) + (header ? header.offsetHeight : 106);
+  wrap.style.height = `calc(100vh - ${offset}px)`;
+  if (map) map.invalidateSize();
 }
 
 function initMap() {
