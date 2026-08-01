@@ -53,8 +53,8 @@
 <div class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Carte des <span>fournisseurs</span> en Europe</h1>
-      <p class="page-subtitle">Localisez les fabricants et prestataires référencés, ville par ville.</p>
+      <h1 class="page-title">Carte des <span id="map-type-title">fournisseurs</span> en Europe</h1>
+      <p class="page-subtitle">Localisez les fabricants, prestataires et systémiers référencés, ville par ville.</p>
     </div>
     <div class="kpi-row">
       <div class="kpi"><div><div class="kpi-n" id="kpi-mapped">—</div><div class="kpi-l">Localisées</div></div></div>
@@ -65,6 +65,14 @@
 
 <div class="dir">
   <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Type</div>
+      <div class="chip-group" id="map-type-chips">
+        <button class="chip active" data-type="fournisseurs" onclick="setMapType('fournisseurs')">Fournisseurs</button>
+        <button class="chip" data-type="prestataires" onclick="setMapType('prestataires')">Prestataires</button>
+        <button class="chip" data-type="systemiers" onclick="setMapType('systemiers')">Systémiers</button>
+      </div>
+    </div>
     <div class="sidebar-section">
       <div class="sidebar-label">Industrie</div>
       <div class="chip-group" id="map-industry-chips"></div>

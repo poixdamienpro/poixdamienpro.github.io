@@ -5,29 +5,68 @@
 let map;
 let markerCluster;
 let mapIndustry = 'all';
+let mapType = 'fournisseurs';
+
+// Mêmes catégories que js/pages/prestations.js — une entreprise dont au moins
+// une catégorie de produit tombe ici est comptée comme prestataire.
+const SERVICE_CATS = ['Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques', 'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système'];
+
+const MAP_TYPE_LABELS = { fournisseurs: 'fournisseurs', prestataires: 'prestataires', systemiers: 'systémiers' };
+const MAP_TYPE_EMPTY = {
+  fournisseurs: 'Aucun fournisseur géolocalisé pour l\'instant.',
+  prestataires: 'Aucun prestataire géolocalisé pour l\'instant.',
+  systemiers: 'Aucun systémier géolocalisé pour l\'instant.',
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   initMap();
   try {
     await loadTaxonomy();
-    const withCoords = COMPANIES.filter(c => typeof c.lat === 'number' && typeof c.lng === 'number');
-    document.getElementById('kpi-mapped').textContent = withCoords.length;
+    window._allMappedCompanies = COMPANIES.filter(c => typeof c.lat === 'number' && typeof c.lng === 'number');
     document.getElementById('kpi-total').textContent = COMPANIES.length;
-
-    if (!withCoords.length) {
-      document.getElementById('map-empty-note').style.display = 'block';
-    }
-
-    const industries = [...new Set(withCoords.map(c => c.industry))].sort();
-    initChips('map-industry-chips', industries, () => mapIndustry, v => { mapIndustry = v; renderMarkers(); });
-
-    window._mappedCompanies = withCoords;
-    renderMarkers();
+    applyMapType();
   } catch (err) {
     console.error('Erreur Supabase:', err);
   }
 });
+
+function isPrestataire(c) {
+  return (c.products || []).some(p => SERVICE_CATS.includes(p));
+}
+function isFournisseur(c) {
+  return (c.products || []).some(p => !SERVICE_CATS.includes(p));
+}
+
+function setMapType(type) {
+  mapType = type;
+  document.querySelectorAll('#map-type-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.type === type));
+  const title = document.getElementById('map-type-title');
+  if (title) title.textContent = MAP_TYPE_LABELS[type];
+  applyMapType();
+}
+
+function applyMapType() {
+  const all = window._allMappedCompanies || [];
+  const filtered = mapType === 'prestataires' ? all.filter(isPrestataire)
+    : mapType === 'systemiers' ? all.filter(c => c.isSystemier)
+    : all.filter(isFournisseur);
+
+  window._mappedCompanies = filtered;
+  document.getElementById('kpi-mapped').textContent = filtered.length;
+
+  const emptyNote = document.getElementById('map-empty-note');
+  if (emptyNote) {
+    emptyNote.textContent = MAP_TYPE_EMPTY[mapType];
+    emptyNote.style.display = filtered.length ? 'none' : 'block';
+  }
+
+  mapIndustry = 'all';
+  const industries = [...new Set(filtered.map(c => c.industry))].sort();
+  initChips('map-industry-chips', industries, () => mapIndustry, v => { mapIndustry = v; renderMarkers(); });
+
+  renderMarkers();
+}
 
 function initMap() {
   map = L.map('map-canvas', { worldCopyJump: true }).setView([50.5, 10], 4);
@@ -72,7 +111,7 @@ function renderMarkers() {
   });
 
   const count = document.getElementById('map-count');
-  if (count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '') + ' localisée' + (filtered.length !== 1 ? 's' : '');
+  if (count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + MAP_TYPE_LABELS[mapType] + ' localisé' + (filtered.length !== 1 ? 's' : '');
 }
 
 function resetMap() {

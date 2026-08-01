@@ -95,6 +95,7 @@ function mapCompany(row) {
     region:    row.region     || '',
     lat:       typeof row.lat === 'number' ? row.lat : (row.lat != null ? Number(row.lat) : null),
     lng:       typeof row.lng === 'number' ? row.lng : (row.lng != null ? Number(row.lng) : null),
+    isSystemier: row.is_systemier || false,
     industry:  row.industry,
     products:  row.categories || [],
     tags:      row.tags       || [],
