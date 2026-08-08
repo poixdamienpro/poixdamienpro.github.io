@@ -93,6 +93,17 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .example-chip:hover{border-color:var(--sage)}
 .example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
 
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:4px 0 24px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.pros-cons-col.pros{border-color:rgba(63,154,114,.3)}
+.pros-cons-col.cons{border-color:rgba(212,80,10,.3)}
+.pros-cons-col h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.pros-cons-col.pros h4{color:var(--sage)}
+.pros-cons-col.cons h4{color:#F0975C}
+.pros-cons-col ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--t-mid);line-height:1.65}
+.pros-cons-col li{margin-bottom:6px}
+
 .next-part{margin-top:56px;background:rgba(91,139,181,.06);border:1px solid rgba(91,139,181,.28);border-radius:14px;padding:28px 32px}
 .next-part-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8FB4D6;margin-bottom:10px}
 .next-part h2{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:10px}
@@ -179,6 +190,56 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <div class="example-chips">
         <a class="example-chip" href="../../pages/produit.html?id=d1f41e5d-d2d1-47b1-a4f6-96566966a09a"><span>EaglePicher Batterie thermique pour défense</span><span class="src">Buy-inner</span></a>
         <a class="example-chip" href="https://www.eaglepicher.com/technology/battery-chemistries/thermal-battery/" target="_blank" rel="noopener"><span>EaglePicher — Thermal Battery Technology</span><span class="src">Fabricant ↗</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDRES DE GRANDEUR -->
+  <div class="cat-section">
+    <div class="cat-section-label">Chiffres</div>
+    <h2>Ordres de grandeur <em>typiques</em></h2>
+    <p>Le « nombre de cycles » n'a pas de sens pour ces produits à usage unique — la colonne équivalente ici est la durée de stockage garantie avant activation.</p>
+    <table class="specs-table">
+      <thead><tr><th>Type</th><th>Tension nominale</th><th>Densité énergétique typique</th><th>Durée de stockage typique</th><th>Dangerosité</th></tr></thead>
+      <tbody>
+        <tr><td>Li-SOCl2</td><td>≈ 3,6 V</td><td>≈ 500–700+ Wh/kg (parmi les plus élevées des piles primaires)</td><td>≈ 10–20 ans, autodécharge &lt; 1–3 %/an</td><td>Faible en usage nominal (cellule hermétique, électrolyte non inflammable) — risque de mise à l'évent si court-circuitée ou déchargée trop rapidement</td></tr>
+        <tr><td>Li-MnO2</td><td>≈ 3,0 V</td><td>≈ 230–280 Wh/kg</td><td>≈ 10 ans</td><td>Faible — bon comportement en décharge de pointe</td></tr>
+        <tr><td>Li-CFx</td><td>≈ 2,5–3,2 V (courbe très plate)</td><td>≈ 600+ Wh/kg</td><td>≈ 10–15 ans</td><td>Très faible — utilisée dans des dispositifs médicaux implantables</td></tr>
+        <tr><td>Batterie thermique</td><td>Variable selon l'empilement de cellules (tension système, pas une valeur unitaire comparable)</td><td>Puissance élevée sur sa fenêtre active de quelques minutes, non comparable en Wh/kg à une chimie continue</td><td>≈ 20 ans à l'état inerte, non activée</td><td>Très faible au stockage (totalement inerte) — la charge pyrotechnique d'activation est gérée comme un composant énergétique/munition, pas comme un risque électrochimique</td></tr>
+      </tbody>
+    </table>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros">
+        <h4>Piles primaires — Avantages</h4>
+        <ul>
+          <li>Autodécharge extrêmement faible sur de très longues durées</li>
+          <li>Densité énergétique élevée, notamment Li-SOCl2 et Li-CFx</li>
+          <li>Pas de circuit de charge ni de BMS de cyclage à intégrer</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons">
+        <h4>Piles primaires — Inconvénients</h4>
+        <ul>
+          <li>Non rechargeables — remplacement complet en fin de vie</li>
+          <li>Capacité de décharge en courant limitée pour le Li-SOCl2 (bobbin-type)</li>
+          <li>Coût par usage plus élevé qu'une chimie rechargeable sur des applications à cycles fréquents</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col pros">
+        <h4>Batteries thermiques — Avantages</h4>
+        <ul>
+          <li>Stockage de 20 ans sans maintenance ni dégradation</li>
+          <li>Activation en moins d'une seconde, puissance élevée immédiate</li>
+          <li>Extrêmement robuste aux chocs, vibrations et environnements sévères</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons">
+        <h4>Batteries thermiques — Inconvénients</h4>
+        <ul>
+          <li>Durée de fonctionnement utile très courte (secondes à minutes)</li>
+          <li>Usage strictement unique, aucune réutilisation possible</li>
+          <li>Intégration et qualification plus proches d'un composant pyrotechnique que d'une batterie classique</li>
+        </ul>
       </div>
     </div>
   </div>

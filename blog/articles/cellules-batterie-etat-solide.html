@@ -96,6 +96,17 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .diagram-wrap{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:28px 20px;overflow-x:auto;margin:20px 0 6px}
 .diagram-caption{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--t-low);text-align:center;margin:10px 0 20px;line-height:1.7}
 
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:4px 0 24px}
+@media(max-width:600px){.pros-cons{grid-template-columns:1fr}}
+.pros-cons-col{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.pros-cons-col.pros{border-color:rgba(63,154,114,.3)}
+.pros-cons-col.cons{border-color:rgba(212,80,10,.3)}
+.pros-cons-col h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.pros-cons-col.pros h4{color:var(--sage)}
+.pros-cons-col.cons h4{color:#F0975C}
+.pros-cons-col ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--t-mid);line-height:1.65}
+.pros-cons-col li{margin-bottom:6px}
+
 .next-part{margin-top:56px;background:rgba(91,139,181,.06);border:1px solid rgba(91,139,181,.28);border-radius:14px;padding:28px 32px}
 .next-part-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8FB4D6;margin-bottom:10px}
 .next-part h2{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:10px}
@@ -181,6 +192,39 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <div class="example-box-label">Exemple de produit</div>
       <div class="example-chips">
         <a class="example-chip" href="../../pages/produit.html?id=a5c72443-370c-4b38-9876-a3e911cbce52"><span>BTRY 1S4P — solid-state ultra-fine</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDRES DE GRANDEUR -->
+  <div class="cat-section">
+    <div class="cat-section-label">Chiffres</div>
+    <h2>Ordres de grandeur <em>typiques</em></h2>
+    <p>L'état solide reste une technologie émergente : les valeurs du polymère (déjà en production industrielle) sont mieux établies que celles du céramique et du sulfure, encore majoritairement au stade prototype/pré-série — traitez ces dernières comme des cibles annoncées par les fabricants, pas des moyennes de marché stabilisées.</p>
+    <table class="specs-table">
+      <thead><tr><th>Famille</th><th>Tension nominale</th><th>Densité énergétique</th><th>Cycles typiques</th><th>Dangerosité / emballement thermique</th></tr></thead>
+      <tbody>
+        <tr><td>Polymère</td><td>≈ 3,3 V (formulation LMP)</td><td>Comparable au LFP/NMC classique, sans gain majeur</td><td>≈ 3 000+ (cellules commercialisées)</td><td>Très faible — pas de liquide inflammable, mécanisme de défaillance différent (dégradation d'interface, pas de runaway chimique)</td></tr>
+        <tr><td>Céramique</td><td>≈ 3,6–4,2 V selon cathode associée</td><td>Cible ≈ 300–500 Wh/kg avec anode lithium métal (annoncé, pas encore généralisé en production)</td><td>Données encore variables selon les développements en cours</td><td>Très faible sur le papier — céramique ininflammable, mais fragilité mécanique à l'interface reste un point de vigilance</td></tr>
+        <tr><td>Sulfure</td><td>≈ 3,6–4,2 V selon cathode associée</td><td>Cible ≈ 300–450 Wh/kg avec anode lithium métal (annoncé)</td><td>Données encore variables selon les développements en cours</td><td>Très faible sur le papier — sensibilité à l'humidité à gérer en fabrication, pas un risque en usage final</td></tr>
+      </tbody>
+    </table>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros">
+        <h4>État solide — Avantages</h4>
+        <ul>
+          <li>Sécurité intrinsèque : pas d'électrolyte liquide inflammable</li>
+          <li>Permet une anode en lithium métal, donc un potentiel de densité énergétique élevé</li>
+          <li>Pas de risque de dépôt de lithium métallique incontrôlé côté anode (contrairement au graphite chargé trop vite)</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons">
+        <h4>État solide — Inconvénients</h4>
+        <ul>
+          <li>Maturité industrielle limitée hors polymère, coûts de fabrication élevés</li>
+          <li>Interface solide-solide fragile, dégradation par micro-décollement en cyclage</li>
+          <li>Disponibilité et volumes encore restreints selon la famille</li>
+        </ul>
       </div>
     </div>
   </div>
