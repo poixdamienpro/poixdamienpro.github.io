@@ -22,6 +22,7 @@ async function loadLayout() {
   }
   markActiveNavLink();
   initTicker();
+  initMobileNav();
   if (typeof applyLang === 'function') applyLang();
   document.querySelectorAll('.overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
@@ -46,6 +47,25 @@ function logPageView() {
       user_agent: navigator.userAgent,
     }]),
   }).catch(() => {});
+}
+
+// Menu hamburger mobile — le nav bar déborde à droite sous ~900px avec
+// 8 liens + bouton + switch de langue, donc on le replie derrière un
+// bouton et on l'étend en colonne au clic.
+function initMobileNav() {
+  const nav = document.querySelector('nav.main');
+  const toggle = document.getElementById('navToggle');
+  if (!nav || !toggle) return;
+  toggle.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('nav-open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  nav.querySelectorAll('.nav-link, .btn-signup').forEach(el => {
+    el.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
 }
 
 function markActiveNavLink() {

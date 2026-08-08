@@ -41,6 +41,22 @@ nav.main{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.10);pos
 .lang-btn{background:none;border:none;cursor:pointer;font-size:18px;line-height:1;padding:3px 4px;border-radius:4px;opacity:.45;transition:opacity .15s,background .15s}
 .lang-btn:hover{opacity:.8}
 .lang-btn.active{opacity:1;background:rgba(255,255,255,.10)}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:32px;height:32px;background:none;border:none;padding:0;cursor:pointer;flex-shrink:0}
+.nav-toggle span{display:block;width:100%;height:2px;background:#F3F1EC;border-radius:1px;transition:transform .18s,opacity .18s}
+nav.main.nav-open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+nav.main.nav-open .nav-toggle span:nth-child(2){opacity:0}
+nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+@media(max-width:900px){
+  nav.main{flex-wrap:wrap;height:auto;min-height:56px;padding:0 16px}
+  .nav-toggle{display:flex}
+  .nav-links,.nav-right{display:none;width:100%}
+  nav.main.nav-open{padding-bottom:14px}
+  nav.main.nav-open .nav-links{display:flex;flex-direction:column;height:auto;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;padding-top:6px}
+  nav.main.nav-open .nav-link{height:46px;padding:0 4px;border-bottom:1px solid rgba(255,255,255,.05)}
+  nav.main.nav-open .nav-right{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:14px}
+  nav.main.nav-open .lang-switcher{margin-left:0}
+}
 
 /* PAGES */
 .page{display:none}.page.active{display:block}

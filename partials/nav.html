@@ -12,7 +12,7 @@
     <img class="logo-mark" src="{{root}}assets/logo-mark.png" alt=""/>
     <span class="logo-name">Buy<span>-inner</span></span>
   </a>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a class="nav-link" data-page="annuaire" href="{{root}}pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a>
     <a class="nav-link" data-page="carte" href="{{root}}pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
     <a class="nav-link" data-page="composants" href="{{root}}pages/composants.html" data-i18n="nav_composants">Composants</a>
@@ -31,4 +31,7 @@
       <button class="lang-btn" data-lang="en" onclick="setLang('en')" title="English">🇬🇧</button>
     </div>
   </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
