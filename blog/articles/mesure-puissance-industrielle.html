@@ -83,6 +83,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
 .pitfall-box p{margin:0;font-size:14px}
 
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
 .checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
 .checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
 .checklist label:last-child{margin-bottom:0}
@@ -137,6 +144,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <span class="comment">// valide instantanément en continu, à condition que V et I soient échantillonnés en synchronisation</span>
     </div>
     <p>En pratique, cette synchronisation est assurée soit par un multiplicateur analogique dédié, soit — plus couramment aujourd'hui — par une acquisition numérique synchrone des deux voies suivie d'un calcul logiciel. L'intégration de la puissance instantanée dans le temps donne l'énergie consommée, la grandeur réellement utile pour le suivi de consommation d'un bus PDU ou la charge d'une batterie.</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.ti.com/product/INA226" target="_blank" rel="noopener"><span>TI INA226</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- PUISSANCE AC MONOPHASE -->
@@ -174,6 +187,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <div class="pitfall-box-label">Erreur fréquente</div>
       <p>Calculer une puissance active en multipliant simplement les valeurs efficaces de tension et de courant mesurées séparément (par une pince ampèremétrique et un voltmètre non synchronisés, par exemple). Ce calcul donne la puissance apparente (S), pas la puissance active (P) — l'écart entre les deux devient significatif dès que la charge n'est plus purement résistive. La puissance active exige d'intégrer le produit instantané v(t) × i(t) sur une période complète, ce qui suppose un échantillonnage synchrone des deux voies.</p>
     </div>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.analog.com/en/products/ade7953.html" target="_blank" rel="noopener"><span>ADI ADE7953</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- PUISSANCE TRIPHASE -->
@@ -186,6 +205,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
     <p>Pour un système à quatre fils (avec neutre) ou déséquilibré, cette simplification ne tient plus : il faut alors mesurer chaque phase indépendamment.</p>
     <h3>Circuits intégrés de mesure d'énergie</h3>
     <p>Dans la pratique industrielle actuelle, la mesure triphasée passe le plus souvent par un circuit intégré dédié (<em>metering IC</em>) qui gère nativement l'acquisition synchrone multi-voies, le calcul de P, Q, S et du facteur de puissance par phase, et l'intégration en énergie — remplaçant l'assemblage discret de capteurs et de calculs séparés.</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.analog.com/en/products/ade9000.html" target="_blank" rel="noopener"><span>ADI ADE9000</span><span class="src">Composant ↗</span></a>
+        <a class="example-chip" href="https://catalog.chauvin-arnoux.com/fr_fr/c-a-8336.html" target="_blank" rel="noopener"><span>Chauvin Arnoux CA 8336</span><span class="src">Instrument ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- CHECKLIST -->

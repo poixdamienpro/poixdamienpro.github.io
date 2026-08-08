@@ -87,6 +87,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
 .pitfall-box p{margin:0;font-size:14px}
 
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
 .checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
 .checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
 .checklist label:last-child{margin-bottom:0}
@@ -170,6 +177,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
         <tr><td>Cas d'usage typiques</td><td>Mesure de précision, métrologie, boucles de régulation rapides (convertisseurs, chargeurs)</td></tr>
       </tbody>
     </table>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.vishay.com/en/product/30108/" target="_blank" rel="noopener"><span>Vishay WSK2512</span><span class="src">Shunt de précision ↗</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=26125c60-bc0b-4d79-a583-760f8f2c1ba1"><span>Victron BMV-712</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- EFFET HALL -->
@@ -226,6 +240,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <p>Dimensionner un capteur à effet Hall sur le seul courant nominal sans vérifier le courant de saturation du noyau magnétique. Un pic de courant transitoire (courant d'appel, défaut) au-delà du seuil de saturation fait sortir le capteur de sa plage linéaire — la mesure devient fausse précisément au moment où elle compte le plus.</p>
     </div>
     <p>Isolement natif, aucune perte insérée dans le circuit de puissance : deux avantages qui expliquent son usage répandu dans le monitoring de PDU, de batteries et dans le contrôle d'onduleurs et de chargeurs, partout où la mesure doit être isolée sans dissiper de puissance.</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=504e8dbe-b28f-4ec5-9c3a-e54003a2d347"><span>Sensata CS-HV500</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="https://www.allegromicro.com/en/products/sense/current-sensor-ics/zero-to-fifty-amp-integrated-conductor-sensor-ics/acs712" target="_blank" rel="noopener"><span>Allegro ACS712</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- TC -->
@@ -242,6 +263,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
       </tbody>
     </table>
     <p>Cas d'usage typiques : comptage d'énergie, protection sur réseaux AC industriels, mesure de courant différentiel. Sur un bus PDU en courant continu, le TC est tout simplement inadapté — c'est l'erreur de spécification la plus facile à éviter : il suffit de vérifier la nature du courant (DC/AC) avant même de comparer les fournisseurs.</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://talema.com/products/low-cost-current-transformers-ac/" target="_blank" rel="noopener"><span>Talema série AC (ex. AC1050)</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- ROGOWSKI -->
@@ -263,6 +290,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
         <tr><td>Cas d'usage typiques</td><td>Courants de défaut, caractérisation de courants d'appel et de commutation rapide (variateurs, convertisseurs de puissance), applications haute tension où l'absence de noyau simplifie l'isolement diélectrique</td></tr>
       </tbody>
     </table>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.pemuk.com/products/cwt-range" target="_blank" rel="noopener"><span>PEM CWT (gamme)</span><span class="src">Instrument ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- VUE D'ENSEMBLE -->

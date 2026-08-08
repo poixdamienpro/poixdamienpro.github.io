@@ -82,6 +82,13 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
 .pitfall-box p{margin:0;font-size:14px}
 
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
 .checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
 .checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
 .checklist label:last-child{margin-bottom:0}
@@ -174,6 +181,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
         <tr><td>Cas d'usage typiques</td><td>Monitoring de bus référencé à la masse, division simple pour ADC (PDU, chargeurs, cartes de contrôle)</td></tr>
       </tbody>
     </table>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=26125c60-bc0b-4d79-a583-760f8f2c1ba1"><span>Victron BMV-712</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- SONDE DIFFERENTIELLE -->
@@ -217,6 +230,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <div class="pitfall-box-label">Erreur fréquente</div>
       <p>Confondre mesure différentielle et isolement galvanique. Une sonde différentielle élimine le potentiel commun de la lecture, mais les deux entrées restent électriquement reliées au même amplificateur : le potentiel commun doit rester dans la plage de tension acceptée par le composant. Pour une vraie séparation électrique — potentiels très éloignés, sécurité des personnes — il faut un isolement galvanique réel (technique suivante).</p>
     </div>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.ti.com/product/INA333" target="_blank" rel="noopener"><span>TI INA333</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- ISOLEMENT GALVANIQUE -->
@@ -232,6 +251,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
     </table>
     <p>Le choix entre les deux dépend d'abord de la nature du signal : un TP est plus simple et moins coûteux mais strictement limité à l'alternatif ; un amplificateur isolé couvre le continu, au prix d'une consommation et d'une complexité de mise en œuvre plus élevées.</p>
     <p>C'est la même logique d'isolement que pour la mesure de courant — voir <a href="mesure-courant-industriel.html" style="color:#8FB4D6">le guide dédié</a> pour le détail des techniques d'isolement appliquées au courant (effet Hall, transformateur de courant, bobine de Rogowski).</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.ti.com/product/AMC1311" target="_blank" rel="noopener"><span>TI AMC1311</span><span class="src">Composant ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- SONDE HT -->
@@ -240,6 +265,12 @@ body { background: var(--ink-3); color: var(--t-hi); }
     <h2>Sonde haute tension <em>compensée</em></h2>
     <p>Un atténuateur résistif haute tension, associé à un réseau de compensation capacitive, maintient une bande passante large à haute fréquence malgré la forte atténuation nécessaire. C'est la technique des sondes utilisées avec un oscilloscope pour caractériser un signal haute tension sans l'endommager.</p>
     <p>Cette technique est adaptée au diagnostic et à la mise au point — caractérisation de commutation, mesure ponctuelle de mise au point — pas au monitoring permanent embarqué, où les techniques précédentes sont mieux adaptées. Le choix de la sonde doit correspondre à la tension et à l'environnement de mesure ; une sonde mal dimensionnée pour son usage est un risque de sécurité autant qu'une source d'erreur.</p>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="https://www.tek.com/en/high-voltage-probe-manual/p5100a" target="_blank" rel="noopener"><span>Tektronix P5100A</span><span class="src">Instrument ↗</span></a>
+      </div>
+    </div>
   </div>
 
   <!-- VUE D'ENSEMBLE -->
