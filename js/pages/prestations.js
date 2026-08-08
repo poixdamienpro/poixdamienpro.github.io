@@ -86,8 +86,8 @@ function renderCompanies() {
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
     const choose = () => {
-      selectRow(row, c);
-      if (!dirIsDesktop()) preview?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (dirIsDesktop()) selectRow(row, c);
+      else window.location.href = ROOT_PREFIX + 'pages/entreprise.html?id=' + encodeURIComponent(c.id);
     };
     row.addEventListener('click', choose);
     row.addEventListener('mouseenter', () => { if(dirIsDesktop()) selectRow(row, c); });
@@ -142,6 +142,7 @@ function renderCompanyPreview(c) {
       <div class="dp-details">${details}</div>
       ${servicesBlock}
       <div class="dp-actions">
+        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche complète →</a>
         <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">Visiter le site →</a>
         <button class="btn-quote" id="dp-quote">📩 Demander un devis</button>
       </div>

@@ -731,6 +731,8 @@ body.theme-dark::after{
 .dp-prods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .dp-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:16px;
   border-top:1px solid rgba(255,255,255,.1)}
+.btn-fiche{padding:10px 20px;border-radius:4px;background:transparent;border:1px solid #8FB4D6;color:#8FB4D6;font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center}
+.btn-fiche:hover{background:rgba(143,180,214,.12)}
 
 /* responsive : sous 1100px on retire l'aperçu (clic = modale) */
 @media(max-width:1100px){

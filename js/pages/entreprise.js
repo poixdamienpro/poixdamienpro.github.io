@@ -3,6 +3,17 @@
 // remplace l'ancienne modale pour le SEO : chaque entreprise référencée
 // devient une page indexable individuellement par Google.
 // ═══════════════════════════════
+// Memes categories que js/pages/prestations.js — une entreprise dont au
+// moins une categorie de produit tombe ici est une prestataire de service.
+const SERVICE_CATS = [
+  'Prestation de talents',
+  'Développement d\'équipements',
+  'Fabrication de faisceaux électriques',
+  'Essais & qualification',
+  'Usinage & fabrication mécanique',
+  'Intégration & assemblage système',
+];
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   const id = new URLSearchParams(window.location.search).get('id');
@@ -32,9 +43,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function renderCompany(c, products) {
+  const isPrestataire = c.products.some(cat => SERVICE_CATS.includes(cat));
+  const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
+  const equipmentCats = c.products.filter(cat => !SERVICE_CATS.includes(cat));
+
   document.title = `${c.name} — ${c.industry} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute('content', (c.desc || `${c.name}, équipementier ${c.industry}`).slice(0, 160));
+  const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${c.industry}` : `${c.name}, équipementier ${c.industry}`;
+  if (metaDesc) metaDesc.setAttribute('content', (c.desc || metaFallback).slice(0, 160));
 
   document.getElementById('ent-header').innerHTML = `
     <h1 class="page-title">${c.logo} ${c.name}</h1>
@@ -45,6 +61,8 @@ function renderCompany(c, products) {
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
       ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
       ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+      ${isPrestataire ? '<span class="tag tag-industry">🧑‍💼 Prestataire de service</span>' : ''}
+      ${c.isSystemier ? '<span class="tag tag-industry">🔗 Systémier</span>' : ''}
       <span class="tag tag-industry">${c.industry}</span>
     </div>
     ${!c.premium ? `
@@ -60,17 +78,23 @@ function renderCompany(c, products) {
     <div class="modal-section">
       <div class="modal-section-title">Informations société</div>
       <div class="detail-grid">
-        ${[['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', c.industry], ['Siège', c.hq]]
+        ${[['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', c.industry], ['Siège', [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
           .map(([l, v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('')}
       </div>
     </div>
+    ${services.length ? `
+    <div class="modal-section">
+      <div class="modal-section-title">Activités de prestation</div>
+      <div class="modal-tags">${services.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>` : ''}
+    ${equipmentCats.length || c.tags.length ? `
     <div class="modal-section">
       <div class="modal-section-title">Gammes & Technologies</div>
-      <div class="modal-tags">${[...c.products, ...c.tags].map(t => `<span class="tag">${t}</span>`).join('')}</div>
-    </div>
+      <div class="modal-tags">${[...equipmentCats, ...c.tags].map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>` : ''}
     ${products.length ? `
     <div class="modal-section">
-      <div class="modal-section-title">Produits référencés sur Buy-inner</div>
+      <div class="modal-section-title">${isPrestataire ? 'Prestations proposées sur Buy-inner' : 'Produits référencés sur Buy-inner'}</div>
       <div class="modal-prod-grid">
         ${products.map(p => `
           <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
