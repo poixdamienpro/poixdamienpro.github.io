@@ -116,6 +116,33 @@ a{color:inherit;text-decoration:none}
 .hud-link:hover{color:var(--t-hi)}
 .hud-link:focus-visible{outline:2px solid var(--steel);outline-offset:3px}
 
+/* menu latéral rapide (desktop large) */
+.side-nav{position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:39;
+  display:flex;flex-direction:column;gap:1px;
+  background:rgba(15,24,32,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;padding:10px 4px}
+.side-nav a{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--t-low);
+  padding:9px 14px;white-space:nowrap;border-radius:6px;transition:color .18s,background .18s;display:block}
+.side-nav a:hover{color:var(--t-hi);background:rgba(255,255,255,.06)}
+.side-nav a.side-nav-cta{color:var(--rust);font-weight:700;margin-top:4px;border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:1400px){.side-nav{display:none}}
+
+/* menu rapide replié (tablette / laptop / mobile) */
+.mnav-toggle{display:none;pointer-events:auto;background:none;border:1px solid var(--line-2);
+  border-radius:6px;width:34px;height:34px;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.mnav-toggle span{display:block;width:16px;height:1.5px;background:var(--t-hi);position:relative}
+.mnav-toggle span::before,.mnav-toggle span::after{content:'';position:absolute;left:0;width:16px;height:1.5px;background:var(--t-hi)}
+.mnav-toggle span::before{top:-5px}
+.mnav-toggle span::after{top:5px}
+@media(max-width:1400px){.mnav-toggle{display:flex}}
+.mnav-panel{display:none;position:fixed;top:64px;left:0;right:0;z-index:38;max-height:calc(100vh - 64px);overflow-y:auto;
+  background:var(--ink-2);border-bottom:1px solid var(--line);padding:6px 20px 18px;
+  flex-direction:column;gap:2px}
+.mnav-panel.open{display:flex}
+.mnav-panel a{font-family:var(--sans);font-size:14px;color:var(--t-mid);padding:12px 4px;border-bottom:1px solid var(--line);transition:color .18s}
+.mnav-panel a:hover{color:var(--t-hi)}
+.mnav-panel a:last-child{border-bottom:0}
+
 /* rail vertical de progression (stations) */
 .rail{right:26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;align-items:center}
 .rail .tick{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line-2);
@@ -343,10 +370,37 @@ a{color:inherit;text-decoration:none}
       <button class="lang-btn" data-lang="fr" onclick="setLang('fr')" title="Français" style="background:none;border:none;cursor:pointer;font-size:18px;padding:3px 4px;border-radius:4px;opacity:.45;transition:opacity .15s">🇫🇷</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')" title="English" style="background:none;border:none;cursor:pointer;font-size:18px;padding:3px 4px;border-radius:4px;opacity:.45;transition:opacity .15s">🇬🇧</button>
     </div>
+    <button class="mnav-toggle" id="mnavToggle" aria-label="Menu" aria-expanded="false" aria-controls="mnavPanel"><span></span></button>
   </div>
 </header>
 
 <nav class="hud rail" aria-hidden="true" id="rail"></nav>
+
+<!-- Menu latéral rapide (desktop large) -->
+<nav class="side-nav" aria-label="Navigation rapide">
+  <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a>
+  <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
+  <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
+  <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+  <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
+  <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
+  <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
+  <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  <a class="side-nav-cta" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
+</nav>
+
+<!-- Menu rapide replié (tablette / laptop / mobile) -->
+<div class="mnav-panel" id="mnavPanel">
+  <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a>
+  <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
+  <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
+  <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+  <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
+  <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
+  <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
+  <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  <a href="pages/submit.html" data-i18n="hud_submit">Référencer mon entreprise</a>
+</div>
 
 <!-- HERO -->
 <section class="hero" aria-label="Introduction">
@@ -585,6 +639,19 @@ a{color:inherit;text-decoration:none}
 <script>
 (() => {
   if (typeof applyLang === 'function') applyLang();
+
+  const mnavToggle = document.getElementById('mnavToggle');
+  const mnavPanel = document.getElementById('mnavPanel');
+  if (mnavToggle && mnavPanel) {
+    mnavToggle.addEventListener('click', () => {
+      const open = mnavPanel.classList.toggle('open');
+      mnavToggle.setAttribute('aria-expanded', open);
+    });
+    mnavPanel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      mnavPanel.classList.remove('open');
+      mnavToggle.setAttribute('aria-expanded', 'false');
+    }));
+  }
 
   // Chiffres clés en direct depuis Supabase (voir js/api.js -> loadTaxonomy)
   loadTaxonomy().then(() => {
