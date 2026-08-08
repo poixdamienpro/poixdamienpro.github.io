@@ -1,9 +1,10 @@
 // ═══════════════════════════════
 // CONFIGURATION SUPABASE
-// Remplace ces deux valeurs par tes vraies clés
-// (Settings → API dans ton projet Supabase)
+// Passe par www.buy-inner.com/api (Worker Cloudflare, voir
+// cloudflare/supabase-proxy-worker.js) au lieu de *.supabase.co direct —
+// certains reseaux d'entreprise bloquent ce domaine par categorie.
 // ═══════════════════════════════
-const SUPABASE_URL    = 'https://pzejxwrtsglmiitbhpjr.supabase.co';  // ex: https://abcdef.supabase.co
+const SUPABASE_URL    = 'https://www.buy-inner.com/api';
 const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6ZWp4d3J0c2dsbWlpdGJocGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTEwNTMsImV4cCI6MjA5Njk4NzA1M30.-SpxNs7G_5nEuZCXL68lNVcCzFTyiaZc93dViix76Ok';     // clé publique anon
 
 // ═══════════════════════════════
