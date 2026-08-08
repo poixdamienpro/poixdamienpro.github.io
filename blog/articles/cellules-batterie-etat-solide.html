@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cellules de batterie à l'état solide : polymère, céramique, sulfure (3/5) | Buy-inner</title>
+<meta name="description" content="Pourquoi remplacer l'électrolyte liquide, les trois familles d'électrolyte solide (polymère, céramique, sulfure), et ce qui reste à résoudre avant une adoption généralisée. Partie 3 d'une série en cinq volets."/>
+<meta name="keywords" content="batterie état solide, cellule solid-state, électrolyte solide polymère céramique sulfure, anode lithium métal, batterie tout-solide"/>
+<meta property="og:title" content="Cellules de batterie à l'état solide : polymère, céramique, sulfure (3/5)"/>
+<meta property="og:description" content="Pourquoi remplacer l'électrolyte liquide, les trois familles d'électrolyte solide, et ce qui reste à résoudre avant une adoption généralisée."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/articles/cellules-batterie-etat-solide.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Cellules de batterie à l'état solide : polymère, céramique, sulfure (3/5)",
+  "description": "Pourquoi remplacer l'électrolyte liquide, les trois familles d'électrolyte solide, et ce qui reste à résoudre avant une adoption généralisée.",
+  "url": "https://www.buy-inner.com/blog/articles/cellules-batterie-etat-solide.html",
+  "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.buy-inner.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides techniques", "item": "https://www.buy-inner.com/blog/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "Cellules à l'état solide", "item": "https://www.buy-inner.com/blog/articles/cellules-batterie-etat-solide.html" }
+  ]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'blog';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 48px}
+.cat-hero-inner{max-width:820px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.part-badge{background:rgba(212,80,10,.14);color:#F0975C;border:1px solid rgba(212,80,10,.35);border-radius:4px;padding:2px 8px;font-size:10px;letter-spacing:.06em}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,44px);line-height:1.15;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);line-height:1.7}
+.article-meta{font-family:var(--mono);font-size:11px;color:var(--t-low);margin-top:20px;display:flex;gap:16px}
+.related-links{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.related-link{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(91,139,181,.08);border:1px solid rgba(91,139,181,.28);border-radius:8px;font-size:12.5px;color:var(--t-mid);text-decoration:none;width:fit-content}
+.related-link:hover{border-color:var(--steel);color:var(--t-hi)}
+.related-link strong{color:#8FB4D6;font-weight:600}
+
+.cat-body{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.cat-section{margin-top:56px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3vw,32px);margin-bottom:16px;line-height:1.15}
+.cat-section h2 em{font-style:italic;color:var(--steel)}
+.cat-section h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--t-hi)}
+.cat-section p{color:var(--t-mid);font-size:16px;line-height:1.8;margin-bottom:20px}
+.cat-section p strong{color:var(--t-hi)}
+.cat-section ul,.cat-section ol{color:var(--t-mid);font-size:15px;line-height:1.8;margin:0 0 20px;padding-left:22px}
+.cat-section li{margin-bottom:8px}
+.cat-section li::marker{color:var(--rust)}
+
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 24px}
+.specs-table th{text-align:left;padding:10px 14px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.06em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500}
+.specs-table tr:last-child td{border-bottom:0}
+
+.pitfall-box{background:rgba(212,80,10,.06);border:1px solid rgba(212,80,10,.3);border-radius:10px;padding:18px 22px;margin:20px 0}
+.pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.pitfall-box p{margin:0;font-size:14px}
+
+.checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
+.checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
+.checklist label:last-child{margin-bottom:0}
+.checklist input{margin-top:3px;accent-color:var(--rust)}
+
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
+.diagram-wrap{background:var(--ink-2);border:1px solid var(--border);border-radius:12px;padding:28px 20px;overflow-x:auto;margin:20px 0 6px}
+.diagram-caption{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--t-low);text-align:center;margin:10px 0 20px;line-height:1.7}
+
+.next-part{margin-top:56px;background:rgba(91,139,181,.06);border:1px solid rgba(91,139,181,.28);border-radius:14px;padding:28px 32px}
+.next-part-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8FB4D6;margin-bottom:10px}
+.next-part h2{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:10px}
+.next-part p{color:var(--t-mid);font-size:14.5px;line-height:1.75;margin:0}
+
+.cat-cta{margin-top:32px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(22px,3vw,30px);font-weight:400;margin-bottom:10px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:15px;margin-bottom:24px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../index.html">Guides techniques</a><span>/</span>
+      <span style="color:var(--t-mid)">Cellules à l'état solide</span>
+    </nav>
+    <div class="cat-eyebrow">Guide technique · Énergie & Stockage <span class="part-badge">PARTIE 3/5</span></div>
+    <h1>Cellules de batterie à <em>l'état solide</em></h1>
+    <p class="cat-hero-desc">
+      Le LFP, le NMC, le NCA et le LTO ne différaient que par une électrode, sur un électrolyte liquide commun. L'état solide change l'architecture elle-même : l'électrolyte liquide disparaît. C'est une rupture plus profonde qu'un simple ajustement de chimie — et qui n'est pas encore arrivée à la même maturité industrielle que le liquide.
+    </p>
+    <div class="article-meta"><span>10 min de lecture</span><span>Niveau : ingénieur / bureau d'études</span></div>
+    <div class="related-links">
+      <a class="related-link" href="cellules-batterie-lfp-nmc.html">← Voir aussi : <strong>LFP vs NMC (1/5)</strong></a>
+      <a class="related-link" href="cellules-batterie-nca-lto.html">← Voir aussi : <strong>NCA vs LTO (2/5)</strong></a>
+    </div>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <div class="cat-section" style="margin-top:48px">
+    <p>Ce guide ne compare pas de marques et ne recommande aucun produit. Toutes les chimies présentées dans les deux premières parties de cette série — LFP, NMC, NCA, LTO — partagent un électrolyte liquide (ou gel polymère) qui permet aux ions lithium de circuler entre les électrodes. L'état solide remplace ce liquide par un électrolyte solide, un changement qui touche la sécurité, la densité énergétique potentielle et les procédés de fabrication à la fois.</p>
+  </div>
+
+  <!-- PRINCIPE -->
+  <div class="cat-section">
+    <div class="cat-section-label">Le principe</div>
+    <h2>Pourquoi remplacer <em>l'électrolyte liquide</em></h2>
+    <p>L'électrolyte liquide d'une cellule Li-ion classique est un solvant organique inflammable. C'est la principale cause des risques d'emballement thermique en cas de défaut interne, de surcharge ou de dommage mécanique — le liquide s'enflamme, alimentant une réaction en chaîne. Remplacer ce liquide par un solide non-combustible élimine directement ce mécanisme, sans dépendre uniquement du BMS pour contenir le risque.</p>
+    <p>Un électrolyte solide ouvre aussi la voie à une anode en lithium métal plutôt qu'en graphite ou en titanate. Le lithium métal a une capacité théorique bien supérieure à celle des anodes à intercalation utilisées dans les chimies liquides — c'est la principale raison pour laquelle l'état solide promet des densités énergétiques que les architectures liquides actuelles ne permettent pas d'atteindre.</p>
+  </div>
+
+  <!-- TROIS FAMILLES -->
+  <div class="cat-section">
+    <div class="cat-section-label">Trois familles</div>
+    <h2>Polymère, <em>céramique, sulfure</em></h2>
+    <p>« Électrolyte solide » recouvre trois familles de matériaux aux propriétés très différentes — le choix entre elles est un compromis à part entière, pas un détail d'implémentation.</p>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>Polymère solide</td><td>La famille la plus mature industriellement des trois. Nécessite généralement une température de fonctionnement plus élevée pour atteindre une conductivité ionique suffisante.</td></tr>
+        <tr><td>Céramique (oxyde)</td><td>Bonne stabilité chimique et résistance au feu. Fragilité mécanique et défis de contact à l'interface avec les électrodes, notamment lors des cycles de dilatation/contraction.</td></tr>
+        <tr><td>Sulfure</td><td>La meilleure conductivité ionique à température ambiante parmi les trois familles. Sensibilité à l'humidité et procédés de fabrication plus exigeants.</td></tr>
+      </tbody>
+    </table>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits et technologies</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=463c8b86-1a9a-42bc-ba87-c2d97237e413"><span>Blue Solutions Cellule LMP</span><span class="src">Buy-inner · Polymère</span></a>
+        <a class="example-chip" href="https://www.quantumscape.com/battery-technology/" target="_blank" rel="noopener"><span>QuantumScape</span><span class="src">Fabricant ↗ · Céramique</span></a>
+        <a class="example-chip" href="https://www.solidpowerbattery.com/sulfide-solid-electrolytes/default.aspx" target="_blank" rel="noopener"><span>Solid Power</span><span class="src">Fabricant ↗ · Sulfure</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CE QUI RESTE A RESOUDRE -->
+  <div class="cat-section">
+    <div class="cat-section-label">Réalité industrielle</div>
+    <h2>Ce qui reste à <em>résoudre</em></h2>
+    <p>Un contact solide-solide à l'interface entre l'électrode et l'électrolyte est mécaniquement plus fragile qu'un contact liquide-solide, qui épouse naturellement les irrégularités de surface. Les électrodes se dilatent et se contractent à chaque cycle de charge/décharge ; dans une architecture tout-solide, ce mouvement peut créer des micro-décollements à l'interface, qui dégradent progressivement le contact électrique et donc la performance de la cellule.</p>
+    <p>Les procédés de fabrication de cellules à l'état solide restent également moins matures et plus coûteux à l'échelle industrielle que les lignes de production liquide, optimisées et amorties depuis des décennies. C'est cette combinaison — défis d'interface non totalement résolus et procédés encore coûteux à grande échelle — qui explique pourquoi l'état solide reste, à ce stade, une technologie émergente : présente dans des applications ciblées, pas encore généralisée à l'ensemble des usages couverts par les chimies liquides.</p>
+    <div class="pitfall-box">
+      <div class="pitfall-box-label">Erreur fréquente</div>
+      <p>Traiter « état solide » comme une chimie unique et prête à substituer n'importe quelle cellule liquide. Les trois familles d'électrolyte solide ont des profils de maturité, de coût et de contraintes de fabrication très différents — un projet qui évalue l'état solide doit préciser laquelle des trois familles est réellement visée avant de comparer quoi que ce soit.</p>
+    </div>
+    <div class="example-box">
+      <div class="example-box-label">Exemple de produit</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=a5c72443-370c-4b38-9876-a3e911cbce52"><span>BTRY 1S4P — solid-state ultra-fine</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="cat-section">
+    <div class="cat-section-label">Synthèse</div>
+    <h2>Checklist de <em>choix</em></h2>
+    <div class="checklist">
+      <label><input type="checkbox" disabled/> Le projet a-t-il précisé laquelle des trois familles d'électrolyte solide (polymère, céramique, sulfure) est réellement visée ?</label>
+      <label><input type="checkbox" disabled/> La sécurité intrinsèque (absence de liquide inflammable) est-elle un critère décisif, au-delà de ce qu'un BMS et un boîtier bien conçus apportent déjà avec une chimie liquide ?</label>
+      <label><input type="checkbox" disabled/> Le calendrier du projet est-il compatible avec la maturité industrielle actuelle de la technologie visée — disponibilité, volumes, qualification ?</label>
+      <label><input type="checkbox" disabled/> Le budget intègre-t-il le surcoût actuel de fabrication par rapport à une chimie liquide équivalente ?</label>
+    </div>
+  </div>
+
+  <div class="next-part">
+    <div class="next-part-label">Série en 5 parties</div>
+    <h2>La suite de <em>la série</em></h2>
+    <p>Partie 4 : les batteries primaires (usage unique, sans recharge) et thermiques, pour le spatial et la défense — une catégorie à part, pas une variante des chimies rechargeables vues jusqu'ici. Partie 5 : les supercondensateurs, une technologie complémentaire aux batteries plutôt qu'une chimie de cellule.</p>
+  </div>
+
+  <div class="cat-cta">
+    <h2>Besoin de <em>cellules et packs référencés</em> ?</h2>
+    <p>Retrouvez fabricants de cellules, packs et systèmes de gestion de batterie référencés sur Buy-inner.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../../pages/annuaire.html">Annuaire fabricants →</a>
+      <a class="btn ghost" href="../../pages/carte.html">Carte de l'écosystème</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+</body>
+</html>
