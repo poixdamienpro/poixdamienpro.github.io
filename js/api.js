@@ -110,6 +110,26 @@ function mapCompany(row) {
   };
 }
 
+// Extrait le domaine (sans www.) du site d'une entreprise, pour interroger
+// logo.dev. Retourne null si pas de site réel renseigné.
+function companyDomain(site) {
+  if (!site || site === '#') return null;
+  try { return new URL(site).hostname.replace(/^www\./, ''); } catch { return null; }
+}
+
+// Rendu HTML du logo d'une entreprise : vrai logo via logo.dev quand un
+// site et une clé sont disponibles, avec repli automatique sur l'emoji
+// (onerror) si le logo n'existe pas chez logo.dev ou si la clé n'est pas
+// configurée — jamais de case vide.
+function companyLogoHtml(c, sizePx) {
+  sizePx = sizePx || 40;
+  const domain = companyDomain(c.site);
+  const fallback = (c.logo || '🏭').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  if (!domain || !LOGO_DEV_TOKEN || LOGO_DEV_TOKEN.includes('XXXX')) return fallback;
+  const url = `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=${sizePx * 2}&format=png`;
+  return `<img src="${url}" alt="" loading="lazy" style="max-width:78%;max-height:78%;object-fit:contain" onerror="this.outerHTML='${fallback}'"/>`;
+}
+
 function mapProduct(row) {
   return {
     id:       row.id,

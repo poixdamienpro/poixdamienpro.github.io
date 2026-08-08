@@ -78,7 +78,7 @@ function renderCompanies() {
     row.setAttribute('role', 'option');
     row.style.animationDelay = (Math.min(i, 16) * 0.03) + 's';
     row.innerHTML = `
-      <span class="dir-logo">${c.logo}</span>
+      <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${c.name}</span>
         <span class="dir-row-sub">${c.country} · ${c.industry}</span>
@@ -126,7 +126,7 @@ function renderCompanyPreview(c) {
   el.innerHTML = `
     <div class="dir-preview-card">
       <div class="dp-head">
-        <div class="dp-logo">${c.logo}</div>
+        <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
           <div class="dp-name">${c.name}</div>
           <div class="dp-loc">${c.country} · ${c.hq}</div>

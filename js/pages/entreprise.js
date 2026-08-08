@@ -53,7 +53,7 @@ function renderCompany(c, products) {
   if (metaDesc) metaDesc.setAttribute('content', (c.desc || metaFallback).slice(0, 160));
 
   document.getElementById('ent-header').innerHTML = `
-    <h1 class="page-title">${c.logo} ${c.name}</h1>
+    <h1 class="page-title"><span style="display:inline-flex;width:40px;height:40px;vertical-align:middle;align-items:center;justify-content:center;margin-right:10px;border-radius:9px;background:rgba(0,0,0,.04);overflow:hidden">${companyLogoHtml(c, 40)}</span>${c.name}</h1>
     <p class="page-subtitle">${c.country} · ${c.hq} — ${c.industry}</p>
   `;
 

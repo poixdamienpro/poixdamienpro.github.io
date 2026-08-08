@@ -8,6 +8,15 @@ const SUPABASE_URL    = 'https://www.buy-inner.com/api';
 const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6ZWp4d3J0c2dsbWlpdGJocGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTEwNTMsImV4cCI6MjA5Njk4NzA1M30.-SpxNs7G_5nEuZCXL68lNVcCzFTyiaZc93dViix76Ok';     // clé publique anon
 
 // ═══════════════════════════════
+// CONFIGURATION LOGO.DEV
+// Vrais logos d'entreprise par domaine (img.logo.dev/:domain). Clé
+// "publishable" — faite pour être exposée côté client, comme la clé
+// anon Supabase ci-dessus. À remplacer par ta propre clé gratuite :
+// https://www.logo.dev -> Get free API key
+// ═══════════════════════════════
+const LOGO_DEV_TOKEN  = 'pk_auyA2g6JQ6aVtkiqtPU2xg';
+
+// ═══════════════════════════════
 // DATA — chargée depuis Supabase
 // ═══════════════════════════════
 let INDUSTRIES = [];
