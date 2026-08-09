@@ -455,6 +455,11 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .sup-pending-note{display:flex;gap:14px;align-items:flex-start;background:rgba(210,162,63,.10);border:1px solid rgba(210,162,63,.35);border-radius:10px;padding:16px 18px}
 .sup-pending-ico{font-size:22px;line-height:1}
 
+/* Bandeau Premium (dashboard fournisseur) */
+.sup-premium-upsell{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:rgba(210,162,63,.10);border:1px solid rgba(210,162,63,.35);border-radius:12px;padding:16px 20px;margin-bottom:18px;font-size:13px;color:rgba(243,241,236,.75)}
+.sup-premium-upsell button{width:auto;white-space:nowrap;flex-shrink:0}
+.sup-premium-active{background:rgba(210,162,63,.10);border:1px solid rgba(210,162,63,.35);border-radius:12px;padding:14px 20px;margin-bottom:18px;font-size:13px;color:#E8CD86}
+
 /* Bandeau de stats */
 .sup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
 .sup-stat{background:var(--white);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}

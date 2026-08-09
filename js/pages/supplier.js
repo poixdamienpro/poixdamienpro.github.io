@@ -29,6 +29,66 @@ function renderSupplierStats() {
     <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">Demandes approuvées</span></div>`;
 }
 
+// Bandeau Premium : bouton d'abonnement, ou confirmation si déjà actif.
+// L'activation réelle se fait côté Worker (/api/create-checkout-session
+// + /api/stripe-webhook), jamais en écrivant premium=true depuis le
+// client — voir cloudflare/supabase-proxy-worker.js.
+function renderPremiumBox() {
+  const el = document.getElementById('sup-premium-box');
+  if (!el || !supplierCompany) return;
+  if (supplierCompany.premium) {
+    el.innerHTML = `<div class="sup-premium-active">★ Votre entreprise est <strong>Premium</strong> — badge et mise en avant prioritaire actifs.</div>`;
+  } else {
+    el.innerHTML = `
+      <div class="sup-premium-upsell">
+        <span>Passez Premium pour le badge ★, la mise en avant prioritaire et le profil enrichi — 1 500 €/an, résiliable à tout moment.</span>
+        <button id="sup-premium-btn" class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+      </div>`;
+  }
+}
+
+async function startPremiumCheckout() {
+  if (!supplierCompany) return;
+  const btn = document.getElementById('sup-premium-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Redirection…'; }
+  try {
+    const res = await fetch(`${SUPABASE_URL}/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        companyId: supplierCompany.id,
+        companyName: supplierCompany.name,
+        email: sessionStorage.getItem('sup_email'),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.error || 'Erreur lors de la création du paiement.');
+    window.location.href = data.url;
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = '★ Passer Premium — 1 500 €/an'; }
+  }
+}
+
+// Après retour depuis Stripe Checkout (success_url/cancel_url) : le
+// webhook a normalement déjà traité l'événement, mais on relit quand
+// même la fiche pour refléter le vrai statut sans attendre un reload.
+async function handlePremiumReturn() {
+  const status = new URLSearchParams(window.location.search).get('premium');
+  if (!status) return;
+  history.replaceState(null, '', window.location.pathname);
+  if (status === 'cancelled') return;
+  if (status === 'success') {
+    const banner = document.getElementById('sup-premium-box');
+    if (banner) banner.innerHTML = `<div class="sup-premium-active">Paiement reçu, activation en cours…</div>`;
+    try {
+      const rows = await supplierFetch(`companies?id=eq.${supplierCompany.id}&select=*`);
+      if (rows && rows.length) supplierCompany = rows[0];
+    } catch { /* le webhook peut avoir une seconde de retard, pas grave */ }
+    renderPremiumBox();
+  }
+}
+
 async function supplierFetch(path, options = {}) {
   const token = sessionStorage.getItem('sup_access_token');
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -133,8 +193,10 @@ async function supplierRouteAfterAuth() {
       document.getElementById('sup-dash-title').textContent = supplierCompany.name;
       setSupplierStep(3);
       renderSupplierStats();
+      renderPremiumBox();
       loadSupplierProducts();
       loadSupplierSubmissions();
+      handlePremiumReturn();
       return;
     }
     const claims = await supplierFetch(`company_claims?user_id=eq.${userId}&status=eq.pending&select=*,companies(name)&order=created_at.desc&limit=1`);

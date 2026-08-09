@@ -61,7 +61,7 @@ const PLANS = [
     {ok:false,text:"Badge Vérifié Premium"},
     {ok:false,text:"Priorité dans les résultats de recherche"}
   ]},
-  {name:"Fournisseur Premium",price:"1 500 €",period:"/an",highlight:false,target:"submit",desc:"Pour les fabricants qui veulent maximiser leur visibilité et leurs leads.",cta:"Devenir Premium",ctaClass:"secondary",features:[
+  {name:"Fournisseur Premium",price:"1 500 €",period:"/an",highlight:false,target:"supplier",desc:"Pour les fabricants qui veulent maximiser leur visibilité et leurs leads. Disponible une fois votre entreprise revendiquée.",cta:"Passer Premium",ctaClass:"secondary",features:[
     {ok:true, text:"Tout le plan Référencement"},
     {ok:true, text:"Badge ★ PREMIUM et mise en avant prioritaire"},
     {ok:true, text:"Profil enrichi : vidéo, datasheets, certifications"},
