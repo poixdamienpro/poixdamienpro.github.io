@@ -111,7 +111,7 @@ function renderCompany(c, products) {
     </div>` : ''}
     <div class="modal-actions">
       <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">↗ Visiter le site officiel</a>
-      <button class="btn-quote" onclick="openLeadModal('${c.name.replace(/'/g, "\\'")}', null)">📩 Demander un devis</button>
+      <button class="btn-quote" onclick="openLeadModal('${c.name.replace(/'/g, "\\'")}', null, '${c.id}')">📩 Demander un devis</button>
     </div>
   `;
 

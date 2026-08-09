@@ -144,7 +144,7 @@ function renderProductPreview(p) {
     el.querySelectorAll('.dir-bar-fill').forEach(f => { f.style.width = f.style.getPropertyValue('--w'); });
   }));
 
-  el.querySelector('#dp-quote').onclick = () => openLeadModal(p.name, p.maker);
+  el.querySelector('#dp-quote').onclick = () => openLeadModal(p.maker, p.name, p.companyId);
   el.querySelector('.btn-cmp-add').onclick = function() { toggleCompare(p.id, this); };
   const close = el.querySelector('.dir-close');
   if(close) close.onclick = () => el.classList.remove('open');

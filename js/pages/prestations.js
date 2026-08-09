@@ -149,7 +149,7 @@ function renderCompanyPreview(c) {
     </div>`;
 
   const quote = el.querySelector('#dp-quote');
-  if(quote) quote.onclick = () => openLeadModal(c.name, null);
+  if(quote) quote.onclick = () => openLeadModal(c.name, null, c.id);
 }
 
 function resetPrestations() {

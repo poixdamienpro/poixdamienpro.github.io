@@ -144,7 +144,7 @@ function renderCompanyPreview(c) {
     </div>`;
 
   const quote = el.querySelector('#dp-quote');
-  if(quote) quote.onclick = () => openLeadModal(c.name, null);
+  if(quote) quote.onclick = () => openLeadModal(c.name, null, c.id);
   const see = el.querySelector('#dp-see');
   if(see) see.onclick = () => { window.location.href = ROOT_PREFIX + 'pages/catalogue.html?company=' + encodeURIComponent(c.name); };
 }

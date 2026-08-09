@@ -4,10 +4,13 @@
 // publique conçue pour être appelée depuis du JS client, comme la clé
 // anon Supabase). Le founder relaie ensuite au fournisseur et ne
 // facture le lead que si le fournisseur l'accepte — jamais de
-// facturation sans accord préalable.
+// facturation sans accord préalable. En parallèle, chaque lead est aussi
+// enregistré dans la table `leads` (voir backend/supabase_add_leads.sql)
+// pour garder une trace exploitable — l'email reste le canal principal,
+// l'enregistrement en base est best-effort et ne bloque jamais l'envoi.
 // ═══════════════════════════════
-function openLeadModal(targetName, productName) {
-  leadTarget = { company: targetName, product: productName };
+function openLeadModal(targetName, productName, companyId) {
+  leadTarget = { company: targetName, product: productName, companyId: companyId || null };
   document.getElementById('lead-target').textContent = productName
     ? `${productName} · ${targetName}`
     : targetName;
@@ -57,6 +60,29 @@ async function submitLeadForm(e) {
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.message || 'Échec de l\'envoi.');
+
+    // Trace en base, best-effort : l'email ci-dessus est le canal
+    // critique et vient de réussir — si Supabase est indisponible, on ne
+    // bloque jamais le buyer pour autant, on logue juste l'échec.
+    fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({
+        company_id: leadTarget.companyId,
+        company_name: leadTarget.company,
+        product_name: leadTarget.product,
+        buyer_name: name,
+        buyer_email: email,
+        buyer_company: company,
+        message: need,
+      }),
+    }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); })
+      .catch(err => console.error('Erreur enregistrement lead en base (email envoyé quand même) :', err));
 
     document.getElementById('lead-body').innerHTML = `
       <div class="lead-success">

@@ -53,7 +53,7 @@ function renderProduct(p) {
       <button class="btn-quote" id="prod-quote-btn">📩 Demander un devis — 💰 ${p.price}</button>
     </div>
   `;
-  document.getElementById('prod-quote-btn').onclick = () => openLeadModal(p.maker, p.name);
+  document.getElementById('prod-quote-btn').onclick = () => openLeadModal(p.maker, p.name, p.companyId);
 
   injectProductJsonLd(p);
 }
