@@ -22,14 +22,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   try {
-    const [companyRow, tagsRaw, catsRaw] = await Promise.all([
+    const [companyRow, tagsRaw, catsRaw, indsRaw] = await Promise.all([
       fetchOne('get_company_by_id', { p_id: id }),
       supabase('company_tags', `select=tag&company_id=eq.${id}`),
       supabase('company_product_categories', `select=category&company_id=eq.${id}`),
+      // Voir backend/supabase_add_company_industries.sql — .catch() dédié
+      // tant que la migration n'a pas encore été exécutée en base.
+      supabase('company_industries', `select=industry&company_id=eq.${id}`).catch(() => []),
     ]);
     if (!companyRow) throw new Error('not found');
     companyRow.tags = tagsRaw.map(t => t.tag);
     companyRow.categories = catsRaw.map(c => c.category);
+    companyRow.industries = indsRaw.map(i => i.industry);
     const c = mapCompany(companyRow);
 
     const productsRows = await fetchRpc('get_products_by_company', { p_company_id: id });
@@ -47,14 +51,15 @@ function renderCompany(c, products) {
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const equipmentCats = c.products.filter(cat => !SERVICE_CATS.includes(cat));
 
-  document.title = `${c.name} — ${c.industry} — Buy-inner`;
+  const industryLabel = c.industries.join(' & ');
+  document.title = `${c.name} — ${industryLabel} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
-  const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${c.industry}` : `${c.name}, équipementier ${c.industry}`;
+  const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${industryLabel}` : `${c.name}, équipementier ${industryLabel}`;
   if (metaDesc) metaDesc.setAttribute('content', (c.desc || metaFallback).slice(0, 160));
 
   document.getElementById('ent-header').innerHTML = `
     <h1 class="page-title"><span style="display:inline-flex;width:40px;height:40px;vertical-align:middle;align-items:center;justify-content:center;margin-right:10px;border-radius:9px;background:rgba(0,0,0,.04);overflow:hidden">${companyLogoHtml(c, 40)}</span>${c.name}</h1>
-    <p class="page-subtitle">${c.country} · ${c.hq} — ${c.industry}</p>
+    <p class="page-subtitle">${c.country} · ${c.hq} — ${industryLabel}</p>
   `;
 
   document.getElementById('ent-body').innerHTML = `
@@ -63,7 +68,7 @@ function renderCompany(c, products) {
       ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
       ${isPrestataire ? '<span class="tag tag-industry">🧑‍💼 Prestataire de service</span>' : ''}
       ${c.isSystemier ? '<span class="tag tag-industry">🔗 Systémier</span>' : ''}
-      <span class="tag tag-industry">${c.industry}</span>
+      ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
     </div>
     ${!c.premium ? `
     <div class="claim-banner">
@@ -78,7 +83,7 @@ function renderCompany(c, products) {
     <div class="modal-section">
       <div class="modal-section-title">Informations société</div>
       <div class="detail-grid">
-        ${[['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', c.industry], ['Siège', [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
+        ${[['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', industryLabel], ['Siège', [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
           .map(([l, v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('')}
       </div>
     </div>
@@ -123,7 +128,7 @@ function injectCompanyJsonLd(c) {
     description: c.desc,
     url: c.site !== '#' ? c.site : undefined,
     address: { '@type': 'PostalAddress', addressLocality: c.hq, addressCountry: c.country },
-    industry: c.industry,
+    industry: c.industries.join(', '),
   });
   document.head.appendChild(script);
 }

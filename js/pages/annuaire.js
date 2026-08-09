@@ -37,7 +37,7 @@ function filteredCompanies() {
   const q = (document.getElementById('ann-search')?.value || '').toLowerCase();
   return COMPANIES.filter(c => {
     const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
-    return ms && (annIndustry === 'all' || c.industry === annIndustry) && (annCat === 'all' || c.products.includes(annCat));
+    return ms && (annIndustry === 'all' || c.industries.includes(annIndustry)) && (annCat === 'all' || c.products.includes(annCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 }
 
@@ -70,7 +70,7 @@ function renderCompanies() {
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${c.name}</span>
-        <span class="dir-row-sub">${c.country} · ${c.industry}</span>
+        <span class="dir-row-sub">${c.country} · ${c.industries.join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}${prodCount ? '<span class="n">'+prodCount+'</span>' : ''}</span>`;
 
@@ -107,7 +107,7 @@ function renderCompanyPreview(c) {
   const prods = PRODUCTS.filter(p => p.maker === c.name);
 
   const _t = typeof t==='function' ? t : k=>k;
-  const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industry], [_t('prev_hq'), c.hq]]
+  const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industries.join(', ')], [_t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
 
   const prodLabel = prods.length===1 ? _t('prev_products_1') : _t('prev_products_n');
@@ -130,7 +130,7 @@ function renderCompanyPreview(c) {
       <div class="dp-badges">
         ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
         ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
-        <span class="tag tag-industry">${c.industry}</span>
+        ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
       <p class="dp-desc">${c.desc}</p>
       <div class="dp-section-label">${_t('prev_info')}</div>

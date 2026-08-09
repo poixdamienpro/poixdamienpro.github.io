@@ -68,7 +68,7 @@ function applyMapType() {
   }
 
   mapIndustry = 'all';
-  const industries = [...new Set(filtered.map(c => c.industry))].sort();
+  const industries = [...new Set(filtered.flatMap(c => c.industries))].sort();
   initChips('map-industry-chips', industries, () => mapIndustry, v => { mapIndustry = v; renderMarkers(); });
 
   renderMarkers();
@@ -138,7 +138,7 @@ function initMap() {
 function renderMarkers() {
   markerCluster.clearLayers();
   const base = window._mappedCompanies || [];
-  const filtered = mapIndustry === 'all' ? base : base.filter(c => c.industry === mapIndustry);
+  const filtered = mapIndustry === 'all' ? base : base.filter(c => c.industries.includes(mapIndustry));
 
   const dot = L.divIcon({ className: 'map-dot', iconSize: [14, 14] });
 
@@ -149,7 +149,7 @@ function renderMarkers() {
       <div class="map-popup">
         <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${c.name}</div>
         <div class="map-popup-loc">${loc}</div>
-        <div class="map-popup-industry">${c.industry}</div>
+        <div class="map-popup-industry">${c.industries.join(', ')}</div>
         <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche →</a>
       </div>
     `, { maxWidth: 210, autoPan: false });

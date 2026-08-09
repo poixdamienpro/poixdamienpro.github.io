@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadTaxonomy();
 
     const serviceCompanies = COMPANIES.filter(c => c.products.some(cat => SERVICE_CATS.includes(cat)));
-    const industries = [...new Set(serviceCompanies.map(c => c.industry))].sort();
+    const industries = [...new Set(serviceCompanies.flatMap(c => c.industries))].sort();
     const catsPresent = SERVICE_CATS.filter(cat => serviceCompanies.some(c => c.products.includes(cat)));
 
     initChips('presta-industry-chips', industries, () => prestaIndustry, v => { prestaIndustry = v; renderCompanies(); });
@@ -49,7 +49,7 @@ function filteredCompanies() {
   const base = window._serviceCompanies || [];
   return base.filter(c => {
     const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
-    return ms && (prestaIndustry === 'all' || c.industry === prestaIndustry) && (prestaCat === 'all' || c.products.includes(prestaCat));
+    return ms && (prestaIndustry === 'all' || c.industries.includes(prestaIndustry)) && (prestaCat === 'all' || c.products.includes(prestaCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 }
 
@@ -81,7 +81,7 @@ function renderCompanies() {
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${c.name}</span>
-        <span class="dir-row-sub">${c.country} · ${c.industry}</span>
+        <span class="dir-row-sub">${c.country} · ${c.industries.join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
@@ -115,7 +115,7 @@ function renderCompanyPreview(c) {
   const el = document.getElementById('company-preview');
   if(!el) return;
 
-  const details = [['Fondée', c.founded], ['Employés', c.employees], ['Secteur', c.industry], ['Siège', c.hq]]
+  const details = [['Fondée', c.founded], ['Employés', c.employees], ['Secteur', c.industries.join(', ')], ['Siège', c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
 
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
@@ -135,7 +135,7 @@ function renderCompanyPreview(c) {
       <div class="dp-badges">
         ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
         ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
-        <span class="tag tag-industry">${c.industry}</span>
+        ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
       <p class="dp-desc">${c.desc}</p>
       <div class="dp-section-label">Informations</div>

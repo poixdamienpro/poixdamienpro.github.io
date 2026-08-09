@@ -97,6 +97,7 @@ function mapCompany(row) {
     lng:       typeof row.lng === 'number' ? row.lng : (row.lng != null ? Number(row.lng) : null),
     isSystemier: row.is_systemier || false,
     industry:  row.industry,
+    industries: (row.industries && row.industries.length) ? row.industries : (row.industry ? [row.industry] : []),
     products:  row.categories || [],
     tags:      row.tags       || [],
     desc:      row.description || '',
@@ -151,11 +152,17 @@ function mapProduct(row) {
 // Charge COMPANIES/PRODUCTS/INDUSTRIES/PROD_CATS depuis Supabase.
 // Appelé par les pages qui en ont besoin (annuaire, catalogue, submit, home) — pas par toutes.
 async function loadTaxonomy() {
-  const [companiesRaw, productsRaw, tagsRaw, catsRaw] = await Promise.all([
+  const [companiesRaw, productsRaw, tagsRaw, catsRaw, indsRaw] = await Promise.all([
     fetchAllPaged('get_companies_page'),
     fetchAllPaged('get_products_page'),
     fetchAllPagedTable('company_tags',               'select=company_id,tag'),
     fetchAllPagedTable('company_product_categories', 'select=company_id,category'),
+    // .catch() dédié : tant que backend/supabase_add_company_industries.sql
+    // n'a pas été exécuté en base, cette table n'existe pas encore — on ne
+    // veut pas que loadTaxonomy() entier échoue pour autant (Promise.all
+    // rejetterait sinon), donc on retombe simplement sur [] (mapCompany()
+    // gère déjà ce cas en repliant sur l'industrie unique companies.industry).
+    fetchAllPagedTable('company_industries', 'select=company_id,industry').catch(() => []),
   ]);
 
   const tagsMap = {};
@@ -168,16 +175,22 @@ async function loadTaxonomy() {
     if (!catsMap[c.company_id]) catsMap[c.company_id] = [];
     catsMap[c.company_id].push(c.category);
   });
+  const indsMap = {};
+  indsRaw.forEach(i => {
+    if (!indsMap[i.company_id]) indsMap[i.company_id] = [];
+    indsMap[i.company_id].push(i.industry);
+  });
 
   COMPANIES = companiesRaw.map(row => {
     row.tags       = tagsMap[row.id]  || [];
     row.categories = catsMap[row.id]  || [];
+    row.industries = indsMap[row.id]  || [];
     return mapCompany(row);
   });
 
   PRODUCTS = productsRaw.map(mapProduct);
 
-  INDUSTRIES = [...new Set(COMPANIES.map(c => c.industry))].sort();
+  INDUSTRIES = [...new Set(COMPANIES.flatMap(c => c.industries))].sort();
   PROD_CATS  = [...new Set(COMPANIES.flatMap(c => c.products))].sort();
 }
 
