@@ -28,6 +28,23 @@ async function loadLayout() {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
   });
   logPageView();
+  await loadBuyerScript();
+}
+
+// Charge js/buyer.js dynamiquement (une seule fois, même si loadLayout()
+// est rappelé) plutôt que d'ajouter une balise <script> sur chacune des
+// dizaines de pages du site — voir js/buyer.js pour la logique de
+// session. Le lien #buyer-account-link (partials/nav.html) a besoin que
+// initBuyerSession() ait tourné pour afficher le bon état.
+function loadBuyerScript() {
+  return new Promise(resolve => {
+    if (typeof initBuyerSession === 'function') { initBuyerSession().then(resolve).catch(resolve); return; }
+    const s = document.createElement('script');
+    s.src = ROOT_PREFIX + 'js/buyer.js';
+    s.onload = () => { if (typeof initBuyerSession === 'function') initBuyerSession().then(resolve).catch(resolve); else resolve(); };
+    s.onerror = () => resolve();
+    document.head.appendChild(s);
+  });
 }
 
 // Log anonyme d'une vue de page (compté côté admin) — fire-and-forget,

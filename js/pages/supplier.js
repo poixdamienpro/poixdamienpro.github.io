@@ -196,6 +196,7 @@ async function supplierRouteAfterAuth() {
       renderPremiumBox();
       loadSupplierProducts();
       loadSupplierSubmissions();
+      loadSupplierLeads();
       handlePremiumReturn();
       return;
     }
@@ -305,6 +306,60 @@ async function loadSupplierSubmissions() {
     }).join('') + `</div>`;
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
+  }
+}
+
+// Demandes de devis reçues sur l'entreprise revendiquée (table `leads`,
+// voir backend/supabase_add_leads.sql — RLS scopée à claimed_by_user_id).
+async function loadSupplierLeads() {
+  const list = document.getElementById('sup-leads-list');
+  if (!list) return;
+  list.innerHTML = 'Chargement…';
+  try {
+    const rows = await supplierFetch(`leads?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=50`);
+    renderSupplierLeads(rows || []);
+  } catch (err) {
+    list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
+  }
+}
+
+function renderSupplierLeads(rows) {
+  const list = document.getElementById('sup-leads-list');
+  if (!rows.length) { list.innerHTML = '<p class="sup-empty">Aucune demande de devis pour le moment.</p>'; return; }
+  const statusMap = {
+    sent:     { cls: 'sup-pill-pending', txt: '⏳ À traiter' },
+    accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
+    rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
+  };
+  list.innerHTML = rows.map(r => {
+    const st = statusMap[r.status] || statusMap.sent;
+    return `
+      <div class="sup-lead">
+        <div class="sup-lead-head">
+          <span class="sup-lead-who">${r.buyer_name} · ${r.buyer_company}</span>
+          <span class="sup-pill ${st.cls}">${st.txt}</span>
+        </div>
+        <div class="sup-lead-meta">${r.buyer_email} · ${r.product_name ? r.product_name + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <p class="sup-lead-msg">${r.message}</p>
+        ${r.status === 'sent' ? `
+        <div class="sup-lead-actions">
+          <button class="btn-add-product sup-btn-sm" onclick="respondToLead('${r.id}','accepted')">✓ Accepter</button>
+          <button class="btn-remove-product" onclick="respondToLead('${r.id}','rejected')">✕ Refuser</button>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function respondToLead(id, status) {
+  try {
+    await supplierFetch(`leads?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status }),
+    });
+    loadSupplierLeads();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
   }
 }
 

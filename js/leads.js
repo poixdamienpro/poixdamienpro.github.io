@@ -19,12 +19,14 @@ function openLeadModal(targetName, productName, companyId) {
 }
 
 function resetLeadForm() {
+  const p = (typeof buyerProfile !== 'undefined' && buyerProfile) ? buyerProfile : null;
   document.getElementById('lead-body').innerHTML = `
     <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non, vous ne serez jamais inscrit à une liste de diffusion.</p>
+    ${p ? '' : `<p class="lead-intro" style="margin-top:-8px"><a href="${ROOT_PREFIX}pages/compte-acheteur.html">Se connecter</a> pour préremplir vos infos et retrouver l'historique de vos demandes.</p>`}
     <form id="lead-form" onsubmit="submitLeadForm(event)">
-      <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" required/></div>
-      <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" required/></div>
-      <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" required/></div>
+      <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" value="${p && p.name ? p.name.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" value="${p && p.email ? p.email.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" value="${p && p.company ? p.company.replace(/"/g,'&quot;') : ''}" required/></div>
       <div class="lead-field"><label>Votre besoin</label><textarea id="lead-need" required placeholder="Quantité, contraintes techniques, délai…"></textarea></div>
       <button type="submit" class="btn-quote" style="width:100%;justify-content:center">📩 Envoyer la demande</button>
     </form>`;
@@ -64,11 +66,15 @@ async function submitLeadForm(e) {
     // Trace en base, best-effort : l'email ci-dessus est le canal
     // critique et vient de réussir — si Supabase est indisponible, on ne
     // bloque jamais le buyer pour autant, on logue juste l'échec.
+    // Si un compte acheteur est connecté, on envoie avec SON token (pas
+    // la clé anon) pour que buyer_user_id passe la policy RLS
+    // buyer_insert_own_lead — voir backend/supabase_add_buyer_accounts.sql.
+    const session = (typeof buyerSession === 'function') ? buyerSession() : null;
     fetch(`${SUPABASE_URL}/rest/v1/leads`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_ANON,
-        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Authorization': 'Bearer ' + (session ? session.token : SUPABASE_ANON),
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal',
       },
@@ -79,6 +85,7 @@ async function submitLeadForm(e) {
         buyer_name: name,
         buyer_email: email,
         buyer_company: company,
+        buyer_user_id: session ? session.userId : null,
         message: need,
       }),
     }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); })

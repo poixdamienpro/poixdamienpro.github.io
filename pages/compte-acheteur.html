@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mon compte · Buy-inner</title>
+<meta name="description" content="Créez un compte acheteur gratuit pour préremplir vos demandes de devis et retrouver leur historique sur Buy-inner."/>
+<meta name="robots" content="noindex,follow"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'compte-acheteur';</script>
+<script src="../js/analytics.js"></script>
+</head>
+<body class="theme-dark">
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Mon <span>compte</span></h1>
+      <p class="page-subtitle">Optionnel et gratuit — préremplissez vos demandes de devis et retrouvez leur historique. Aucun compte n'est nécessaire pour utiliser Buy-inner.</p>
+    </div>
+  </div>
+</header>
+
+<div class="submit-wrap">
+
+  <!-- État : non connecté -->
+  <div id="acc-auth-box">
+    <div class="sup-gate">
+      <aside class="sup-gate-aside">
+        <span class="section-eyebrow">// POURQUOI SE CONNECTER</span>
+        <h2 class="sup-gate-title">Vos demandes, <em>retrouvées en un clic.</em></h2>
+        <ul class="sup-gate-points">
+          <li><span class="sup-gate-ico">✓</span><span>Nom, email et entreprise <strong>préremplis</strong> à chaque demande de devis.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>L'historique de toutes vos demandes envoyées, avec leur statut.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span>Toujours <strong>100&nbsp;% gratuit</strong>, jamais obligatoire pour utiliser l'annuaire.</span></li>
+        </ul>
+      </aside>
+
+      <div class="sup-gate-card">
+        <div class="submit-section-title">Se connecter</div>
+        <form onsubmit="handleBuyerLogin(event)">
+          <div class="lead-field"><label>Email</label><input type="email" id="acc-login-email" required/></div>
+          <div class="lead-field"><label>Mot de passe</label><input type="password" id="acc-login-password" required/></div>
+          <button type="submit" class="btn-submit-form">Se connecter</button>
+        </form>
+        <div class="sup-gate-sep"><span>nouveau&nbsp;?</span></div>
+        <div class="submit-section-title">Créer un compte</div>
+        <form onsubmit="handleBuyerSignup(event)">
+          <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-signup-name" required/></div>
+          <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-signup-company" required/></div>
+          <div class="lead-field"><label>Email</label><input type="email" id="acc-signup-email" required/></div>
+          <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="acc-signup-password" minlength="8" required/></div>
+          <button type="submit" class="btn-submit-form">Créer mon compte</button>
+        </form>
+        <p id="acc-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- État : connecté -->
+  <div id="acc-dashboard" style="display:none">
+    <div class="product-block-header">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">Mon profil</span>
+      <button class="btn-remove-product" onclick="handleBuyerLogout()">Se déconnecter</button>
+    </div>
+    <div class="sup-panel">
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Nom</div><div class="detail-value" id="acc-name">—</div></div>
+        <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value" id="acc-email">—</div></div>
+        <div class="detail-item"><div class="detail-label">Entreprise</div><div class="detail-value" id="acc-company">—</div></div>
+      </div>
+    </div>
+
+    <div class="sup-panel">
+      <span class="submit-section-title" style="border:none;padding:0">Historique de mes demandes</span>
+      <div id="acc-leads-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/pages/compte-acheteur.js"></script>
+</body>
+</html>
