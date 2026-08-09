@@ -97,7 +97,15 @@
 
   <!-- État: connecté, entreprise revendiquée — tableau de bord -->
   <div id="sup-dashboard" style="display:none">
-    <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+    <div class="product-block-header">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn-add-product sup-btn-sm" onclick="openCompanyEditForm()">Modifier la fiche</button>
+        <button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button>
+      </div>
+    </div>
+
+    <div id="sup-company-form-wrap" style="display:none;margin-bottom:18px"></div>
 
     <div class="sup-stats" id="sup-stats"></div>
 

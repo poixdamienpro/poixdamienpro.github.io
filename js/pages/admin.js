@@ -195,7 +195,25 @@ function renderAdminSubmissions(rows) {
     list.innerHTML = '<div class="admin-empty">Aucune soumission en attente. 🎉</div>';
     return;
   }
-  list.innerHTML = rows.map(r => `
+  list.innerHTML = rows.map(r => r.submission_type === 'company_update' ? `
+    <div class="admin-card" id="admin-card-${r.id}">
+      <div class="admin-card-head">
+        <div>
+          <div class="admin-card-title">🏢 Modification fiche entreprise · ${r.company_name || ''}</div>
+          <div class="admin-card-meta">Soumis par ${r.submitter_name || r.submitter_email} (${r.submitter_email}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        </div>
+      </div>
+      <div class="admin-field-row"><span>Description</span><span>${r.company_description || '—'}</span></div>
+      <div class="admin-field-row"><span>Site web</span><span>${r.company_site || '—'}</span></div>
+      <div class="admin-field-row"><span>Siège</span><span>${r.company_hq || '—'}</span></div>
+      <div class="admin-field-row"><span>Pays</span><span>${r.company_country || '—'}</span></div>
+      <div class="admin-field-row"><span>Industrie</span><span>${r.company_industry || '—'}</span></div>
+      <div class="admin-field-row"><span>Email de contact</span><span>${r.company_contact_email || '—'}</span></div>
+      <div class="admin-actions">
+        <button class="btn-approve" onclick="approveSubmission('${r.id}')">✓ Approuver et publier</button>
+        <button class="btn-reject" onclick="rejectSubmission('${r.id}')">✕ Rejeter</button>
+      </div>
+    </div>` : `
     <div class="admin-card" id="admin-card-${r.id}">
       <div class="admin-card-head">
         <div>
@@ -234,6 +252,8 @@ async function approveSubmission(id) {
       await applyUpdateSubmission(sub);
     } else if (sub.submission_type === 'delete') {
       await applyDeleteSubmission(sub);
+    } else if (sub.submission_type === 'company_update') {
+      companyId = await applyCompanyUpdateSubmission(sub);
     } else {
       companyId = await applyNewSubmission(sub);
     }
@@ -243,7 +263,9 @@ async function approveSubmission(id) {
       body: JSON.stringify({ status: 'approved' }),
     });
 
-    if (sub.submission_type !== 'delete' && sub.submitter_email && companyId) {
+    // "Votre fiche est publiée" n'a de sens que pour une toute nouvelle
+    // entreprise — pas pour une mise à jour produit ou fiche entreprise.
+    if (sub.submission_type === 'new' && sub.submitter_email && companyId) {
       sendTransactionalEmail('submission_approved', sub.submitter_email, {
         submitterName: sub.submitter_name || sub.submitter_email,
         companyName: sub.company_name,
@@ -301,6 +323,23 @@ async function applyUpdateSubmission(sub) {
       body: JSON.stringify(sub.product_certs.map(c => ({ product_id: productId, cert_name: c }))),
     });
   }
+}
+
+async function applyCompanyUpdateSubmission(sub) {
+  const companyId = sub.company_id;
+  if (!companyId) return null;
+  await adminFetch(`companies?id=eq.${companyId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      description: sub.company_description,
+      site: sub.company_site,
+      hq: sub.company_hq,
+      country: sub.company_country,
+      industry: sub.company_industry,
+      contact_email: sub.company_contact_email,
+    }),
+  });
+  return companyId;
 }
 
 async function applyNewSubmission(sub) {

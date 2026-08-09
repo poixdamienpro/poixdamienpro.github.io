@@ -89,6 +89,65 @@ async function handlePremiumReturn() {
   }
 }
 
+// Modification de la fiche entreprise — comme les produits, ça passe par
+// product_submissions (submission_type: 'company_update') et validation
+// admin, jamais d'écriture directe. Voir js/pages/admin.js pour le
+// traitement côté validation (applyCompanyUpdateSubmission).
+function openCompanyEditForm() {
+  const wrap = document.getElementById('sup-company-form-wrap');
+  if (!wrap || !supplierCompany) return;
+  const c = supplierCompany;
+  const esc = v => (v || '').replace(/"/g, '&quot;');
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="sup-panel">
+      <div class="submit-section-title">Modifier la fiche entreprise</div>
+      <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Comme pour les produits, la modification est soumise à validation avant d'être publiée.</p>
+      <form onsubmit="submitCompanyEditForm(event)">
+        <div class="lead-field"><label>Description</label><textarea id="sup-c-desc" rows="3">${c.desc || ''}</textarea></div>
+        <div class="lead-field"><label>Site web</label><input type="url" id="sup-c-site" value="${esc(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
+        <div class="lead-field"><label>Siège (ville)</label><input type="text" id="sup-c-hq" value="${esc(c.hq)}"/></div>
+        <div class="lead-field"><label>Pays</label><input type="text" id="sup-c-country" value="${esc(c.country)}"/></div>
+        <div class="lead-field"><label>Industrie</label><input type="text" id="sup-c-industry" value="${esc(c.industry)}"/></div>
+        <div class="lead-field"><label>Email de contact</label><input type="email" id="sup-c-contact" value="${esc(c.contact)}"/></div>
+        <div class="submit-actions">
+          <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
+          <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-company-form-wrap').style.display='none'">Annuler</button>
+        </div>
+      </form>`;
+}
+
+async function submitCompanyEditForm(e) {
+  e.preventDefault();
+  try {
+    await supplierFetch('product_submissions', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify([{
+        submission_type: 'company_update',
+        company_id: supplierCompany.id,
+        submitter_user_id: sessionStorage.getItem('sup_user_id'),
+        submitter_name: supplierCompany.name,
+        submitter_email: sessionStorage.getItem('sup_email'),
+        company_name: supplierCompany.name,
+        company_description: document.getElementById('sup-c-desc').value || null,
+        company_site: document.getElementById('sup-c-site').value || null,
+        company_hq: document.getElementById('sup-c-hq').value || null,
+        company_country: document.getElementById('sup-c-country').value || null,
+        company_industry: document.getElementById('sup-c-industry').value || null,
+        company_contact_email: document.getElementById('sup-c-contact').value || null,
+        product_name: 'Fiche entreprise',
+        product_category: '—',
+      }]),
+    });
+    document.getElementById('sup-company-form-wrap').style.display = 'none';
+    alert('Demande envoyée, en attente de validation admin.');
+    loadSupplierSubmissions();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
 async function supplierFetch(path, options = {}) {
   const token = sessionStorage.getItem('sup_access_token');
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
