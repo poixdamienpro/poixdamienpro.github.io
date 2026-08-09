@@ -5,28 +5,36 @@
 // ═══════════════════════════════
 let supplierCompany = null; // entreprise revendiquée (si déjà approuvée)
 let supplierEditingProductId = null; // null = ajout, sinon id du produit en cours d'édition
-let supStatProducts = null, supStatPending = null, supStatApproved = null; // compteurs du bandeau
+let supStatProducts = null, supStatPending = null, supStatApproved = null, supStatLeadsPending = null; // compteurs du bandeau
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   tryRestoreSupplierSession();
 });
 
-// Met en surbrillance l'étape courante du parcours (1 Compte, 2 Revendiquer, 3 Publier)
+// Met en surbrillance l'étape courante du parcours (1 Compte, 2 Revendiquer,
+// 3 Publier) — n'a de sens que pendant l'onboarding : une fois le dashboard
+// atteint (étape 3), le stepper n'apporte plus rien en permanence, on le masque.
 function setSupplierStep(step) {
   const el = document.getElementById('sup-steps');
-  if (el) el.setAttribute('data-step', step);
+  if (!el) return;
+  el.setAttribute('data-step', step);
+  el.style.display = step >= 3 ? 'none' : '';
 }
 
-// Bandeau de stats du tableau de bord (valeurs réelles calculées côté client)
+// Bandeau de stats du tableau de bord (valeurs réelles calculées côté client).
+// "Leads à traiter" en premier : c'est le plus actionnable/urgent des 4 —
+// distinct des soumissions produit ("Soumissions...") pour éviter toute
+// confusion entre les deux notions de "demande" sur la même page.
 function renderSupplierStats() {
   const el = document.getElementById('sup-stats');
   if (!el) return;
   const fmt = v => (v === null ? '—' : v);
   el.innerHTML = `
+    <div class="sup-stat"><span class="sup-stat-n ${supStatLeadsPending ? 'sup-stat-pending' : ''}">${fmt(supStatLeadsPending)}</span><span class="sup-stat-l">Leads à traiter</span></div>
     <div class="sup-stat"><span class="sup-stat-n">${fmt(supStatProducts)}</span><span class="sup-stat-l">Produits publiés</span></div>
-    <div class="sup-stat"><span class="sup-stat-n sup-stat-pending">${fmt(supStatPending)}</span><span class="sup-stat-l">Demandes en attente</span></div>
-    <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">Demandes approuvées</span></div>`;
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-pending">${fmt(supStatPending)}</span><span class="sup-stat-l">Soumissions en attente</span></div>
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">Soumissions approuvées</span></div>`;
 }
 
 // Bandeau Premium : bouton d'abonnement, ou confirmation si déjà actif.
@@ -376,6 +384,8 @@ async function loadSupplierLeads() {
   list.innerHTML = 'Chargement…';
   try {
     const rows = await supplierFetch(`leads?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=50`);
+    supStatLeadsPending = (rows || []).filter(r => r.status === 'sent').length;
+    renderSupplierStats();
     renderSupplierLeads(rows || []);
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;

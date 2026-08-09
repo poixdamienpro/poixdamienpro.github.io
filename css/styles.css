@@ -461,7 +461,8 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .sup-premium-active{background:rgba(210,162,63,.10);border:1px solid rgba(210,162,63,.35);border-radius:12px;padding:14px 20px;margin-bottom:18px;font-size:13px;color:#E8CD86}
 
 /* Bandeau de stats */
-.sup-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.sup-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:900px){.sup-stats{grid-template-columns:repeat(2,1fr)}}
 .sup-stat{background:var(--white);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
 .sup-stat-n{font-family:var(--serif);font-size:30px;color:#F3F1EC;line-height:1}
 .sup-stat-n.sup-stat-pending{color:#E3C57E}
