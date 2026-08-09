@@ -68,14 +68,18 @@
   <div id="acc-dashboard" style="display:none">
     <div class="product-block-header">
       <span class="submit-section-title" style="margin:0;border:none;padding:0">Mon profil</span>
-      <button class="btn-remove-product" onclick="handleBuyerLogout()">Se déconnecter</button>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="btn-add-product sup-btn-sm" onclick="openBuyerProfileForm()">Modifier</button>
+        <button class="btn-remove-product" onclick="handleBuyerLogout()">Se déconnecter</button>
+      </div>
     </div>
     <div class="sup-panel">
-      <div class="detail-grid">
+      <div class="detail-grid" id="acc-profile-view">
         <div class="detail-item"><div class="detail-label">Nom</div><div class="detail-value" id="acc-name">—</div></div>
         <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value" id="acc-email">—</div></div>
         <div class="detail-item"><div class="detail-label">Entreprise</div><div class="detail-value" id="acc-company">—</div></div>
       </div>
+      <div id="acc-profile-form-wrap" style="display:none"></div>
     </div>
 
     <div class="sup-panel">

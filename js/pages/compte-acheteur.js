@@ -20,6 +20,48 @@ function renderAccountState() {
   }
 }
 
+function openBuyerProfileForm() {
+  const wrap = document.getElementById('acc-profile-form-wrap');
+  const view = document.getElementById('acc-profile-view');
+  const p = buyerProfile || {};
+  const esc = v => (v || '').replace(/"/g, '&quot;');
+  view.style.display = 'none';
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <form onsubmit="submitBuyerProfileForm(event)">
+      <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-p-name" value="${esc(p.name)}"/></div>
+      <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-p-company" value="${esc(p.company)}"/></div>
+      <div class="submit-actions">
+        <button type="submit" class="btn-submit-form">Enregistrer</button>
+        <button type="button" class="btn-remove-product" onclick="closeBuyerProfileForm()">Annuler</button>
+      </div>
+    </form>`;
+}
+
+function closeBuyerProfileForm() {
+  document.getElementById('acc-profile-form-wrap').style.display = 'none';
+  document.getElementById('acc-profile-view').style.display = '';
+}
+
+async function submitBuyerProfileForm(e) {
+  e.preventDefault();
+  const name = document.getElementById('acc-p-name').value;
+  const company = document.getElementById('acc-p-company').value;
+  try {
+    const session = buyerSession();
+    await buyerFetch(`buyer_profiles?user_id=eq.${session.userId}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ name, company }),
+    });
+    buyerProfile = { ...(buyerProfile || {}), name, company };
+    closeBuyerProfileForm();
+    renderAccountState();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
 function showAccMessage(msg, isError) {
   const box = document.getElementById('acc-auth-message');
   box.textContent = msg;

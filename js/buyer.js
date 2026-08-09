@@ -126,6 +126,27 @@ async function buyerLogin(email, password) {
   localStorage.setItem('buyer_refresh_token', data.refresh_token);
   localStorage.setItem('buyer_user_id', data.user.id);
   await loadBuyerProfile();
+
+  // Compte auth.users existant sans ligne buyer_profiles (ex. un compte
+  // admin ou fournisseur qui se connecte ici pour la première fois avec
+  // les mêmes identifiants) — on crée un profil minimal plutôt que de
+  // laisser un état "connecté mais vide".
+  if (!buyerProfile) {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/buyer_profiles`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON,
+          'Authorization': 'Bearer ' + data.access_token,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify([{ user_id: data.user.id, name: '', email, company: '' }]),
+      });
+      buyerProfile = { user_id: data.user.id, name: '', email, company: '' };
+    } catch { /* pas bloquant, le profil restera vide et éditable plus tard */ }
+  }
+
   updateBuyerNavUI();
 }
 
