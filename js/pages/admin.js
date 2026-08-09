@@ -229,18 +229,27 @@ async function approveSubmission(id) {
   buttons.forEach(b => b.disabled = true);
 
   try {
+    let companyId = sub.company_id || null;
     if (sub.submission_type === 'update') {
       await applyUpdateSubmission(sub);
     } else if (sub.submission_type === 'delete') {
       await applyDeleteSubmission(sub);
     } else {
-      await applyNewSubmission(sub);
+      companyId = await applyNewSubmission(sub);
     }
 
     await adminFetch(`product_submissions?id=eq.${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ status: 'approved' }),
     });
+
+    if (sub.submission_type !== 'delete' && sub.submitter_email && companyId) {
+      sendTransactionalEmail('submission_approved', sub.submitter_email, {
+        submitterName: sub.submitter_name || sub.submitter_email,
+        companyName: sub.company_name,
+        link: `https://www.buy-inner.com/pages/entreprise.html?id=${companyId}`,
+      });
+    }
 
     card.remove();
     delete adminSubmissionsCache[id];
@@ -362,6 +371,8 @@ async function applyNewSubmission(sub) {
       method: 'POST',
       body: JSON.stringify([{ company_id: companyId, category: sub.product_category }]),
     });
+
+    return companyId;
 }
 
 async function rejectSubmission(id) {
@@ -433,6 +444,14 @@ async function approveClaim(id) {
       method: 'PATCH',
       body: JSON.stringify({ status: 'approved' }),
     });
+
+    if (claim.user_email) {
+      sendTransactionalEmail('claim_approved', claim.user_email, {
+        companyName: (claim.companies && claim.companies.name) || 'votre entreprise',
+        link: `https://www.buy-inner.com/pages/supplier.html`,
+      });
+    }
+
     card.remove();
     delete adminClaimsCache[id];
     if (!Object.keys(adminClaimsCache).length) {

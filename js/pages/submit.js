@@ -198,6 +198,10 @@ async function submitSupplierForm(e) {
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
+    sendTransactionalEmail('submission_confirmation', submitterEmail, {
+      submitterName, companyName,
+    });
+
     const stepper = document.getElementById('sub-steps');
     if (stepper) stepper.style.display = 'none';
     document.getElementById('submit-wrap').innerHTML = `

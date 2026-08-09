@@ -17,6 +17,26 @@ const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const LOGO_DEV_TOKEN  = 'pk_auyA2g6JQ6aVtkiqtPU2xg';
 
 // ═══════════════════════════════
+// EMAILS TRANSACTIONNELS — relayés par le Worker Cloudflare
+// (/api/send-email -> Resend, clé secrète côté Worker, voir
+// cloudflare/supabase-proxy-worker.js). Best-effort à chaque site
+// d'appel : un échec ne doit jamais bloquer le flux principal (soumission,
+// approbation...), on logue juste l'erreur en console.
+// ═══════════════════════════════
+async function sendTransactionalEmail(type, to, params) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/send-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, to, params }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch (err) {
+    console.error(`Erreur envoi email transactionnel (${type}):`, err);
+  }
+}
+
+// ═══════════════════════════════
 // DATA — chargée depuis Supabase
 // ═══════════════════════════════
 let INDUSTRIES = [];
