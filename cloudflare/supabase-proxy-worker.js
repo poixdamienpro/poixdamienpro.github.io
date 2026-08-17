@@ -11,6 +11,17 @@
 //    (abonnement Premium 1500€/an) pour une entreprise deja revendiquee.
 //  - /api/stripe-webhook : recoit les evenements Stripe (paiement reussi,
 //    abonnement annule/impaye) et met a jour companies.premium en base.
+//  - /pages/entreprise.html et /pages/produit.html : injecte le vrai
+//    contenu (nom, description, specs) dans le HTML AVANT de le servir,
+//    pour tout le monde (pas seulement les robots — zero risque de
+//    cloaking, et ca evite aussi le flash "Chargement..." pour un vrai
+//    visiteur). Sans ca, ces ~550 pages partent avec un HTML quasi vide
+//    ("Chargement...") tant que le JS client n'a pas fini d'aller
+//    chercher les donnees chez Supabase — Google les classait en
+//    soft-404 / "decouvertes, non indexees" a cause de ca (voir Search
+//    Console, aout 2026). Le JS client continue de tourner par-dessus
+//    normalement (hydratation), ce bloc ne fait qu'ameliorer le tout
+//    premier rendu.
 //
 // Toutes les cles secretes (RESEND_API_KEY, STRIPE_SECRET_KEY,
 // STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SUPABASE_SERVICE_ROLE_KEY)
@@ -21,8 +32,10 @@
 //
 // Deploiement : colle ce fichier tel quel dans l'editeur du Worker sur
 // le dashboard Cloudflare (Workers & Pages -> ton worker -> Edit code).
-// Route a configurer : www.buy-inner.com/api/*
-// (voir Settings -> Domains & Routes sur le Worker)
+// Routes a configurer (Settings -> Domains & Routes) :
+//   www.buy-inner.com/api/*
+//   www.buy-inner.com/pages/entreprise.html*
+//   www.buy-inner.com/pages/produit.html*
 //
 // Cote site : js/data.js doit avoir
 //   const SUPABASE_URL = 'https://www.buy-inner.com/api';
@@ -30,6 +43,10 @@
 // ═══════════════════════════════
 
 const SUPABASE_ORIGIN = 'https://pzejxwrtsglmiitbhpjr.supabase.co';
+// Cle publique "anon" — deliberement embarquable cote client (identique
+// a celle deja presente en clair dans js/data.js), pas un secret.
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6ZWp4d3J0c2dsbWlpdGJocGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTEwNTMsImV4cCI6MjA5Njk4NzA1M30.-SpxNs7G_5nEuZCXL68lNVcCzFTyiaZc93dViix76Ok';
+const GITHUB_PAGES_ORIGIN = 'https://poixdamienpro.github.io';
 const RESEND_FROM = 'Buy-inner <noreply@buy-inner.com>';
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SITE_URL = 'https://www.buy-inner.com';
@@ -180,6 +197,112 @@ async function patchCompanies(env, filterQuery, patchBody) {
   });
 }
 
+// ── Pré-rendu : injection du vrai contenu dans entreprise.html / produit.html ──
+async function fetchRpcRow(rpcName, params) {
+  const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/${rpcName}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return (rows && rows[0]) || null;
+}
+
+class SetHtml {
+  constructor(html) { this.html = html; }
+  element(el) { el.setInnerContent(this.html, { html: true }); }
+}
+class SetAttr {
+  constructor(attr, value) { this.attr = attr; this.value = value; }
+  element(el) { el.setAttribute(this.attr, this.value); }
+}
+
+async function handleEntreprisePage(request, env, ctx) {
+  const url = new URL(request.url);
+  const cache = caches.default;
+  const cacheKey = new Request(url.toString(), request);
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
+
+  const originRes = await fetch(GITHUB_PAGES_ORIGIN + '/pages/entreprise.html' + url.search);
+  const id = url.searchParams.get('id');
+  if (!id) return originRes;
+
+  const c = await fetchRpcRow('get_company_by_id', { p_id: id });
+  if (!c) return originRes;
+
+  const title = `${c.name} — ${c.industry || ''} — Buy-inner`;
+  const desc = (c.description || `${c.name}, équipementier ${c.industry || ''}`).slice(0, 160);
+  const headerHtml = `<h1 class="page-title">${escapeHtml(c.name)}</h1><p class="page-subtitle">${escapeHtml(c.country || '')} · ${escapeHtml(c.hq || '')} — ${escapeHtml(c.industry || '')}</p>`;
+  const bodyHtml = `
+    <div class="modal-section">
+      <div class="modal-section-title">Description</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(c.description || '')}</p>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Informations société</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Fondée en</div><div class="detail-value">${escapeHtml(c.founded || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">Effectifs</div><div class="detail-value">${escapeHtml(c.employees || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">Secteur</div><div class="detail-value">${escapeHtml(c.industry || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">Siège</div><div class="detail-value">${escapeHtml(c.hq || '—')}</div></div>
+      </div>
+    </div>`;
+
+  let response = new HTMLRewriter()
+    .on('title', new SetHtml(escapeHtml(title)))
+    .on('meta[name="description"]', new SetAttr('content', desc))
+    .on('#ent-header', new SetHtml(headerHtml))
+    .on('#ent-body', new SetHtml(bodyHtml))
+    .transform(originRes);
+
+  response = new Response(response.body, response);
+  response.headers.set('Cache-Control', 'public, max-age=600');
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
+async function handleProduitPage(request, env, ctx) {
+  const url = new URL(request.url);
+  const cache = caches.default;
+  const cacheKey = new Request(url.toString(), request);
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
+
+  const originRes = await fetch(GITHUB_PAGES_ORIGIN + '/pages/produit.html' + url.search);
+  const id = url.searchParams.get('id');
+  if (!id) return originRes;
+
+  const p = await fetchRpcRow('get_product_by_id', { p_id: id });
+  if (!p) return originRes;
+
+  const title = `${p.name} — ${p.company_name || ''} — Buy-inner`;
+  const desc = (p.description || `${p.name} par ${p.company_name || ''}`).slice(0, 160);
+  const headerHtml = `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(p.name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(p.category || '')} ${p.industry ? '· ' + escapeHtml(p.industry) : ''}</p>`;
+  const bodyHtml = `
+    <div class="modal-section">
+      <div class="modal-section-title">Description</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.description || '')}</p>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Fabricant</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.company_name || '')} — <a href="entreprise.html?id=${escapeHtml(p.company_id || '')}">Voir la fiche →</a></p>
+    </div>`;
+
+  let response = new HTMLRewriter()
+    .on('title', new SetHtml(escapeHtml(title)))
+    .on('meta[name="description"]', new SetAttr('content', desc))
+    .on('#prod-header', new SetHtml(headerHtml))
+    .on('#prod-body', new SetHtml(bodyHtml))
+    .transform(originRes);
+
+  response = new Response(response.body, response);
+  response.headers.set('Cache-Control', 'public, max-age=600');
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
 async function handleStripeWebhook(request, env) {
   if (!env.STRIPE_WEBHOOK_SECRET || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: 'Webhook Stripe non configuré sur le Worker' }, 500);
@@ -228,8 +351,15 @@ async function handleStripeWebhook(request, env) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    if (url.pathname === '/pages/entreprise.html') {
+      return handleEntreprisePage(request, env, ctx);
+    }
+    if (url.pathname === '/pages/produit.html') {
+      return handleProduitPage(request, env, ctx);
+    }
 
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });

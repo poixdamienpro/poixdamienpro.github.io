@@ -58,16 +58,21 @@ function renderProduct(p) {
   injectProductJsonLd(p);
 }
 
+// "Thing" plutôt que "Product" : la plupart des fiches sont "Sur devis"
+// (pas de prix fixe) et sans avis clients — un vrai schema.org Product
+// exige offers/review/aggregateRating, que Google signale en erreur
+// (Search Console) s'ils sont absents. "Thing" décrit correctement la
+// fiche sans revendiquer une éligibilité aux résultats enrichis Produit
+// qu'on ne peut pas honnêtement remplir.
 function injectProductJsonLd(p) {
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.textContent = JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Product',
+    '@type': 'Thing',
     name: p.name,
     description: p.desc,
-    category: p.cat,
-    brand: { '@type': 'Brand', name: p.maker },
+    additionalType: p.cat,
   });
   document.head.appendChild(script);
 }
