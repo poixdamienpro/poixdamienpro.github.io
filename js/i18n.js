@@ -15,6 +15,7 @@ const TRANSLATIONS = {
     nav_fournisseur:     'Espace fournisseur',
     nav_mon_compte:      'Mon compte',
     nav_referencer:      'Référencer mon entreprise',
+    footer_cgv:          'CGV',
     nav_pill:            '✓ Annuaire & specs 100% gratuits',
     ticker_label:        '// NOUVEAU',
 
@@ -160,6 +161,7 @@ const TRANSLATIONS = {
     nav_fournisseur:     'Supplier Portal',
     nav_mon_compte:      'My account',
     nav_referencer:      'List my company',
+    footer_cgv:          'Terms of sale',
     nav_pill:            '✓ Directory & specs 100% free',
     ticker_label:        '// NEW',
 
