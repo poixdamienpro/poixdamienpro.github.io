@@ -100,8 +100,9 @@ function sizeMapWrap() {
 function initMap() {
   map = L.map('map-canvas', { worldCopyJump: true }).setView([50.5, 10], 4);
 
-  // Fond de carte clair (CARTO light_all / Positron — gratuit, sans clé API)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  // Fond de carte clair (CARTO light_all / Positron) — CARTO exige désormais une
+  // clé API gratuite (fair use, 5M requêtes/mois) même pour ce style public.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2nux_1_e0fa27c2f88426a4f5df2e90', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
