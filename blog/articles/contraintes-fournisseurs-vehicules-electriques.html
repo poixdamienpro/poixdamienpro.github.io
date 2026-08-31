@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Fournisseurs véhicules électriques : sourcer une chaîne de traction (3/5) | Buy-inner</title>
+<meta name="description" content="ISO 26262, homologations R100 et UN38.3, architecture 400V vs 800V, LFP vs NMC — les contraintes qui structurent le sourcing de la chaîne de traction électrique."/>
+<meta name="keywords" content="fournisseur vehicule electrique, ISO 26262, ASIL, architecture 400V 800V, OBC chargeur embarque, fournisseur batterie VE France"/>
+<meta property="og:title" content="Fournisseurs véhicules électriques : sourcer une chaîne de traction (3/5)"/>
+<meta property="og:description" content="ISO 26262, homologations R100 et UN38.3, architecture 400V vs 800V, LFP vs NMC — les contraintes du sourcing de la chaîne de traction électrique."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-vehicules-electriques.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Fournisseurs véhicules électriques : sourcer une chaîne de traction (3/5)",
+  "description": "ISO 26262, homologations R100 et UN38.3, architecture 400V vs 800V, LFP vs NMC — les contraintes du sourcing de la chaîne de traction électrique.",
+  "url": "https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-vehicules-electriques.html",
+  "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.buy-inner.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides techniques", "item": "https://www.buy-inner.com/blog/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "Contraintes fournisseurs véhicules électriques", "item": "https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-vehicules-electriques.html" }
+  ]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'blog';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 48px}
+.cat-hero-inner{max-width:820px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.part-badge{background:rgba(212,80,10,.14);color:#F0975C;border:1px solid rgba(212,80,10,.35);border-radius:4px;padding:2px 8px;font-size:10px;letter-spacing:.06em}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,44px);line-height:1.15;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);line-height:1.7}
+.article-meta{font-family:var(--mono);font-size:11px;color:var(--t-low);margin-top:20px;display:flex;gap:16px}
+
+.cat-body{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.cat-section{margin-top:56px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3vw,32px);margin-bottom:16px;line-height:1.15}
+.cat-section h2 em{font-style:italic;color:var(--steel)}
+.cat-section h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--t-hi)}
+.cat-section p{color:var(--t-mid);font-size:16px;line-height:1.8;margin-bottom:20px}
+.cat-section p strong{color:var(--t-hi)}
+.cat-section ul,.cat-section ol{color:var(--t-mid);font-size:15px;line-height:1.8;margin:0 0 20px;padding-left:22px}
+.cat-section li{margin-bottom:8px}
+.cat-section li::marker{color:var(--rust)}
+
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 24px}
+.specs-table th{text-align:left;padding:10px 14px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.06em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500}
+.specs-table tr:last-child td{border-bottom:0}
+
+.pitfall-box{background:rgba(212,80,10,.06);border:1px solid rgba(212,80,10,.3);border-radius:10px;padding:18px 22px;margin:20px 0}
+.pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.pitfall-box p{margin:0;font-size:14px}
+
+.checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
+.checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
+.checklist label:last-child{margin-bottom:0}
+.checklist input{margin-top:3px;accent-color:var(--rust)}
+
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
+.next-part{margin-top:56px;background:rgba(91,139,181,.06);border:1px solid rgba(91,139,181,.28);border-radius:14px;padding:28px 32px}
+.next-part-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8FB4D6;margin-bottom:10px}
+.next-part h2{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:10px}
+.next-part p{color:var(--t-mid);font-size:14.5px;line-height:1.75;margin:0}
+
+.cat-cta{margin-top:32px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(22px,3vw,30px);font-weight:400;margin-bottom:10px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:15px;margin-bottom:24px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../index.html">Guides techniques</a><span>/</span>
+      <span style="color:var(--t-mid)">Fournisseurs véhicules électriques</span>
+    </nav>
+    <div class="cat-eyebrow">Guide sectoriel · Contraintes fournisseurs <span class="part-badge">PARTIE 3/5</span></div>
+    <h1>Véhicules électriques : sourcer <em>une chaîne, pas un composant</em></h1>
+    <p class="cat-hero-desc">
+      Troisième volet de la série. En VE, personne ne source « une batterie » — on source une chaîne de traction complète, où chaque choix d'architecture verrouille les composants compatibles en amont et en aval.
+    </p>
+    <div class="article-meta"><span>7 min de lecture</span><span>Niveau : ingénieur / bureau d'études</span></div>
+    <a class="related-link" href="../../pages/fournisseurs-vehicules-electriques.html" style="margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(91,139,181,.08);border:1px solid rgba(91,139,181,.28);border-radius:8px;font-size:12.5px;color:var(--t-mid);text-decoration:none;width:fit-content">← Voir aussi : <strong style="color:#8FB4D6;font-weight:600">Fournisseurs véhicules électriques référencés</strong></a>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <div class="cat-section" style="margin-top:48px">
+    <p>L'électrification de la mobilité ne se résume pas à choisir une cellule. C'est une chaîne complète — cellules et packs, chargeur embarqué (OBC), convertisseurs DC/DC, distribution haute tension — où chaque maillon impose des contraintes de compatibilité aux autres. Sourcer un composant isolément, sans avoir figé l'architecture globale, est la source la plus fréquente de reprises de conception.</p>
+  </div>
+
+  <!-- SURETE ET HOMOLOGATION -->
+  <div class="cat-section">
+    <div class="cat-section-label">Contrainte 1</div>
+    <h2>Sûreté fonctionnelle <em>et homologations obligatoires</em></h2>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>ISO 26262 (ASIL)</td><td>Norme de sûreté fonctionnelle automobile — chaque fonction électronique se voit attribuer un niveau d'exigence (ASIL) proportionnel au risque en cas de défaillance</td></tr>
+        <tr><td>Protection haute tension</td><td>Isolement galvanique, détection de défaut d'isolement, coupure automatique — la chaîne de traction manipule des tensions dangereuses pour l'humain</td></tr>
+        <tr><td>Gestion de l'emballement thermique</td><td>Détection précoce et confinement d'un emballement thermique cellule pour éviter sa propagation au reste du pack</td></tr>
+        <tr><td>R100 / UN38.3 / CEM auto</td><td>Homologation véhicule électrique (R100), transport de batteries lithium (UN38.3), compatibilité électromagnétique automobile — trois homologations distinctes, toutes obligatoires</td></tr>
+      </tbody>
+    </table>
+    <p>Le rôle du BMS est central dans cette équation de sûreté — protection, équilibrage, détection de dérive thermique. Notre <a href="choisir-bms-battery-management-system.html" style="color:#8FB4D6">guide dédié au choix d'un BMS</a> détaille ces fonctions en détail.</p>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="cat-section">
+    <div class="cat-section-label">Contrainte 2</div>
+    <h2>L'architecture <em>verrouille toute la chaîne</em></h2>
+    <p>Le choix d'une architecture 400V ou 800V se prend tôt dans un projet, et se répercute en cascade sur le chargeur embarqué (OBC), les convertisseurs DC/DC et le dimensionnement du câblage. Un OBC conçu pour du 400V n'est pas simplement moins performant sur du 800V — il n'est généralement pas compatible du tout, ce qui interdit de changer d'architecture à mi-projet sans tout requalifier.</p>
+    <p>Le choix de chimie cellule reste l'autre arbitrage structurant : LFP pour le coût et la longévité, NMC pour la densité énergétique. C'est un compromis autonomie / prix / sécurité que nous détaillons dans notre <a href="cellules-batterie-lfp-nmc.html" style="color:#8FB4D6">guide comparatif LFP vs NMC</a>, premier volet de notre série sur les chimies de cellules.</p>
+    <div class="pitfall-box">
+      <div class="pitfall-box-label">Erreur fréquente</div>
+      <p>Sourcer un OBC ou un convertisseur DC/DC avant d'avoir figé l'architecture de tension du véhicule. Le composant le plus performant du marché ne sert à rien s'il n'est pas compatible avec le bus retenu.</p>
+    </div>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits référencés</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=c07f725c-a4f6-45fe-88f8-e687c829aa8d"><span>CATL — LiFePO4 Pack 280Ah</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=3642c44d-dfdd-483e-89b6-38d41e1f905f"><span>CATL — NMC Qilin 100Ah</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=e3f3b186-7cf1-46d5-be64-fb941390f3d9"><span>Delta Electronics — OBC 22 kW Bidirectionnel V2G</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=967e4d7d-0724-4e9f-96ab-1223832cbfea"><span>Brusa Elektronik — Convertisseur DC/DC BDC546</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="cat-section">
+    <div class="cat-section-label">Synthèse</div>
+    <h2>Checklist avant de <em>sourcer une chaîne de traction</em></h2>
+    <div class="checklist">
+      <label><input type="checkbox" disabled/> L'architecture de tension (400V ou 800V) est-elle figée avant de sourcer OBC et convertisseurs ?</label>
+      <label><input type="checkbox" disabled/> Le niveau ASIL requis par fonction est-il défini, et le composant l'atteint-il réellement ?</label>
+      <label><input type="checkbox" disabled/> Les trois homologations (R100, UN38.3, CEM auto) sont-elles couvertes, pas seulement l'une d'entre elles ?</label>
+      <label><input type="checkbox" disabled/> L'arbitrage de chimie (LFP vs NMC) est-il cohérent avec le compromis autonomie / prix / sécurité visé ?</label>
+    </div>
+  </div>
+
+  <div class="next-part">
+    <div class="next-part-label">Série en 5 parties</div>
+    <h2>La suite de <em>la série</em></h2>
+    <p><a href="contraintes-fournisseurs-energie-stockage.html" style="color:#8FB4D6">Partie 4 : énergie & stockage — quand le vrai coût se mesure en cycles, pas en kWh affichés →</a></p>
+  </div>
+
+  <div class="cat-cta">
+    <h2>Besoin d'un <em>fournisseur pour votre chaîne de traction</em> ?</h2>
+    <p>Retrouvez les spécialistes véhicules électriques référencés sur Buy-inner.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../../pages/fournisseurs-vehicules-electriques.html">Fournisseurs VE →</a>
+      <a class="btn ghost" href="../../pages/annuaire.html">Annuaire complet</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+</body>
+</html>

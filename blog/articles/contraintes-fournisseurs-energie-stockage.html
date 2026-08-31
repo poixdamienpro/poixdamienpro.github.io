@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Fournisseurs énergie & stockage : le vrai coût se mesure en cycles (4/5) | Buy-inner</title>
+<meta name="description" content="IEC 62619, UL 1973/9540A, UN38.3 — les certifications du stockage stationnaire, et pourquoi le nombre de cycles à profondeur de décharge donnée compte plus que la capacité affichée."/>
+<meta name="keywords" content="fournisseur ESS, stockage energie stationnaire, IEC 62619, UL 9540A, fournisseur batterie stationnaire France"/>
+<meta property="og:title" content="Fournisseurs énergie & stockage : le vrai coût se mesure en cycles (4/5)"/>
+<meta property="og:description" content="IEC 62619, UL 1973/9540A, UN38.3 — les certifications du stockage stationnaire, et pourquoi le cycle compte plus que la capacité affichée."/>
+<meta property="og:type" content="article"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-energie-stockage.html"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Fournisseurs énergie & stockage : le vrai coût se mesure en cycles (4/5)",
+  "description": "IEC 62619, UL 1973/9540A, UN38.3 — les certifications du stockage stationnaire, et pourquoi le cycle compte plus que la capacité affichée.",
+  "url": "https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-energie-stockage.html",
+  "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.buy-inner.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Guides techniques", "item": "https://www.buy-inner.com/blog/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "Contraintes fournisseurs énergie & stockage", "item": "https://www.buy-inner.com/blog/articles/contraintes-fournisseurs-energie-stockage.html" }
+  ]
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/styles.css"/>
+<link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../../'; window.CURRENT_PAGE = 'blog';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 48px}
+.cat-hero-inner{max-width:820px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.part-badge{background:rgba(212,80,10,.14);color:#F0975C;border:1px solid rgba(212,80,10,.35);border-radius:4px;padding:2px 8px;font-size:10px;letter-spacing:.06em}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4vw,44px);line-height:1.15;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);line-height:1.7}
+.article-meta{font-family:var(--mono);font-size:11px;color:var(--t-low);margin-top:20px;display:flex;gap:16px}
+
+.cat-body{max-width:820px;margin:0 auto;padding:0 24px 80px}
+.cat-section{margin-top:56px}
+.cat-section-label{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rust);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.cat-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.cat-section h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3vw,32px);margin-bottom:16px;line-height:1.15}
+.cat-section h2 em{font-style:italic;color:var(--steel)}
+.cat-section h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:28px 0 10px;color:var(--t-hi)}
+.cat-section p{color:var(--t-mid);font-size:16px;line-height:1.8;margin-bottom:20px}
+.cat-section p strong{color:var(--t-hi)}
+.cat-section ul,.cat-section ol{color:var(--t-mid);font-size:15px;line-height:1.8;margin:0 0 20px;padding-left:22px}
+.cat-section li{margin-bottom:8px}
+.cat-section li::marker{color:var(--rust)}
+
+.specs-table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 24px}
+.specs-table th{text-align:left;padding:10px 14px;background:var(--ink-2);color:var(--t-low);font-family:var(--mono);font-size:11px;letter-spacing:.06em;font-weight:500;border-bottom:1px solid var(--border)}
+.specs-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t-mid);vertical-align:top}
+.specs-table td:first-child{color:var(--t-hi);font-weight:500}
+.specs-table tr:last-child td{border-bottom:0}
+
+.pitfall-box{background:rgba(212,80,10,.06);border:1px solid rgba(212,80,10,.3);border-radius:10px;padding:18px 22px;margin:20px 0}
+.pitfall-box-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.pitfall-box p{margin:0;font-size:14px}
+
+.checklist{background:var(--ink-2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:12px}
+.checklist label{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--t-mid);line-height:1.6;margin-bottom:12px}
+.checklist label:last-child{margin-bottom:0}
+.checklist input{margin-top:3px;accent-color:var(--rust)}
+
+.example-box{background:rgba(63,154,114,.05);border:1px solid rgba(63,154,114,.22);border-radius:10px;padding:16px 20px;margin:20px 0}
+.example-box-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:10px}
+.example-chips{display:flex;flex-wrap:wrap;gap:8px}
+.example-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;background:var(--ink-2);border:1px solid var(--border);color:var(--t-hi);font-size:12.5px;text-decoration:none}
+.example-chip:hover{border-color:var(--sage)}
+.example-chip .src{font-family:var(--mono);font-size:9.5px;color:var(--t-low);text-transform:uppercase;letter-spacing:.04em}
+
+.next-part{margin-top:56px;background:rgba(91,139,181,.06);border:1px solid rgba(91,139,181,.28);border-radius:14px;padding:28px 32px}
+.next-part-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8FB4D6;margin-bottom:10px}
+.next-part h2{font-family:var(--serif);font-size:22px;font-weight:400;margin-bottom:10px}
+.next-part p{color:var(--t-mid);font-size:14.5px;line-height:1.75;margin:0}
+
+.cat-cta{margin-top:32px;background:linear-gradient(135deg,var(--ink-2),var(--ink-3));border:1px solid var(--border);border-radius:14px;padding:36px 32px;text-align:center}
+.cat-cta h2{font-family:var(--serif);font-size:clamp(22px,3vw,30px);font-weight:400;margin-bottom:10px}
+.cat-cta h2 em{color:var(--rust);font-style:italic}
+.cat-cta p{color:var(--t-mid);font-size:15px;margin-bottom:24px}
+.cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../../index.html">Accueil</a><span>/</span>
+      <a href="../index.html">Guides techniques</a><span>/</span>
+      <span style="color:var(--t-mid)">Fournisseurs énergie & stockage</span>
+    </nav>
+    <div class="cat-eyebrow">Guide sectoriel · Contraintes fournisseurs <span class="part-badge">PARTIE 4/5</span></div>
+    <h1>Énergie &amp; stockage : le vrai coût <em>se mesure en cycles</em></h1>
+    <p class="cat-hero-desc">
+      Quatrième volet de la série. Entre renouvelable intermittent et électrification des usages, le stockage stationnaire (ESS) est devenu un poste de sourcing à part entière — avec un paramètre qui prime sur tous les autres.
+    </p>
+    <div class="article-meta"><span>6 min de lecture</span><span>Niveau : ingénieur / bureau d'études</span></div>
+    <a class="related-link" href="../../pages/fournisseurs-energie.html" style="margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(91,139,181,.08);border:1px solid rgba(91,139,181,.28);border-radius:8px;font-size:12.5px;color:var(--t-mid);text-decoration:none;width:fit-content">← Voir aussi : <strong style="color:#8FB4D6;font-weight:600">Fournisseurs énergie & stockage référencés</strong></a>
+  </div>
+</section>
+
+<div class="cat-body">
+
+  <div class="cat-section" style="margin-top:48px">
+    <p>Le stockage stationnaire n'a pas la contrainte de masse ou de volume d'un véhicule ou d'un satellite — un conteneur ESS reste globalement immobile. Ce qui le distingue, c'est un horizon de rentabilité qui se compte en années de cyclage, et une réglementation incendie particulièrement stricte du fait des volumes d'énergie concentrés sur un même site.</p>
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="cat-section">
+    <div class="cat-section-label">Contrainte 1</div>
+    <h2>La sécurité incendie, <em>au cœur de la réglementation</em></h2>
+    <table class="specs-table">
+      <tbody>
+        <tr><td>IEC 62619</td><td>Norme de sécurité pour les cellules et batteries lithium à usage industriel stationnaire</td></tr>
+        <tr><td>UL 1973 / UL 9540A</td><td>Sécurité produit et méthode d'évaluation de la propagation d'un emballement thermique à l'échelle d'une installation ESS complète — pas seulement d'une cellule</td></tr>
+        <tr><td>UN38.3</td><td>Qualification transport, commune à toutes les batteries lithium quel que soit le secteur d'usage final</td></tr>
+      </tbody>
+    </table>
+    <p>L'indice d'étanchéité (IP) et la plage de température supportée dépendent directement du mode d'installation visé — intérieur, extérieur, ou en conteneur dédié — et conditionnent le niveau de protection climatique à prévoir autour du système, pas seulement les caractéristiques du pack lui-même.</p>
+  </div>
+
+  <!-- CYCLE VS CAPACITE -->
+  <div class="cat-section">
+    <div class="cat-section-label">Contrainte 2</div>
+    <h2>Le cycle, <em>pas la capacité affichée</em></h2>
+    <p>Deux systèmes ESS de même capacité nominale peuvent avoir un coût réel du kWh stocké très différent sur la durée de vie du projet. Le paramètre qui fait vraiment ce coût, c'est le nombre de cycles tenus à une profondeur de décharge donnée (DOD) — un système qui tient 6&nbsp;000 cycles à 80&nbsp;% DOD amortit son investissement très différemment d'un système qui n'en tient que 2&nbsp;000, même à capacité initiale identique.</p>
+    <p>C'est un raisonnement proche de celui qu'on développe pour les chimies de cellule dans notre <a href="cellules-batterie-lfp-nmc.html" style="color:#8FB4D6">série sur les chimies LFP, NMC, NCA et LTO</a> — la longévité en cycles n'est jamais un détail de fiche technique, c'est le paramètre qui détermine l'économie réelle du projet.</p>
+    <div class="pitfall-box">
+      <div class="pitfall-box-label">Erreur fréquente</div>
+      <p>Comparer deux offres ESS sur le seul prix au kWh de capacité installée, sans ramener ce prix au nombre de cycles réellement garantis à la profondeur de décharge d'exploitation visée.</p>
+    </div>
+    <div class="example-box">
+      <div class="example-box-label">Exemples de produits référencés</div>
+      <div class="example-chips">
+        <a class="example-chip" href="../../pages/produit.html?id=48715583-2eb2-4d1e-be37-0690f2b4a4fd"><span>Blue Solutions — Module Bluestorage 35 kWh</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=5edd3506-a063-4c58-87a5-0adfc8681634"><span>Schneider Electric — Onduleur Galaxy VS 100kVA</span><span class="src">Buy-inner</span></a>
+        <a class="example-chip" href="../../pages/produit.html?id=7c173e98-338f-4ce1-9b5e-ff3138c366f6"><span>Victron Energy — MultiPlus-II 48/5000</span><span class="src">Buy-inner</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="cat-section">
+    <div class="cat-section-label">Synthèse</div>
+    <h2>Checklist avant de <em>sourcer un système ESS</em></h2>
+    <div class="checklist">
+      <label><input type="checkbox" disabled/> Le système est-il conforme IEC 62619, et évalué UL 1973/9540A si le marché ou le site l'exige ?</label>
+      <label><input type="checkbox" disabled/> Le nombre de cycles annoncé est-il rapporté à une profondeur de décharge (DOD) précisée, ou seulement à un chiffre brut ?</label>
+      <label><input type="checkbox" disabled/> L'indice IP et la plage de température correspondent-ils au mode d'installation réel (intérieur, extérieur, conteneur) ?</label>
+      <label><input type="checkbox" disabled/> Le coût au kWh a-t-il été recalculé sur la durée de vie en cycles, pas seulement à l'achat ?</label>
+    </div>
+  </div>
+
+  <div class="next-part">
+    <div class="next-part-label">Série en 5 parties</div>
+    <h2>La suite de <em>la série</em></h2>
+    <p><a href="contraintes-fournisseurs-maritime-offshore.html" style="color:#8FB4D6">Partie 5 : maritime, naval & offshore — quand la classification prime sur la fiche technique →</a></p>
+  </div>
+
+  <div class="cat-cta">
+    <h2>Besoin d'un <em>fournisseur ESS ou distribution de puissance</em> ?</h2>
+    <p>Retrouvez les fournisseurs énergie & stockage référencés sur Buy-inner.</p>
+    <div class="cat-cta-btns">
+      <a class="btn primary" href="../../pages/fournisseurs-energie.html">Fournisseurs énergie →</a>
+      <a class="btn ghost" href="../../pages/annuaire.html">Annuaire complet</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../../js/i18n.js"></script>
+<script src="../../js/data.js"></script>
+<script src="../../js/api.js"></script>
+<script src="../../js/layout.js"></script>
+<script src="../../js/modal.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+</body>
+</html>
