@@ -136,6 +136,22 @@ function initMap() {
   map.addLayer(markerCluster);
 }
 
+// Construit le popup Leaflet d'un marqueur d'entreprise. `siteLabel` distingue
+// le siège d'une implantation secondaire (ex: "Site — Ottobrunn") — voir
+// backend/supabase_add_company_locations_2026_09.sql pour la table dédiée
+// aux implantations, une entreprise pouvant avoir plusieurs marqueurs sur la
+// carte tout en ne renvoyant que vers une seule fiche entreprise.
+function companyPopupHtml(c, loc, siteLabel) {
+  return `
+    <div class="map-popup">
+      <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${c.name}</div>
+      <div class="map-popup-loc">${siteLabel ? `<strong>${siteLabel}</strong> — ` : ''}${loc}</div>
+      <div class="map-popup-industry">${c.industries.join(', ')}</div>
+      <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche →</a>
+    </div>
+  `;
+}
+
 function renderMarkers() {
   markerCluster.clearLayers();
   const base = window._mappedCompanies || [];
@@ -146,15 +162,19 @@ function renderMarkers() {
   filtered.forEach(c => {
     const marker = L.marker([c.lat, c.lng], { icon: dot });
     const loc = [c.city, c.department, c.region].filter(Boolean).join(' · ') || c.hq || c.country;
-    marker.bindPopup(`
-      <div class="map-popup">
-        <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${c.name}</div>
-        <div class="map-popup-loc">${loc}</div>
-        <div class="map-popup-industry">${c.industries.join(', ')}</div>
-        <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche →</a>
-      </div>
-    `, { maxWidth: 210, autoPan: false });
+    const siteLabel = (c.locations && c.locations.length) ? 'Siège' : '';
+    marker.bindPopup(companyPopupHtml(c, loc, siteLabel), { maxWidth: 210, autoPan: false });
     markerCluster.addLayer(marker);
+
+    // Implantations secondaires réelles (autres pays/villes) de la même
+    // entreprise — un marqueur par site, tous cliquables vers la même fiche.
+    (c.locations || []).forEach(site => {
+      if (typeof site.lat !== 'number' || isNaN(site.lat) || typeof site.lng !== 'number' || isNaN(site.lng)) return;
+      const siteMarker = L.marker([site.lat, site.lng], { icon: dot });
+      const siteLoc = [site.city, site.country].filter(Boolean).join(' · ');
+      siteMarker.bindPopup(companyPopupHtml(c, siteLoc, site.label || 'Site'), { maxWidth: 210, autoPan: false });
+      markerCluster.addLayer(siteMarker);
+    });
   });
 
   const count = document.getElementById('map-count');

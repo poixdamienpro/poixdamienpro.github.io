@@ -95,6 +95,11 @@ function mapCompany(row) {
     region:    row.region     || '',
     lat:       typeof row.lat === 'number' ? row.lat : (row.lat != null ? Number(row.lat) : null),
     lng:       typeof row.lng === 'number' ? row.lng : (row.lng != null ? Number(row.lng) : null),
+    // Implantations secondaires (autres pays/villes) — voir
+    // backend/supabase_add_company_locations_2026_09.sql. Vide pour la
+    // grande majorité des entreprises (un seul site) ; alimenté au fur et
+    // à mesure pour celles réellement multi-sites (Beyond Gravity, etc.).
+    locations: row.locations || [],
     isSystemier: row.is_systemier || false,
     industry:  row.industry,
     industries: (row.industries && row.industries.length) ? row.industries : (row.industry ? [row.industry] : []),
@@ -143,6 +148,11 @@ function mapProduct(row) {
     image:    row.image_url   || '',
     desc:     row.description || '',
     datasheetUrl: row.datasheet_url || '',
+    // Caracteristiques electriques/mecaniques/environnementales normalisees
+    // (filtre par plage numerique) — voir
+    // backend/supabase_add_product_characteristics_2026_09.sql. Vide pour la
+    // plupart des produits pour l'instant (pilote sur 3 secteurs).
+    characteristics: row.characteristics || [],
     specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium })),
     bars:     (row.bars  || []).map(b => ({ l: b.label, v: b.value, c: b.color })),
     certs:    row.certs  || [],
@@ -153,7 +163,7 @@ function mapProduct(row) {
 // Charge COMPANIES/PRODUCTS/INDUSTRIES/PROD_CATS depuis Supabase.
 // Appelé par les pages qui en ont besoin (annuaire, catalogue, submit, home) — pas par toutes.
 async function loadTaxonomy() {
-  const [companiesRaw, productsRaw, tagsRaw, catsRaw, indsRaw] = await Promise.all([
+  const [companiesRaw, productsRaw, tagsRaw, catsRaw, indsRaw, locsRaw, charsRaw] = await Promise.all([
     fetchAllPaged('get_companies_page'),
     fetchAllPaged('get_products_page'),
     fetchAllPagedTable('company_tags',               'select=company_id,tag'),
@@ -164,6 +174,13 @@ async function loadTaxonomy() {
     // rejetterait sinon), donc on retombe simplement sur [] (mapCompany()
     // gère déjà ce cas en repliant sur l'industrie unique companies.industry).
     fetchAllPagedTable('company_industries', 'select=company_id,industry').catch(() => []),
+    // Implantations secondaires — voir backend/supabase_add_company_locations_2026_09.sql.
+    // Même repli que company_industries tant que la table n'existe pas encore en base.
+    fetchAllPagedTable('company_locations', 'select=company_id,label,city,country,lat,lng').catch(() => []),
+    // Caractéristiques électriques/mécaniques/environnementales normalisées
+    // (filtre par plage) — voir backend/supabase_add_product_characteristics_2026_09.sql.
+    // Pilote sur 3 secteurs pour l'instant ; même repli que les tables ci-dessus.
+    fetchAllPagedTable('product_characteristics', 'select=product_id,axis,characteristic,label,unit,value_min,value_max').catch(() => []),
   ]);
 
   const tagsMap = {};
@@ -181,15 +198,39 @@ async function loadTaxonomy() {
     if (!indsMap[i.company_id]) indsMap[i.company_id] = [];
     indsMap[i.company_id].push(i.industry);
   });
+  const locsMap = {};
+  locsRaw.forEach(l => {
+    if (!locsMap[l.company_id]) locsMap[l.company_id] = [];
+    locsMap[l.company_id].push({
+      label:   l.label || '',
+      city:    l.city  || '',
+      country: l.country || '',
+      lat:     typeof l.lat === 'number' ? l.lat : Number(l.lat),
+      lng:     typeof l.lng === 'number' ? l.lng : Number(l.lng),
+    });
+  });
+  const charsMap = {};
+  charsRaw.forEach(c => {
+    if (!charsMap[c.product_id]) charsMap[c.product_id] = [];
+    charsMap[c.product_id].push({
+      axis: c.axis, characteristic: c.characteristic, label: c.label, unit: c.unit,
+      min: typeof c.value_min === 'number' ? c.value_min : Number(c.value_min),
+      max: typeof c.value_max === 'number' ? c.value_max : Number(c.value_max),
+    });
+  });
 
   COMPANIES = companiesRaw.map(row => {
     row.tags       = tagsMap[row.id]  || [];
     row.categories = catsMap[row.id]  || [];
     row.industries = indsMap[row.id]  || [];
+    row.locations  = locsMap[row.id]  || [];
     return mapCompany(row);
   });
 
-  PRODUCTS = productsRaw.map(mapProduct);
+  PRODUCTS = productsRaw.map(row => {
+    row.characteristics = charsMap[row.id] || [];
+    return mapProduct(row);
+  });
 
   INDUSTRIES = [...new Set(COMPANIES.flatMap(c => c.industries))].sort();
   PROD_CATS  = [...new Set(COMPANIES.flatMap(c => c.products))].sort();

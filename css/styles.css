@@ -76,6 +76,20 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .chip{padding:3px 9px;border-radius:3px;border:1px solid var(--border);font-size:11px;font-weight:500;background:var(--white);color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:var(--sans)}
 .chip:hover{border-color:var(--ink);color:var(--ink)}
 .chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+/* Filtres par caracteristique (electrique/mecanique/environnemental) —
+   double curseur avec deux <input type=range> superposes (piste commune,
+   chaque input ne capte le clic que sur son propre curseur). Voir
+   backend/supabase_add_product_characteristics_2026_09.sql. */
+.range-filter{margin-bottom:14px}
+.range-filter:last-child{margin-bottom:0}
+.range-filter-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px}
+.range-filter-vals{font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
+.range-track{position:relative;height:18px}
+.range-input{position:absolute;left:0;top:6px;width:100%;height:6px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none}
+.range-input::-webkit-slider-runnable-track{height:3px;background:var(--border2);border-radius:2px}
+.range-input::-moz-range-track{height:3px;background:var(--border2);border-radius:2px}
+.range-input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--rust);border:2px solid var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;margin-top:-5.5px}
+.range-input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--rust);border:2px solid var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer}
 .reset-btn{width:100%;padding:7px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;margin-top:10px}
 .reset-btn:hover{border-color:var(--rust);color:var(--rust)}
 .content{flex:1;padding:18px 22px;min-width:0}
@@ -661,6 +675,9 @@ body.theme-dark::after{
 .theme-dark .search-input::placeholder{color:rgba(243,241,236,.35)}
 .theme-dark .chip:hover{border-color:#F3F1EC;color:#F3F1EC}
 .theme-dark .chip.active{background:var(--rust);border-color:var(--rust);color:#fff}
+.theme-dark .range-filter-head{color:#F3F1EC}
+.theme-dark .range-input::-webkit-slider-thumb{border-color:#18242E}
+.theme-dark .range-input::-moz-range-thumb{border-color:#18242E}
 /* toolbar + cartes */
 .theme-dark .result-count strong{color:#F3F1EC}
 .theme-dark .company-card:hover{border-color:rgba(255,255,255,.4);transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.45)}

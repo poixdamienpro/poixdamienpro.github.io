@@ -43,7 +43,7 @@
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-label" data-i18n="cat_label_search">Recherche</div>
-      <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" data-i18n-placeholder="cat_placeholder" placeholder="Produit, fabricant…" oninput="renderProducts()"/></div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="cat-search" type="text" data-i18n-placeholder="cat_placeholder" placeholder="Produit, fabricant…" oninput="onCatSearchInput()"/></div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
@@ -55,6 +55,7 @@
       <div class="sidebar-label" data-i18n="cat_label_industry">Industrie</div>
       <div class="chip-group" id="cat-ind-chips"></div>
     </div>
+    <div id="cat-char-filters"></div>
     <button class="reset-btn" onclick="resetCatalogue()" data-i18n="cat_reset">↺ Réinitialiser</button>
     <div class="pro-upsell">
       <div class="pro-upsell-title" data-i18n="cat_upsell_title">★ Vous êtes fournisseur ?</div>

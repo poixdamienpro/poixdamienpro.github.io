@@ -4,13 +4,22 @@
 let catCurrentId = null;
 const catIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
 
+// Filtres par caractéristique (électrique/mécanique/environnemental) — voir
+// backend/supabase_add_product_characteristics_2026_09.sql. charFilters ne
+// contient une entrée pour une caractéristique que lorsque l'utilisateur a
+// resserré la plage par rapport aux bornes réelles des données (sinon le
+// filtre est un no-op et n'exclut aucun produit sans cette caractéristique).
+let charFilters = {};
+
+const AXIS_LABELS = { electrique: 'Électrique', mecanique: 'Mécanique', environnemental: 'Environnemental' };
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   showLoading(['products-list']);
   try {
     await loadTaxonomy();
-    initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; renderProducts(); });
-    initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; renderProducts(); });
+    initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; charFilters = {}; renderCharFilters(); renderProducts(); });
+    initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; charFilters = {}; renderCharFilters(); renderProducts(); });
 
     const params = new URLSearchParams(window.location.search);
     const company = params.get('company');
@@ -20,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cat = params.get('cat');
     if (cat && PROD_CATS.includes(cat)) { catCat = cat; updateChips('cat-cat-chips', () => catCat); }
 
+    renderCharFilters();
     renderProducts();
     updateCompareBanner();
   } catch (err) {
@@ -28,11 +38,123 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-function filteredProducts() {
+// Produits filtrés par recherche/catégorie/industrie SEULEMENT (sans les
+// filtres de caractéristiques) — sert de base stable pour savoir quelles
+// caractéristiques proposer dans le panneau de filtres, sans que celui-ci
+// ne se vide au fur et à mesure qu'on resserre les curseurs.
+function baseFilteredProducts() {
   const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
   return PRODUCTS.filter(p => {
     const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
     return ms && (catCat === 'all' || p.cat === catCat) && (catInd === 'all' || p.industry === catInd);
+  });
+}
+
+function matchesCharFilters(p) {
+  const keys = Object.keys(charFilters);
+  if (!keys.length) return true;
+  return keys.every(key => {
+    const f = charFilters[key];
+    const c = (p.characteristics || []).find(x => x.characteristic === key);
+    if (!c) return false; // caractéristique non renseignée pour ce produit → exclu si un filtre actif la cible
+    return c.max >= f.min && c.min <= f.max; // chevauchement de plages
+  });
+}
+
+function filteredProducts() {
+  return baseFilteredProducts().filter(matchesCharFilters);
+}
+
+// Construit, pour chaque caractéristique présente parmi les produits
+// actuellement visibles (hors filtres de caractéristiques eux-mêmes), les
+// bornes réelles [min,max] observées dans les données — utilisées comme
+// bornes du curseur.
+function computeCharBounds() {
+  const base = baseFilteredProducts();
+  const bounds = {};
+  base.forEach(p => {
+    (p.characteristics || []).forEach(c => {
+      if (!bounds[c.characteristic]) {
+        bounds[c.characteristic] = { axis: c.axis, label: c.label, unit: c.unit, dataMin: c.min, dataMax: c.max };
+      } else {
+        const b = bounds[c.characteristic];
+        if (c.min < b.dataMin) b.dataMin = c.min;
+        if (c.max > b.dataMax) b.dataMax = c.max;
+      }
+    });
+  });
+  return bounds;
+}
+
+function niceStep(range) {
+  if (!isFinite(range) || range <= 0) return 1;
+  const raw = range / 200;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw / pow;
+  const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * pow;
+  return step;
+}
+
+function fmtCharVal(v) {
+  if (Math.abs(v) >= 100) return Math.round(v).toLocaleString('fr-FR');
+  if (Math.abs(v) >= 10) return (Math.round(v * 10) / 10).toLocaleString('fr-FR');
+  return (Math.round(v * 1000) / 1000).toLocaleString('fr-FR');
+}
+
+function renderCharFilters() {
+  const wrap = document.getElementById('cat-char-filters');
+  if (!wrap) return;
+  const bounds = computeCharBounds();
+  const keys = Object.keys(bounds);
+
+  if (!keys.length) { wrap.innerHTML = ''; return; }
+
+  const byAxis = {};
+  keys.forEach(k => { (byAxis[bounds[k].axis] = byAxis[bounds[k].axis] || []).push(k); });
+
+  wrap.innerHTML = Object.keys(byAxis).map(axis => `
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">${AXIS_LABELS[axis] || axis}</div>
+      ${byAxis[axis].map(key => {
+        const b = bounds[key];
+        const cur = charFilters[key] || { min: b.dataMin, max: b.dataMax };
+        const step = niceStep(b.dataMax - b.dataMin) || 1;
+        return `
+        <div class="range-filter" data-char="${key}">
+          <div class="range-filter-head">
+            <span>${b.label} (${b.unit})</span>
+            <span class="range-filter-vals"><span class="rf-min">${fmtCharVal(cur.min)}</span> – <span class="rf-max">${fmtCharVal(cur.max)}</span></span>
+          </div>
+          <div class="range-track">
+            <input type="range" class="range-input range-min" min="${b.dataMin}" max="${b.dataMax}" step="${step}" value="${cur.min}">
+            <input type="range" class="range-input range-max" min="${b.dataMin}" max="${b.dataMax}" step="${step}" value="${cur.max}">
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+
+  wrap.querySelectorAll('.range-filter').forEach(box => {
+    const key = box.dataset.char;
+    const b = bounds[key];
+    const minInput = box.querySelector('.range-min');
+    const maxInput = box.querySelector('.range-max');
+    const rfMin = box.querySelector('.rf-min');
+    const rfMax = box.querySelector('.rf-max');
+
+    const apply = () => {
+      let vMin = parseFloat(minInput.value);
+      let vMax = parseFloat(maxInput.value);
+      if (vMin > vMax) { [vMin, vMax] = [vMax, vMin]; minInput.value = vMin; maxInput.value = vMax; }
+      rfMin.textContent = fmtCharVal(vMin);
+      rfMax.textContent = fmtCharVal(vMax);
+      if (vMin <= b.dataMin && vMax >= b.dataMax) delete charFilters[key];
+      else charFilters[key] = { min: vMin, max: vMax };
+      renderProducts();
+    };
+    minInput.addEventListener('input', apply);
+    maxInput.addEventListener('input', apply);
   });
 }
 
@@ -152,10 +274,18 @@ function renderProductPreview(p) {
   if(close) close.onclick = () => el.classList.remove('open');
 }
 
+function onCatSearchInput() {
+  charFilters = {};
+  renderCharFilters();
+  renderProducts();
+}
+
 function resetCatalogue() {
   document.getElementById('cat-search').value = '';
   catCat = 'all'; catInd = 'all';
+  charFilters = {};
   updateChips('cat-cat-chips', () => catCat);
   updateChips('cat-ind-chips', () => catInd);
+  renderCharFilters();
   renderProducts();
 }
