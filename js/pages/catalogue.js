@@ -134,6 +134,8 @@ function renderProductPreview(p) {
       ${certs}
       <div class="dp-price"><span class="price-tag">💰 ${p.price}</span></div>
       <div class="dp-actions">
+        <a class="btn-fiche" href="produit.html?id=${p.id}">Voir la fiche complète →</a>
+        ${p.datasheetUrl ? `<a class="btn-datasheet-dark" href="${p.datasheetUrl}" target="_blank" rel="noopener">📄 Datasheet</a>` : ''}
         <button class="btn-cmp-add ${inCompare ? 'on' : ''}" data-cmp="${p.id}">${inCompare ? _t('prod_compare_in') : _t('prod_compare_add')}</button>
         <button class="btn-quote" id="dp-quote">${_t('prod_quote')}</button>
       </div>

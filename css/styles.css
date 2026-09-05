@@ -365,6 +365,8 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 
 /* REQUEST QUOTE / LEAD */
 .btn-quote{padding:10px 20px;border-radius:4px;background:var(--sage);border:none;color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.btn-datasheet{padding:9px 20px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--ink);font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-datasheet:hover{border-color:var(--ink)}
 .btn-quote-sm{font-size:11px;color:var(--sage);font-weight:700;background:transparent;border:none;cursor:pointer}
 .lead-modal{max-width:420px}
 .lead-intro{font-size:12px;color:var(--text2);line-height:1.65;margin:0 0 16px;padding:10px 12px;background:var(--sage-soft);border:1px solid #9ECFB5;border-radius:6px}
@@ -746,6 +748,8 @@ body.theme-dark::after{
   border-top:1px solid rgba(255,255,255,.1)}
 .btn-fiche{padding:10px 20px;border-radius:4px;background:transparent;border:1px solid #8FB4D6;color:#8FB4D6;font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center}
 .btn-fiche:hover{background:rgba(143,180,214,.12)}
+.btn-datasheet-dark{padding:10px 20px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,.22);color:#F3F1EC;font-weight:700;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-datasheet-dark:hover{border-color:#F3F1EC}
 
 /* responsive : sous 1100px on retire l'aperçu (clic = modale) */
 @media(max-width:1100px){

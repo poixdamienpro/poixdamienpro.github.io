@@ -142,6 +142,7 @@ function mapProduct(row) {
     icon:     row.icon        || '🔧',
     image:    row.image_url   || '',
     desc:     row.description || '',
+    datasheetUrl: row.datasheet_url || '',
     specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium })),
     bars:     (row.bars  || []).map(b => ({ l: b.label, v: b.value, c: b.color })),
     certs:    row.certs  || [],

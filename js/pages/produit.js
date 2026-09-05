@@ -50,6 +50,7 @@ function renderProduct(p) {
     </div>
     <div class="modal-actions">
       <a class="btn-visit" href="entreprise.html?id=${p.companyId}">↗ Voir la fiche ${p.maker}</a>
+      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${p.datasheetUrl}" target="_blank" rel="noopener">📄 Télécharger la datasheet</a>` : ''}
       <button class="btn-quote" id="prod-quote-btn">📩 Demander un devis — 💰 ${p.price}</button>
     </div>
   `;
