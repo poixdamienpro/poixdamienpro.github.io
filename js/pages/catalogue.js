@@ -13,13 +13,25 @@ let charFilters = {};
 
 const AXIS_LABELS = { electrique: 'Électrique', mecanique: 'Mécanique', environnemental: 'Environnemental' };
 
+// Filtres catégoriels (cases à cocher, pas une plage numérique) — voir
+// backend/supabase_add_product_tags_2026_09.sql. "Qualification" réutilise
+// le champ certs déjà riche (250/437 produits) plutôt qu'une nouvelle table ;
+// "Protection" (indice IP) vient de product_tags. tagFilters[groupKey] est un
+// Set des valeurs cochées ; une valeur cochée dans un groupe matche en OU, les
+// groupes entre eux matchent en ET (facette classique).
+let tagFilters = { qualification: new Set(), protection: new Set() };
+const TAG_GROUPS = [
+  { key: 'qualification', label: 'Qualification', values: p => p.certs || [] },
+  { key: 'protection',    label: 'Protection (IP)', values: p => (p.productTags || []).filter(t => t.type === 'protection').map(t => t.value) },
+];
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   showLoading(['products-list']);
   try {
     await loadTaxonomy();
-    initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; charFilters = {}; renderCharFilters(); renderProducts(); });
-    initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; charFilters = {}; renderCharFilters(); renderProducts(); });
+    initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; charFilters = {}; resetTagFilters(); renderCharFilters(); renderTagFilters(); renderProducts(); });
+    initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; charFilters = {}; resetTagFilters(); renderCharFilters(); renderTagFilters(); renderProducts(); });
 
     const params = new URLSearchParams(window.location.search);
     const company = params.get('company');
@@ -30,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cat && PROD_CATS.includes(cat)) { catCat = cat; updateChips('cat-cat-chips', () => catCat); }
 
     renderCharFilters();
+    renderTagFilters();
     renderProducts();
     updateCompareBanner();
   } catch (err) {
@@ -61,8 +74,21 @@ function matchesCharFilters(p) {
   });
 }
 
+function matchesTagFilters(p) {
+  return TAG_GROUPS.every(g => {
+    const selected = tagFilters[g.key];
+    if (!selected || !selected.size) return true;
+    const have = g.values(p);
+    return have.some(v => selected.has(v));
+  });
+}
+
+function resetTagFilters() {
+  TAG_GROUPS.forEach(g => tagFilters[g.key].clear());
+}
+
 function filteredProducts() {
-  return baseFilteredProducts().filter(matchesCharFilters);
+  return baseFilteredProducts().filter(p => matchesCharFilters(p) && matchesTagFilters(p));
 }
 
 // Construit, pour chaque caractéristique présente parmi les produits
@@ -171,6 +197,66 @@ function renderCharFilters() {
     };
     minInput.addEventListener('input', apply);
     maxInput.addEventListener('input', apply);
+  });
+}
+
+// Compte, pour chaque groupe de tags (Qualification/Protection), combien de
+// produits actuellement visibles (hors filtres à tags eux-mêmes) portent
+// chaque valeur — sert à afficher les cases à cocher avec un compteur et à
+// ne proposer que des valeurs pertinentes pour la sélection en cours.
+function computeTagFacets() {
+  const base = baseFilteredProducts();
+  const facets = {};
+  TAG_GROUPS.forEach(g => {
+    const counts = {};
+    base.forEach(p => { g.values(p).forEach(v => { counts[v] = (counts[v] || 0) + 1; }); });
+    facets[g.key] = counts;
+  });
+  return facets;
+}
+
+function renderTagFilters() {
+  const wrap = document.getElementById('cat-tag-filters');
+  if (!wrap) return;
+  const facets = computeTagFacets();
+
+  // Un tag porté par 1-2 produits seulement n'aide pas à filtrer (et la liste
+  // de certifications a une très longue traîne de valeurs quasi uniques) —
+  // on ne propose que celles qui regroupent au moins 3 produits, sauf si
+  // déjà cochée (pour ne pas faire disparaître une sélection active).
+  const MIN_TAG_COUNT = 3;
+  const groupsHtml = TAG_GROUPS.map(g => {
+    const counts = facets[g.key];
+    const values = Object.keys(counts)
+      .filter(v => counts[v] >= MIN_TAG_COUNT || tagFilters[g.key].has(v))
+      .sort((a, b) => counts[b] - counts[a]);
+    if (!values.length) return '';
+    return `
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">${g.label}</div>
+      <div class="tag-filter-list" data-group="${g.key}">
+        ${values.map(v => `
+          <label class="tag-filter-item">
+            <input type="checkbox" value="${v}" ${tagFilters[g.key].has(v) ? 'checked' : ''}>
+            <span>${v}</span>
+            <span class="tag-filter-count">${counts[v]}</span>
+          </label>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = groupsHtml;
+
+  wrap.querySelectorAll('.tag-filter-list').forEach(list => {
+    const key = list.dataset.group;
+    list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) tagFilters[key].add(cb.value);
+        else tagFilters[key].delete(cb.value);
+        renderProducts();
+      });
+    });
   });
 }
 
@@ -292,7 +378,9 @@ function renderProductPreview(p) {
 
 function onCatSearchInput() {
   charFilters = {};
+  resetTagFilters();
   renderCharFilters();
+  renderTagFilters();
   renderProducts();
 }
 
@@ -300,8 +388,10 @@ function resetCatalogue() {
   document.getElementById('cat-search').value = '';
   catCat = 'all'; catInd = 'all';
   charFilters = {};
+  resetTagFilters();
   updateChips('cat-cat-chips', () => catCat);
   updateChips('cat-ind-chips', () => catInd);
   renderCharFilters();
+  renderTagFilters();
   renderProducts();
 }

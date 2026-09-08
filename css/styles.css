@@ -91,6 +91,14 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .range-input::-moz-range-track{height:3px;background:var(--border2);border-radius:2px}
 .range-input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--rust);border:2px solid var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer;margin-top:-5.5px}
 .range-input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:var(--rust);border:2px solid var(--white);box-shadow:0 1px 3px rgba(0,0,0,.3);cursor:pointer}
+/* Filtres a tags (Qualification/Protection) — cases a cocher avec compteur.
+   Voir backend/supabase_add_product_tags_2026_09.sql. */
+.tag-filter-list{display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto}
+.tag-filter-item{display:flex;align-items:center;gap:7px;padding:3px 2px;font-size:11.5px;color:var(--text2);cursor:pointer;border-radius:3px}
+.tag-filter-item:hover{background:var(--paper)}
+.tag-filter-item input{margin:0;accent-color:var(--rust);cursor:pointer;flex-shrink:0}
+.tag-filter-item span:first-of-type{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-filter-count{font-family:var(--mono);font-size:10px;color:var(--muted);flex-shrink:0}
 .reset-btn{width:100%;padding:7px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:11px;margin-top:10px}
 .reset-btn:hover{border-color:var(--rust);color:var(--rust)}
 .content{flex:1;padding:18px 22px;min-width:0}
@@ -679,6 +687,8 @@ body.theme-dark::after{
 .theme-dark .range-filter-head{color:#F3F1EC}
 .theme-dark .range-input::-webkit-slider-thumb{border-color:#18242E}
 .theme-dark .range-input::-moz-range-thumb{border-color:#18242E}
+.theme-dark .tag-filter-item{color:#F3F1EC}
+.theme-dark .tag-filter-item:hover{background:rgba(255,255,255,.05)}
 /* toolbar + cartes */
 .theme-dark .result-count strong{color:#F3F1EC}
 .theme-dark .company-card:hover{border-color:rgba(255,255,255,.4);transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.45)}

@@ -153,6 +153,11 @@ function mapProduct(row) {
     // backend/supabase_add_product_characteristics_2026_09.sql. Vide pour la
     // plupart des produits pour l'instant (pilote sur 3 secteurs).
     characteristics: row.characteristics || [],
+    // Filtres catégoriels (cases à cocher, pas une plage numérique) — voir
+    // backend/supabase_add_product_tags_2026_09.sql. tag_type='protection'
+    // pour l'instant (indice IP) ; 'certs' ci-dessous sert de source pour le
+    // filtre "Qualification" (déjà riche, pas besoin de le dupliquer ici).
+    productTags: row.product_tags || [],
     specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium })),
     bars:     (row.bars  || []).map(b => ({ l: b.label, v: b.value, c: b.color })),
     certs:    row.certs  || [],
@@ -163,7 +168,7 @@ function mapProduct(row) {
 // Charge COMPANIES/PRODUCTS/INDUSTRIES/PROD_CATS depuis Supabase.
 // Appelé par les pages qui en ont besoin (annuaire, catalogue, submit, home) — pas par toutes.
 async function loadTaxonomy() {
-  const [companiesRaw, productsRaw, tagsRaw, catsRaw, indsRaw, locsRaw, charsRaw] = await Promise.all([
+  const [companiesRaw, productsRaw, tagsRaw, catsRaw, indsRaw, locsRaw, charsRaw, prodTagsRaw] = await Promise.all([
     fetchAllPaged('get_companies_page'),
     fetchAllPaged('get_products_page'),
     fetchAllPagedTable('company_tags',               'select=company_id,tag'),
@@ -181,6 +186,9 @@ async function loadTaxonomy() {
     // (filtre par plage) — voir backend/supabase_add_product_characteristics_2026_09.sql.
     // Pilote sur 3 secteurs pour l'instant ; même repli que les tables ci-dessus.
     fetchAllPagedTable('product_characteristics', 'select=product_id,axis,characteristic,label,unit,value_min,value_max').catch(() => []),
+    // Filtres catégoriels (cases à cocher) — voir backend/supabase_add_product_tags_2026_09.sql.
+    // 1ère brique : tag_type='protection' (indice IP). Même repli.
+    fetchAllPagedTable('product_tags', 'select=product_id,tag_type,value').catch(() => []),
   ]);
 
   const tagsMap = {};
@@ -218,6 +226,11 @@ async function loadTaxonomy() {
       max: typeof c.value_max === 'number' ? c.value_max : Number(c.value_max),
     });
   });
+  const prodTagsMap = {};
+  prodTagsRaw.forEach(t => {
+    if (!prodTagsMap[t.product_id]) prodTagsMap[t.product_id] = [];
+    prodTagsMap[t.product_id].push({ type: t.tag_type, value: t.value });
+  });
 
   COMPANIES = companiesRaw.map(row => {
     row.tags       = tagsMap[row.id]  || [];
@@ -229,6 +242,7 @@ async function loadTaxonomy() {
 
   PRODUCTS = productsRaw.map(row => {
     row.characteristics = charsMap[row.id] || [];
+    row.product_tags    = prodTagsMap[row.id] || [];
     return mapProduct(row);
   });
 
