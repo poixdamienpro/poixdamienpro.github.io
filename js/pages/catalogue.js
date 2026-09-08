@@ -104,6 +104,22 @@ function fmtCharVal(v) {
 function renderCharFilters() {
   const wrap = document.getElementById('cat-char-filters');
   if (!wrap) return;
+
+  // Sur "Tous", les caractéristiques de catégories très différentes (tension
+  // d'un micromoteur vs d'un moteur industriel, par ex.) se mélangent en une
+  // seule plage géante et perdent tout sens — on n'affiche donc le panneau
+  // qu'une fois une catégorie précise choisie, pour avoir des filtres qui
+  // correspondent réellement au type d'équipement sélectionné.
+  if (catCat === 'all') {
+    wrap.innerHTML = `
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Caractéristiques</div>
+        <p class="char-filters-hint">Choisissez une catégorie ci-dessus pour filtrer par tension, masse, température…</p>
+      </div>`;
+    return;
+  }
+
   const bounds = computeCharBounds();
   const keys = Object.keys(bounds);
 
