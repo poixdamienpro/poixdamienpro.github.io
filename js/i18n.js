@@ -4,7 +4,7 @@
 const TRANSLATIONS = {
   fr: {
     // Nav
-    nav_annuaire:        'Annuaire',
+    nav_systemiers:      'Systémiers',
     nav_carte:           'Carte de l\'écosystème',
     nav_composants:      'Composants',
     nav_secteurs:        'Secteurs',
@@ -150,7 +150,7 @@ const TRANSLATIONS = {
 
   en: {
     // Nav
-    nav_annuaire:        'Directory',
+    nav_systemiers:      'Systems integrators',
     nav_carte:           'Ecosystem map',
     nav_composants:      'Components',
     nav_secteurs:        'Industries',

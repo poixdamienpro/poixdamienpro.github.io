@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Systémiers & intégrateurs système · Buy-inner</title>
+<meta name="description" content="Annuaire des systémiers référencés sur Buy-inner : plateformistes satellites, lanceurs, intégrateurs système. Retrouvez les fabricants qui livrent un système complet, pas un simple composant."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://www.buy-inner.com/pages/systemiers.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Buy-inner"/>
+<meta property="og:title" content="Systémiers & intégrateurs système · Buy-inner"/>
+<meta property="og:description" content="Plateformistes satellites, lanceurs, intégrateurs système : retrouvez les systémiers référencés sur Buy-inner."/>
+<meta property="og:locale" content="fr_FR"/>
+<meta property="og:url" content="https://www.buy-inner.com/pages/systemiers.html"/>
+<meta property="og:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Systémiers & intégrateurs système · Buy-inner"/>
+<meta name="twitter:description" content="Plateformistes satellites, lanceurs, intégrateurs système : retrouvez les systémiers référencés sur Buy-inner."/>
+<meta name="twitter:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Systémiers & intégrateurs système",
+  "url": "https://www.buy-inner.com/pages/systemiers.html",
+  "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com/" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'systemiers';</script>
+<script src="../js/analytics.js"></script>
+</head>
+<body class="theme-dark">
+
+<div id="nav-slot"></div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title">Systémiers <span>& intégrateurs système</span></h1>
+      <p class="page-subtitle">Ceux qui livrent un système complet — plateforme satellite, lanceur — pas un composant isolé. <a href="../blog/articles/systemier-vs-equipementier.html" style="color:inherit;text-decoration:underline">Systémier vs équipementier, quelle différence ?</a></p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div><div class="kpi-n" id="kpi-c">—</div><div class="kpi-l">Systémiers</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-p">—</div><div class="kpi-l">Systèmes référencés</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="dir">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Recherche</div>
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="sys-search" type="text" placeholder="Nom, pays, système…" oninput="renderSystemiers()"/></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Industrie</div>
+      <div class="chip-group" id="sys-industry-chips"></div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Type de système</div>
+      <div class="chip-group" id="sys-cat-chips"></div>
+    </div>
+    <button class="reset-btn" onclick="resetSystemiers()">↺ Réinitialiser</button>
+  </aside>
+  <div class="dir-list-col">
+    <div class="toolbar">
+      <div><span class="toolbar-label">// SYSTÉMIERS</span><span class="result-count" id="sys-count"></span></div>
+      <span class="dir-hint">Survolez pour prévisualiser</span>
+    </div>
+    <div class="dir-list" id="companies-list" role="listbox" aria-label="Systémiers"></div>
+  </div>
+  <aside class="dir-preview" id="company-preview" aria-live="polite"></aside>
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/chips.js"></script>
+<script src="../js/leads.js"></script>
+<script src="../js/pages/systemiers.js"></script>
+</body>
+</html>

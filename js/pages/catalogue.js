@@ -33,13 +33,14 @@ const CATEGORY_GROUPS = [
 // Categories exclues du catalogue produit : prestations de service (memes
 // categories que js/pages/prestations.js et js/pages/carte.js — elles
 // apparaissent sur la page Prestataires, pas ici) + Plateformes satellites
-// (ce sont des systemes complets, pas des composants comparables par
-// caracteristiques ; visibles via la fiche entreprise / carte en attendant
-// un onglet Systemiers dedie).
+// et Lanceurs (ce sont des systemes complets, pas des composants
+// comparables par caracteristiques ; visibles via la fiche entreprise /
+// carte en attendant un onglet Systemiers dedie).
 const CATALOGUE_EXCLUDED_CATS = [
   'Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques',
   'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système',
   'Segment sol & opérations',
+  'Lanceurs',
   'Plateformes satellites',
 ];
 
