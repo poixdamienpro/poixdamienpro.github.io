@@ -27,7 +27,7 @@ const CATEGORY_GROUPS = [
   { group: 'Câblage & Connectique', cats: ['Câblage & Connecteurs', 'Connecteurs sous-marins'] },
   { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision', 'Logiciels de cybersécurité'] },
   { group: 'Thermique', cats: ['Contrôle thermique'] },
-  { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation'] },
+  { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation', 'Impression 3D métal'] },
   { group: 'Hydrogène & Énergie', cats: ['Hydrogène & Énergie'] },
   { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO', 'Drones & UAV'] },
 ];
