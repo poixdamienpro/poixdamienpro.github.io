@@ -11,6 +11,12 @@ const SERVICE_CATS = [
   'Essais & qualification',
   'Usinage & fabrication mécanique',
   'Intégration & assemblage système',
+  // Ajoutee lors de la mise en place des grandes categories catalogue :
+  // 1 des 3 produits (Spaceit) est explicitement un service ("controle de
+  // mission en tant que service"), et les 2 autres (antenne/station sol
+  // partagees) relevent plus de l'operation partagee que d'un composant
+  // qu'un acheteur integre dans son propre systeme -- voir js/pages/catalogue.js.
+  'Segment sol & opérations',
 ];
 
 let dirCurrentId = null;

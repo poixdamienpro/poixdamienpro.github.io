@@ -4,6 +4,48 @@
 let catCurrentId = null;
 const catIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
 
+// Hierarchie grandes categories / sous-categories (demande client 2026-09).
+// Chaque sous-categorie est la vraie valeur products.category en base —
+// aucune donnee n'est renommee pour construire cette hierarchie (à 3
+// exceptions pres, scindees en amont côté SQL parce qu'elles melangeaient
+// des produits de nature differente : voir
+// backend/supabase_reorganize_categories_2026_09.sql — "Infrastructure
+// SpaceVPX" -> Routers/Traitement de données, "Stockage de données
+// spatiales" -> Mémoires, "Traitement charge utile" -> Traitement de
+// données). Le regroupement en grande categorie, lui, est purement
+// cote frontend.
+const CATEGORY_GROUPS = [
+  { group: 'Battery & stockage d\'énergie', cats: ['Batteries & Stockage', 'OBC (On-Board Charger)'] },
+  { group: 'RF', cats: ['Communication & RF', 'Amplificateurs RF'] },
+  { group: 'Intelligence embarquée', cats: ['Calculateurs embarqués', 'Calculateurs embarqués Edge IA', 'Mémoires', 'Routers', 'Traitement de données'] },
+  { group: 'Capteurs & instrumentation', cats: ['Capteurs & Instrumentation', 'Capteurs ADAS', 'Navigation inertielle'] },
+  { group: 'Power & distribution', cats: ['Convertisseurs & Onduleurs', 'DC/DC Converters', 'Power Supplies', 'PDU (Power Distribution)', 'Panneaux solaires'] },
+  { group: 'Mobilité', cats: ['Moteurs & Entraînements', 'Électrification'] },
+  { group: 'Vannes & Actionneurs', cats: ['Vannes & Actionneurs', 'Actionneurs & GNC'] },
+  { group: 'Câblage & Connectique', cats: ['Câblage & Connecteurs', 'Connecteurs sous-marins'] },
+  { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision'] },
+  { group: 'Thermique', cats: ['Contrôle thermique'] },
+  { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO'] },
+];
+
+// Categories exclues du catalogue produit : prestations de service (memes
+// categories que js/pages/prestations.js et js/pages/carte.js — elles
+// apparaissent sur la page Prestataires, pas ici) + Plateformes satellites
+// (ce sont des systemes complets, pas des composants comparables par
+// caracteristiques ; visibles via la fiche entreprise / carte en attendant
+// un onglet Systemiers dedie).
+const CATALOGUE_EXCLUDED_CATS = [
+  'Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques',
+  'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système',
+  'Segment sol & opérations',
+  'Plateformes satellites',
+];
+
+function groupOfCat(cat) {
+  const g = CATEGORY_GROUPS.find(g => g.cats.includes(cat));
+  return g ? g.group : null;
+}
+
 // Filtres par caractéristique (électrique/mécanique/environnemental) — voir
 // backend/supabase_add_product_characteristics_2026_09.sql. charFilters ne
 // contient une entrée pour une caractéristique que lorsque l'utilisateur a
@@ -30,7 +72,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   showLoading(['products-list']);
   try {
     await loadTaxonomy();
-    initChips('cat-cat-chips', PROD_CATS, () => catCat, v => { catCat = v; charFilters = {}; resetTagFilters(); renderCharFilters(); renderTagFilters(); renderProducts(); });
+
+    const groupNames = CATEGORY_GROUPS.map(g => g.group).filter(g => CATEGORY_GROUPS.find(x => x.group === g).cats.some(c => PROD_CATS.includes(c)));
+    initChips('cat-cat-chips', groupNames, () => catGroup, v => {
+      catGroup = v; catSubCat = 'all'; charFilters = {}; resetTagFilters();
+      renderSubCatChips(); renderCharFilters(); renderTagFilters(); renderProducts();
+    });
     initChips('cat-ind-chips', INDUSTRIES, () => catInd, v => { catInd = v; charFilters = {}; resetTagFilters(); renderCharFilters(); renderTagFilters(); renderProducts(); });
 
     const params = new URLSearchParams(window.location.search);
@@ -38,9 +85,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (company) document.getElementById('cat-search').value = company;
 
     // Préselection de catégorie via ?cat= (liens depuis les pages composants)
+    // — le paramètre porte le nom de la sous-catégorie (valeur réelle
+    // products.category) ; on en déduit la grande catégorie parente.
     const cat = params.get('cat');
-    if (cat && PROD_CATS.includes(cat)) { catCat = cat; updateChips('cat-cat-chips', () => catCat); }
+    if (cat && !CATALOGUE_EXCLUDED_CATS.includes(cat) && PROD_CATS.includes(cat)) {
+      catSubCat = cat;
+      catGroup = groupOfCat(cat) || 'all';
+      updateChips('cat-cat-chips', () => catGroup);
+    }
 
+    renderSubCatChips();
     renderCharFilters();
     renderTagFilters();
     renderProducts();
@@ -51,6 +105,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// Chips de sous-catégorie (niveau 2), affichées seulement une fois une
+// grande catégorie choisie — sinon mélange de sous-catégories sans rapport
+// (ex. "Tous" mélangerait des vannes et des batteries).
+function renderSubCatChips() {
+  const wrap = document.getElementById('cat-subcat-chips');
+  if (!wrap) return;
+  if (catGroup === 'all') { wrap.innerHTML = ''; return; }
+  const g = CATEGORY_GROUPS.find(g => g.group === catGroup);
+  const subCats = (g ? g.cats : []).filter(c => PROD_CATS.includes(c));
+  // Groupe à sous-catégorie unique (ex. Thermique) : pas besoin de chips de
+  // niveau 2, mais on considère la sous-catégorie comme déjà sélectionnée
+  // (déjà aussi précis que possible) pour que les filtres caractéristiques
+  // s'affichent directement.
+  if (subCats.length <= 1) { wrap.innerHTML = ''; catSubCat = subCats.length === 1 ? subCats[0] : 'all'; return; }
+  wrap.innerHTML = '<div class="chip-group" id="cat-subcat-chip-group"></div>';
+  initChips('cat-subcat-chip-group', subCats, () => catSubCat, v => {
+    catSubCat = v; charFilters = {}; resetTagFilters();
+    renderCharFilters(); renderTagFilters(); renderProducts();
+  });
+  updateChips('cat-subcat-chip-group', () => catSubCat);
+}
+
 // Produits filtrés par recherche/catégorie/industrie SEULEMENT (sans les
 // filtres de caractéristiques) — sert de base stable pour savoir quelles
 // caractéristiques proposer dans le panneau de filtres, sans que celui-ci
@@ -58,8 +134,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 function baseFilteredProducts() {
   const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
   return PRODUCTS.filter(p => {
+    if (CATALOGUE_EXCLUDED_CATS.includes(p.cat)) return false;
     const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
-    return ms && (catCat === 'all' || p.cat === catCat) && (catInd === 'all' || p.industry === catInd);
+    const matchesGroup = catGroup === 'all' || groupOfCat(p.cat) === catGroup;
+    const matchesSub = catSubCat === 'all' || p.cat === catSubCat;
+    return ms && matchesGroup && matchesSub && (catInd === 'all' || p.industry === catInd);
   });
 }
 
@@ -131,17 +210,18 @@ function renderCharFilters() {
   const wrap = document.getElementById('cat-char-filters');
   if (!wrap) return;
 
-  // Sur "Tous", les caractéristiques de catégories très différentes (tension
-  // d'un micromoteur vs d'un moteur industriel, par ex.) se mélangent en une
+  // Sur "Tous" (ou une grande catégorie encore non affinée), les
+  // caractéristiques de sous-catégories très différentes (tension d'un
+  // micromoteur vs d'un moteur industriel, par ex.) se mélangent en une
   // seule plage géante et perdent tout sens — on n'affiche donc le panneau
-  // qu'une fois une catégorie précise choisie, pour avoir des filtres qui
-  // correspondent réellement au type d'équipement sélectionné.
-  if (catCat === 'all') {
+  // qu'une fois une sous-catégorie précise choisie, pour avoir des filtres
+  // qui correspondent réellement au type d'équipement sélectionné.
+  if (catSubCat === 'all') {
     wrap.innerHTML = `
       <div class="sidebar-divider"></div>
       <div class="sidebar-section">
         <div class="sidebar-label">Caractéristiques</div>
-        <p class="char-filters-hint">Choisissez une catégorie ci-dessus pour filtrer par tension, masse, température…</p>
+        <p class="char-filters-hint">Choisissez une catégorie précise ci-dessus pour filtrer par tension, masse, température…</p>
       </div>`;
     return;
   }
@@ -386,11 +466,12 @@ function onCatSearchInput() {
 
 function resetCatalogue() {
   document.getElementById('cat-search').value = '';
-  catCat = 'all'; catInd = 'all';
+  catGroup = 'all'; catSubCat = 'all'; catInd = 'all';
   charFilters = {};
   resetTagFilters();
-  updateChips('cat-cat-chips', () => catCat);
+  updateChips('cat-cat-chips', () => catGroup);
   updateChips('cat-ind-chips', () => catInd);
+  renderSubCatChips();
   renderCharFilters();
   renderTagFilters();
   renderProducts();

@@ -76,6 +76,10 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .chip{padding:3px 9px;border-radius:3px;border:1px solid var(--border);font-size:11px;font-weight:500;background:var(--white);color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;font-family:var(--sans)}
 .chip:hover{border-color:var(--ink);color:var(--ink)}
 .chip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+/* Sous-categories (niveau 2) sous les grandes categories du catalogue —
+   legerement en retrait et plus petites pour marquer la hierarchie. */
+#cat-subcat-chips{margin-top:6px;padding-left:8px;border-left:2px solid var(--border)}
+#cat-subcat-chips .chip{font-size:10px;padding:2px 7px}
 /* Filtres par caracteristique (electrique/mecanique/environnemental) —
    double curseur avec deux <input type=range> superposes (piste commune,
    chaque input ne capte le clic que sur son propre curseur). Voir
