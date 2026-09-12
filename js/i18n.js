@@ -129,6 +129,100 @@ const TRANSLATIONS = {
     prev_visit:          '↗ Visiter le site',
     prev_quote:          '✉ Demander un devis',
 
+    // Libellés partagés (carte, prestations, systémiers, fiches entreprise/produit)
+    lbl_search:          'Recherche',
+    lbl_industry:        'Industrie',
+    lbl_reset:           '↺ Réinitialiser',
+    lbl_hint_preview:    'Survolez pour prévisualiser',
+    lbl_info:            'Informations',
+    lbl_description:     'Description',
+    lbl_ranges_tech:     'Gammes & Technologies',
+    lbl_products_referenced: 'Produits référencés sur Buy-inner',
+    badge_premium:       '★ Premium',
+    badge_verified:      '✓ Vérifié',
+    tag_systemier:       '🔗 Systémier',
+    tag_prestataire:     '🧑‍💼 Prestataire de service',
+    btn_view_profile:    'Voir la fiche complète →',
+    btn_visit_site:      '↗ Visiter le site officiel',
+    btn_visit_short:     'Visiter le site →',
+    btn_request_quote:   '📩 Demander un devis',
+    btn_close:           '✕ Fermer',
+
+    // Page carte
+    map_title_prefix:    'Carte des',
+    map_title_suffix:    'en Europe',
+    map_subtitle:        'Localisez les fabricants, prestataires et systémiers référencés, ville par ville.',
+    map_label_type:      'Type',
+    map_fournisseurs:    'Fournisseurs',
+    map_prestataires:    'Prestataires',
+    map_systemiers:      'Systémiers',
+    map_kpi_mapped:      'Localisées',
+    map_kpi_total:       'Entreprises au total',
+    map_toolbar:         '// CARTE',
+    map_empty_fournisseurs: 'Aucun fournisseur géolocalisé pour l\'instant.',
+    map_empty_prestataires: 'Aucun prestataire géolocalisé pour l\'instant.',
+    map_empty_systemiers:   'Aucun systémier géolocalisé pour l\'instant.',
+    map_popup_hq:        'Siège',
+    map_popup_site:      'Site',
+    map_popup_link:      'Voir la fiche →',
+    map_located_one:     'localisé',
+    map_located_many:    'localisés',
+
+    // Page prestations
+    presta_title_html:   'Prestataires de <span>services</span> industriels',
+    presta_subtitle:      'Talents en régie, développement d\'équipements, fabrication de faisceaux électriques, essais & qualification, usinage, intégration système, segment sol & opérations.',
+    presta_kpi_c:        'Prestataires',
+    presta_kpi_types:    'Types de prestation',
+    presta_placeholder:  'Nom, pays, prestation…',
+    presta_label_type:   'Type de prestation',
+    presta_toolbar:      '// PRESTATIONS',
+    presta_empty:        'Aucun prestataire ne correspond.',
+    presta_count_one:    'prestataire',
+    presta_count_many:   'prestataires',
+    presta_services_label: 'Prestations proposées',
+
+    // Page systémiers
+    sys_title_html:      'Systémiers <span>& intégrateurs système</span>',
+    sys_subtitle_html:   'Ceux qui livrent un système complet — plateforme satellite, lanceur — pas un composant isolé. <a href="../blog/articles/systemier-vs-equipementier.html" style="color:inherit;text-decoration:underline">Systémier vs équipementier, quelle différence ?</a>',
+    sys_kpi_c:           'Systémiers',
+    sys_kpi_p:           'Systèmes référencés',
+    sys_placeholder:     'Nom, pays, système…',
+    sys_label_type:      'Type de système',
+    sys_toolbar:         '// SYSTÉMIERS',
+    sys_empty:           'Aucun systémier ne correspond.',
+    sys_count_one:       'systémier',
+    sys_count_many:      'systémiers',
+    sys_systems_label:   'Systèmes référencés',
+
+    // Fiches entreprise / produit
+    ent_claim_text:      'Fiche non revendiquée — construite à partir de données publiques. Êtes-vous',
+    ent_claim_link:      'Revendiquer',
+    modal_see_products:  '🔧 Voir tous leurs produits →',
+    prod_download_datasheet: '📄 Télécharger la datasheet',
+    prod_view_maker_prefix:  '↗ Voir la fiche',
+
+    // Modale devis
+    lead_modal_title:    'Demander un devis',
+    lead_intro:          'C\'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non, vous ne serez jamais inscrit à une liste de diffusion.',
+    lead_name:           'Nom complet',
+    lead_email:          'Email professionnel',
+    lead_company:        'Entreprise',
+    lead_need:           'Votre besoin',
+    lead_need_placeholder: 'Quantité, contraintes techniques, délai…',
+    lead_submit:         '📩 Envoyer la demande',
+    cmp_title:           'Comparaison technique',
+    cmp_criteria:        'Critère',
+    cmp_price_certs:     'Prix & Certifications',
+    cmp_price_label:     'Prix indicatif',
+    cmp_legend:          '🟢 Meilleure valeur · 🔴 Valeur la plus basse',
+    lead_login_link:     'Se connecter',
+    lead_login_suffix:   'pour préremplir vos infos et retrouver l\'historique de vos demandes.',
+    lead_sending:        'Envoi en cours…',
+    lead_success_title:  'Demande envoyée',
+    lead_success_body:   'Votre demande pour <strong>{company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement, vous n\'avez rien à payer.',
+    lbl_close:           'Fermer',
+    lead_error_alert:    'Erreur lors de l\'envoi. Vérifiez votre connexion et réessayez, ou écrivez-nous directement à',
+
     // Preview produit
     prod_specs:          'Spécifications',
     prod_scores:         'Scores relatifs',
@@ -139,7 +233,7 @@ const TRANSLATIONS = {
 
     // Comparateur
     cmp_banner:          'produit(s) sélectionné(s)',
-    cmp_compare:         'Comparer',
+    cmp_compare:         'Comparer →',
     cmp_clear:           'Vider',
 
     // États
@@ -275,6 +369,100 @@ const TRANSLATIONS = {
     prev_visit:          '↗ Visit website',
     prev_quote:          '✉ Request a quote',
 
+    // Libellés partagés (carte, prestations, systémiers, fiches entreprise/produit)
+    lbl_search:          'Search',
+    lbl_industry:        'Industry',
+    lbl_reset:           '↺ Reset',
+    lbl_hint_preview:    'Hover to preview',
+    lbl_info:            'Information',
+    lbl_description:     'Description',
+    lbl_ranges_tech:     'Ranges & Technologies',
+    lbl_products_referenced: 'Products listed on Buy-inner',
+    badge_premium:       '★ Premium',
+    badge_verified:      '✓ Verified',
+    tag_systemier:       '🔗 Systems integrator',
+    tag_prestataire:     '🧑‍💼 Service provider',
+    btn_view_profile:    'View full profile →',
+    btn_visit_site:      '↗ Visit official website',
+    btn_visit_short:     'Visit website →',
+    btn_request_quote:   '📩 Request a quote',
+    btn_close:           '✕ Close',
+
+    // Page carte
+    map_title_prefix:    'Map of',
+    map_title_suffix:    'in Europe',
+    map_subtitle:        'Locate listed manufacturers, service providers and systems integrators, city by city.',
+    map_label_type:      'Type',
+    map_fournisseurs:    'Suppliers',
+    map_prestataires:    'Service providers',
+    map_systemiers:      'Systems integrators',
+    map_kpi_mapped:      'Located',
+    map_kpi_total:       'Total companies',
+    map_toolbar:         '// MAP',
+    map_empty_fournisseurs: 'No supplier located yet.',
+    map_empty_prestataires: 'No service provider located yet.',
+    map_empty_systemiers:   'No systems integrator located yet.',
+    map_popup_hq:        'HQ',
+    map_popup_site:      'Site',
+    map_popup_link:      'View profile →',
+    map_located_one:     'located',
+    map_located_many:    'located',
+
+    // Page prestations
+    presta_title_html:   'Industrial <span>service</span> providers',
+    presta_subtitle:      'Staffing, equipment development, wiring harness manufacturing, testing & qualification, machining, system integration, ground segment & operations.',
+    presta_kpi_c:        'Service providers',
+    presta_kpi_types:    'Service types',
+    presta_placeholder:  'Name, country, service…',
+    presta_label_type:   'Service type',
+    presta_toolbar:      '// SERVICES',
+    presta_empty:        'No matching service provider.',
+    presta_count_one:    'service provider',
+    presta_count_many:   'service providers',
+    presta_services_label: 'Services offered',
+
+    // Page systémiers
+    sys_title_html:      'Systems integrators <span>& system builders</span>',
+    sys_subtitle_html:   'Those who deliver a complete system — satellite platform, launch vehicle — not a standalone component. <a href="../blog/articles/systemier-vs-equipementier.html" style="color:inherit;text-decoration:underline">Systems integrator vs. component supplier, what\'s the difference?</a>',
+    sys_kpi_c:           'Systems integrators',
+    sys_kpi_p:           'Listed systems',
+    sys_placeholder:     'Name, country, system…',
+    sys_label_type:      'System type',
+    sys_toolbar:         '// SYSTEMS INTEGRATORS',
+    sys_empty:           'No matching systems integrator.',
+    sys_count_one:       'systems integrator',
+    sys_count_many:      'systems integrators',
+    sys_systems_label:   'Listed systems',
+
+    // Fiches entreprise / produit
+    ent_claim_text:      'Unclaimed listing — built from public data. Are you',
+    ent_claim_link:      'Claim it',
+    modal_see_products:  '🔧 View all their products →',
+    prod_download_datasheet: '📄 Download datasheet',
+    prod_view_maker_prefix:  '↗ View',
+
+    // Modale devis
+    lead_modal_title:    'Request a quote',
+    lead_intro:          'It\'s free. Your request is sent to the supplier, who chooses whether to contact you back — you will never be added to a mailing list.',
+    lead_name:           'Full name',
+    lead_email:          'Business email',
+    lead_company:        'Company',
+    lead_need:           'Your requirement',
+    lead_need_placeholder: 'Quantity, technical constraints, timeline…',
+    lead_submit:         '📩 Send request',
+    cmp_title:           'Technical comparison',
+    cmp_criteria:        'Criterion',
+    cmp_price_certs:     'Price & Certifications',
+    cmp_price_label:     'Indicative price',
+    cmp_legend:          '🟢 Best value · 🔴 Lowest value',
+    lead_login_link:     'Log in',
+    lead_login_suffix:   'to prefill your info and find your request history.',
+    lead_sending:        'Sending…',
+    lead_success_title:  'Request sent',
+    lead_success_body:   'Your request for <strong>{company}</strong> has been sent. The supplier will be notified and may contact you directly — you have nothing to pay.',
+    lbl_close:           'Close',
+    lead_error_alert:    'Something went wrong while sending. Check your connection and try again, or email us directly at',
+
     // Preview produit
     prod_specs:          'Specifications',
     prod_scores:         'Performance scores',
@@ -285,7 +473,7 @@ const TRANSLATIONS = {
 
     // Comparateur
     cmp_banner:          'product(s) selected',
-    cmp_compare:         'Compare',
+    cmp_compare:         'Compare →',
     cmp_clear:           'Clear',
 
     // États
@@ -344,9 +532,15 @@ function applyLang() {
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
     if (val !== undefined) el.placeholder = val;
   });
-  // Re-rendu du contenu dynamique (liste entreprises / produits)
+  // Re-rendu du contenu dynamique (liste entreprises / produits) — chaque
+  // page définit la fonction qui la concerne, les autres restent undefined.
   if (typeof renderCompanies === 'function') renderCompanies();
   if (typeof renderProducts === 'function') renderProducts();
+  if (typeof renderSystemiers === 'function') renderSystemiers();
+  // Point d'extension générique pour un re-rendu supplémentaire propre à
+  // une page (ex: carte.js recalcule le titre/popup/carte, dont le texte
+  // n'est pas capturé par un simple data-i18n).
+  if (typeof onLangChange === 'function') onLangChange();
   // Mettre à jour le switcher
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);

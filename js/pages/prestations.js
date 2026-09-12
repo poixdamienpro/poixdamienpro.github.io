@@ -63,7 +63,7 @@ function renderCompanies() {
   const filtered = filteredCompanies();
 
   const count = document.getElementById('presta-count');
-  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> prestataire' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + t(filtered.length !== 1 ? 'presta_count_many' : 'presta_count_one');
 
   const list = document.getElementById('companies-list');
   const preview = document.getElementById('company-preview');
@@ -72,7 +72,7 @@ function renderCompanies() {
   dirCurrentId = null;
 
   if(!filtered.length) {
-    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucun prestataire ne correspond.</div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>' + t('presta_empty') + '</div>';
     if(preview) preview.innerHTML = '';
     return;
   }
@@ -121,12 +121,12 @@ function renderCompanyPreview(c) {
   const el = document.getElementById('company-preview');
   if(!el) return;
 
-  const details = [['Fondée', c.founded], ['Employés', c.employees], ['Secteur', c.industries.join(', ')], ['Siège', c.hq]]
+  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
 
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const servicesBlock = services.length ? `
-    <div class="dp-section-label">Prestations proposées</div>
+    <div class="dp-section-label">${t('presta_services_label')}</div>
     <div class="cat-tags" style="margin-top:8px">${services.map(s => '<span class="cat-tag">'+s+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
@@ -139,18 +139,18 @@ function renderCompanyPreview(c) {
         </div>
       </div>
       <div class="dp-badges">
-        ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
-        ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+        ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
+        ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
       <p class="dp-desc">${c.desc}</p>
-      <div class="dp-section-label">Informations</div>
+      <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${servicesBlock}
       <div class="dp-actions">
-        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche complète →</a>
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">Visiter le site →</a>
-        <button class="btn-quote" id="dp-quote">📩 Demander un devis</button>
+        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${t('btn_view_profile')}</a>
+        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
+        <button class="btn-quote" id="dp-quote">${t('btn_request_quote')}</button>
       </div>
     </div>`;
 

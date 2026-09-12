@@ -11,12 +11,10 @@ let mapType = 'fournisseurs';
 // une catégorie de produit tombe ici est comptée comme prestataire.
 const SERVICE_CATS = ['Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques', 'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système', 'Segment sol & opérations'];
 
-const MAP_TYPE_LABELS = { fournisseurs: 'fournisseurs', prestataires: 'prestataires', systemiers: 'systémiers' };
-const MAP_TYPE_EMPTY = {
-  fournisseurs: 'Aucun fournisseur géolocalisé pour l\'instant.',
-  prestataires: 'Aucun prestataire géolocalisé pour l\'instant.',
-  systemiers: 'Aucun systémier géolocalisé pour l\'instant.',
-};
+// Libellés traduits (js/i18n.js) — fonctions plutôt que des objets figés,
+// pour rester corrects après un changement de langue en cours de session.
+const mapTypeLabel = type => t({ fournisseurs: 'map_fournisseurs', prestataires: 'map_prestataires', systemiers: 'map_systemiers' }[type]);
+const mapTypeEmpty = type => t({ fournisseurs: 'map_empty_fournisseurs', prestataires: 'map_empty_prestataires', systemiers: 'map_empty_systemiers' }[type]);
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
@@ -48,7 +46,7 @@ function setMapType(type) {
   mapType = type;
   document.querySelectorAll('#map-type-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.type === type));
   const title = document.getElementById('map-type-title');
-  if (title) title.textContent = MAP_TYPE_LABELS[type];
+  if (title) title.textContent = mapTypeLabel(type);
   applyMapType();
 }
 
@@ -63,7 +61,7 @@ function applyMapType() {
 
   const emptyNote = document.getElementById('map-empty-note');
   if (emptyNote) {
-    emptyNote.textContent = MAP_TYPE_EMPTY[mapType];
+    emptyNote.textContent = mapTypeEmpty(mapType);
     emptyNote.style.display = filtered.length ? 'none' : 'block';
   }
 
@@ -147,7 +145,7 @@ function companyPopupHtml(c, loc, siteLabel) {
       <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${c.name}</div>
       <div class="map-popup-loc">${siteLabel ? `<strong>${siteLabel}</strong> — ` : ''}${loc}</div>
       <div class="map-popup-industry">${c.industries.join(', ')}</div>
-      <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche →</a>
+      <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">${t('map_popup_link')}</a>
     </div>
   `;
 }
@@ -162,7 +160,7 @@ function renderMarkers() {
   filtered.forEach(c => {
     const marker = L.marker([c.lat, c.lng], { icon: dot });
     const loc = [c.city, c.department, c.region].filter(Boolean).join(' · ') || c.hq || c.country;
-    const siteLabel = (c.locations && c.locations.length) ? 'Siège' : '';
+    const siteLabel = (c.locations && c.locations.length) ? t('map_popup_hq') : '';
     marker.bindPopup(companyPopupHtml(c, loc, siteLabel), { maxWidth: 210, autoPan: false });
     markerCluster.addLayer(marker);
 
@@ -172,13 +170,13 @@ function renderMarkers() {
       if (typeof site.lat !== 'number' || isNaN(site.lat) || typeof site.lng !== 'number' || isNaN(site.lng)) return;
       const siteMarker = L.marker([site.lat, site.lng], { icon: dot });
       const siteLoc = [site.city, site.country].filter(Boolean).join(' · ');
-      siteMarker.bindPopup(companyPopupHtml(c, siteLoc, site.label || 'Site'), { maxWidth: 210, autoPan: false });
+      siteMarker.bindPopup(companyPopupHtml(c, siteLoc, site.label || t('map_popup_site')), { maxWidth: 210, autoPan: false });
       markerCluster.addLayer(siteMarker);
     });
   });
 
   const count = document.getElementById('map-count');
-  if (count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + MAP_TYPE_LABELS[mapType] + ' localisé' + (filtered.length !== 1 ? 's' : '');
+  if (count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + mapTypeLabel(mapType) + ' ' + t(filtered.length !== 1 ? 'map_located_many' : 'map_located_one');
 }
 
 function resetMap() {
@@ -186,4 +184,10 @@ function resetMap() {
   updateChips('map-industry-chips', () => mapIndustry);
   renderMarkers();
   map.setView([50.5, 10], 4);
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : le titre
+// dynamique, les popups et le compteur ne sont pas capturés par data-i18n.
+function onLangChange() {
+  setMapType(mapType);
 }

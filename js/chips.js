@@ -6,7 +6,8 @@ function initChips(containerId, items, getState, setState) {
   el.innerHTML = '';
   const allBtn = document.createElement('button');
   allBtn.className = 'chip active';
-  allBtn.textContent = 'Tous';
+  allBtn.dataset.all = 'true';
+  allBtn.textContent = typeof t === 'function' ? t('all_filter') : 'Tous';
   allBtn.onclick = () => { setState('all'); updateChips(containerId, getState); };
   el.appendChild(allBtn);
   items.forEach(item => {
@@ -20,7 +21,6 @@ function initChips(containerId, items, getState, setState) {
 
 function updateChips(containerId, getState) {
   document.querySelectorAll('#' + containerId + ' .chip').forEach(c => {
-    const isAll = c.textContent === 'Tous';
-    c.classList.toggle('active', isAll ? getState() === 'all' : c.textContent === getState());
+    c.classList.toggle('active', c.dataset.all === 'true' ? getState() === 'all' : c.textContent === getState());
   });
 }

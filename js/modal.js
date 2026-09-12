@@ -19,7 +19,7 @@ function syncCompareButtons() {
   document.querySelectorAll('[data-cmp]').forEach(b => {
     const on = compareIds.includes(b.dataset.cmp);
     b.classList.toggle('on', on);
-    if(b.classList.contains('btn-cmp-add')) b.textContent = on ? '✓ Dans le comparateur' : '＋ Comparer';
+    if(b.classList.contains('btn-cmp-add')) b.textContent = on ? t('prod_compare_in') : t('prod_compare_add');
     else if(b.classList.contains('dir-cmp')) b.textContent = on ? '✓' : '＋';
   });
 }
@@ -74,22 +74,22 @@ function openCompareModal() {
     return `<tr><td class="row-label">📊 ${label}</td>${cells}</tr>`;
   }).join('');
 
-  const certRow = `<tr><td class="row-label">Certifications</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.join(', ')+'</td>').join('')}</tr>`;
-  const priceRow = `<tr><td class="row-label">Prix indicatif</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+p.price+'</td>').join('')}</tr>`;
+  const certRow = `<tr><td class="row-label">${t('prod_certs')}</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.join(', ')+'</td>').join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">${t('cmp_price_label')}</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+p.price+'</td>').join('')}</tr>`;
 
   document.getElementById('compare-table-wrap').innerHTML = `
     <table class="cmp-table">
-      <thead><tr><th style="min-width:150px">Critère</th>${hCols}</tr></thead>
+      <thead><tr><th style="min-width:150px">${t('cmp_criteria')}</th>${hCols}</tr></thead>
       <tbody>
-        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Spécifications techniques</td></tr>
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">${t('prod_specs')}</td></tr>
         ${specRows}
-        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Scores relatifs</td></tr>
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">${t('prod_scores')}</td></tr>
         ${barRows}
-        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">Prix & Certifications</td></tr>
+        <tr><td class="row-label cmp-section" colspan="${prods.length+1}">${t('cmp_price_certs')}</td></tr>
         ${priceRow}${certRow}
       </tbody>
     </table>
-    <p style="font-size:11px;color:var(--muted);margin-top:10px">🟢 Meilleure valeur · 🔴 Valeur la plus basse</p>`;
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">${t('cmp_legend')}</p>`;
 
   document.getElementById('compare-overlay').classList.add('open');
 }

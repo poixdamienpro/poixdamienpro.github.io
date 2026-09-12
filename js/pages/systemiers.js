@@ -57,7 +57,7 @@ function renderSystemiers() {
   const filtered = filteredSystemiers();
 
   const count = document.getElementById('sys-count');
-  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> systémier' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + t(filtered.length !== 1 ? 'sys_count_many' : 'sys_count_one');
 
   const list = document.getElementById('companies-list');
   const preview = document.getElementById('company-preview');
@@ -66,7 +66,7 @@ function renderSystemiers() {
   dirCurrentId = null;
 
   if(!filtered.length) {
-    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>Aucun systémier ne correspond.</div>';
+    list.innerHTML = '<div class="dir-empty"><div style="font-size:28px;opacity:.4;margin-bottom:8px">🔍</div>' + t('sys_empty') + '</div>';
     if(preview) preview.innerHTML = '';
     return;
   }
@@ -115,7 +115,7 @@ function renderSystemierPreview(c) {
   const el = document.getElementById('company-preview');
   if(!el) return;
 
-  const details = [['Fondée', c.founded], ['Employés', c.employees], ['Secteur', c.industries.join(', ')], ['Siège', c.hq]]
+  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
 
   // Systemes references pour cette entreprise (produits "systeme
@@ -124,7 +124,7 @@ function renderSystemierPreview(c) {
   // tag de categorie.
   const systems = PRODUCTS.filter(p => p.companyId === c.id && SYSTEMIER_CATS.includes(p.cat));
   const systemsBlock = systems.length ? `
-    <div class="dp-section-label">Systèmes référencés</div>
+    <div class="dp-section-label">${t('sys_systems_label')}</div>
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
       ${systems.map(s => `
         <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px">
@@ -144,19 +144,19 @@ function renderSystemierPreview(c) {
         </div>
       </div>
       <div class="dp-badges">
-        ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
-        ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
-        <span class="tag tag-industry">🔗 Systémier</span>
+        ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
+        ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
+        <span class="tag tag-industry">${t('tag_systemier')}</span>
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
       <p class="dp-desc">${c.desc}</p>
-      <div class="dp-section-label">Informations</div>
+      <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${systemsBlock}
       <div class="dp-actions">
-        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche complète →</a>
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">Visiter le site →</a>
-        <button class="btn-quote" id="dp-quote">📩 Demander un devis</button>
+        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${t('btn_view_profile')}</a>
+        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
+        <button class="btn-quote" id="dp-quote">${t('btn_request_quote')}</button>
       </div>
     </div>`;
 

@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const productsRows = await fetchRpc('get_products_by_company', { p_company_id: id });
     const products = productsRows.map(mapProduct);
 
+    // Caches pour re-rendu au changement de langue (voir onLangChange plus bas).
+    window._entCompany = c;
+    window._entProducts = products;
     renderCompany(c, products);
   } catch (err) {
     console.error('Erreur chargement fiche entreprise:', err);
@@ -64,42 +67,42 @@ function renderCompany(c, products) {
 
   document.getElementById('ent-body').innerHTML = `
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-      ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
-      ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
-      ${isPrestataire ? '<span class="tag tag-industry">🧑‍💼 Prestataire de service</span>' : ''}
-      ${c.isSystemier ? '<span class="tag tag-industry">🔗 Systémier</span>' : ''}
+      ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
+      ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
+      ${isPrestataire ? `<span class="tag tag-industry">${t('tag_prestataire')}</span>` : ''}
+      ${c.isSystemier ? `<span class="tag tag-industry">${t('tag_systemier')}</span>` : ''}
       ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
     </div>
     ${!c.premium ? `
     <div class="claim-banner">
       <span style="font-size:16px">ℹ️</span>
-      <p>Fiche non revendiquée — construite à partir de données publiques. Êtes-vous <strong>${c.name}</strong> ?</p>
-      <a href="supplier.html">Revendiquer</a>
+      <p>${t('ent_claim_text')} <strong>${c.name}</strong> ?</p>
+      <a href="supplier.html">${t('ent_claim_link')}</a>
     </div>` : ''}
     <div class="modal-section">
-      <div class="modal-section-title">Description</div>
+      <div class="modal-section-title">${t('lbl_description')}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${c.desc}</p>
     </div>
     <div class="modal-section">
-      <div class="modal-section-title">Informations société</div>
+      <div class="modal-section-title">${t('prev_info')}</div>
       <div class="detail-grid">
-        ${[['Fondée en', c.founded], ['Effectifs', c.employees], ['Secteur', industryLabel], ['Siège', [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
+        ${[[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), industryLabel], [t('prev_hq'), [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
           .map(([l, v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v}</div></div>`).join('')}
       </div>
     </div>
     ${services.length ? `
     <div class="modal-section">
-      <div class="modal-section-title">Activités de prestation</div>
-      <div class="modal-tags">${services.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="modal-section-title">${t('presta_services_label')}</div>
+      <div class="modal-tags">${services.map(s => `<span class="tag">${s}</span>`).join('')}</div>
     </div>` : ''}
     ${equipmentCats.length || c.tags.length ? `
     <div class="modal-section">
-      <div class="modal-section-title">Gammes & Technologies</div>
-      <div class="modal-tags">${[...equipmentCats, ...c.tags].map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="modal-section-title">${t('lbl_ranges_tech')}</div>
+      <div class="modal-tags">${[...equipmentCats, ...c.tags].map(g => `<span class="tag">${g}</span>`).join('')}</div>
     </div>` : ''}
     ${products.length ? `
     <div class="modal-section">
-      <div class="modal-section-title">${isPrestataire ? 'Prestations proposées sur Buy-inner' : 'Produits référencés sur Buy-inner'}</div>
+      <div class="modal-section-title">${isPrestataire ? t('presta_services_label') : t('lbl_products_referenced')}</div>
       <div class="modal-prod-grid">
         ${products.map(p => `
           <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
@@ -110,12 +113,18 @@ function renderCompany(c, products) {
       </div>
     </div>` : ''}
     <div class="modal-actions">
-      <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">↗ Visiter le site officiel</a>
-      <button class="btn-quote" onclick="openLeadModal('${c.name.replace(/'/g, "\\'")}', null, '${c.id}')">📩 Demander un devis</button>
+      <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${t('btn_visit_site')}</a>
+      <button class="btn-quote" onclick="openLeadModal('${c.name.replace(/'/g, "\\'")}', null, '${c.id}')">${t('btn_request_quote')}</button>
     </div>
   `;
 
   injectCompanyJsonLd(c);
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : le corps
+// de la fiche est construit en JS, pas via data-i18n.
+function onLangChange() {
+  if (window._entCompany) renderCompany(window._entCompany, window._entProducts);
 }
 
 function injectCompanyJsonLd(c) {

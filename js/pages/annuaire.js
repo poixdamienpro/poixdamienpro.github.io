@@ -128,8 +128,8 @@ function renderCompanyPreview(c) {
         </div>
       </div>
       <div class="dp-badges">
-        ${c.premium ? '<span class="badge-premium">★ Premium</span>' : ''}
-        ${c.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+        ${c.premium ? `<span class="badge-premium">${_t('badge_premium')}</span>` : ''}
+        ${c.verified ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
       <p class="dp-desc">${c.desc}</p>
@@ -137,7 +137,7 @@ function renderCompanyPreview(c) {
       <div class="dp-details">${details}</div>
       ${prodsBlock}
       <div class="dp-actions">
-        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">Voir la fiche complète →</a>
+        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${_t('btn_view_profile')}</a>
         <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${_t('prev_visit')}</a>
         <button class="btn-quote" id="dp-quote">${_t('prev_quote')}</button>
       </div>

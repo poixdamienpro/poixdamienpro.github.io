@@ -20,15 +20,16 @@ function openLeadModal(targetName, productName, companyId) {
 
 function resetLeadForm() {
   const p = (typeof buyerProfile !== 'undefined' && buyerProfile) ? buyerProfile : null;
+  const _t = typeof t === 'function' ? t : k => k;
   document.getElementById('lead-body').innerHTML = `
-    <p class="lead-intro">C'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non, vous ne serez jamais inscrit à une liste de diffusion.</p>
-    ${p ? '' : `<p class="lead-intro" style="margin-top:-8px"><a href="${ROOT_PREFIX}pages/compte-acheteur.html">Se connecter</a> pour préremplir vos infos et retrouver l'historique de vos demandes.</p>`}
+    <p class="lead-intro">${_t('lead_intro')}</p>
+    ${p ? '' : `<p class="lead-intro" style="margin-top:-8px"><a href="${ROOT_PREFIX}pages/compte-acheteur.html">${_t('lead_login_link')}</a> ${_t('lead_login_suffix')}</p>`}
     <form id="lead-form" onsubmit="submitLeadForm(event)">
-      <div class="lead-field"><label>Nom complet</label><input type="text" id="lead-name" value="${p && p.name ? p.name.replace(/"/g,'&quot;') : ''}" required/></div>
-      <div class="lead-field"><label>Email professionnel</label><input type="email" id="lead-email" value="${p && p.email ? p.email.replace(/"/g,'&quot;') : ''}" required/></div>
-      <div class="lead-field"><label>Entreprise</label><input type="text" id="lead-company" value="${p && p.company ? p.company.replace(/"/g,'&quot;') : ''}" required/></div>
-      <div class="lead-field"><label>Votre besoin</label><textarea id="lead-need" required placeholder="Quantité, contraintes techniques, délai…"></textarea></div>
-      <button type="submit" class="btn-quote" style="width:100%;justify-content:center">📩 Envoyer la demande</button>
+      <div class="lead-field"><label>${_t('lead_name')}</label><input type="text" id="lead-name" value="${p && p.name ? p.name.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_email')}</label><input type="email" id="lead-email" value="${p && p.email ? p.email.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_company')}</label><input type="text" id="lead-company" value="${p && p.company ? p.company.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_need')}</label><textarea id="lead-need" required placeholder="${_t('lead_need_placeholder')}"></textarea></div>
+      <button type="submit" class="btn-quote" style="width:100%;justify-content:center">${_t('lead_submit')}</button>
     </form>`;
 }
 
@@ -39,8 +40,9 @@ async function submitLeadForm(e) {
   const company = document.getElementById('lead-company').value;
   const need = document.getElementById('lead-need').value;
 
+  const _t = typeof t === 'function' ? t : k => k;
   const submitBtn = document.querySelector('#lead-form button[type=submit]');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi en cours…'; }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = _t('lead_sending'); }
 
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
@@ -94,14 +96,14 @@ async function submitLeadForm(e) {
     document.getElementById('lead-body').innerHTML = `
       <div class="lead-success">
         <div class="icon">✅</div>
-        <h3>Demande envoyée</h3>
-        <p>Votre demande pour <strong>${leadTarget.company}</strong> a été transmise. Le fournisseur sera informé et pourra vous recontacter directement, vous n'avez rien à payer.</p>
-        <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">Fermer</button>
+        <h3>${_t('lead_success_title')}</h3>
+        <p>${_t('lead_success_body').replace('{company}', leadTarget.company)}</p>
+        <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">${_t('lbl_close')}</button>
       </div>`;
   } catch (err) {
     console.error('Erreur envoi lead:', err);
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📩 Envoyer la demande'; }
-    alert(`Erreur lors de l'envoi. Vérifiez votre connexion et réessayez, ou écrivez-nous directement à ${FOUNDER_EMAIL}.`);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = _t('lead_submit'); }
+    alert(`${_t('lead_error_alert')} ${FOUNDER_EMAIL}.`);
   }
 }
 

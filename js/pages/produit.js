@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const row = await fetchOne('get_product_by_id', { p_id: id });
     if (!row) throw new Error('not found');
-    renderProduct(mapProduct(row));
+    // Cache pour re-rendu au changement de langue (voir onLangChange plus bas).
+    window._prodItem = mapProduct(row);
+    renderProduct(window._prodItem);
   } catch (err) {
     console.error('Erreur chargement fiche produit:', err);
     document.getElementById('prod-body').innerHTML = '<p style="color:#C0392B">Cette fiche produit n\'existe pas ou plus.</p>';
@@ -33,11 +35,11 @@ function renderProduct(p) {
   document.getElementById('prod-body').innerHTML = `
     ${p.image ? `<img src="${p.image}" alt="${p.name}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
     <div class="modal-section">
-      <div class="modal-section-title">Description</div>
+      <div class="modal-section-title">${t('lbl_description')}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${p.desc}</p>
     </div>
     <div class="modal-section">
-      <div class="modal-section-title">Spécifications techniques</div>
+      <div class="modal-section-title">${t('prod_specs')}</div>
       <table class="spec-table">
         <tbody>${p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}</tbody>
       </table>
@@ -49,14 +51,19 @@ function renderProduct(p) {
       ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + c + '</span>').join('')}</div>` : ''}
     </div>
     <div class="modal-actions">
-      <a class="btn-visit" href="entreprise.html?id=${p.companyId}">↗ Voir la fiche ${p.maker}</a>
-      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${p.datasheetUrl}" target="_blank" rel="noopener">📄 Télécharger la datasheet</a>` : ''}
-      <button class="btn-quote" id="prod-quote-btn">📩 Demander un devis — 💰 ${p.price}</button>
+      <a class="btn-visit" href="entreprise.html?id=${p.companyId}">${t('prod_view_maker_prefix')} ${p.maker}</a>
+      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${p.datasheetUrl}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>` : ''}
+      <button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${p.price}</button>
     </div>
   `;
   document.getElementById('prod-quote-btn').onclick = () => openLeadModal(p.maker, p.name, p.companyId);
 
   injectProductJsonLd(p);
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()).
+function onLangChange() {
+  if (window._prodItem) renderProduct(window._prodItem);
 }
 
 // "Thing" plutôt que "Product" : la plupart des fiches sont "Sur devis"

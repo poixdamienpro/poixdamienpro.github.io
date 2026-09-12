@@ -61,12 +61,12 @@
 <div class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Carte des <span id="map-type-title">fournisseurs</span> en Europe</h1>
-      <p class="page-subtitle">Localisez les fabricants, prestataires et systémiers référencés, ville par ville.</p>
+      <h1 class="page-title"><span data-i18n="map_title_prefix">Carte des</span> <span id="map-type-title">fournisseurs</span> <span data-i18n="map_title_suffix">en Europe</span></h1>
+      <p class="page-subtitle" data-i18n="map_subtitle">Localisez les fabricants, prestataires et systémiers référencés, ville par ville.</p>
     </div>
     <div class="kpi-row">
-      <div class="kpi"><div><div class="kpi-n" id="kpi-mapped">—</div><div class="kpi-l">Localisées</div></div></div>
-      <div class="kpi"><div><div class="kpi-n" id="kpi-total">—</div><div class="kpi-l">Entreprises au total</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-mapped">—</div><div class="kpi-l" data-i18n="map_kpi_mapped">Localisées</div></div></div>
+      <div class="kpi"><div><div class="kpi-n" id="kpi-total">—</div><div class="kpi-l" data-i18n="map_kpi_total">Entreprises au total</div></div></div>
     </div>
   </div>
 </div>
@@ -74,21 +74,21 @@
 <div class="dir dir-map">
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-label">Type</div>
+      <div class="sidebar-label" data-i18n="map_label_type">Type</div>
       <div class="chip-group" id="map-type-chips">
-        <button class="chip active" data-type="fournisseurs" onclick="setMapType('fournisseurs')">Fournisseurs</button>
-        <button class="chip" data-type="prestataires" onclick="setMapType('prestataires')">Prestataires</button>
-        <button class="chip" data-type="systemiers" onclick="setMapType('systemiers')">Systémiers</button>
+        <button class="chip active" data-type="fournisseurs" onclick="setMapType('fournisseurs')" data-i18n="map_fournisseurs">Fournisseurs</button>
+        <button class="chip" data-type="prestataires" onclick="setMapType('prestataires')" data-i18n="map_prestataires">Prestataires</button>
+        <button class="chip" data-type="systemiers" onclick="setMapType('systemiers')" data-i18n="map_systemiers">Systémiers</button>
       </div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Industrie</div>
+      <div class="sidebar-label" data-i18n="lbl_industry">Industrie</div>
       <div class="chip-group" id="map-industry-chips"></div>
     </div>
-    <button class="reset-btn" onclick="resetMap()">↺ Réinitialiser</button>
+    <button class="reset-btn" onclick="resetMap()" data-i18n="lbl_reset">↺ Réinitialiser</button>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <span class="toolbar-label">// CARTE</span><span class="result-count" id="map-count"></span>
+      <span class="toolbar-label" data-i18n="map_toolbar">// CARTE</span><span class="result-count" id="map-count"></span>
     </div>
   </aside>
   <div class="dir-list-col">
