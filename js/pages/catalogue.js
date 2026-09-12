@@ -21,15 +21,16 @@ const CATEGORY_GROUPS = [
   { group: 'RF', cats: ['Communication & RF', 'Amplificateurs RF'] },
   { group: 'Intelligence embarquée', cats: ['Calculateurs embarqués', 'Calculateurs embarqués Edge IA', 'Mémoires', 'Routers', 'Traitement de données'] },
   { group: 'Capteurs & instrumentation', cats: ['Capteurs & Instrumentation', 'Capteurs ADAS', 'Navigation inertielle'] },
-  { group: 'Power & distribution', cats: ['Convertisseurs & Onduleurs', 'DC/DC Converters', 'Power Supplies', 'PDU (Power Distribution)', 'Panneaux solaires'] },
+  { group: 'Power & distribution', cats: ['Convertisseurs & Onduleurs', 'DC/DC Converters', 'Power Supplies', 'PDU (Power Distribution)', 'Panneaux solaires', 'Bornes de recharge'] },
   { group: 'Mobilité', cats: ['Moteurs & Entraînements', 'Électrification'] },
   { group: 'Vannes & Actionneurs', cats: ['Vannes & Actionneurs', 'Actionneurs & GNC'] },
   { group: 'Câblage & Connectique', cats: ['Câblage & Connecteurs', 'Connecteurs sous-marins'] },
   { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision', 'Logiciels de cybersécurité'] },
   { group: 'Thermique', cats: ['Contrôle thermique'] },
-  { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation', 'Impression 3D métal'] },
+  { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation', 'Impression 3D métal', 'Impression 3D béton'] },
   { group: 'Hydrogène & Énergie', cats: ['Hydrogène & Énergie'] },
-  { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO', 'Drones & UAV'] },
+  { group: 'Photonique & Quantique', cats: ['Photonique & Optique', 'Informatique quantique'] },
+  { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO', 'Drones & UAV', 'Recyclage & Économie circulaire'] },
 ];
 
 // Categories exclues du catalogue produit : prestations de service (memes
