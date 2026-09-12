@@ -188,6 +188,10 @@ function resetMap() {
 
 // Re-rendu au changement de langue (voir js/i18n.js applyLang()) : le titre
 // dynamique, les popups et le compteur ne sont pas capturés par data-i18n.
+// Garde nécessaire : loadLayout() (donc applyLang(), donc ce hook) s'exécute
+// AVANT initMap() dans le DOMContentLoaded plus bas -- sans elle, ce hook
+// tente d'utiliser markerCluster avant sa creation et fait planter la carte.
 function onLangChange() {
+  if (!markerCluster) return;
   setMapType(mapType);
 }
