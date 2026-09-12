@@ -25,7 +25,7 @@ const CATEGORY_GROUPS = [
   { group: 'Mobilité', cats: ['Moteurs & Entraînements', 'Électrification'] },
   { group: 'Vannes & Actionneurs', cats: ['Vannes & Actionneurs', 'Actionneurs & GNC'] },
   { group: 'Câblage & Connectique', cats: ['Câblage & Connecteurs', 'Connecteurs sous-marins'] },
-  { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision'] },
+  { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision', 'Logiciels de cybersécurité'] },
   { group: 'Thermique', cats: ['Contrôle thermique'] },
   { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation'] },
   { group: 'Hydrogène & Énergie', cats: ['Hydrogène & Énergie'] },
