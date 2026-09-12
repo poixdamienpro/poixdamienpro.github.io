@@ -27,7 +27,9 @@ const CATEGORY_GROUPS = [
   { group: 'Câblage & Connectique', cats: ['Câblage & Connecteurs', 'Connecteurs sous-marins'] },
   { group: 'Software', cats: ['Logiciels & Systèmes MRO', 'Logiciels de supervision'] },
   { group: 'Thermique', cats: ['Contrôle thermique'] },
-  { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO'] },
+  { group: 'Robotique & Automatisation', cats: ['Robotique & Automatisation'] },
+  { group: 'Hydrogène & Énergie', cats: ['Hydrogène & Énergie'] },
+  { group: 'Autres', cats: ['Manipulateurs sous-marins', 'Pièces & MRO', 'Drones & UAV'] },
 ];
 
 // Categories exclues du catalogue produit : prestations de service (memes
@@ -42,6 +44,7 @@ const CATALOGUE_EXCLUDED_CATS = [
   'Segment sol & opérations',
   'Lanceurs',
   'Plateformes satellites',
+  'Véhicules',
 ];
 
 function groupOfCat(cat) {
