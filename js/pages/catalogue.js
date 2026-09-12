@@ -6,16 +6,18 @@ const catIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
 
 // Hierarchie grandes categories / sous-categories (demande client 2026-09).
 // Chaque sous-categorie est la vraie valeur products.category en base —
-// aucune donnee n'est renommee pour construire cette hierarchie (à 3
-// exceptions pres, scindees en amont côté SQL parce qu'elles melangeaient
-// des produits de nature differente : voir
+// aucune donnee n'est renommee pour construire cette hierarchie (à
+// quelques exceptions pres, scindees en amont côté SQL parce qu'elles
+// melangeaient des produits de nature differente : voir
 // backend/supabase_reorganize_categories_2026_09.sql — "Infrastructure
 // SpaceVPX" -> Routers/Traitement de données, "Stockage de données
 // spatiales" -> Mémoires, "Traitement charge utile" -> Traitement de
-// données). Le regroupement en grande categorie, lui, est purement
-// cote frontend.
+// données — et backend/supabase_split_batteries_subcategories_2026_09.sql
+// — "Batteries & Stockage" (56 produits, un seul bloc) -> Cellules
+// accumulateurs / BMS / Modules batteries). Le regroupement en grande
+// categorie, lui, est purement cote frontend.
 const CATEGORY_GROUPS = [
-  { group: 'Battery & stockage d\'énergie', cats: ['Batteries & Stockage', 'OBC (On-Board Charger)'] },
+  { group: 'Battery & stockage d\'énergie', cats: ['Cellules accumulateurs', 'BMS', 'Modules batteries', 'OBC (On-Board Charger)'] },
   { group: 'RF', cats: ['Communication & RF', 'Amplificateurs RF'] },
   { group: 'Intelligence embarquée', cats: ['Calculateurs embarqués', 'Calculateurs embarqués Edge IA', 'Mémoires', 'Routers', 'Traitement de données'] },
   { group: 'Capteurs & instrumentation', cats: ['Capteurs & Instrumentation', 'Capteurs ADAS', 'Navigation inertielle'] },
@@ -85,10 +87,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (company) document.getElementById('cat-search').value = company;
 
     // Préselection de catégorie via ?cat= (liens depuis les pages composants)
-    // — le paramètre porte le nom de la sous-catégorie (valeur réelle
-    // products.category) ; on en déduit la grande catégorie parente.
+    // — le paramètre porte soit le nom d'une grande catégorie (ex. liens qui
+    // pointaient vers "Batteries & Stockage" avant son éclatement en
+    // sous-catégories), soit le nom d'une sous-catégorie (valeur réelle
+    // products.category), dont on déduit alors la grande catégorie parente.
     const cat = params.get('cat');
-    if (cat && !CATALOGUE_EXCLUDED_CATS.includes(cat) && PROD_CATS.includes(cat)) {
+    if (cat && CATEGORY_GROUPS.some(g => g.group === cat)) {
+      catGroup = cat;
+      updateChips('cat-cat-chips', () => catGroup);
+    } else if (cat && !CATALOGUE_EXCLUDED_CATS.includes(cat) && PROD_CATS.includes(cat)) {
       catSubCat = cat;
       catGroup = groupOfCat(cat) || 'all';
       updateChips('cat-cat-chips', () => catGroup);
