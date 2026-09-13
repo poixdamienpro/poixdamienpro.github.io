@@ -932,6 +932,14 @@ body.theme-dark::after{
 .cat-uc li::before{content:'▸';position:absolute;left:0;color:var(--rust)}
 .cat-final .cat-h2{font-size:19px;margin-bottom:10px}
 
+/* Fondateur (page qui-sommes-nous) */
+.founder-card{display:flex;gap:22px;align-items:flex-start;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px}
+.founder-avatar{width:72px;height:72px;border-radius:50%;background:rgba(212,80,10,.18);border:1px solid rgba(212,80,10,.45);color:#F0975C;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:22px;flex-shrink:0}
+.founder-name{font-family:var(--serif);font-size:19px;color:#F3F1EC;margin-bottom:2px}
+.founder-role{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--rust);margin-bottom:10px}
+.founder-bio{font-size:13px;line-height:1.7;color:var(--text2);margin:0;max-width:64ch}
+@media(max-width:600px){.founder-card{flex-direction:column;align-items:flex-start}}
+
 /* Hub */
 .hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .hub-card{display:flex;flex-direction:column;gap:7px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:22px;text-decoration:none;transition:all .15s}
