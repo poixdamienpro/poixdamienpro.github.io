@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Fournisseurs véhicules électriques : sourcer une chaîne de traction (3/5) | Buy-inner</title>
 <meta name="description" content="ISO 26262, homologations R100 et UN38.3, architecture 400V vs 800V, LFP vs NMC — les contraintes qui structurent le sourcing de la chaîne de traction électrique."/>
-<meta name="keywords" content="fournisseur vehicule electrique, ISO 26262, ASIL, architecture 400V 800V, OBC chargeur embarque, fournisseur batterie VE France"/>
+<meta name="keywords" content="fournisseur vehicule electrique, ISO 26262, ASIL, architecture 400V 800V, chargeur embarque, fournisseur batterie VE France"/>
 <meta property="og:title" content="Fournisseurs véhicules électriques : sourcer une chaîne de traction (3/5)"/>
 <meta property="og:description" content="ISO 26262, homologations R100 et UN38.3, architecture 400V vs 800V, LFP vs NMC — les contraintes du sourcing de la chaîne de traction électrique."/>
 <meta property="og:type" content="article"/>
@@ -124,7 +124,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
 <div class="cat-body">
 
   <div class="cat-section" style="margin-top:48px">
-    <p>L'électrification de la mobilité ne se résume pas à choisir une cellule. C'est une chaîne complète — cellules et packs, chargeur embarqué (OBC), convertisseurs DC/DC, distribution haute tension — où chaque maillon impose des contraintes de compatibilité aux autres. Sourcer un composant isolément, sans avoir figé l'architecture globale, est la source la plus fréquente de reprises de conception.</p>
+    <p>L'électrification de la mobilité ne se résume pas à choisir une cellule. C'est une chaîne complète — cellules et packs, chargeur embarqué, convertisseurs DC/DC, distribution haute tension — où chaque maillon impose des contraintes de compatibilité aux autres. Sourcer un composant isolément, sans avoir figé l'architecture globale, est la source la plus fréquente de reprises de conception.</p>
   </div>
 
   <!-- SURETE ET HOMOLOGATION -->
@@ -146,11 +146,11 @@ body { background: var(--ink-3); color: var(--t-hi); }
   <div class="cat-section">
     <div class="cat-section-label">Contrainte 2</div>
     <h2>L'architecture <em>verrouille toute la chaîne</em></h2>
-    <p>Le choix d'une architecture 400V ou 800V se prend tôt dans un projet, et se répercute en cascade sur le chargeur embarqué (OBC), les convertisseurs DC/DC et le dimensionnement du câblage. Un OBC conçu pour du 400V n'est pas simplement moins performant sur du 800V — il n'est généralement pas compatible du tout, ce qui interdit de changer d'architecture à mi-projet sans tout requalifier.</p>
+    <p>Le choix d'une architecture 400V ou 800V se prend tôt dans un projet, et se répercute en cascade sur le chargeur embarqué, les convertisseurs DC/DC et le dimensionnement du câblage. Un chargeur embarqué conçu pour du 400V n'est pas simplement moins performant sur du 800V — il n'est généralement pas compatible du tout, ce qui interdit de changer d'architecture à mi-projet sans tout requalifier.</p>
     <p>Le choix de chimie cellule reste l'autre arbitrage structurant : LFP pour le coût et la longévité, NMC pour la densité énergétique. C'est un compromis autonomie / prix / sécurité que nous détaillons dans notre <a href="cellules-batterie-lfp-nmc.html" style="color:#8FB4D6">guide comparatif LFP vs NMC</a>, premier volet de notre série sur les chimies de cellules.</p>
     <div class="pitfall-box">
       <div class="pitfall-box-label">Erreur fréquente</div>
-      <p>Sourcer un OBC ou un convertisseur DC/DC avant d'avoir figé l'architecture de tension du véhicule. Le composant le plus performant du marché ne sert à rien s'il n'est pas compatible avec le bus retenu.</p>
+      <p>Sourcer un chargeur embarqué ou un convertisseur DC/DC avant d'avoir figé l'architecture de tension du véhicule. Le composant le plus performant du marché ne sert à rien s'il n'est pas compatible avec le bus retenu.</p>
     </div>
     <div class="example-box">
       <div class="example-box-label">Exemples de produits référencés</div>
@@ -168,7 +168,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
     <div class="cat-section-label">Synthèse</div>
     <h2>Checklist avant de <em>sourcer une chaîne de traction</em></h2>
     <div class="checklist">
-      <label><input type="checkbox" disabled/> L'architecture de tension (400V ou 800V) est-elle figée avant de sourcer OBC et convertisseurs ?</label>
+      <label><input type="checkbox" disabled/> L'architecture de tension (400V ou 800V) est-elle figée avant de sourcer chargeur embarqué et convertisseurs ?</label>
       <label><input type="checkbox" disabled/> Le niveau ASIL requis par fonction est-il défini, et le composant l'atteint-il réellement ?</label>
       <label><input type="checkbox" disabled/> Les trois homologations (R100, UN38.3, CEM auto) sont-elles couvertes, pas seulement l'une d'entre elles ?</label>
       <label><input type="checkbox" disabled/> L'arbitrage de chimie (LFP vs NMC) est-il cohérent avec le compromis autonomie / prix / sécurité visé ?</label>
