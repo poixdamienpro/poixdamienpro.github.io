@@ -253,6 +253,7 @@ async function handleEntreprisePage(request, env, ctx) {
   let response = new HTMLRewriter()
     .on('title', new SetHtml(escapeHtml(title)))
     .on('meta[name="description"]', new SetAttr('content', desc))
+    .on('link[rel="canonical"]', new SetAttr('href', `https://www.buy-inner.com/pages/entreprise.html?id=${encodeURIComponent(id)}`))
     .on('#ent-header', new SetHtml(headerHtml))
     .on('#ent-body', new SetHtml(bodyHtml))
     .transform(originRes);
@@ -293,6 +294,7 @@ async function handleProduitPage(request, env, ctx) {
   let response = new HTMLRewriter()
     .on('title', new SetHtml(escapeHtml(title)))
     .on('meta[name="description"]', new SetAttr('content', desc))
+    .on('link[rel="canonical"]', new SetAttr('href', `https://www.buy-inner.com/pages/produit.html?id=${encodeURIComponent(id)}`))
     .on('#prod-header', new SetHtml(headerHtml))
     .on('#prod-body', new SetHtml(bodyHtml))
     .transform(originRes);
