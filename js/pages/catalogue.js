@@ -17,7 +17,7 @@ const catIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
 // accumulateurs / BMS / Modules batteries). Le regroupement en grande
 // categorie, lui, est purement cote frontend.
 const CATEGORY_GROUPS = [
-  { group: 'Battery & stockage d\'énergie', cats: ['Cellules accumulateurs', 'BMS', 'Modules batteries', 'OBC (On-Board Charger)'] },
+  { group: 'Battery & stockage d\'énergie', cats: ['Cellules accumulateurs', 'BMS', 'Modules batteries', 'Chargeur embarqué'] },
   { group: 'RF', cats: ['Communication & RF', 'Amplificateurs RF'] },
   { group: 'Intelligence embarquée', cats: ['Calculateurs embarqués', 'Calculateurs embarqués Edge IA', 'Mémoires', 'Routers', 'Traitement de données'] },
   { group: 'Capteurs & instrumentation', cats: ['Capteurs & Instrumentation', 'Capteurs ADAS', 'Navigation inertielle'] },
