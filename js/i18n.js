@@ -4,13 +4,17 @@
 const TRANSLATIONS = {
   fr: {
     // Nav
+    nav_cat_annuaire:    'Annuaire',
+    nav_annuaire:        'Fabricants',
     nav_systemiers:      'Systémiers',
     nav_carte:           'Carte de l\'écosystème',
+    nav_cat_ressources:  'Ressources',
     nav_composants:      'Composants',
     nav_secteurs:        'Secteurs',
     nav_produits:        'Produits & Specs',
     nav_prestations:     'Prestations',
     nav_guides:          'Guides techniques',
+    nav_cat_entreprise:  'Entreprise',
     nav_tarifs:          'Tarifs',
     nav_fournisseur:     'Espace fournisseur',
     nav_mon_compte:      'Mon compte',
@@ -244,13 +248,17 @@ const TRANSLATIONS = {
 
   en: {
     // Nav
+    nav_cat_annuaire:    'Directory',
+    nav_annuaire:        'Manufacturers',
     nav_systemiers:      'Systems integrators',
     nav_carte:           'Ecosystem map',
+    nav_cat_ressources:  'Resources',
     nav_composants:      'Components',
     nav_secteurs:        'Industries',
     nav_produits:        'Products & Specs',
     nav_prestations:     'Services',
     nav_guides:          'Technical Guides',
+    nav_cat_entreprise:  'Company',
     nav_tarifs:          'Pricing',
     nav_fournisseur:     'Supplier Portal',
     nav_mon_compte:      'My account',

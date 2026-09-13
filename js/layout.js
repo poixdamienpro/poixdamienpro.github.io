@@ -77,17 +77,47 @@ function initMobileNav() {
     const isOpen = nav.classList.toggle('nav-open');
     toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
-  nav.querySelectorAll('.nav-link, .btn-signup').forEach(el => {
+
+  // Boutons de catégorie (Annuaire / Ressources / Entreprise) : au clic,
+  // on ouvre/ferme leur sous-menu sans fermer tout le nav mobile — seul un
+  // vrai lien terminal (.nav-drop-link) ou un lien de premier niveau sans
+  // sous-menu doit refermer le nav (cf. boucle plus bas).
+  nav.querySelectorAll('.nav-drop-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.nav-item');
+      const isOpen = item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      nav.querySelectorAll('.nav-item.open').forEach(other => {
+        if (other !== item) {
+          other.classList.remove('open');
+          other.querySelector('.nav-drop-btn')?.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!nav.contains(e.target)) {
+      nav.querySelectorAll('.nav-item.open').forEach(item => {
+        item.classList.remove('open');
+        item.querySelector('.nav-drop-btn')?.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+
+  nav.querySelectorAll('.nav-link:not(.nav-drop-btn), .nav-drop-link, .btn-signup').forEach(el => {
     el.addEventListener('click', () => {
       nav.classList.remove('nav-open');
       toggle.setAttribute('aria-expanded', 'false');
+      nav.querySelectorAll('.nav-item.open').forEach(item => item.classList.remove('open'));
     });
   });
 }
 
 function markActiveNavLink() {
   const link = document.querySelector('[data-page="' + (window.CURRENT_PAGE || 'home') + '"]');
-  if (link) link.classList.add('active');
+  if (!link) return;
+  link.classList.add('active');
+  link.closest('.nav-item')?.querySelector('.nav-drop-btn')?.classList.add('active');
 }
 
 function closeModal(id) {

@@ -34,6 +34,18 @@ nav.main{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.10);pos
 .nav-link{display:flex;align-items:center;padding:0 14px;border:none;background:transparent;color:rgba(243,241,236,.62);border-bottom:2px solid transparent;font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;font-family:var(--sans);text-decoration:none}
 .nav-link:hover{color:#F3F1EC}
 .nav-link.active{color:var(--rust);border-bottom-color:var(--rust);font-weight:700}
+.nav-item{position:relative;display:flex;align-items:stretch}
+.nav-drop-btn{gap:5px}
+.nav-caret{font-size:9px;opacity:.55;transition:transform .15s}
+.nav-item.open .nav-caret{transform:rotate(180deg)}
+.nav-dropdown{position:absolute;top:100%;left:0;min-width:230px;background:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px;box-shadow:0 14px 32px rgba(0,0,0,.35);padding:6px;display:none;flex-direction:column;z-index:110}
+.nav-item.open .nav-dropdown{display:flex}
+.nav-drop-link{display:block;padding:9px 12px;font-size:13px;font-weight:500;color:rgba(243,241,236,.68);border-radius:5px;text-decoration:none;white-space:nowrap;font-family:var(--sans);transition:background .12s,color .12s}
+.nav-drop-link:hover{background:rgba(255,255,255,.07);color:#F3F1EC}
+.nav-drop-link.active{color:var(--rust);font-weight:700}
+@media(min-width:901px){
+  .nav-item:hover .nav-dropdown{display:flex}
+}
 .nav-right{display:flex;align-items:center;gap:8px}
 .free-pill{padding:5px 12px;border-radius:4px;border:1px solid rgba(63,154,114,.5);background:rgba(63,154,114,.14);color:#86D6AC;font-size:11px;font-weight:700;letter-spacing:.02em}
 .btn-signup{display:inline-flex;align-items:center;padding:7px 16px;border-radius:4px;background:var(--rust);border:none;color:#fff;font-size:12px;font-weight:700;text-decoration:none}
@@ -56,6 +68,11 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
   nav.main.nav-open .nav-link{height:46px;padding:0 4px;border-bottom:1px solid rgba(255,255,255,.05)}
   nav.main.nav-open .nav-right{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:14px}
   nav.main.nav-open .lang-switcher{margin-left:0}
+  .nav-item{position:static;display:block}
+  .nav-drop-btn{width:100%;justify-content:space-between}
+  .nav-dropdown{position:static;background:none;border:none;box-shadow:none;padding:0 0 0 14px;border-radius:0;display:none}
+  .nav-item.open .nav-dropdown{display:flex}
+  .nav-drop-link{height:40px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.05)}
 }
 
 /* PAGES */

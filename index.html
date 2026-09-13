@@ -125,6 +125,14 @@ a{color:inherit;text-decoration:none}
   padding:9px 14px;white-space:nowrap;border-radius:6px;transition:color .18s,background .18s;display:block}
 .side-nav a:hover{color:var(--t-hi);background:rgba(255,255,255,.06)}
 .side-nav a.side-nav-cta{color:var(--rust);font-weight:700;margin-top:4px;border-top:1px solid var(--line);padding-top:12px}
+.side-nav summary{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--t-low);
+  padding:9px 14px;white-space:nowrap;border-radius:6px;cursor:pointer;list-style:none;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;transition:color .18s,background .18s}
+.side-nav summary::-webkit-details-marker{display:none}
+.side-nav summary::after{content:'▾';font-size:9px;opacity:.5;transition:transform .15s}
+.side-nav details[open] summary::after{transform:rotate(180deg)}
+.side-nav summary:hover{color:var(--t-hi);background:rgba(255,255,255,.06)}
+.side-nav details a{padding-left:26px;font-size:10.5px}
 @media(max-width:1400px){.side-nav{display:none}}
 
 /* menu rapide replié (tablette / laptop / mobile) */
@@ -142,6 +150,14 @@ a{color:inherit;text-decoration:none}
 .mnav-panel a{font-family:var(--sans);font-size:14px;color:var(--t-mid);padding:12px 4px;border-bottom:1px solid var(--line);transition:color .18s}
 .mnav-panel a:hover{color:var(--t-hi)}
 .mnav-panel a:last-child{border-bottom:0}
+.mnav-panel details{border-bottom:1px solid var(--line)}
+.mnav-panel details a{display:block;padding-left:14px;font-size:13px}
+.mnav-panel details a:last-child{border-bottom:0}
+.mnav-panel summary{font-family:var(--sans);font-size:14px;color:var(--t-mid);padding:12px 4px;
+  cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mnav-panel summary::-webkit-details-marker{display:none}
+.mnav-panel summary::after{content:'▾';font-size:10px;opacity:.5;transition:transform .15s}
+.mnav-panel details[open] summary::after{transform:rotate(180deg)}
 
 /* rail vertical de progression (stations) */
 .rail{right:26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:16px;align-items:center}
@@ -378,27 +394,49 @@ a{color:inherit;text-decoration:none}
 
 <!-- Menu latéral rapide (desktop large) -->
 <nav class="side-nav" aria-label="Navigation rapide">
-  <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a>
-  <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
-  <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
-  <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+  <details>
+    <summary data-i18n="nav_cat_annuaire">Annuaire</summary>
+    <a href="pages/annuaire.html" data-i18n="nav_annuaire">Fabricants</a>
+    <a href="pages/systemiers.html" data-i18n="nav_systemiers">Systémiers</a>
+    <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
+    <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+    <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
+  </details>
   <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
-  <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
-  <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
-  <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  <details>
+    <summary data-i18n="nav_cat_ressources">Ressources</summary>
+    <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
+    <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
+  </details>
+  <details>
+    <summary data-i18n="nav_cat_entreprise">Entreprise</summary>
+    <a href="pages/qui-sommes-nous.html" data-i18n="footer_about">Qui sommes-nous</a>
+    <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  </details>
   <a class="side-nav-cta" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
 </nav>
 
 <!-- Menu rapide replié (tablette / laptop / mobile) -->
 <div class="mnav-panel" id="mnavPanel">
-  <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a>
-  <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
-  <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
-  <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+  <details>
+    <summary data-i18n="nav_cat_annuaire">Annuaire</summary>
+    <a href="pages/annuaire.html" data-i18n="nav_annuaire">Fabricants</a>
+    <a href="pages/systemiers.html" data-i18n="nav_systemiers">Systémiers</a>
+    <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
+    <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
+    <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
+  </details>
   <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
-  <a href="pages/prestations.html" data-i18n="nav_prestations">Prestations</a>
-  <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
-  <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  <details>
+    <summary data-i18n="nav_cat_ressources">Ressources</summary>
+    <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
+    <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
+  </details>
+  <details>
+    <summary data-i18n="nav_cat_entreprise">Entreprise</summary>
+    <a href="pages/qui-sommes-nous.html" data-i18n="footer_about">Qui sommes-nous</a>
+    <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
+  </details>
   <a href="pages/submit.html" data-i18n="hud_submit">Référencer mon entreprise</a>
 </div>
 
@@ -628,7 +666,7 @@ a{color:inherit;text-decoration:none}
       <a class="btn ghost" href="pages/catalogue.html" data-i18n="outro_btn2">Parcourir le catalogue</a>
     </div>
     <nav class="colophon" aria-label="Plan du site">
-      <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a><span>·</span><a href="pages/catalogue.html">Catalogue</a><span>·</span><a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a><span>·</span><a href="pages/submit.html" data-i18n="nav_referencer">Référencer mon entreprise</a><span>·</span><a href="pages/supplier.html" data-i18n="nav_fournisseur">Espace fournisseur</a>
+      <a href="pages/annuaire.html" data-i18n="nav_annuaire">Annuaire</a><span>·</span><a href="pages/catalogue.html">Catalogue</a><span>·</span><a href="pages/qui-sommes-nous.html" data-i18n="nav_about">Qui sommes-nous</a><span>·</span><a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a><span>·</span><a href="pages/submit.html" data-i18n="nav_referencer">Référencer mon entreprise</a><span>·</span><a href="pages/supplier.html" data-i18n="nav_fournisseur">Espace fournisseur</a>
     </nav>
   </div>
 </section>
