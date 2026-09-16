@@ -15,7 +15,7 @@ let sysCat = 'all';
 // Plateformes satellites/Lanceurs : pas des composants comparables par
 // caracteristiques, donc pas dans le catalogue produit, mais bien les
 // "produits" d'un systemier a afficher ici.
-const SYSTEMIER_CATS = ['Plateformes satellites', 'Lanceurs'];
+const SYSTEMIER_CATS = ['Plateformes satellites', 'Lanceurs', 'Véhicules'];
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();

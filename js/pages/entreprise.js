@@ -12,6 +12,8 @@ const SERVICE_CATS = [
   'Essais & qualification',
   'Usinage & fabrication mécanique',
   'Intégration & assemblage système',
+  'Segment sol & opérations',
+  'Sous-traitance électronique (EMS)',
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {

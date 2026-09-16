@@ -9,7 +9,7 @@ let mapType = 'fournisseurs';
 
 // Mêmes catégories que js/pages/prestations.js — une entreprise dont au moins
 // une catégorie de produit tombe ici est comptée comme prestataire.
-const SERVICE_CATS = ['Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques', 'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système', 'Segment sol & opérations'];
+const SERVICE_CATS = ['Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques', 'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système', 'Segment sol & opérations', 'Sous-traitance électronique (EMS)'];
 
 // Libellés traduits (js/i18n.js) — fonctions plutôt que des objets figés,
 // pour rester corrects après un changement de langue en cours de session.

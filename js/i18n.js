@@ -174,7 +174,7 @@ const TRANSLATIONS = {
 
     // Page prestations
     presta_title_html:   'Prestataires de <span>services</span> industriels',
-    presta_subtitle:      'Talents en régie, développement d\'équipements, fabrication de faisceaux électriques, essais & qualification, usinage, intégration système, segment sol & opérations.',
+    presta_subtitle:      'Talents en régie, développement d\'équipements, fabrication de faisceaux électriques, essais & qualification, usinage, intégration système, segment sol & opérations, sous-traitance électronique (EMS).',
     presta_kpi_c:        'Prestataires',
     presta_kpi_types:    'Types de prestation',
     presta_placeholder:  'Nom, pays, prestation…',
@@ -418,7 +418,7 @@ const TRANSLATIONS = {
 
     // Page prestations
     presta_title_html:   'Industrial <span>service</span> providers',
-    presta_subtitle:      'Staffing, equipment development, wiring harness manufacturing, testing & qualification, machining, system integration, ground segment & operations.',
+    presta_subtitle:      'Staffing, equipment development, wiring harness manufacturing, testing & qualification, machining, system integration, ground segment & operations, electronics manufacturing services (EMS).',
     presta_kpi_c:        'Service providers',
     presta_kpi_types:    'Service types',
     presta_placeholder:  'Name, country, service…',

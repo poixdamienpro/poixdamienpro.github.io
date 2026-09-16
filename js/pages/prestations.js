@@ -17,6 +17,10 @@ const SERVICE_CATS = [
   // partagees) relevent plus de l'operation partagee que d'un composant
   // qu'un acheteur integre dans son propre systeme -- voir js/pages/catalogue.js.
   'Segment sol & opérations',
+  // EMS = Electronics Manufacturing Services -- sous-traitance de
+  // conception/fabrication de cartes et equipements electroniques pour
+  // le compte d'autres entreprises (ex: Selha Group).
+  'Sous-traitance électronique (EMS)',
 ];
 
 let dirCurrentId = null;

@@ -42,7 +42,7 @@ const CATEGORY_GROUPS = [
 const CATALOGUE_EXCLUDED_CATS = [
   'Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques',
   'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système',
-  'Segment sol & opérations',
+  'Segment sol & opérations', 'Sous-traitance électronique (EMS)',
   'Lanceurs',
   'Plateformes satellites',
   'Véhicules',
