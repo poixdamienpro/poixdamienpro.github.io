@@ -7,6 +7,7 @@ let supplierCompany = null; // entreprise revendiquée (si déjà approuvée)
 let supplierEditingProductId = null; // null = ajout, sinon id du produit en cours d'édition
 let supStatProducts = null, supStatPending = null, supStatApproved = null, supStatLeadsPending = null; // compteurs du bandeau
 let supplierViewRows = []; // vues produit (entity_views), stats premium -- voir loadSupplierViews()
+let supplierAllProducts = []; // catalogue complet (mapProduct), pour la comparaison concurrentielle premium
 
 // Plages du sélecteur temporel des stats de vues (même liste que
 // js/pages/admin.js ANALYTICS_RANGES, pour une expérience cohérente).
@@ -261,6 +262,7 @@ function supplierLogout() {
   supplierCompany = null;
   supStatProducts = supStatPending = supStatApproved = null;
   supplierViewRows = [];
+  supplierAllProducts = [];
   document.getElementById('sup-auth-box').style.display = 'block';
   document.getElementById('sup-claim-box').style.display = 'none';
   document.getElementById('sup-pending-box').style.display = 'none';
@@ -291,6 +293,7 @@ async function supplierRouteAfterAuth() {
       loadSupplierSubmissions();
       loadSupplierLeads();
       loadSupplierViews();
+      loadSupplierComparison();
       handlePremiumReturn();
       return;
     }
@@ -656,5 +659,90 @@ async function submitSupplierProductForm(e) {
   } catch (err) {
     alert('Erreur : ' + err.message);
   }
+}
+
+// ── Comparaison concurrentielle — réservée aux fournisseurs premium.
+// Contrairement aux stats de vues, la donnée sous-jacente (le catalogue
+// public) n'a rien de confidentiel : n'importe quel visiteur peut déjà
+// comparer ces mêmes produits sur pages/catalogue.html. Le gate premium
+// ici est une restriction d'usage côté client (valeur ajoutée du
+// dashboard), pas une protection RLS. Nécessite js/api.js (fetchAllPaged,
+// mapProduct) chargé sur pages/supplier.html.
+async function loadSupplierComparison() {
+  const select = document.getElementById('sup-compare-product');
+  const table = document.getElementById('sup-compare-table');
+  if (!supplierCompany.premium) {
+    select.style.display = 'none';
+    table.innerHTML = `
+      <div class="sup-premium-upsell">
+        <span>La comparaison de vos produits avec la concurrence est réservée aux entreprises Premium.</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+      </div>`;
+    return;
+  }
+  table.innerHTML = 'Chargement du catalogue…';
+  try {
+    const rows = await fetchAllPaged('get_products_page');
+    supplierAllProducts = rows.map(mapProduct);
+    const ownProducts = supplierAllProducts.filter(p => p.companyId === supplierCompany.id);
+    if (!ownProducts.length) {
+      select.style.display = 'none';
+      table.innerHTML = '<p class="sup-empty">Ajoutez d\'abord un produit pour le comparer à la concurrence.</p>';
+      return;
+    }
+    select.style.display = '';
+    select.innerHTML = ownProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    renderSupplierComparison();
+  } catch (err) {
+    table.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
+  }
+}
+
+function renderSupplierComparison() {
+  const table = document.getElementById('sup-compare-table');
+  const selectedId = document.getElementById('sup-compare-product').value;
+  const own = supplierAllProducts.find(p => p.id === selectedId);
+  if (!own) return;
+
+  // Même catégorie, autre entreprise -- 4 concurrents max, comme le
+  // comparateur du catalogue (voir js/modal.js openCompareModal).
+  const competitors = supplierAllProducts
+    .filter(p => p.cat === own.cat && p.companyId !== own.companyId)
+    .slice(0, 4);
+
+  if (!competitors.length) {
+    table.innerHTML = `<p class="sup-empty">Aucun autre produit référencé dans la catégorie « ${own.cat} » pour l'instant.</p>`;
+    return;
+  }
+
+  const prods = [own, ...competitors];
+  const allLabels = [...new Set(prods.flatMap(p => p.specs.map(s => s.l)))];
+
+  const hCols = prods.map((p, i) => `
+    <th class="prod-col">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <span style="font-size:18px">${p.icon}</span>
+        <strong style="font-size:11px">${p.name}</strong>
+        <span style="font-size:10px;opacity:.8">${i === 0 ? '★ Votre produit' : p.maker}</span>
+      </div>
+    </th>`).join('');
+
+  const specRows = allLabels.map(label => {
+    const cells = prods.map(p => {
+      const s = p.specs.find(x => x.l === label);
+      return `<td>${s ? s.v : '—'}</td>`;
+    }).join('');
+    return `<tr><td class="row-label">${label}</td>${cells}</tr>`;
+  }).join('');
+
+  const priceRow = `<tr><td class="row-label">Prix</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${p.price}</td>`).join('')}</tr>`;
+
+  table.innerHTML = `
+    <div style="overflow-x:auto">
+      <table class="cmp-table">
+        <thead><tr><th style="min-width:120px">Caractéristique</th>${hCols}</tr></thead>
+        <tbody>${specRows}${priceRow}</tbody>
+      </table>
+    </div>`;
 }
 

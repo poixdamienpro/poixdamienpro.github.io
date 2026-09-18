@@ -140,6 +140,14 @@
     </div>
 
     <div class="sup-panel">
+      <div class="sup-panel-head">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Comparaison avec la concurrence</span>
+        <select id="sup-compare-product" onchange="renderSupplierComparison()" style="display:none;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)"></select>
+      </div>
+      <div id="sup-compare-table"></div>
+    </div>
+
+    <div class="sup-panel">
       <span class="submit-section-title" style="border:none;padding:0">Vos soumissions</span>
       <div id="sup-submissions-list"></div>
     </div>
@@ -154,6 +162,7 @@
 
 <script src="../js/i18n.js"></script>
 <script src="../js/data.js"></script>
+<script src="../js/api.js"></script>
 <script src="../js/layout.js"></script>
 <script src="../js/pages/supplier.js"></script>
 </body>
