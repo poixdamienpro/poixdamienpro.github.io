@@ -64,8 +64,8 @@ function renderRfqList() {
   list.innerHTML = rfqDossierRows.map(d => `
     <div class="sup-prod">
       <div class="sup-prod-main">
-        <span class="sup-prod-name">${d.rfq_type} — ${d.title}</span>
-        <span class="sup-prod-cat">${d.company_name}${d.category ? ' · ' + d.category : ''}${d.deadline ? ' · avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}</span>
+        <span class="sup-prod-name">${d.rfq_type} — ${d.title}${d.requires_custom_nda ? ' 🔒' : ''}</span>
+        <span class="sup-prod-cat">${d.company_name}${d.category ? ' · ' + d.category : ''}${d.deadline ? ' · avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}${d.requires_custom_nda ? ' · NDA personnalisé requis' : ''}</span>
       </div>
       <button class="btn-add-product sup-btn-sm" onclick="openRfqDetail('${d.id}')">Voir le détail</button>
     </div>`).join('');
@@ -120,7 +120,16 @@ async function acceptRfqNda() {
 
 function renderRfqDetail(d) {
   const panel = document.getElementById('rfq-detail-panel');
-  const filename = d.attachment_path ? d.attachment_path.split('/').slice(1).join('/') : null;
+
+  // Dossier avec NDA personnalisé, pas encore approuvé pour notre
+  // entreprise : la RPC a déjà rédigé description/attachment_path (NULL),
+  // on affiche l'écran de signature au lieu du contenu.
+  if (d.requires_custom_nda && d.custom_nda_status !== 'approved') {
+    renderCustomNdaPanel(d);
+    return;
+  }
+
+  const filename = d.attachment_path ? d.attachment_path.split('/').pop() : null;
   panel.innerHTML = `
     <div class="sup-panel-head">
       <span class="submit-section-title" style="margin:0;border:none;padding:0">${d.rfq_type} — ${d.title}</span>
@@ -137,6 +146,87 @@ function renderRfqDetail(d) {
       <div class="lead-field"><label>Prix indicatif (optionnel)</label><input type="text" id="rfq-resp-price" placeholder="Sur devis"/></div>
       <button type="submit" class="btn-submit-form">Envoyer ma réponse</button>
     </form>`;
+}
+
+// ── NDA personnalisé (voir backend/supabase_add_rfq_custom_nda_2026_09.sql) --
+// écran affiché tant que le systémier n'a pas approuvé notre signature
+// pour CE dossier précis. custom_nda_status vaut 'none' (jamais soumis),
+// 'pending' (en attente de vérification) ou 'rejected' (à corriger).
+function renderCustomNdaPanel(d) {
+  const panel = document.getElementById('rfq-detail-panel');
+  const templateFilename = d.custom_nda_template_path ? d.custom_nda_template_path.split('/').pop() : null;
+
+  const statusBlock = {
+    none: `<p style="font-size:13px;color:var(--text2)">Ce dossier nécessite un NDA personnalisé fourni par le systémier, en plus de l'accord standard. Téléchargez-le, signez-le hors plateforme, puis uploadez votre copie signée.</p>`,
+    pending: `<p style="font-size:13px;color:var(--text2)">Votre copie signée a été envoyée et est en attente de vérification par le systémier.</p>`,
+    rejected: `<p style="font-size:13px;color:#E06A52">Votre signature a été rejetée${d.custom_nda_rejection_reason ? ' : ' + d.custom_nda_rejection_reason : ''}. Vous pouvez renvoyer une copie corrigée ci-dessous.</p>`,
+  }[d.custom_nda_status] || '';
+
+  panel.innerHTML = `
+    <div class="sup-panel-head">
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">${d.rfq_type} — ${d.title} 🔒</span>
+      <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">Fermer</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">${d.company_name}${d.category ? ' · ' + d.category : ''}</p>
+    ${statusBlock}
+    ${templateFilename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${d.custom_nda_template_path}','${templateFilename.replace(/'/g, "\\'")}')">📄 Télécharger le gabarit NDA</button>` : ''}
+    ${d.custom_nda_status !== 'pending' ? `
+    <div class="submit-section-title" style="margin-top:20px">Envoyer ma copie signée</div>
+    <form onsubmit="submitSignedNda(event,'${d.id}')">
+      <div class="lead-field"><label>Copie signée (PDF)</label><input type="file" id="rfq-nda-signed-file" accept=".pdf" required/></div>
+      <button type="submit" class="btn-submit-form">Envoyer pour vérification</button>
+    </form>` : ''}`;
+}
+
+async function submitSignedNda(e, rfqId) {
+  e.preventDefault();
+  const fileInput = document.getElementById('rfq-nda-signed-file');
+  const file = fileInput.files[0];
+  if (!file) return;
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    const token = sessionStorage.getItem('sup_access_token');
+    const path = `${rfqId}/nda-signed/${supplierCompany.id}/${encodeURIComponent(file.name)}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/rfq-attachments/${path}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + token, 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'true' },
+      body: file,
+    });
+    if (!res.ok) throw new Error(`Échec de l'envoi du fichier (HTTP ${res.status})`);
+
+    // Existe-t-il déjà une demande (rejetée) pour ce dossier ? Sinon on en
+    // crée une nouvelle -- la contrainte unique (rfq_id, company_id) impose
+    // une mise à jour plutôt qu'un second INSERT.
+    const existing = await supplierFetch(`rfq_custom_nda_signatures?rfq_id=eq.${rfqId}&company_id=eq.${supplierCompany.id}&select=id`);
+    if (existing && existing.length) {
+      await supplierFetch(`rfq_custom_nda_signatures?id=eq.${existing[0].id}`, {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ signed_document_path: path, status: 'pending', rejection_reason: null }),
+      });
+    } else {
+      await supplierFetch('rfq_custom_nda_signatures', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify([{
+          rfq_id: rfqId,
+          company_id: supplierCompany.id,
+          submitter_user_id: sessionStorage.getItem('sup_user_id'),
+          submitter_name: supplierCompany.name,
+          submitter_email: sessionStorage.getItem('sup_email'),
+          signed_document_path: path,
+        }]),
+      });
+    }
+
+    alert('Copie signée envoyée, en attente de vérification par le systémier.');
+    openRfqDetail(rfqId);
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 async function submitRfqResponse(e, rfqId) {

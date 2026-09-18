@@ -771,6 +771,7 @@ function renderSupplierComparison() {
 // loadSupplierLeads/respondToLead.
 let supplierRfqDossiers = [];
 let supplierRfqResponsesByDossier = {};
+let supplierRfqNdaSignaturesByDossier = {};
 let rfqEditingAttachmentDossierId = null;
 
 async function loadSupplierRfqDossiers() {
@@ -794,13 +795,19 @@ async function loadSupplierRfqDossiers() {
     supplierRfqDossiers = await supplierFetch(`rfq_dossiers?company_id=eq.${supplierCompany.id}&select=*&order=created_at.desc`) || [];
     if (!supplierRfqDossiers.length) {
       supplierRfqResponsesByDossier = {};
+      supplierRfqNdaSignaturesByDossier = {};
       list.innerHTML = '<p class="sup-empty">Aucun dossier déposé pour le moment.</p>';
       return;
     }
     const ids = supplierRfqDossiers.map(d => d.id).join(',');
-    const responses = await supplierFetch(`rfq_responses?rfq_id=in.(${ids})&select=*&order=created_at.desc`) || [];
+    const [responses, ndaSignatures] = await Promise.all([
+      supplierFetch(`rfq_responses?rfq_id=in.(${ids})&select=*&order=created_at.desc`),
+      supplierFetch(`rfq_custom_nda_signatures?rfq_id=in.(${ids})&select=*&order=created_at.desc`),
+    ]);
     supplierRfqResponsesByDossier = {};
-    responses.forEach(r => { (supplierRfqResponsesByDossier[r.rfq_id] ||= []).push(r); });
+    (responses || []).forEach(r => { (supplierRfqResponsesByDossier[r.rfq_id] ||= []).push(r); });
+    supplierRfqNdaSignaturesByDossier = {};
+    (ndaSignatures || []).forEach(s => { (supplierRfqNdaSignaturesByDossier[s.rfq_id] ||= []).push(s); });
     renderSupplierRfqDossiers();
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
@@ -818,15 +825,17 @@ function renderSupplierRfqDossiers() {
   list.innerHTML = supplierRfqDossiers.map(d => {
     const st = statusMap[d.status] || { cls: '', txt: d.status };
     const nResp = (supplierRfqResponsesByDossier[d.id] || []).length;
+    const nNdaPending = (supplierRfqNdaSignaturesByDossier[d.id] || []).filter(s => s.status === 'pending').length;
     return `
       <div class="sup-prod">
         <div class="sup-prod-main">
-          <span class="sup-prod-name">${d.rfq_type} — ${d.title}</span>
+          <span class="sup-prod-name">${d.rfq_type} — ${d.title}${d.requires_custom_nda ? ' 🔒' : ''}</span>
           <span class="sup-prod-cat">${d.category || '—'}</span>
         </div>
         <span class="sup-pill ${st.cls}">${st.txt}</span>
         <div class="sup-prod-actions">
           ${d.status === 'published' ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqResponses('${d.id}')">Réponses (${nResp})</button>` : ''}
+          ${d.status === 'published' && d.requires_custom_nda ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqNdaSignatures('${d.id}')">Signatures NDA (${nNdaPending})</button>` : ''}
           ${d.status === 'published' ? `<button class="btn-remove-product" onclick="closeRfqDossier('${d.id}')">Clôturer</button>` : ''}
         </div>
       </div>
@@ -851,6 +860,16 @@ function openRfqDossierForm() {
       <div class="lead-field"><label>Description / cahier des charges (texte)</label><textarea id="sup-rfq-desc" rows="5" required></textarea></div>
       <div class="lead-field"><label>Date limite de réponse</label><input type="date" id="sup-rfq-deadline"/></div>
       <div class="lead-field"><label>Pièce jointe (cahier des charges, optionnel)</label><input type="file" id="sup-rfq-file"/></div>
+      <div class="lead-field">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="sup-rfq-custom-nda" onchange="document.getElementById('sup-rfq-nda-template-wrap').style.display=this.checked?'block':'none'" style="width:auto"/>
+          NDA personnalisé requis (en plus de l'accord standard)
+        </label>
+      </div>
+      <div id="sup-rfq-nda-template-wrap" style="display:none">
+        <div class="lead-field"><label>Gabarit NDA à faire signer (PDF)</label><input type="file" id="sup-rfq-nda-file" accept=".pdf"/></div>
+        <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Les fournisseurs devront télécharger ce document, le signer hors plateforme, puis uploader leur copie signée — vous devrez la vérifier et l'approuver avant qu'ils n'accèdent au contenu détaillé.</p>
+      </div>
       <div class="submit-actions">
         <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
         <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-rfq-form-wrap').style.display='none'">Annuler</button>
@@ -883,7 +902,26 @@ async function submitRfqDossierForm(e) {
 
     const fileInput = document.getElementById('sup-rfq-file');
     if (fileInput.files[0]) {
-      await uploadRfqAttachment(rfqId, fileInput.files[0]);
+      const path = await uploadRfqFile(rfqId, fileInput.files[0]);
+      await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ attachment_path: path }),
+      });
+    }
+
+    const ndaFileInput = document.getElementById('sup-rfq-nda-file');
+    if (document.getElementById('sup-rfq-custom-nda').checked && ndaFileInput.files[0]) {
+      // Voir backend/supabase_add_rfq_custom_nda_2026_09.sql -- convention
+      // de chemin <rfq_id>/nda-template/<filename>, distincte du cahier
+      // des charges, pour que les policies storage puissent traiter ce
+      // fichier différemment (lisible dès le NDA standard accepté).
+      const ndaPath = await uploadRfqFile(rfqId, ndaFileInput.files[0], 'nda-template');
+      await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ requires_custom_nda: true, custom_nda_template_path: ndaPath }),
+      });
     }
 
     document.getElementById('sup-rfq-form-wrap').style.display = 'none';
@@ -897,12 +935,14 @@ async function submitRfqDossierForm(e) {
 }
 
 // Upload direct dans le bucket privé rfq-attachments (voir
-// backend/supabase_add_rfq_system_2026_09.sql SECTION 6) -- chemin
-// <rfq_id>/<filename>, autorisé par la policy storage INSERT tant que le
-// dossier appartient bien à l'entreprise de l'utilisateur connecté.
-async function uploadRfqAttachment(rfqId, file) {
+// backend/supabase_add_rfq_system_2026_09.sql SECTION 6 et
+// supabase_add_rfq_custom_nda_2026_09.sql SECTION 5 pour la convention de
+// chemins) -- autorisé par la policy storage INSERT tant que le dossier
+// appartient bien à l'entreprise de l'utilisateur connecté. Retourne le
+// chemin uploadé, à enregistrer soi-même sur la bonne colonne ensuite.
+async function uploadRfqFile(rfqId, file, subfolder) {
   const token = sessionStorage.getItem('sup_access_token');
-  const path = `${rfqId}/${encodeURIComponent(file.name)}`;
+  const path = subfolder ? `${rfqId}/${subfolder}/${encodeURIComponent(file.name)}` : `${rfqId}/${encodeURIComponent(file.name)}`;
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/rfq-attachments/${path}`, {
     method: 'POST',
     headers: {
@@ -914,11 +954,7 @@ async function uploadRfqAttachment(rfqId, file) {
     body: file,
   });
   if (!res.ok) throw new Error(`Échec de l'envoi du fichier (HTTP ${res.status})`);
-  await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
-    method: 'PATCH',
-    headers: { 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ attachment_path: path }),
-  });
+  return path;
 }
 
 async function closeRfqDossier(rfqId) {
@@ -979,6 +1015,80 @@ async function respondToRfqResponse(id, status, rfqId) {
     viewRfqResponses(rfqId);
   } catch (err) {
     alert('Erreur : ' + err.message);
+  }
+}
+
+// ── Vérification des NDA personnalisés reçus (voir
+// backend/supabase_add_rfq_custom_nda_2026_09.sql) -- une demande par
+// fournisseur, le systémier télécharge la copie signée et
+// approuve/rejette. Seule une signature 'approved' débloque le contenu
+// détaillé du dossier pour ce fournisseur (voir get_rfq_dossier_detail).
+function viewRfqNdaSignatures(rfqId) {
+  const wrap = document.getElementById('sup-rfq-nda-wrap');
+  const dossier = supplierRfqDossiers.find(d => d.id === rfqId);
+  const signatures = supplierRfqNdaSignaturesByDossier[rfqId] || [];
+  const statusMap = {
+    pending:  { cls: 'sup-pill-pending', txt: '⏳ À vérifier' },
+    approved: { cls: 'sup-pill-ok',      txt: '✓ Approuvée' },
+    rejected: { cls: 'sup-pill-no',      txt: '✕ Rejetée' },
+  };
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="submit-section-title">Signatures NDA — ${dossier ? dossier.title : ''}</div>
+    ${!signatures.length ? '<p class="sup-empty">Aucune demande de signature pour le moment.</p>' : signatures.map(s => {
+      const st = statusMap[s.status] || statusMap.pending;
+      const filename = s.signed_document_path ? s.signed_document_path.split('/').pop() : null;
+      return `
+      <div class="sup-lead">
+        <div class="sup-lead-head">
+          <span class="sup-lead-who">${s.submitter_name}</span>
+          <span class="sup-pill ${st.cls}">${st.txt}</span>
+        </div>
+        <div class="sup-lead-meta">${s.submitter_email} · ${new Date(s.created_at).toLocaleDateString('fr-FR')}</div>
+        ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:6px 0" onclick="downloadRfqFileSupplier('${s.signed_document_path}','${filename.replace(/'/g, "\\'")}')">📄 Télécharger la copie signée</button>` : '<p style="font-size:12px;color:var(--muted)">Aucun document uploadé.</p>'}
+        ${s.status === 'pending' ? `
+        <div class="sup-lead-actions">
+          <button class="btn-add-product sup-btn-sm" onclick="reviewRfqNdaSignature('${s.id}','approved','${rfqId}')">✓ Approuver</button>
+          <button class="btn-remove-product" onclick="reviewRfqNdaSignature('${s.id}','rejected','${rfqId}')">✕ Rejeter</button>
+        </div>` : ''}
+      </div>`;
+    }).join('')}
+    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-nda-wrap').style.display='none'">Fermer</button>`;
+}
+
+async function reviewRfqNdaSignature(id, status, rfqId) {
+  const reason = status === 'rejected' ? (prompt('Motif du refus (affiché au fournisseur) :') || null) : null;
+  try {
+    await supplierFetch(`rfq_custom_nda_signatures?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status, rejection_reason: reason, reviewed_at: new Date().toISOString() }),
+    });
+    await loadSupplierRfqDossiers();
+    viewRfqNdaSignatures(rfqId);
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+// Bucket privé -- même principe de téléchargement authentifié que côté
+// admin/fournisseur (voir js/pages/admin.js downloadRfqAttachmentAdmin,
+// js/pages/rfq.js downloadRfqAttachment).
+async function downloadRfqFileSupplier(path, filename) {
+  try {
+    const token = sessionStorage.getItem('sup_access_token');
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/rfq-attachments/${path}`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert('Impossible de télécharger le fichier : ' + err.message);
   }
 }
 

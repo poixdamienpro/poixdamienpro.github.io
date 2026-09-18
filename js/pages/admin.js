@@ -660,12 +660,13 @@ function renderAdminRfqDossiers(rows) {
     <div class="admin-card" id="admin-rfq-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">${r.rfq_type} — ${r.title}</div>
+          <div class="admin-card-title">${r.rfq_type} — ${r.title}${r.requires_custom_nda ? ' 🔒 NDA personnalisé' : ''}</div>
           <div class="admin-card-meta">${(r.companies && r.companies.name) || 'Entreprise inconnue'} · ${r.category || '—'} · déposé le ${new Date(r.created_at).toLocaleDateString('fr-FR')}${r.deadline ? ' · réponses avant le ' + new Date(r.deadline).toLocaleDateString('fr-FR') : ''}</div>
         </div>
       </div>
       <p style="font-size:12px;color:var(--muted);white-space:pre-wrap;margin:8px 0">${r.description}</p>
-      ${r.attachment_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px" onclick="downloadRfqAttachmentAdmin('${r.attachment_path}','${r.attachment_path.split('/').slice(1).join('/').replace(/'/g, "\\'")}')">📄 Télécharger la pièce jointe</button>` : ''}
+      ${r.attachment_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px" onclick="downloadRfqAttachmentAdmin('${r.attachment_path}','${r.attachment_path.split('/').pop().replace(/'/g, "\\'")}')">📄 Télécharger la pièce jointe</button>` : ''}
+      ${r.custom_nda_template_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px;margin-left:8px" onclick="downloadRfqAttachmentAdmin('${r.custom_nda_template_path}','${r.custom_nda_template_path.split('/').pop().replace(/'/g, "\\'")}')">📄 Télécharger le gabarit NDA</button>` : ''}
       <div class="admin-actions">
         <button class="btn-approve" onclick="approveRfqDossier('${r.id}')">✓ Publier</button>
         <button class="btn-reject" onclick="rejectRfqDossier('${r.id}')">✕ Rejeter</button>
