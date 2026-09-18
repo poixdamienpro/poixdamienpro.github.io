@@ -7,6 +7,17 @@
 let adminSubmissionsCache = {};
 let adminAnalyticsRows = [];
 
+// Plages du sélecteur temporel (voir #admin-range-filter, pages/admin.html)
+// -- valeur = nombre de jours en arrière, label = libellé KPI/titre.
+const ANALYTICS_RANGES = {
+  1:   '1 jour',
+  7:   '1 semaine',
+  30:  '1 mois',
+  90:  '3 mois',
+  180: '6 mois',
+  365: '1 an',
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   tryRestoreAdminSession();
@@ -105,57 +116,89 @@ async function loadAnalytics() {
   kpis.innerHTML = '<div class="admin-empty">Chargement…</div>';
   top.innerHTML = '';
   try {
-    const rows = await adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc');
-    adminAnalyticsRows = rows;
-    const now = Date.now();
-    const DAY = 24 * 60 * 60 * 1000;
-    const within = (r, days) => now - new Date(r.created_at).getTime() <= days * DAY;
-
-    const total = rows.length;
-    const last7 = rows.filter(r => within(r, 7)).length;
-    const last30 = rows.filter(r => within(r, 30)).length;
-
-    kpis.innerHTML = [
-      ['Vues · 7 derniers jours', last7],
-      ['Vues · 30 derniers jours', last30],
-      ['Vues · total enregistré', total],
-    ].map(([label, n]) => `<div class="kpi"><div><div class="kpi-n">${n}</div><div class="kpi-l">${label}</div></div></div>`).join('');
-
-    const pageCounts = {};
-    rows.filter(r => within(r, 30)).forEach(r => { pageCounts[r.page] = (pageCounts[r.page] || 0) + 1; });
-    const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-
-    top.innerHTML = !topPages.length
-      ? '<div class="admin-empty">Aucune vue enregistrée sur les 30 derniers jours.</div>'
-      : `<div class="submit-section-title" style="margin-top:0">Pages les plus vues (30 j)</div>` +
-        topPages.map(([page, n]) => `<div class="admin-field-row"><span>${page}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+    adminAnalyticsRows = await adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc');
 
     const select = document.getElementById('admin-chart-page-filter');
-    const allPages = Object.keys(pageCounts).sort();
+    const allPages = [...new Set(adminAnalyticsRows.map(r => r.page))].sort();
     select.innerHTML = '<option value="__all__">Toutes les pages</option>' +
       allPages.map(p => `<option value="${p}">${p}</option>`).join('');
 
-    renderAnalyticsChart();
+    renderAnalyticsForRange();
   } catch (err) {
     kpis.innerHTML = `<div class="admin-empty">${err.message}</div>`;
   }
 }
 
-// ── Graphique courbe — visites/jour sur 30 jours, filtrable par page ──
+// Rappelé au changement de #admin-range-filter -- toutes les lignes sont
+// déjà en mémoire (adminAnalyticsRows), donc pas de nouvel appel réseau.
+function onAnalyticsRangeChange() {
+  renderAnalyticsForRange();
+}
+
+// ── KPIs + top pages pour la plage sélectionnée (#admin-range-filter) ──
+function renderAnalyticsForRange() {
+  const kpis = document.getElementById('admin-analytics-kpis');
+  const top = document.getElementById('admin-analytics-top');
+  const rangeDays = Number(document.getElementById('admin-range-filter').value) || 30;
+  const rangeLabel = ANALYTICS_RANGES[rangeDays] || `${rangeDays} j`;
+
+  const now = Date.now();
+  const DAY = 24 * 60 * 60 * 1000;
+  const within = (r, days) => now - new Date(r.created_at).getTime() <= days * DAY;
+
+  const rows = adminAnalyticsRows;
+  const inRange = rows.filter(r => within(r, rangeDays));
+
+  kpis.innerHTML = [
+    [`Vues · ${rangeLabel}`, inRange.length],
+    ['Vues · total enregistré', rows.length],
+  ].map(([label, n]) => `<div class="kpi"><div><div class="kpi-n">${n}</div><div class="kpi-l">${label}</div></div></div>`).join('');
+
+  const pageCounts = {};
+  inRange.forEach(r => { pageCounts[r.page] = (pageCounts[r.page] || 0) + 1; });
+  const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+  top.innerHTML = !topPages.length
+    ? `<div class="admin-empty">Aucune vue enregistrée sur cette période (${rangeLabel}).</div>`
+    : `<div class="submit-section-title" style="margin-top:0">Pages les plus vues (${rangeLabel})</div>` +
+      topPages.map(([page, n]) => `<div class="admin-field-row"><span>${page}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+
+  renderAnalyticsChart();
+}
+
+// ── Graphique courbe — visites sur la plage sélectionnée, filtrable par
+// page. Granularité horaire pour "1 jour" (24 points), journalière sinon
+// (un point par jour de la plage) — au-delà de 60 points, les puces par
+// point sont masquées pour rester lisible (la courbe suffit).
 function renderAnalyticsChart() {
   const wrap = document.getElementById('admin-analytics-chart');
   const filter = document.getElementById('admin-chart-page-filter').value;
+  const rangeDays = Number(document.getElementById('admin-range-filter').value) || 30;
   const rows = filter === '__all__' ? adminAnalyticsRows : adminAnalyticsRows.filter(r => r.page === filter);
 
-  const DAY = 24 * 60 * 60 * 1000;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const days = [];
-  for (let i = 29; i >= 0; i--) days.push(new Date(today.getTime() - i * DAY));
+  const HOUR = 60 * 60 * 1000, DAY = 24 * HOUR;
+  const hourly = rangeDays === 1;
 
-  const counts = days.map(d => {
-    const dayStr = d.toISOString().slice(0, 10);
-    return rows.filter(r => r.created_at.slice(0, 10) === dayStr).length;
-  });
+  let buckets, counts, labelFor;
+  if (hourly) {
+    const now = new Date(); now.setMinutes(0, 0, 0);
+    buckets = [];
+    for (let i = 23; i >= 0; i--) buckets.push(new Date(now.getTime() - i * HOUR));
+    counts = buckets.map(b => rows.filter(r => {
+      const t = new Date(r.created_at).getTime();
+      return t >= b.getTime() && t < b.getTime() + HOUR;
+    }).length);
+    labelFor = b => `${b.getHours()}h`;
+  } else {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    buckets = [];
+    for (let i = rangeDays - 1; i >= 0; i--) buckets.push(new Date(today.getTime() - i * DAY));
+    counts = buckets.map(b => {
+      const dayStr = b.toISOString().slice(0, 10);
+      return rows.filter(r => r.created_at.slice(0, 10) === dayStr).length;
+    });
+    labelFor = b => `${b.getDate()}/${b.getMonth() + 1}`;
+  }
 
   if (!rows.length) {
     wrap.innerHTML = '<div class="admin-empty">Aucune vue enregistrée pour cette sélection.</div>';
@@ -166,7 +209,7 @@ function renderAnalyticsChart() {
   const chartW = W - padL - padR, chartH = H - padT - padB;
   const max = Math.max(1, ...counts);
 
-  const x = i => padL + (i / (counts.length - 1)) * chartW;
+  const x = i => padL + (counts.length === 1 ? chartW / 2 : (i / (counts.length - 1)) * chartW);
   const y = v => padT + chartH - (v / max) * chartH;
 
   const points = counts.map((v, i) => `${x(i)},${y(v)}`).join(' ');
@@ -178,13 +221,18 @@ function renderAnalyticsChart() {
             <text x="${padL - 8}" y="${yy + 4}" font-size="10" fill="var(--muted)" text-anchor="end">${Math.round(f * max)}</text>`;
   }).join('');
 
+  // Espace les labels de l'axe X pour rester lisible quelle que soit la
+  // plage (24 points horaires jusqu'à 365 points journaliers).
+  const labelStride = Math.max(1, Math.ceil(counts.length / 8));
   const xLabels = counts.map((v, i) => {
-    if (i % 5 !== 0 && i !== counts.length - 1) return '';
-    const d = days[i];
-    return `<text x="${x(i)}" y="${H - 6}" font-size="9" fill="var(--muted)" text-anchor="middle">${d.getDate()}/${d.getMonth() + 1}</text>`;
+    if (i % labelStride !== 0 && i !== counts.length - 1) return '';
+    return `<text x="${x(i)}" y="${H - 6}" font-size="9" fill="var(--muted)" text-anchor="middle">${labelFor(buckets[i])}</text>`;
   }).join('');
 
-  const dots = counts.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="var(--accent, #2563eb)"><title>${days[i].toLocaleDateString('fr-FR')} : ${v} vue${v !== 1 ? 's' : ''}</title></circle>`).join('');
+  const dateFmt = hourly
+    ? b => b.toLocaleDateString('fr-FR') + ' ' + labelFor(b)
+    : b => b.toLocaleDateString('fr-FR');
+  const dots = counts.length > 60 ? '' : counts.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="var(--accent, #2563eb)"><title>${dateFmt(buckets[i])} : ${v} vue${v !== 1 ? 's' : ''}</title></circle>`).join('');
 
   wrap.innerHTML = `
     <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--white);border:1px solid var(--border);border-radius:8px">

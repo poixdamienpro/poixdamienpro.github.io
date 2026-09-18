@@ -40,6 +40,18 @@
       <span class="submit-section-title" style="margin:0;border:none;padding:0">Analytics</span>
       <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
     </div>
+
+    <div class="product-block-header" style="margin-bottom:10px">
+      <span></span>
+      <select id="admin-range-filter" onchange="onAnalyticsRangeChange()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+        <option value="1">1 jour</option>
+        <option value="7">1 semaine</option>
+        <option value="30" selected>1 mois</option>
+        <option value="90">3 mois</option>
+        <option value="180">6 mois</option>
+        <option value="365">1 an</option>
+      </select>
+    </div>
     <div id="admin-analytics-kpis" class="kpi-row" style="margin-bottom:18px"></div>
 
     <div class="product-block-header" style="margin-bottom:10px">
