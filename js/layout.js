@@ -66,6 +66,36 @@ function logPageView() {
   }).catch(() => {});
 }
 
+// Log anonyme d'une vue "entité" (produit ou entreprise) -- table séparée
+// de site_page_views (voir backend/supabase_add_entity_views_2026_09.sql) :
+// site_page_views compte les chargements de page (toutes pages
+// confondues), entity_views compte les consultations de fiche dédiée
+// (produit/entreprise), avec la catégorie/le domaine associés -- les
+// mélanger aurait faussé le total "Vues de page" existant. Appelée
+// depuis js/pages/produit.js et js/pages/entreprise.js une fois la fiche
+// chargée, PAS depuis loadLayout() (l'id n'est pas encore connu à ce
+// moment-là contrairement à logPageView()).
+function logEntityView({ type, productId, productName, category, companyId, companyName, industry }) {
+  fetch(`${SUPABASE_URL}/rest/v1/entity_views`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal',
+    },
+    body: JSON.stringify([{
+      entity_type: type,
+      product_id: productId || null,
+      product_name: productName || null,
+      category: category || null,
+      company_id: companyId || null,
+      company_name: companyName || null,
+      industry: industry || null,
+    }]),
+  }).catch(() => {});
+}
+
 // Menu hamburger mobile — le nav bar déborde à droite sous ~900px avec
 // 8 liens + bouton + switch de langue, donc on le replie derrière un
 // bouton et on l'étend en colonne au clic.

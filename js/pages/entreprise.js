@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window._entCompany = c;
     window._entProducts = products;
     renderCompany(c, products);
+    logEntityView({ type: 'company', companyId: c.id, companyName: c.name, industry: c.industry });
   } catch (err) {
     console.error('Erreur chargement fiche entreprise:', err);
     document.getElementById('ent-body').innerHTML = '<p style="color:#C0392B">Cette fiche entreprise n\'existe pas ou plus.</p>';

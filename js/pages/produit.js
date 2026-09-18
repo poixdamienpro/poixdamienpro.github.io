@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Cache pour re-rendu au changement de langue (voir onLangChange plus bas).
     window._prodItem = mapProduct(row);
     renderProduct(window._prodItem);
+    logEntityView({
+      type: 'product',
+      productId: window._prodItem.id, productName: window._prodItem.name, category: window._prodItem.cat,
+      companyId: window._prodItem.companyId, companyName: window._prodItem.maker, industry: window._prodItem.industry,
+    });
   } catch (err) {
     console.error('Erreur chargement fiche produit:', err);
     document.getElementById('prod-body').innerHTML = '<p style="color:#C0392B">Cette fiche produit n\'existe pas ou plus.</p>';

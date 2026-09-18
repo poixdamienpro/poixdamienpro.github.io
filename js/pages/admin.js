@@ -6,6 +6,7 @@
 // ═══════════════════════════════
 let adminSubmissionsCache = {};
 let adminAnalyticsRows = [];
+let adminEntityViewRows = [];
 
 // Plages du sélecteur temporel (voir #admin-range-filter, pages/admin.html)
 // -- valeur = nombre de jours en arrière, label = libellé KPI/titre.
@@ -116,7 +117,10 @@ async function loadAnalytics() {
   kpis.innerHTML = '<div class="admin-empty">Chargement…</div>';
   top.innerHTML = '';
   try {
-    adminAnalyticsRows = await adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc');
+    [adminAnalyticsRows, adminEntityViewRows] = await Promise.all([
+      adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc'),
+      adminFetchAllPages('entity_views?select=entity_type,product_id,product_name,category,company_id,company_name,industry,created_at&order=created_at.desc'),
+    ]);
 
     const select = document.getElementById('admin-chart-page-filter');
     const allPages = [...new Set(adminAnalyticsRows.map(r => r.page))].sort();
@@ -135,10 +139,21 @@ function onAnalyticsRangeChange() {
   renderAnalyticsForRange();
 }
 
-// ── KPIs + top pages pour la plage sélectionnée (#admin-range-filter) ──
+// Rendu générique d'un bloc "top N" (pages/produits/catégories/domaines) --
+// même structure `.admin-field-row` que le reste du panel admin.
+function renderTopList(elId, title, entries, emptyMsg) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = !entries.length
+    ? `<div class="admin-empty">${emptyMsg}</div>`
+    : `<div class="submit-section-title" style="margin-top:0">${title}</div>` +
+      entries.map(([label, n]) => `<div class="admin-field-row"><span>${label}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+}
+
+// ── KPIs + top pages/produits/catégories/domaines pour la plage
+// sélectionnée (#admin-range-filter) ──
 function renderAnalyticsForRange() {
   const kpis = document.getElementById('admin-analytics-kpis');
-  const top = document.getElementById('admin-analytics-top');
   const rangeDays = Number(document.getElementById('admin-range-filter').value) || 30;
   const rangeLabel = ANALYTICS_RANGES[rangeDays] || `${rangeDays} j`;
 
@@ -157,11 +172,34 @@ function renderAnalyticsForRange() {
   const pageCounts = {};
   inRange.forEach(r => { pageCounts[r.page] = (pageCounts[r.page] || 0) + 1; });
   const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  renderTopList('admin-analytics-top', `Pages les plus vues (${rangeLabel})`, topPages,
+    `Aucune vue enregistrée sur cette période (${rangeLabel}).`);
 
-  top.innerHTML = !topPages.length
-    ? `<div class="admin-empty">Aucune vue enregistrée sur cette période (${rangeLabel}).</div>`
-    : `<div class="submit-section-title" style="margin-top:0">Pages les plus vues (${rangeLabel})</div>` +
-      topPages.map(([page, n]) => `<div class="admin-field-row"><span>${page}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+  // Vues par fiche produit/entreprise (voir backend/supabase_add_entity_views_2026_09.sql
+  // -- table séparée de site_page_views, alimentée uniquement par
+  // pages/produit.html et pages/entreprise.html).
+  const entityInRange = adminEntityViewRows.filter(r => within(r, rangeDays));
+
+  const productCounts = {};
+  entityInRange.filter(r => r.entity_type === 'product' && r.product_id).forEach(r => {
+    if (!productCounts[r.product_id]) productCounts[r.product_id] = { name: r.product_name || r.product_id, n: 0 };
+    productCounts[r.product_id].n++;
+  });
+  const topProducts = Object.values(productCounts).sort((a, b) => b.n - a.n).slice(0, 10).map(p => [p.name, p.n]);
+  renderTopList('admin-analytics-top-products', `Produits les plus vus (${rangeLabel})`, topProducts,
+    `Aucune vue produit sur cette période (${rangeLabel}).`);
+
+  const categoryCounts = {};
+  entityInRange.filter(r => r.category).forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
+  const topCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  renderTopList('admin-analytics-top-categories', `Catégories les plus vues (${rangeLabel})`, topCategories,
+    `Aucune vue sur cette période (${rangeLabel}).`);
+
+  const domainCounts = {};
+  entityInRange.filter(r => r.industry).forEach(r => { domainCounts[r.industry] = (domainCounts[r.industry] || 0) + 1; });
+  const topDomains = Object.entries(domainCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  renderTopList('admin-analytics-top-domains', `Domaines les plus vus (${rangeLabel})`, topDomains,
+    `Aucune vue sur cette période (${rangeLabel}).`);
 
   renderAnalyticsChart();
 }
