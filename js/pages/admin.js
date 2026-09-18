@@ -88,6 +88,7 @@ async function adminLogin(e) {
     loadAnalytics();
     loadPendingSubmissions();
     loadPendingClaims();
+    loadPendingRfqDossiers();
   } catch (err) {
     errBox.textContent = err.message;
     errBox.style.display = 'block';
@@ -108,6 +109,7 @@ function tryRestoreAdminSession() {
   loadAnalytics();
   loadPendingSubmissions();
   loadPendingClaims();
+  loadPendingRfqDossiers();
 }
 
 // ── Analytics — vues de page anonymes loggées par js/layout.js ──
@@ -620,6 +622,111 @@ async function rejectClaim(id) {
     delete adminClaimsCache[id];
     if (!Object.keys(adminClaimsCache).length) {
       document.getElementById('admin-claims-list').innerHTML = '<div class="admin-empty">Aucune revendication en attente.</div>';
+    }
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    card.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+// ── Modération des dossiers RFQ/RFI/RFP (voir
+// backend/supabase_add_rfq_system_2026_09.sql) -- même schéma que les
+// revendications ci-dessus : liste "pending", approuver bascule le
+// statut à 'published' (visible des fournisseurs via get_rfq_dossiers_page),
+// rejeter enregistre un motif affiché au systémier dans son dashboard.
+let adminRfqCache = {};
+
+async function loadPendingRfqDossiers() {
+  const list = document.getElementById('admin-rfq-list');
+  if (!list) return;
+  list.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  try {
+    const rows = await adminFetch('rfq_dossiers?status=eq.pending&select=*,companies(name)&order=created_at.asc');
+    adminRfqCache = {};
+    (rows || []).forEach(r => { adminRfqCache[r.id] = r; });
+    renderAdminRfqDossiers(rows || []);
+  } catch (err) {
+    list.innerHTML = `<div class="admin-empty">${err.message}</div>`;
+  }
+}
+
+function renderAdminRfqDossiers(rows) {
+  const list = document.getElementById('admin-rfq-list');
+  if (!rows.length) {
+    list.innerHTML = '<div class="admin-empty">Aucun dossier RFQ en attente.</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r => `
+    <div class="admin-card" id="admin-rfq-${r.id}">
+      <div class="admin-card-head">
+        <div>
+          <div class="admin-card-title">${r.rfq_type} — ${r.title}</div>
+          <div class="admin-card-meta">${(r.companies && r.companies.name) || 'Entreprise inconnue'} · ${r.category || '—'} · déposé le ${new Date(r.created_at).toLocaleDateString('fr-FR')}${r.deadline ? ' · réponses avant le ' + new Date(r.deadline).toLocaleDateString('fr-FR') : ''}</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);white-space:pre-wrap;margin:8px 0">${r.description}</p>
+      ${r.attachment_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px" onclick="downloadRfqAttachmentAdmin('${r.attachment_path}','${r.attachment_path.split('/').slice(1).join('/').replace(/'/g, "\\'")}')">📄 Télécharger la pièce jointe</button>` : ''}
+      <div class="admin-actions">
+        <button class="btn-approve" onclick="approveRfqDossier('${r.id}')">✓ Publier</button>
+        <button class="btn-reject" onclick="rejectRfqDossier('${r.id}')">✕ Rejeter</button>
+      </div>
+    </div>`).join('');
+}
+
+// Bucket privé (voir backend/supabase_add_rfq_system_2026_09.sql
+// SECTION 6) -- l'admin y a accès via sa propre policy storage
+// (is_admin()), même principe de téléchargement authentifié que
+// js/pages/rfq.js downloadRfqAttachment côté fournisseur.
+async function downloadRfqAttachmentAdmin(path, filename) {
+  try {
+    const token = sessionStorage.getItem('admin_access_token');
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/rfq-attachments/${path}`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert('Impossible de télécharger le fichier : ' + err.message);
+  }
+}
+
+async function approveRfqDossier(id) {
+  const card = document.getElementById(`admin-rfq-${id}`);
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    await adminFetch(`rfq_dossiers?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'published' }),
+    });
+    card.remove();
+    delete adminRfqCache[id];
+    if (!Object.keys(adminRfqCache).length) {
+      document.getElementById('admin-rfq-list').innerHTML = '<div class="admin-empty">Aucun dossier RFQ en attente.</div>';
+    }
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    card.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+async function rejectRfqDossier(id) {
+  const reason = prompt('Motif du refus (affiché au systémier) :') || null;
+  const card = document.getElementById(`admin-rfq-${id}`);
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    await adminFetch(`rfq_dossiers?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'rejected', rejection_reason: reason }),
+    });
+    card.remove();
+    delete adminRfqCache[id];
+    if (!Object.keys(adminRfqCache).length) {
+      document.getElementById('admin-rfq-list').innerHTML = '<div class="admin-empty">Aucun dossier RFQ en attente.</div>';
     }
   } catch (err) {
     alert('Erreur : ' + err.message);

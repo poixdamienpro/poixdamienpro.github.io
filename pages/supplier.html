@@ -100,6 +100,7 @@
     <div class="product-block-header">
       <span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span>
       <div style="display:flex;gap:8px">
+        <a href="rfq.html" class="btn-add-product sup-btn-sm">📋 Dossiers RFQ disponibles</a>
         <button type="button" class="btn-add-product sup-btn-sm" onclick="openCompanyEditForm()">Modifier la fiche</button>
         <button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button>
       </div>
@@ -121,6 +122,18 @@
       </div>
       <div id="sup-products-list"></div>
       <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
+    </div>
+
+    <!-- Dépôt de dossiers RFQ/RFI/RFP -- visible uniquement si l'entreprise
+    est systémier ET premium (voir renderSupplierRfqSection, js/pages/supplier.js) -->
+    <div class="sup-panel" id="sup-rfq-panel" style="display:none">
+      <div class="sup-panel-head">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Vos dossiers RFQ / RFI / RFP</span>
+        <button type="button" class="btn-add-product sup-add-inline" onclick="openRfqDossierForm()">+ Déposer un dossier</button>
+      </div>
+      <div id="sup-rfq-list"></div>
+      <div id="sup-rfq-form-wrap" style="display:none;margin-top:20px"></div>
+      <div id="sup-rfq-responses-wrap" style="display:none;margin-top:20px"></div>
     </div>
 
     <div class="sup-panel">

@@ -179,7 +179,14 @@ async function supplierFetch(path, options = {}) {
     supplierLogout();
     throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
   }
-  if (!res.ok) throw new Error(`HTTP ${res.status} sur ${path}`);
+  if (!res.ok) {
+    // Remonte le vrai message Postgres (ex: RAISE EXCEPTION 'nda_required'
+    // dans get_rfq_dossier_detail, voir js/pages/rfq.js) plutôt qu'un
+    // simple code HTTP -- utile pour distinguer les erreurs "attendues"
+    // (à intercepter côté UI) des vraies pannes.
+    const body = await res.json().catch(() => null);
+    throw new Error((body && body.message) || `HTTP ${res.status} sur ${path}`);
+  }
   if (res.status === 204) return null;
   return res.json().catch(() => null);
 }
@@ -263,6 +270,8 @@ function supplierLogout() {
   supStatProducts = supStatPending = supStatApproved = null;
   supplierViewRows = [];
   supplierAllProducts = [];
+  supplierRfqDossiers = [];
+  supplierRfqResponsesByDossier = {};
   document.getElementById('sup-auth-box').style.display = 'block';
   document.getElementById('sup-claim-box').style.display = 'none';
   document.getElementById('sup-pending-box').style.display = 'none';
@@ -285,7 +294,8 @@ async function supplierRouteAfterAuth() {
       document.getElementById('sup-claim-box').style.display = 'none';
       document.getElementById('sup-pending-box').style.display = 'none';
       document.getElementById('sup-dashboard').style.display = 'block';
-      document.getElementById('sup-dash-title').textContent = supplierCompany.name;
+      const title = document.getElementById('sup-dash-title');
+      if (title) title.textContent = supplierCompany.name;
       setSupplierStep(3);
       renderSupplierStats();
       renderPremiumBox();
@@ -294,7 +304,10 @@ async function supplierRouteAfterAuth() {
       loadSupplierLeads();
       loadSupplierViews();
       loadSupplierComparison();
+      loadSupplierRfqDossiers();
       handlePremiumReturn();
+      // pages/rfq.html uniquement -- voir js/pages/rfq.js (non défini sur supplier.html).
+      if (typeof loadRfqBrowse === 'function') loadRfqBrowse();
       return;
     }
     const claims = await supplierFetch(`company_claims?user_id=eq.${userId}&status=eq.pending&select=*,companies(name)&order=created_at.desc&limit=1`);
@@ -354,6 +367,7 @@ async function requestCompanyClaim(companyId, companyName) {
 
 async function loadSupplierProducts() {
   const list = document.getElementById('sup-products-list');
+  if (!list) return;
   list.innerHTML = 'Chargement…';
   try {
     const products = await supplierFetch(`products?company_id=eq.${supplierCompany.id}&select=*`);
@@ -379,6 +393,7 @@ async function loadSupplierProducts() {
 
 async function loadSupplierSubmissions() {
   const list = document.getElementById('sup-submissions-list');
+  if (!list) return;
   list.innerHTML = 'Chargement…';
   try {
     const rows = await supplierFetch(`product_submissions?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=20`);
@@ -431,6 +446,7 @@ async function loadSupplierViews() {
   const range = document.getElementById('sup-views-range');
   const chart = document.getElementById('sup-views-chart');
   const list = document.getElementById('sup-views-products');
+  if (!range || !chart || !list) return;
   if (!supplierCompany.premium) {
     range.style.display = 'none';
     chart.innerHTML = '';
@@ -671,6 +687,7 @@ async function submitSupplierProductForm(e) {
 async function loadSupplierComparison() {
   const select = document.getElementById('sup-compare-product');
   const table = document.getElementById('sup-compare-table');
+  if (!select || !table) return;
   if (!supplierCompany.premium) {
     select.style.display = 'none';
     table.innerHTML = `
@@ -744,5 +761,224 @@ function renderSupplierComparison() {
         <tbody>${specRows}${priceRow}</tbody>
       </table>
     </div>`;
+}
+
+// ── Dépôt et suivi des dossiers RFQ/RFI/RFP côté systémier -- réservé aux
+// entreprises is_systemier=true ET premium (voir
+// backend/supabase_add_rfq_system_2026_09.sql, policy
+// systemier_premium_can_submit_rfq). Les réponses reçues des fournisseurs
+// se gèrent ici aussi (accepter/refuser), même logique que
+// loadSupplierLeads/respondToLead.
+let supplierRfqDossiers = [];
+let supplierRfqResponsesByDossier = {};
+let rfqEditingAttachmentDossierId = null;
+
+async function loadSupplierRfqDossiers() {
+  const panel = document.getElementById('sup-rfq-panel');
+  const list = document.getElementById('sup-rfq-list');
+  if (!panel || !list) return;
+  if (!supplierCompany.is_systemier) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  if (!supplierCompany.premium) {
+    list.innerHTML = `
+      <div class="sup-premium-upsell">
+        <span>Le dépôt de dossiers RFQ/RFI/RFP auprès de tous les fournisseurs référencés est réservé aux entreprises Premium.</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+      </div>`;
+    document.querySelector('#sup-rfq-panel .sup-add-inline').style.display = 'none';
+    return;
+  }
+  document.querySelector('#sup-rfq-panel .sup-add-inline').style.display = '';
+  list.innerHTML = 'Chargement…';
+  try {
+    supplierRfqDossiers = await supplierFetch(`rfq_dossiers?company_id=eq.${supplierCompany.id}&select=*&order=created_at.desc`) || [];
+    if (!supplierRfqDossiers.length) {
+      supplierRfqResponsesByDossier = {};
+      list.innerHTML = '<p class="sup-empty">Aucun dossier déposé pour le moment.</p>';
+      return;
+    }
+    const ids = supplierRfqDossiers.map(d => d.id).join(',');
+    const responses = await supplierFetch(`rfq_responses?rfq_id=in.(${ids})&select=*&order=created_at.desc`) || [];
+    supplierRfqResponsesByDossier = {};
+    responses.forEach(r => { (supplierRfqResponsesByDossier[r.rfq_id] ||= []).push(r); });
+    renderSupplierRfqDossiers();
+  } catch (err) {
+    list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
+  }
+}
+
+function renderSupplierRfqDossiers() {
+  const list = document.getElementById('sup-rfq-list');
+  const statusMap = {
+    pending:   { cls: 'sup-pill-pending', txt: '⏳ En attente de validation' },
+    published: { cls: 'sup-pill-ok',      txt: '● Publié' },
+    rejected:  { cls: 'sup-pill-no',      txt: '✕ Rejeté' },
+    closed:    { cls: '',                 txt: '◼ Clôturé' },
+  };
+  list.innerHTML = supplierRfqDossiers.map(d => {
+    const st = statusMap[d.status] || { cls: '', txt: d.status };
+    const nResp = (supplierRfqResponsesByDossier[d.id] || []).length;
+    return `
+      <div class="sup-prod">
+        <div class="sup-prod-main">
+          <span class="sup-prod-name">${d.rfq_type} — ${d.title}</span>
+          <span class="sup-prod-cat">${d.category || '—'}</span>
+        </div>
+        <span class="sup-pill ${st.cls}">${st.txt}</span>
+        <div class="sup-prod-actions">
+          ${d.status === 'published' ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqResponses('${d.id}')">Réponses (${nResp})</button>` : ''}
+          ${d.status === 'published' ? `<button class="btn-remove-product" onclick="closeRfqDossier('${d.id}')">Clôturer</button>` : ''}
+        </div>
+      </div>
+      ${d.status === 'rejected' && d.rejection_reason ? `<p style="font-size:12px;color:#E06A52;margin:-4px 0 10px">Motif du refus : ${d.rejection_reason}</p>` : ''}`;
+  }).join('');
+}
+
+function openRfqDossierForm() {
+  rfqEditingAttachmentDossierId = null;
+  const wrap = document.getElementById('sup-rfq-form-wrap');
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="submit-section-title">Nouveau dossier RFQ / RFI / RFP</div>
+    <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Visible par tous les fournisseurs connectés une fois validé par notre équipe. Le contenu détaillé (description, cahier des charges) n'est révélé qu'après acceptation d'un accord de confidentialité par le fournisseur.</p>
+    <form onsubmit="submitRfqDossierForm(event)">
+      <div class="lead-field"><label>Type</label>
+        <select id="sup-rfq-type"><option value="RFQ">RFQ — Demande de devis</option><option value="RFI">RFI — Demande d'information</option><option value="RFP">RFP — Demande de proposition</option></select>
+      </div>
+      <div class="lead-field"><label>Titre</label><input type="text" id="sup-rfq-title" required/></div>
+      <div class="lead-field"><label>Catégorie</label><input type="text" id="sup-rfq-category" placeholder="ex: Calculateurs embarqués"/></div>
+      <div class="lead-field"><label>Domaine</label><input type="text" id="sup-rfq-industry" placeholder="ex: Spatial"/></div>
+      <div class="lead-field"><label>Description / cahier des charges (texte)</label><textarea id="sup-rfq-desc" rows="5" required></textarea></div>
+      <div class="lead-field"><label>Date limite de réponse</label><input type="date" id="sup-rfq-deadline"/></div>
+      <div class="lead-field"><label>Pièce jointe (cahier des charges, optionnel)</label><input type="file" id="sup-rfq-file"/></div>
+      <div class="submit-actions">
+        <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
+        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-rfq-form-wrap').style.display='none'">Annuler</button>
+      </div>
+    </form>`;
+}
+
+async function submitRfqDossierForm(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    const created = await supplierFetch('rfq_dossiers', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=representation' },
+      body: JSON.stringify([{
+        company_id: supplierCompany.id,
+        submitter_user_id: sessionStorage.getItem('sup_user_id'),
+        submitter_name: supplierCompany.name,
+        submitter_email: sessionStorage.getItem('sup_email'),
+        title: document.getElementById('sup-rfq-title').value,
+        rfq_type: document.getElementById('sup-rfq-type').value,
+        category: document.getElementById('sup-rfq-category').value || null,
+        industry: document.getElementById('sup-rfq-industry').value || null,
+        description: document.getElementById('sup-rfq-desc').value,
+        deadline: document.getElementById('sup-rfq-deadline').value || null,
+      }]),
+    });
+    const rfqId = created[0].id;
+
+    const fileInput = document.getElementById('sup-rfq-file');
+    if (fileInput.files[0]) {
+      await uploadRfqAttachment(rfqId, fileInput.files[0]);
+    }
+
+    document.getElementById('sup-rfq-form-wrap').style.display = 'none';
+    alert('Dossier envoyé, en attente de validation admin.');
+    loadSupplierRfqDossiers();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Upload direct dans le bucket privé rfq-attachments (voir
+// backend/supabase_add_rfq_system_2026_09.sql SECTION 6) -- chemin
+// <rfq_id>/<filename>, autorisé par la policy storage INSERT tant que le
+// dossier appartient bien à l'entreprise de l'utilisateur connecté.
+async function uploadRfqAttachment(rfqId, file) {
+  const token = sessionStorage.getItem('sup_access_token');
+  const path = `${rfqId}/${encodeURIComponent(file.name)}`;
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/rfq-attachments/${path}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  });
+  if (!res.ok) throw new Error(`Échec de l'envoi du fichier (HTTP ${res.status})`);
+  await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ attachment_path: path }),
+  });
+}
+
+async function closeRfqDossier(rfqId) {
+  if (!confirm('Clôturer ce dossier ? Les fournisseurs ne pourront plus y répondre.')) return;
+  try {
+    await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: 'closed' }),
+    });
+    loadSupplierRfqDossiers();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+function viewRfqResponses(rfqId) {
+  const wrap = document.getElementById('sup-rfq-responses-wrap');
+  const dossier = supplierRfqDossiers.find(d => d.id === rfqId);
+  const responses = supplierRfqResponsesByDossier[rfqId] || [];
+  const statusMap = {
+    sent:     { cls: 'sup-pill-pending', txt: '⏳ À traiter' },
+    accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
+    rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
+    invoiced: { cls: 'sup-pill-ok',      txt: '✓ Facturée' },
+  };
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="submit-section-title">Réponses reçues — ${dossier ? dossier.title : ''}</div>
+    ${!responses.length ? '<p class="sup-empty">Aucune réponse pour le moment.</p>' : responses.map(r => {
+      const st = statusMap[r.status] || statusMap.sent;
+      return `
+      <div class="sup-lead">
+        <div class="sup-lead-head">
+          <span class="sup-lead-who">${r.submitter_name}</span>
+          <span class="sup-pill ${st.cls}">${st.txt}</span>
+        </div>
+        <div class="sup-lead-meta">${r.submitter_email} · ${r.price_label ? r.price_label + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <p class="sup-lead-msg">${r.message}</p>
+        ${r.status === 'sent' ? `
+        <div class="sup-lead-actions">
+          <button class="btn-add-product sup-btn-sm" onclick="respondToRfqResponse('${r.id}','accepted','${rfqId}')">✓ Accepter</button>
+          <button class="btn-remove-product" onclick="respondToRfqResponse('${r.id}','rejected','${rfqId}')">✕ Refuser</button>
+        </div>` : ''}
+      </div>`;
+    }).join('')}
+    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-responses-wrap').style.display='none'">Fermer</button>`;
+}
+
+async function respondToRfqResponse(id, status, rfqId) {
+  try {
+    await supplierFetch(`rfq_responses?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status }),
+    });
+    await loadSupplierRfqDossiers();
+    viewRfqResponses(rfqId);
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
 }
 
