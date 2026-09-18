@@ -32,6 +32,26 @@ async function adminFetch(path, options = {}) {
   return res.json().catch(() => null);
 }
 
+// PostgREST plafonne toute lecture directe de table à 50 lignes par
+// requête (db-max-rows, voir backend/supabase_lock_base_tables.sql),
+// quel que soit le `limit` demandé dans l'URL -- sans boucle sur
+// `offset`, un compteur basé sur rows.length reste bloqué au plafond dès
+// que la table dépasse 50 lignes (c'est ce qui bloquait "Vues · total
+// enregistré" à 50 dans l'admin).
+async function adminFetchAllPages(path) {
+  let all = [];
+  let offset = 0;
+  while (true) {
+    const sep = path.includes('?') ? '&' : '?';
+    const page = await adminFetch(`${path}${sep}offset=${offset}`);
+    if (!page || !page.length) break;
+    all = all.concat(page);
+    if (page.length < 50) break;
+    offset += page.length;
+  }
+  return all;
+}
+
 async function adminLogin(e) {
   e.preventDefault();
   const email = document.getElementById('admin-email').value;
@@ -85,7 +105,7 @@ async function loadAnalytics() {
   kpis.innerHTML = '<div class="admin-empty">Chargement…</div>';
   top.innerHTML = '';
   try {
-    const rows = await adminFetch('site_page_views?select=page,created_at&order=created_at.desc&limit=10000');
+    const rows = await adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc');
     adminAnalyticsRows = rows;
     const now = Date.now();
     const DAY = 24 * 60 * 60 * 1000;
