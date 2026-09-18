@@ -124,6 +124,22 @@
     </div>
 
     <div class="sup-panel">
+      <div class="sup-panel-head">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Statistiques de vues</span>
+        <select id="sup-views-range" onchange="renderSupplierViewsForRange()" style="display:none;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+          <option value="1">1 jour</option>
+          <option value="7">1 semaine</option>
+          <option value="30" selected>1 mois</option>
+          <option value="90">3 mois</option>
+          <option value="180">6 mois</option>
+          <option value="365">1 an</option>
+        </select>
+      </div>
+      <div id="sup-views-chart"></div>
+      <div id="sup-views-products"></div>
+    </div>
+
+    <div class="sup-panel">
       <span class="submit-section-title" style="border:none;padding:0">Vos soumissions</span>
       <div id="sup-submissions-list"></div>
     </div>

@@ -6,6 +6,13 @@
 let supplierCompany = null; // entreprise revendiquée (si déjà approuvée)
 let supplierEditingProductId = null; // null = ajout, sinon id du produit en cours d'édition
 let supStatProducts = null, supStatPending = null, supStatApproved = null, supStatLeadsPending = null; // compteurs du bandeau
+let supplierViewRows = []; // vues produit (entity_views), stats premium -- voir loadSupplierViews()
+
+// Plages du sélecteur temporel des stats de vues (même liste que
+// js/pages/admin.js ANALYTICS_RANGES, pour une expérience cohérente).
+const SUPPLIER_VIEW_RANGES = {
+  1: '1 jour', 7: '1 semaine', 30: '1 mois', 90: '3 mois', 180: '6 mois', 365: '1 an',
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
@@ -176,6 +183,24 @@ async function supplierFetch(path, options = {}) {
   return res.json().catch(() => null);
 }
 
+// PostgREST plafonne les lectures directes à 50 lignes par requête
+// (db-max-rows, voir backend/supabase_lock_base_tables.sql) -- même
+// correctif que adminFetchAllPages (js/pages/admin.js), nécessaire dès
+// qu'un fournisseur premium dépasse 50 vues enregistrées.
+async function supplierFetchAllPages(path) {
+  let all = [];
+  let offset = 0;
+  while (true) {
+    const sep = path.includes('?') ? '&' : '?';
+    const page = await supplierFetch(`${path}${sep}offset=${offset}`);
+    if (!page || !page.length) break;
+    all = all.concat(page);
+    if (page.length < 50) break;
+    offset += page.length;
+  }
+  return all;
+}
+
 function showSupplierMessage(msg, isError) {
   const box = document.getElementById('sup-auth-message');
   box.textContent = msg;
@@ -235,6 +260,7 @@ function supplierLogout() {
   sessionStorage.removeItem('sup_user_id');
   supplierCompany = null;
   supStatProducts = supStatPending = supStatApproved = null;
+  supplierViewRows = [];
   document.getElementById('sup-auth-box').style.display = 'block';
   document.getElementById('sup-claim-box').style.display = 'none';
   document.getElementById('sup-pending-box').style.display = 'none';
@@ -264,6 +290,7 @@ async function supplierRouteAfterAuth() {
       loadSupplierProducts();
       loadSupplierSubmissions();
       loadSupplierLeads();
+      loadSupplierViews();
       handlePremiumReturn();
       return;
     }
@@ -390,6 +417,117 @@ async function loadSupplierLeads() {
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
   }
+}
+
+// ── Stats de vues (produits + fiche entreprise) — réservées aux
+// fournisseurs premium (voir backend/supabase_add_supplier_view_stats_2026_09.sql :
+// RLS sur entity_views, un non-premium récupère 0 ligne côté serveur même
+// s'il force la requête). Table alimentée par pages/produit.html et
+// pages/entreprise.html — voir backend/supabase_add_entity_views_2026_09.sql.
+async function loadSupplierViews() {
+  const range = document.getElementById('sup-views-range');
+  const chart = document.getElementById('sup-views-chart');
+  const list = document.getElementById('sup-views-products');
+  if (!supplierCompany.premium) {
+    range.style.display = 'none';
+    chart.innerHTML = '';
+    list.innerHTML = `
+      <div class="sup-premium-upsell">
+        <span>Les statistiques de vues détaillées par produit sont réservées aux entreprises Premium.</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+      </div>`;
+    return;
+  }
+  range.style.display = '';
+  list.innerHTML = 'Chargement…';
+  try {
+    supplierViewRows = await supplierFetchAllPages(
+      `entity_views?company_id=eq.${supplierCompany.id}&entity_type=eq.product&select=product_id,product_name,created_at&order=created_at.desc`
+    );
+    renderSupplierViewsForRange();
+  } catch (err) {
+    list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
+  }
+}
+
+function renderSupplierViewsForRange() {
+  const chart = document.getElementById('sup-views-chart');
+  const list = document.getElementById('sup-views-products');
+  const rangeDays = Number(document.getElementById('sup-views-range').value) || 30;
+  const rangeLabel = SUPPLIER_VIEW_RANGES[rangeDays] || `${rangeDays} j`;
+
+  const now = Date.now();
+  const DAY = 24 * 60 * 60 * 1000;
+  const within = (r, days) => now - new Date(r.created_at).getTime() <= days * DAY;
+  const inRange = supplierViewRows.filter(r => within(r, rangeDays));
+
+  // Table par produit : vues sur la plage + total toutes périodes confondues.
+  const byProduct = {};
+  supplierViewRows.forEach(r => {
+    if (!r.product_id) return;
+    if (!byProduct[r.product_id]) byProduct[r.product_id] = { name: r.product_name || r.product_id, inRange: 0, total: 0 };
+    byProduct[r.product_id].total++;
+  });
+  inRange.forEach(r => { if (r.product_id && byProduct[r.product_id]) byProduct[r.product_id].inRange++; });
+  const rows = Object.values(byProduct).sort((a, b) => b.inRange - a.inRange);
+
+  list.innerHTML = !rows.length
+    ? `<p class="sup-empty">Aucune vue enregistrée sur vos produits pour le moment.</p>`
+    : `<div class="admin-field-row" style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase"><span>Produit</span><span>${rangeLabel} · Total</span></div>` +
+      rows.map(p => `<div class="admin-field-row"><span>${p.name}</span><span>${p.inRange} · ${p.total}</span></div>`).join('');
+
+  renderSupplierViewsChart(chart, inRange, rangeDays);
+}
+
+// Graphique courbe simplifié (une seule série : toutes vos vues produit) --
+// même logique horaire/journalière que js/pages/admin.js renderAnalyticsChart(),
+// réduite pour un usage fournisseur (pas de filtre par page).
+function renderSupplierViewsChart(wrap, rows, rangeDays) {
+  if (!rows.length) { wrap.innerHTML = ''; return; }
+
+  const HOUR = 60 * 60 * 1000, DAY = 24 * HOUR;
+  const hourly = rangeDays === 1;
+  let buckets, counts, labelFor;
+  if (hourly) {
+    const now = new Date(); now.setMinutes(0, 0, 0);
+    buckets = [];
+    for (let i = 23; i >= 0; i--) buckets.push(new Date(now.getTime() - i * HOUR));
+    counts = buckets.map(b => rows.filter(r => {
+      const t = new Date(r.created_at).getTime();
+      return t >= b.getTime() && t < b.getTime() + HOUR;
+    }).length);
+    labelFor = b => `${b.getHours()}h`;
+  } else {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    buckets = [];
+    for (let i = rangeDays - 1; i >= 0; i--) buckets.push(new Date(today.getTime() - i * DAY));
+    counts = buckets.map(b => {
+      const dayStr = b.toISOString().slice(0, 10);
+      return rows.filter(r => r.created_at.slice(0, 10) === dayStr).length;
+    });
+    labelFor = b => `${b.getDate()}/${b.getMonth() + 1}`;
+  }
+
+  const W = 700, H = 160, padL = 30, padB = 22, padT = 10, padR = 10;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const max = Math.max(1, ...counts);
+  const x = i => padL + (counts.length === 1 ? chartW / 2 : (i / (counts.length - 1)) * chartW);
+  const y = v => padT + chartH - (v / max) * chartH;
+  const points = counts.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  const areaPoints = `${padL},${padT + chartH} ${points} ${padL + chartW},${padT + chartH}`;
+
+  const labelStride = Math.max(1, Math.ceil(counts.length / 8));
+  const xLabels = counts.map((v, i) => {
+    if (i % labelStride !== 0 && i !== counts.length - 1) return '';
+    return `<text x="${x(i)}" y="${H - 5}" font-size="9" fill="var(--muted)" text-anchor="middle">${labelFor(buckets[i])}</text>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--white);border:1px solid var(--border);border-radius:8px;margin-bottom:14px">
+      <polygon points="${areaPoints}" fill="var(--accent, #2563eb)" opacity="0.08"/>
+      <polyline points="${points}" fill="none" stroke="var(--accent, #2563eb)" stroke-width="2"/>
+      ${xLabels}
+    </svg>`;
 }
 
 function renderSupplierLeads(rows) {
