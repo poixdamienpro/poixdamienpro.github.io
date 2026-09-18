@@ -49,14 +49,18 @@ function updateCompareBanner() {
 
 function openCompareModal() {
   const prods = compareIds.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
-  const allLabels = [...new Set(prods.flatMap(p => p.specs.map(s => s.l)))];
+  // Specs localisées une seule fois (voir js/i18n.js localize()) — le
+  // regroupement par libellé ci-dessous compare des chaînes déjà traduites,
+  // donc reste cohérent même quand FR et EN diffèrent.
+  const localizedSpecs = prods.map(p => p.specs.map(s => ({ l: localize(s.l, s.lEn), v: localize(s.v, s.vEn) })));
+  const allLabels = [...new Set(localizedSpecs.flat().map(s => s.l))];
   const allBars   = [...new Set(prods.flatMap(p => p.bars.map(b => b.l)))];
 
   const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${p.icon}</span><strong style="font-size:11px">${p.name}</strong><span style="font-size:10px;opacity:.8">${p.maker}</span></div></th>`).join('');
 
   const specRows = allLabels.map((label) => {
-    const cells = prods.map(p => {
-      const s = p.specs.find(x => x.l === label);
+    const cells = localizedSpecs.map(specs => {
+      const s = specs.find(x => x.l === label);
       return `<td>${s ? s.v : '—'}</td>`;
     }).join('');
     return `<tr><td class="row-label">${label}</td>${cells}</tr>`;

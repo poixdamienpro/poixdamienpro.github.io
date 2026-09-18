@@ -147,7 +147,7 @@ function baseFilteredProducts() {
   const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
   return PRODUCTS.filter(p => {
     if (CATALOGUE_EXCLUDED_CATS.includes(p.cat)) return false;
-    const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || localize(p.desc, p.descEn).toLowerCase().includes(q);
     const matchesGroup = catGroup === 'all' || groupOfCat(p.cat) === catGroup;
     const matchesSub = catSubCat === 'all' || p.cat === catSubCat;
     return ms && matchesGroup && matchesSub && (catInd === 'all' || p.industry === catInd);
@@ -415,7 +415,7 @@ function renderProductPreview(p) {
   if(!el) return;
   const inCompare = compareIds.includes(p.id);
 
-  const specs = p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('');
+  const specs = p.specs.map(s => `<tr><td>${localize(s.l, s.lEn)}</td><td>${localize(s.v, s.vEn)}</td></tr>`).join('');
 
   const _t = typeof t==='function' ? t : k=>k;
   const bars = (p.bars || []).length ? `
@@ -443,7 +443,7 @@ function renderProductPreview(p) {
         </div>
       </div>
       <div class="dp-badges"><span class="tag tag-industry">${p.industry}</span></div>
-      <p class="dp-desc">${p.desc}</p>
+      <p class="dp-desc">${localize(p.desc, p.descEn)}</p>
       <div class="dp-section-label">${_t('prod_specs')}</div>
       <table class="spec-table"><tbody>${specs}</tbody></table>
       ${bars}
@@ -474,6 +474,16 @@ function onCatSearchInput() {
   renderCharFilters();
   renderTagFilters();
   renderProducts();
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : la fiche
+// produit actuellement affichée (desc/specs) est construite en JS, pas via
+// data-i18n. Garde sur catCurrentId : ne s'exécute qu'une fois une fiche
+// déjà sélectionnée (donc PRODUCTS forcément déjà chargé à ce stade).
+function onLangChange() {
+  if (!catCurrentId) return;
+  const p = PRODUCTS.find(x => x.id === catCurrentId);
+  if (p) renderProductPreview(p);
 }
 
 function resetCatalogue() {

@@ -106,6 +106,10 @@ function mapCompany(row) {
     products:  row.categories || [],
     tags:      row.tags       || [],
     desc:      row.description || '',
+    // Traduction anglaise optionnelle (voir js/i18n.js localize()) — vide
+    // pour la plupart des entreprises tant que la traduction n'a pas été
+    // faite ; localize() retombe alors silencieusement sur `desc`.
+    descEn:    row.description_en || '',
     site:      row.site       || '#',
     logo:      row.logo       || '🏭',
     verified:  row.verified   || false,
@@ -147,6 +151,8 @@ function mapProduct(row) {
     icon:     row.icon        || '🔧',
     image:    row.image_url   || '',
     desc:     row.description || '',
+    // Voir js/i18n.js localize() et mapCompany() ci-dessus.
+    descEn:   row.description_en || '',
     datasheetUrl: row.datasheet_url || '',
     // Caracteristiques electriques/mecaniques/environnementales normalisees
     // (filtre par plage numerique) — voir
@@ -158,7 +164,7 @@ function mapProduct(row) {
     // pour l'instant (indice IP) ; 'certs' ci-dessous sert de source pour le
     // filtre "Qualification" (déjà riche, pas besoin de le dupliquer ici).
     productTags: row.product_tags || [],
-    specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium })),
+    specs:    (row.specs || []).map(s => ({ l: s.label, v: s.value, premium: s.is_premium, lEn: s.label_en, vEn: s.value_en })),
     bars:     (row.bars  || []).map(b => ({ l: b.label, v: b.value, c: b.color })),
     certs:    row.certs  || [],
     price:    row.price_label || 'Sur devis',

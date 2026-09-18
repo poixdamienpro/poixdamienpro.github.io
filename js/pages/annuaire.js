@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function filteredCompanies() {
   const q = (document.getElementById('ann-search')?.value || '').toLowerCase();
   return COMPANIES.filter(c => {
-    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
+    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || localize(c.desc, c.descEn).toLowerCase().includes(q);
     return ms && (annIndustry === 'all' || c.industries.includes(annIndustry)) && (annCat === 'all' || c.products.includes(annCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 }
@@ -114,7 +114,7 @@ function renderCompanyPreview(c) {
   const prodsBlock = prods.length ? `
     <div class="dp-section-label">${prods.length} ${prodLabel}</div>
     <div class="dp-prods">
-      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${p.icon} ${p.name}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => s.l+' : '+s.v).join(' · ')}</div><div class="modal-prod-price">💰 ${p.price}</div></div>`).join('')}
+      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${p.icon} ${p.name}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => localize(s.l, s.lEn)+' : '+localize(s.v, s.vEn)).join(' · ')}</div><div class="modal-prod-price">💰 ${p.price}</div></div>`).join('')}
     </div>
     ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">'+_t('prev_see')+' '+prods.length+' '+_t('prev_see_suffix')+'</button>' : ''}` : '';
 
@@ -132,7 +132,7 @@ function renderCompanyPreview(c) {
         ${c.verified ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
-      <p class="dp-desc">${c.desc}</p>
+      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
       <div class="dp-section-label">${_t('prev_info')}</div>
       <div class="dp-details">${details}</div>
       ${prodsBlock}
@@ -155,4 +155,14 @@ function resetAnnuaire() {
   updateChips('ann-industry-chips', () => annIndustry);
   updateChips('ann-cat-chips', () => annCat);
   renderCompanies();
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : la fiche
+// entreprise actuellement affichée (desc/specs) est construite en JS, pas
+// via data-i18n. Garde sur dirCurrentId : ne s'exécute qu'une fois une
+// fiche déjà sélectionnée (donc COMPANIES forcément déjà chargé).
+function onLangChange() {
+  if (!dirCurrentId) return;
+  const c = COMPANIES.find(x => x.name === dirCurrentId);
+  if (c) renderCompanyPreview(c);
 }

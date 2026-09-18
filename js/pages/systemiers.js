@@ -48,7 +48,7 @@ function filteredSystemiers() {
   const q = (document.getElementById('sys-search')?.value || '').toLowerCase();
   const base = window._systemierCompanies || [];
   return base.filter(c => {
-    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
+    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || localize(c.desc, c.descEn).toLowerCase().includes(q);
     return ms && (sysIndustry === 'all' || c.industries.includes(sysIndustry)) && (sysCat === 'all' || c.products.includes(sysCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 }
@@ -130,7 +130,7 @@ function renderSystemierPreview(c) {
         <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px">
           <div style="font-weight:600;font-size:13px;margin-bottom:2px">${s.icon || '🛰️'} ${s.name}</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${s.cat}</div>
-          ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${sp.l} : <strong style="color:var(--ink)">${sp.v}</strong>`).join(' · ')}</div>` : ''}
+          ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${localize(sp.l, sp.lEn)} : <strong style="color:var(--ink)">${localize(sp.v, sp.vEn)}</strong>`).join(' · ')}</div>` : ''}
         </div>`).join('')}
     </div>` : '';
 
@@ -149,7 +149,7 @@ function renderSystemierPreview(c) {
         <span class="tag tag-industry">${t('tag_systemier')}</span>
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
-      <p class="dp-desc">${c.desc}</p>
+      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${systemsBlock}
@@ -170,4 +170,14 @@ function resetSystemiers() {
   updateChips('sys-industry-chips', () => sysIndustry);
   updateChips('sys-cat-chips', () => sysCat);
   renderSystemiers();
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : la fiche
+// systémier actuellement affichée (desc/specs) est construite en JS, pas
+// via data-i18n. Garde sur dirCurrentId : ne s'exécute qu'une fois une
+// fiche déjà sélectionnée (donc COMPANIES forcément déjà chargé).
+function onLangChange() {
+  if (!dirCurrentId) return;
+  const c = COMPANIES.find(x => x.name === dirCurrentId);
+  if (c) renderSystemierPreview(c);
 }

@@ -60,7 +60,7 @@ function renderCompany(c, products) {
   document.title = `${c.name} — ${industryLabel} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
   const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${industryLabel}` : `${c.name}, équipementier ${industryLabel}`;
-  if (metaDesc) metaDesc.setAttribute('content', (c.desc || metaFallback).slice(0, 160));
+  if (metaDesc) metaDesc.setAttribute('content', (localize(c.desc, c.descEn) || metaFallback).slice(0, 160));
 
   document.getElementById('ent-header').innerHTML = `
     <h1 class="page-title"><span style="display:inline-flex;width:40px;height:40px;vertical-align:middle;align-items:center;justify-content:center;margin-right:10px;border-radius:9px;background:rgba(0,0,0,.04);overflow:hidden">${companyLogoHtml(c, 40)}</span>${c.name}</h1>
@@ -83,7 +83,7 @@ function renderCompany(c, products) {
     </div>` : ''}
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_description')}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${c.desc}</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${localize(c.desc, c.descEn)}</p>
     </div>
     <div class="modal-section">
       <div class="modal-section-title">${t('prev_info')}</div>
@@ -109,7 +109,7 @@ function renderCompany(c, products) {
         ${products.map(p => `
           <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
             <div class="modal-prod-name">${p.icon} ${p.name}</div>
-            <div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => s.l + ' : ' + s.v).join(' · ')}</div>
+            <div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => localize(s.l, s.lEn) + ' : ' + localize(s.v, s.vEn)).join(' · ')}</div>
             <div class="modal-prod-price">💰 ${p.price}</div>
           </a>`).join('')}
       </div>
@@ -136,7 +136,7 @@ function injectCompanyJsonLd(c) {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: c.name,
-    description: c.desc,
+    description: localize(c.desc, c.descEn),
     url: c.site !== '#' ? c.site : undefined,
     address: { '@type': 'PostalAddress', addressLocality: c.hq, addressCountry: c.country },
     industry: c.industries.join(', '),

@@ -523,6 +523,15 @@ function t(key) {
   return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key] || key;
 }
 
+// Traduction du contenu dynamique (Supabase : descriptions entreprise/produit,
+// libellés de specs) — contrairement à t() ci-dessus qui couvre les textes
+// fixes de l'UI. La plupart des lignes n'ont pas encore de traduction _en
+// renseignée en base : fallback silencieux vers le FR tant que c'est vide,
+// plutôt qu'un champ blanc à l'écran.
+function localize(fr, en) {
+  return (getLang() === 'en' && en) ? en : (fr || '');
+}
+
 function applyLang() {
   const lang = getLang();
   document.querySelectorAll('[data-i18n]').forEach(el => {

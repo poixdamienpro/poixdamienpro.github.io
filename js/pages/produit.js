@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderProduct(p) {
   document.title = `${p.name} — ${p.maker} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute('content', (p.desc || `${p.name} par ${p.maker}`).slice(0, 160));
+  if (metaDesc) metaDesc.setAttribute('content', (localize(p.desc, p.descEn) || `${p.name} par ${p.maker}`).slice(0, 160));
 
   document.getElementById('prod-header').innerHTML = `
     <h1 class="page-title">${p.icon} ${p.name}</h1>
@@ -36,12 +36,12 @@ function renderProduct(p) {
     ${p.image ? `<img src="${p.image}" alt="${p.name}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_description')}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${p.desc}</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${localize(p.desc, p.descEn)}</p>
     </div>
     <div class="modal-section">
       <div class="modal-section-title">${t('prod_specs')}</div>
       <table class="spec-table">
-        <tbody>${p.specs.map(s => `<tr><td>${s.l}</td><td>${s.v}</td></tr>`).join('')}</tbody>
+        <tbody>${p.specs.map(s => `<tr><td>${localize(s.l, s.lEn)}</td><td>${localize(s.v, s.vEn)}</td></tr>`).join('')}</tbody>
       </table>
       ${p.bars.map(b => `
         <div class="bar-row">
@@ -79,7 +79,7 @@ function injectProductJsonLd(p) {
     '@context': 'https://schema.org',
     '@type': 'Thing',
     name: p.name,
-    description: p.desc,
+    description: localize(p.desc, p.descEn),
     additionalType: p.cat,
   });
   document.head.appendChild(script);

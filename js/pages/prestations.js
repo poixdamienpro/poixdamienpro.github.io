@@ -58,7 +58,7 @@ function filteredCompanies() {
   const q = (document.getElementById('presta-search')?.value || '').toLowerCase();
   const base = window._serviceCompanies || [];
   return base.filter(c => {
-    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || c.desc.toLowerCase().includes(q);
+    const ms = !q || c.name.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.tags.some(t => t.toLowerCase().includes(q)) || localize(c.desc, c.descEn).toLowerCase().includes(q);
     return ms && (prestaIndustry === 'all' || c.industries.includes(prestaIndustry)) && (prestaCat === 'all' || c.products.includes(prestaCat));
   }).sort((a,b) => { if(a.premium && !b.premium) return -1; if(!a.premium && b.premium) return 1; return a.name.localeCompare(b.name,'fr'); });
 }
@@ -147,7 +147,7 @@ function renderCompanyPreview(c) {
         ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
         ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
       </div>
-      <p class="dp-desc">${c.desc}</p>
+      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${servicesBlock}
@@ -168,4 +168,14 @@ function resetPrestations() {
   updateChips('presta-industry-chips', () => prestaIndustry);
   updateChips('presta-cat-chips', () => prestaCat);
   renderCompanies();
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : la fiche
+// prestataire actuellement affichée (desc) est construite en JS, pas via
+// data-i18n. Garde sur dirCurrentId : ne s'exécute qu'une fois une fiche
+// déjà sélectionnée (donc COMPANIES forcément déjà chargé).
+function onLangChange() {
+  if (!dirCurrentId) return;
+  const c = COMPANIES.find(x => x.name === dirCurrentId);
+  if (c) renderCompanyPreview(c);
 }
