@@ -236,6 +236,16 @@ async function startMfaEnrollment() {
   const token = sessionStorage.getItem('admin_access_token');
   box.innerHTML = '<p style="font-size:12px;color:var(--muted)">Génération du QR code…</p>';
   try {
+    // Supabase refuse un nouveau facteur si un précédent (même "unverified",
+    // abandonné après un essai raté) porte déjà le même friendly_name --
+    // on nettoie les tentatives inachevées avant d'en créer une nouvelle.
+    // On ne touche jamais à un facteur déjà "verified" (MFA active).
+    const existingUser = await authFetch('user', token);
+    const abandoned = ((existingUser && existingUser.factors) || []).filter(f => f.factor_type === 'totp' && f.status !== 'verified');
+    for (const f of abandoned) {
+      await authFetch(`factors/${f.id}`, token, { method: 'DELETE' }).catch(() => {});
+    }
+
     const factor = await authFetch('factors', token, {
       method: 'POST',
       body: JSON.stringify({ factor_type: 'totp', friendly_name: 'Authenticator' }),
