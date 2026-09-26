@@ -64,6 +64,43 @@ async function adminFetchAllPages(path) {
   return all;
 }
 
+// ── MFA (TOTP) ──────────────────────────────────────────────
+// API brute Supabase Auth (aucun SDK JS chargé sur ce site, voir js/api.js) :
+//   POST /auth/v1/factors                    → enrôle un nouveau facteur TOTP
+//   POST /auth/v1/factors/{id}/challenge      → ouvre un défi (avant verify)
+//   POST /auth/v1/factors/{id}/verify         → valide un code, renvoie une
+//                                                nouvelle session au niveau aal2
+//   DELETE /auth/v1/factors/{id}              → retire un facteur
+// GET /auth/v1/user renvoie user.factors[] (status 'verified'/'unverified').
+//
+// Un mot de passe seul ne donne qu'une session aal1 : is_admin() ne
+// vérifiera le niveau aal2 qu'après exécution manuelle de
+// backend/supabase_enforce_mfa_aal2.sql — à ne lancer QU'UNE FOIS la MFA
+// activée et testée sur ce compte, sinon accès admin bloqué pour tout le
+// monde (voir avertissement en tête de ce fichier SQL).
+let adminPendingAal1Token = null; // token aal1 en attente du code MFA pendant la connexion
+let adminPendingFactorId = null;  // id du facteur ciblé par ce défi de connexion
+let adminEnrollFactorId = null;   // id du facteur en cours d'enrôlement (avant confirmation)
+
+async function authFetch(path, token, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && (data.error_description || data.msg || data.message)) || `HTTP ${res.status}`);
+  return data;
+}
+
+function verifiedTotpFactor(user) {
+  return ((user && user.factors) || []).find(f => f.factor_type === 'totp' && f.status === 'verified') || null;
+}
+
 async function adminLogin(e) {
   e.preventDefault();
   const email = document.getElementById('admin-email').value;
@@ -81,18 +118,70 @@ async function adminLogin(e) {
     if (!res.ok || !data.access_token) {
       throw new Error(data.error_description || data.msg || 'Identifiants incorrects.');
     }
-    sessionStorage.setItem('admin_access_token', data.access_token);
-    sessionStorage.setItem('admin_email', email);
-    document.getElementById('admin-login-box').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
-    loadAnalytics();
-    loadPendingSubmissions();
-    loadPendingClaims();
-    loadPendingRfqDossiers();
+
+    const user = await authFetch('user', data.access_token);
+    const factor = verifiedTotpFactor(user);
+    if (factor) {
+      // Double authentification active sur ce compte : on n'ouvre pas encore
+      // le panneau, on attend le code à 6 chiffres (voir adminMfaVerify).
+      adminPendingAal1Token = data.access_token;
+      adminPendingFactorId = factor.id;
+      sessionStorage.setItem('admin_email', email);
+      document.getElementById('admin-login-box').style.display = 'none';
+      document.getElementById('admin-mfa-box').style.display = 'block';
+      document.getElementById('admin-mfa-code').focus();
+      return;
+    }
+
+    completeAdminLogin(data.access_token, email);
   } catch (err) {
     errBox.textContent = err.message;
     errBox.style.display = 'block';
   }
+}
+
+async function adminMfaVerify(e) {
+  e.preventDefault();
+  const code = document.getElementById('admin-mfa-code').value.trim();
+  const errBox = document.getElementById('admin-mfa-error');
+  errBox.style.display = 'none';
+  try {
+    const challenge = await authFetch(`factors/${adminPendingFactorId}/challenge`, adminPendingAal1Token, {
+      method: 'POST', body: JSON.stringify({}),
+    });
+    const verified = await authFetch(`factors/${adminPendingFactorId}/verify`, adminPendingAal1Token, {
+      method: 'POST', body: JSON.stringify({ challenge_id: challenge.id, code }),
+    });
+    const email = sessionStorage.getItem('admin_email');
+    adminPendingAal1Token = null;
+    adminPendingFactorId = null;
+    document.getElementById('admin-mfa-code').value = '';
+    completeAdminLogin(verified.access_token, email);
+  } catch (err) {
+    errBox.textContent = 'Code invalide ou expiré : ' + err.message;
+    errBox.style.display = 'block';
+  }
+}
+
+function adminMfaCancel() {
+  adminPendingAal1Token = null;
+  adminPendingFactorId = null;
+  document.getElementById('admin-mfa-code').value = '';
+  document.getElementById('admin-mfa-box').style.display = 'none';
+  document.getElementById('admin-login-box').style.display = 'block';
+}
+
+function completeAdminLogin(accessToken, email) {
+  sessionStorage.setItem('admin_access_token', accessToken);
+  sessionStorage.setItem('admin_email', email);
+  document.getElementById('admin-login-box').style.display = 'none';
+  document.getElementById('admin-mfa-box').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  loadAdminMfaStatus();
+  loadAnalytics();
+  loadPendingSubmissions();
+  loadPendingClaims();
+  loadPendingRfqDossiers();
 }
 
 function adminLogout() {
@@ -106,10 +195,88 @@ function tryRestoreAdminSession() {
   if (!sessionStorage.getItem('admin_access_token')) return;
   document.getElementById('admin-login-box').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
+  loadAdminMfaStatus();
   loadAnalytics();
   loadPendingSubmissions();
   loadPendingClaims();
   loadPendingRfqDossiers();
+}
+
+// ── Statut + enrôlement MFA, affiché en haut du panneau une fois connecté ──
+async function loadAdminMfaStatus() {
+  const box = document.getElementById('admin-mfa-status');
+  if (!box) return;
+  const token = sessionStorage.getItem('admin_access_token');
+  try {
+    const user = await authFetch('user', token);
+    const factor = verifiedTotpFactor(user);
+    box.innerHTML = factor ? `
+      <div class="admin-field-row"><span>✓ Double authentification active</span>
+        <button class="btn-remove-product" onclick="removeMfaFactor('${factor.id}')">Désactiver</button>
+      </div>` : `
+      <div class="admin-field-row"><span>⚠️ Double authentification non activée sur ce compte</span>
+        <button class="btn-add-product" onclick="startMfaEnrollment()">Activer</button>
+      </div>`;
+  } catch (err) {
+    box.innerHTML = `<p style="color:#C0392B;font-size:12px">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function startMfaEnrollment() {
+  const box = document.getElementById('admin-mfa-status');
+  const token = sessionStorage.getItem('admin_access_token');
+  box.innerHTML = '<p style="font-size:12px;color:var(--muted)">Génération du QR code…</p>';
+  try {
+    const factor = await authFetch('factors', token, {
+      method: 'POST',
+      body: JSON.stringify({ factor_type: 'totp', friendly_name: 'Authenticator' }),
+    });
+    adminEnrollFactorId = factor.id;
+    box.innerHTML = `
+      <p style="font-size:12px;color:var(--text2);line-height:1.6">Scanne ce QR code avec ton application d'authentification (Google Authenticator, 1Password, Authy...), puis entre le code généré pour confirmer.</p>
+      <img src="${escapeHtml(factor.totp.qr_code)}" alt="QR code MFA" style="width:180px;height:180px;border:1px solid var(--border);border-radius:8px;margin:10px 0"/>
+      <p style="font-size:11px;color:var(--muted);word-break:break-all">Clé manuelle (si le QR code ne scanne pas) : ${escapeHtml(factor.totp.secret)}</p>
+      <form onsubmit="confirmMfaEnrollment(event)">
+        <div class="lead-field"><label>Code de confirmation</label><input type="text" id="admin-mfa-enroll-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required/></div>
+        <button type="submit" class="btn-submit-form">Confirmer l'activation</button>
+        <button type="button" class="btn-remove-product" style="margin-top:8px" onclick="loadAdminMfaStatus()">Annuler</button>
+        <p id="admin-mfa-enroll-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+      </form>`;
+  } catch (err) {
+    box.innerHTML = `<p style="color:#C0392B;font-size:12px">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+async function confirmMfaEnrollment(e) {
+  e.preventDefault();
+  const code = document.getElementById('admin-mfa-enroll-code').value.trim();
+  const errBox = document.getElementById('admin-mfa-enroll-error');
+  const token = sessionStorage.getItem('admin_access_token');
+  try {
+    const challenge = await authFetch(`factors/${adminEnrollFactorId}/challenge`, token, {
+      method: 'POST', body: JSON.stringify({}),
+    });
+    await authFetch(`factors/${adminEnrollFactorId}/verify`, token, {
+      method: 'POST', body: JSON.stringify({ challenge_id: challenge.id, code }),
+    });
+    adminEnrollFactorId = null;
+    alert("Double authentification activée. Elle sera demandée à ta prochaine connexion — ne lance backend/supabase_enforce_mfa_aal2.sql qu'après avoir vérifié qu'une reconnexion complète fonctionne.");
+    loadAdminMfaStatus();
+  } catch (err) {
+    errBox.textContent = 'Code invalide : ' + err.message;
+    errBox.style.display = 'block';
+  }
+}
+
+async function removeMfaFactor(factorId) {
+  if (!confirm('Désactiver la double authentification sur ce compte ? Si backend/supabase_enforce_mfa_aal2.sql a déjà été exécuté, tu perdras l\'accès admin tant que tu ne réactives pas la MFA.')) return;
+  const token = sessionStorage.getItem('admin_access_token');
+  try {
+    await authFetch(`factors/${factorId}`, token, { method: 'DELETE' });
+    loadAdminMfaStatus();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
 }
 
 // ── Analytics — vues de page anonymes loggées par js/layout.js ──
