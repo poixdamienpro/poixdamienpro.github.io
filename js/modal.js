@@ -42,7 +42,7 @@ function updateCompareBanner() {
     const p = PRODUCTS.find(x => x.id === id);
     if(!p) return '';
     const label = p.name.length > 20 ? p.name.slice(0,20)+'…' : p.name;
-    return `<div class="compare-pill">${p.icon} ${label}<button onclick="toggleCompare('${id}')">✕</button></div>`;
+    return `<div class="compare-pill">${escapeHtml(p.icon)} ${escapeHtml(label)}<button onclick="toggleCompare('${id}')">✕</button></div>`;
   }).join('');
   banner.classList.toggle('visible', n >= 2);
 }
@@ -56,14 +56,14 @@ function openCompareModal() {
   const allLabels = [...new Set(localizedSpecs.flat().map(s => s.l))];
   const allBars   = [...new Set(prods.flatMap(p => p.bars.map(b => b.l)))];
 
-  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${p.icon}</span><strong style="font-size:11px">${p.name}</strong><span style="font-size:10px;opacity:.8">${p.maker}</span></div></th>`).join('');
+  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${escapeHtml(p.icon)}</span><strong style="font-size:11px">${escapeHtml(p.name)}</strong><span style="font-size:10px;opacity:.8">${escapeHtml(p.maker)}</span></div></th>`).join('');
 
   const specRows = allLabels.map((label) => {
     const cells = localizedSpecs.map(specs => {
       const s = specs.find(x => x.l === label);
-      return `<td>${s ? s.v : '—'}</td>`;
+      return `<td>${s ? escapeHtml(s.v) : '—'}</td>`;
     }).join('');
-    return `<tr><td class="row-label">${label}</td>${cells}</tr>`;
+    return `<tr><td class="row-label">${escapeHtml(label)}</td>${cells}</tr>`;
   }).join('');
 
   const barRows = allBars.map(label => {
@@ -73,13 +73,13 @@ function openCompareModal() {
     const cells = prods.map((p,i) => {
       const v = vals[i];
       const cls = v === max ? 'cmp-best' : v === min ? 'cmp-worst' : '';
-      return `<td class="${cls}">${v !== null ? v+'%' : '—'}</td>`;
+      return `<td class="${cls}">${v !== null ? escapeHtml(v)+'%' : '—'}</td>`;
     }).join('');
-    return `<tr><td class="row-label">📊 ${label}</td>${cells}</tr>`;
+    return `<tr><td class="row-label">📊 ${escapeHtml(label)}</td>${cells}</tr>`;
   }).join('');
 
-  const certRow = `<tr><td class="row-label">${t('prod_certs')}</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.join(', ')+'</td>').join('')}</tr>`;
-  const priceRow = `<tr><td class="row-label">${t('cmp_price_label')}</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+p.price+'</td>').join('')}</tr>`;
+  const certRow = `<tr><td class="row-label">${t('prod_certs')}</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.map(escapeHtml).join(', ')+'</td>').join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">${t('cmp_price_label')}</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+escapeHtml(p.price)+'</td>').join('')}</tr>`;
 
   document.getElementById('compare-table-wrap').innerHTML = `
     <table class="cmp-table">

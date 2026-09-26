@@ -25,9 +25,9 @@ function resetLeadForm() {
     <p class="lead-intro">${_t('lead_intro')}</p>
     ${p ? '' : `<p class="lead-intro" style="margin-top:-8px"><a href="${ROOT_PREFIX}pages/compte-acheteur.html">${_t('lead_login_link')}</a> ${_t('lead_login_suffix')}</p>`}
     <form id="lead-form" onsubmit="submitLeadForm(event)">
-      <div class="lead-field"><label>${_t('lead_name')}</label><input type="text" id="lead-name" value="${p && p.name ? p.name.replace(/"/g,'&quot;') : ''}" required/></div>
-      <div class="lead-field"><label>${_t('lead_email')}</label><input type="email" id="lead-email" value="${p && p.email ? p.email.replace(/"/g,'&quot;') : ''}" required/></div>
-      <div class="lead-field"><label>${_t('lead_company')}</label><input type="text" id="lead-company" value="${p && p.company ? p.company.replace(/"/g,'&quot;') : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_name')}</label><input type="text" id="lead-name" value="${p && p.name ? escapeHtml(p.name) : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_email')}</label><input type="email" id="lead-email" value="${p && p.email ? escapeHtml(p.email) : ''}" required/></div>
+      <div class="lead-field"><label>${_t('lead_company')}</label><input type="text" id="lead-company" value="${p && p.company ? escapeHtml(p.company) : ''}" required/></div>
       <div class="lead-field"><label>${_t('lead_need')}</label><textarea id="lead-need" required placeholder="${_t('lead_need_placeholder')}"></textarea></div>
       <button type="submit" class="btn-quote" style="width:100%;justify-content:center">${_t('lead_submit')}</button>
     </form>`;
@@ -97,7 +97,7 @@ async function submitLeadForm(e) {
       <div class="lead-success">
         <div class="icon">✅</div>
         <h3>${_t('lead_success_title')}</h3>
-        <p>${_t('lead_success_body').replace('{company}', leadTarget.company)}</p>
+        <p>${_t('lead_success_body').replace('{company}', escapeHtml(leadTarget.company))}</p>
         <button class="btn-quote" onclick="closeModal('lead-overlay')" style="width:100%;justify-content:center">${_t('lbl_close')}</button>
       </div>`;
   } catch (err) {

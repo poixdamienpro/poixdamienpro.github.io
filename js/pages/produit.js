@@ -33,32 +33,32 @@ function renderProduct(p) {
   if (metaDesc) metaDesc.setAttribute('content', (localize(p.desc, p.descEn) || `${p.name} par ${p.maker}`).slice(0, 160));
 
   document.getElementById('prod-header').innerHTML = `
-    <h1 class="page-title">${p.icon} ${p.name}</h1>
-    <p class="page-subtitle">${p.maker} — ${p.cat} ${p.industry ? '· ' + p.industry : ''}</p>
+    <h1 class="page-title">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</h1>
+    <p class="page-subtitle">${escapeHtml(p.maker)} — ${escapeHtml(p.cat)} ${p.industry ? '· ' + escapeHtml(p.industry) : ''}</p>
   `;
 
   document.getElementById('prod-body').innerHTML = `
-    ${p.image ? `<img src="${p.image}" alt="${p.name}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
+    ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_description')}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${localize(p.desc, p.descEn)}</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(localize(p.desc, p.descEn))}</p>
     </div>
     <div class="modal-section">
       <div class="modal-section-title">${t('prod_specs')}</div>
       <table class="spec-table">
-        <tbody>${p.specs.map(s => `<tr><td>${localize(s.l, s.lEn)}</td><td>${localize(s.v, s.vEn)}</td></tr>`).join('')}</tbody>
+        <tbody>${p.specs.map(s => `<tr><td>${escapeHtml(localize(s.l, s.lEn))}</td><td>${escapeHtml(localize(s.v, s.vEn))}</td></tr>`).join('')}</tbody>
       </table>
       ${p.bars.map(b => `
         <div class="bar-row">
-          <div class="bar-labels"><span>${b.l}</span><span style="font-weight:700">${b.v}%</span></div>
-          <div class="bar-track"><div class="bar-fill" style="width:${b.v}%;background:${b.c}"></div></div>
+          <div class="bar-labels"><span>${escapeHtml(b.l)}</span><span style="font-weight:700">${escapeHtml(b.v)}%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${escapeHtml(b.v)}%;background:${escapeHtml(b.c)}"></div></div>
         </div>`).join('')}
-      ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + c + '</span>').join('')}</div>` : ''}
+      ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + escapeHtml(c) + '</span>').join('')}</div>` : ''}
     </div>
     <div class="modal-actions">
-      <a class="btn-visit" href="entreprise.html?id=${p.companyId}">${t('prod_view_maker_prefix')} ${p.maker}</a>
-      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${p.datasheetUrl}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>` : ''}
-      <button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${p.price}</button>
+      <a class="btn-visit" href="entreprise.html?id=${p.companyId}">${t('prod_view_maker_prefix')} ${escapeHtml(p.maker)}</a>
+      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>` : ''}
+      <button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(p.price)}</button>
     </div>
   `;
   document.getElementById('prod-quote-btn').onclick = () => openLeadModal(p.maker, p.name, p.companyId);

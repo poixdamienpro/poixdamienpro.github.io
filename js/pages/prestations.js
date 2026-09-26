@@ -90,8 +90,8 @@ function renderCompanies() {
     row.innerHTML = `
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
-        <span class="dir-row-name">${c.name}</span>
-        <span class="dir-row-sub">${c.country} · ${c.industries.join(', ')}</span>
+        <span class="dir-row-name">${escapeHtml(c.name)}</span>
+        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
@@ -126,34 +126,34 @@ function renderCompanyPreview(c) {
   if(!el) return;
 
   const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
-    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
+    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const servicesBlock = services.length ? `
     <div class="dp-section-label">${t('presta_services_label')}</div>
-    <div class="cat-tags" style="margin-top:8px">${services.map(s => '<span class="cat-tag">'+s+'</span>').join('')}</div>` : '';
+    <div class="cat-tags" style="margin-top:8px">${services.map(s => '<span class="cat-tag">'+escapeHtml(s)+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
     <div class="dir-preview-card">
       <div class="dp-head">
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
-          <div class="dp-name">${c.name}</div>
-          <div class="dp-loc">${c.country} · ${c.hq}</div>
+          <div class="dp-name">${escapeHtml(c.name)}</div>
+          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
-        ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
       </div>
-      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
+      <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${servicesBlock}
       <div class="dp-actions">
         <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${t('btn_view_profile')}</a>
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
+        <a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
         <button class="btn-quote" id="dp-quote">${t('btn_request_quote')}</button>
       </div>
     </div>`;

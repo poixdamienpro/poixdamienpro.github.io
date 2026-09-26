@@ -127,7 +127,7 @@ async function loadAnalytics() {
     const select = document.getElementById('admin-chart-page-filter');
     const allPages = [...new Set(adminAnalyticsRows.map(r => r.page))].sort();
     select.innerHTML = '<option value="__all__">Toutes les pages</option>' +
-      allPages.map(p => `<option value="${p}">${p}</option>`).join('');
+      allPages.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
 
     renderAnalyticsForRange();
   } catch (err) {
@@ -149,7 +149,7 @@ function renderTopList(elId, title, entries, emptyMsg) {
   el.innerHTML = !entries.length
     ? `<div class="admin-empty">${emptyMsg}</div>`
     : `<div class="submit-section-title" style="margin-top:0">${title}</div>` +
-      entries.map(([label, n]) => `<div class="admin-field-row"><span>${label}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
+      entries.map(([label, n]) => `<div class="admin-field-row"><span>${escapeHtml(label)}</span><span>${n} vue${n > 1 ? 's' : ''}</span></div>`).join('');
 }
 
 // ── KPIs + top pages/produits/catégories/domaines pour la plage
@@ -307,16 +307,16 @@ function renderAdminSubmissions(rows) {
     <div class="admin-card" id="admin-card-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">🏢 Modification fiche entreprise · ${r.company_name || ''}</div>
-          <div class="admin-card-meta">Soumis par ${r.submitter_name || r.submitter_email} (${r.submitter_email}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+          <div class="admin-card-title">🏢 Modification fiche entreprise · ${escapeHtml(r.company_name || '')}</div>
+          <div class="admin-card-meta">Soumis par ${escapeHtml(r.submitter_name || r.submitter_email)} (${escapeHtml(r.submitter_email)}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
         </div>
       </div>
-      <div class="admin-field-row"><span>Description</span><span>${r.company_description || '—'}</span></div>
-      <div class="admin-field-row"><span>Site web</span><span>${r.company_site || '—'}</span></div>
-      <div class="admin-field-row"><span>Siège</span><span>${r.company_hq || '—'}</span></div>
-      <div class="admin-field-row"><span>Pays</span><span>${r.company_country || '—'}</span></div>
-      <div class="admin-field-row"><span>Industrie</span><span>${r.company_industry || '—'}</span></div>
-      <div class="admin-field-row"><span>Email de contact</span><span>${r.company_contact_email || '—'}</span></div>
+      <div class="admin-field-row"><span>Description</span><span>${escapeHtml(r.company_description || '—')}</span></div>
+      <div class="admin-field-row"><span>Site web</span><span>${escapeHtml(r.company_site || '—')}</span></div>
+      <div class="admin-field-row"><span>Siège</span><span>${escapeHtml(r.company_hq || '—')}</span></div>
+      <div class="admin-field-row"><span>Pays</span><span>${escapeHtml(r.company_country || '—')}</span></div>
+      <div class="admin-field-row"><span>Industrie</span><span>${escapeHtml(r.company_industry || '—')}</span></div>
+      <div class="admin-field-row"><span>Email de contact</span><span>${escapeHtml(r.company_contact_email || '—')}</span></div>
       <div class="admin-actions">
         <button class="btn-approve" onclick="approveSubmission('${r.id}')">✓ Approuver et publier</button>
         <button class="btn-reject" onclick="rejectSubmission('${r.id}')">✕ Rejeter</button>
@@ -325,20 +325,20 @@ function renderAdminSubmissions(rows) {
     <div class="admin-card" id="admin-card-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">${{new:'🆕',update:'✏️',delete:'🗑️'}[r.submission_type] || '🆕'} ${r.product_name || '(produit supprimé)'} · ${r.company_name || ''}</div>
-          <div class="admin-card-meta">Soumis par ${r.submitter_name || r.submitter_email} (${r.submitter_email}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')} ${r.submission_type !== 'new' ? ' · type: ' + r.submission_type : ''}</div>
+          <div class="admin-card-title">${{new:'🆕',update:'✏️',delete:'🗑️'}[r.submission_type] || '🆕'} ${escapeHtml(r.product_name || '(produit supprimé)')} · ${escapeHtml(r.company_name || '')}</div>
+          <div class="admin-card-meta">Soumis par ${escapeHtml(r.submitter_name || r.submitter_email)} (${escapeHtml(r.submitter_email)}) le ${new Date(r.created_at).toLocaleDateString('fr-FR')} ${r.submission_type !== 'new' ? ' · type: ' + escapeHtml(r.submission_type) : ''}</div>
         </div>
-        ${r.product_image_url ? `<img src="${r.product_image_url}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0"/>` : ''}
+        ${r.product_image_url ? `<img src="${escapeHtml(r.product_image_url)}" alt="" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0"/>` : ''}
       </div>
-      <div class="admin-field-row"><span>Catégorie</span><span>${r.product_category}</span></div>
-      <div class="admin-field-row"><span>Industrie</span><span>${r.product_industry || r.company_industry || '—'}</span></div>
-      <div class="admin-field-row"><span>Prix</span><span>${r.product_price_label || '—'}</span></div>
-      <div class="admin-field-row"><span>Description produit</span><span>${r.product_description || '—'}</span></div>
-      <div class="admin-field-row"><span>Pays / Siège</span><span>${r.company_country || '—'} · ${r.company_hq || '—'}</span></div>
-      <div class="admin-field-row"><span>Site / Contact</span><span>${r.company_site || '—'} · ${r.company_contact_email || '—'}</span></div>
+      <div class="admin-field-row"><span>Catégorie</span><span>${escapeHtml(r.product_category)}</span></div>
+      <div class="admin-field-row"><span>Industrie</span><span>${escapeHtml(r.product_industry || r.company_industry || '—')}</span></div>
+      <div class="admin-field-row"><span>Prix</span><span>${escapeHtml(r.product_price_label || '—')}</span></div>
+      <div class="admin-field-row"><span>Description produit</span><span>${escapeHtml(r.product_description || '—')}</span></div>
+      <div class="admin-field-row"><span>Pays / Siège</span><span>${escapeHtml(r.company_country || '—')} · ${escapeHtml(r.company_hq || '—')}</span></div>
+      <div class="admin-field-row"><span>Site / Contact</span><span>${escapeHtml(r.company_site || '—')} · ${escapeHtml(r.company_contact_email || '—')}</span></div>
       <div class="admin-specs-list">
-        ${(r.product_specs || []).map(s => `<div>• ${s.label} : ${s.value}</div>`).join('') || '<div>Aucune spec renseignée</div>'}
-        ${(r.product_certs && r.product_certs.length) ? `<div style="margin-top:4px">Certs : ${r.product_certs.join(', ')}</div>` : ''}
+        ${(r.product_specs || []).map(s => `<div>• ${escapeHtml(s.label)} : ${escapeHtml(s.value)}</div>`).join('') || '<div>Aucune spec renseignée</div>'}
+        ${(r.product_certs && r.product_certs.length) ? `<div style="margin-top:4px">Certs : ${r.product_certs.map(escapeHtml).join(', ')}</div>` : ''}
       </div>
       <div class="admin-actions">
         <button class="btn-approve" onclick="approveSubmission('${r.id}')">✓ Approuver et publier</button>
@@ -566,8 +566,8 @@ function renderAdminClaims(rows) {
     <div class="admin-card" id="admin-claim-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">${(r.companies && r.companies.name) || 'Entreprise inconnue'}</div>
-          <div class="admin-card-meta">Demandée par ${r.user_email} le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+          <div class="admin-card-title">${escapeHtml((r.companies && r.companies.name) || 'Entreprise inconnue')}</div>
+          <div class="admin-card-meta">Demandée par ${escapeHtml(r.user_email)} le ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
         </div>
       </div>
       <div class="admin-actions">
@@ -660,13 +660,13 @@ function renderAdminRfqDossiers(rows) {
     <div class="admin-card" id="admin-rfq-${r.id}">
       <div class="admin-card-head">
         <div>
-          <div class="admin-card-title">${r.rfq_type} — ${r.title}${r.requires_custom_nda ? ' 🔒 NDA personnalisé' : ''}</div>
-          <div class="admin-card-meta">${(r.companies && r.companies.name) || 'Entreprise inconnue'} · ${r.category || '—'} · déposé le ${new Date(r.created_at).toLocaleDateString('fr-FR')}${r.deadline ? ' · réponses avant le ' + new Date(r.deadline).toLocaleDateString('fr-FR') : ''}</div>
+          <div class="admin-card-title">${escapeHtml(r.rfq_type)} — ${escapeHtml(r.title)}${r.requires_custom_nda ? ' 🔒 NDA personnalisé' : ''}</div>
+          <div class="admin-card-meta">${escapeHtml((r.companies && r.companies.name) || 'Entreprise inconnue')} · ${escapeHtml(r.category || '—')} · déposé le ${new Date(r.created_at).toLocaleDateString('fr-FR')}${r.deadline ? ' · réponses avant le ' + new Date(r.deadline).toLocaleDateString('fr-FR') : ''}</div>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--muted);white-space:pre-wrap;margin:8px 0">${r.description}</p>
-      ${r.attachment_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px" onclick="downloadRfqAttachmentAdmin('${r.attachment_path}','${r.attachment_path.split('/').pop().replace(/'/g, "\\'")}')">📄 Télécharger la pièce jointe</button>` : ''}
-      ${r.custom_nda_template_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px;margin-left:8px" onclick="downloadRfqAttachmentAdmin('${r.custom_nda_template_path}','${r.custom_nda_template_path.split('/').pop().replace(/'/g, "\\'")}')">📄 Télécharger le gabarit NDA</button>` : ''}
+      <p style="font-size:12px;color:var(--muted);white-space:pre-wrap;margin:8px 0">${escapeHtml(r.description)}</p>
+      ${r.attachment_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px" onclick="downloadRfqAttachmentAdmin('${escapeJsAttr(r.attachment_path)}','${escapeJsAttr(r.attachment_path.split('/').pop())}')">📄 Télécharger la pièce jointe</button>` : ''}
+      ${r.custom_nda_template_path ? `<button type="button" class="btn-approve" style="margin-bottom:8px;margin-left:8px" onclick="downloadRfqAttachmentAdmin('${escapeJsAttr(r.custom_nda_template_path)}','${escapeJsAttr(r.custom_nda_template_path.split('/').pop())}')">📄 Télécharger le gabarit NDA</button>` : ''}
       <div class="admin-actions">
         <button class="btn-approve" onclick="approveRfqDossier('${r.id}')">✓ Publier</button>
         <button class="btn-reject" onclick="rejectRfqDossier('${r.id}')">✕ Rejeter</button>

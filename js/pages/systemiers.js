@@ -80,8 +80,8 @@ function renderSystemiers() {
     row.innerHTML = `
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
-        <span class="dir-row-name">${c.name}</span>
-        <span class="dir-row-sub">${c.country} · ${c.industries.join(', ')}</span>
+        <span class="dir-row-name">${escapeHtml(c.name)}</span>
+        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
@@ -116,7 +116,7 @@ function renderSystemierPreview(c) {
   if(!el) return;
 
   const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
-    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
+    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   // Systemes references pour cette entreprise (produits "systeme
   // complet", pas les composants qu'elle vend par ailleurs) -- avec
@@ -128,9 +128,9 @@ function renderSystemierPreview(c) {
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
       ${systems.map(s => `
         <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-          <div style="font-weight:600;font-size:13px;margin-bottom:2px">${s.icon || '🛰️'} ${s.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${s.cat}</div>
-          ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${localize(sp.l, sp.lEn)} : <strong style="color:var(--ink)">${localize(sp.v, sp.vEn)}</strong>`).join(' · ')}</div>` : ''}
+          <div style="font-weight:600;font-size:13px;margin-bottom:2px">${escapeHtml(s.icon || '🛰️')} ${escapeHtml(s.name)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${escapeHtml(s.cat)}</div>
+          ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${escapeHtml(localize(sp.l, sp.lEn))} : <strong style="color:var(--ink)">${escapeHtml(localize(sp.v, sp.vEn))}</strong>`).join(' · ')}</div>` : ''}
         </div>`).join('')}
     </div>` : '';
 
@@ -139,23 +139,23 @@ function renderSystemierPreview(c) {
       <div class="dp-head">
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
-          <div class="dp-name">${c.name}</div>
-          <div class="dp-loc">${c.country} · ${c.hq}</div>
+          <div class="dp-name">${escapeHtml(c.name)}</div>
+          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
         <span class="tag tag-industry">${t('tag_systemier')}</span>
-        ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
       </div>
-      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
+      <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>
       <div class="dp-details">${details}</div>
       ${systemsBlock}
       <div class="dp-actions">
         <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${t('btn_view_profile')}</a>
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
+        <a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${t('btn_visit_short')}</a>
         <button class="btn-quote" id="dp-quote">${t('btn_request_quote')}</button>
       </div>
     </div>`;

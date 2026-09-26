@@ -69,8 +69,8 @@ function renderCompanies() {
     row.innerHTML = `
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
-        <span class="dir-row-name">${c.name}</span>
-        <span class="dir-row-sub">${c.country} · ${c.industries.join(', ')}</span>
+        <span class="dir-row-name">${escapeHtml(c.name)}</span>
+        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}${prodCount ? '<span class="n">'+prodCount+'</span>' : ''}</span>`;
 
@@ -108,13 +108,13 @@ function renderCompanyPreview(c) {
 
   const _t = typeof t==='function' ? t : k=>k;
   const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industries.join(', ')], [_t('prev_hq'), c.hq]]
-    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${l}</div><div class="detail-value">${v || '—'}</div></div>`).join('');
+    .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   const prodLabel = prods.length===1 ? _t('prev_products_1') : _t('prev_products_n');
   const prodsBlock = prods.length ? `
     <div class="dp-section-label">${prods.length} ${prodLabel}</div>
     <div class="dp-prods">
-      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${p.icon} ${p.name}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => localize(s.l, s.lEn)+' : '+localize(s.v, s.vEn)).join(' · ')}</div><div class="modal-prod-price">💰 ${p.price}</div></div>`).join('')}
+      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => escapeHtml(localize(s.l, s.lEn))+' : '+escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div><div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div></div>`).join('')}
     </div>
     ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">'+_t('prev_see')+' '+prods.length+' '+_t('prev_see_suffix')+'</button>' : ''}` : '';
 
@@ -123,22 +123,22 @@ function renderCompanyPreview(c) {
       <div class="dp-head">
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
-          <div class="dp-name">${c.name}</div>
-          <div class="dp-loc">${c.country} · ${c.hq}</div>
+          <div class="dp-name">${escapeHtml(c.name)}</div>
+          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${_t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
-        ${c.industries.map(ind => `<span class="tag tag-industry">${ind}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
       </div>
-      <p class="dp-desc">${localize(c.desc, c.descEn)}</p>
+      <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${_t('prev_info')}</div>
       <div class="dp-details">${details}</div>
       ${prodsBlock}
       <div class="dp-actions">
         <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${_t('btn_view_profile')}</a>
-        <a class="btn-visit" href="${c.site}" target="_blank" rel="noopener">${_t('prev_visit')}</a>
+        <a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${_t('prev_visit')}</a>
         <button class="btn-quote" id="dp-quote">${_t('prev_quote')}</button>
       </div>
     </div>`;

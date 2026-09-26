@@ -24,13 +24,12 @@ function openBuyerProfileForm() {
   const wrap = document.getElementById('acc-profile-form-wrap');
   const view = document.getElementById('acc-profile-view');
   const p = buyerProfile || {};
-  const esc = v => (v || '').replace(/"/g, '&quot;');
   view.style.display = 'none';
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <form onsubmit="submitBuyerProfileForm(event)">
-      <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-p-name" value="${esc(p.name)}"/></div>
-      <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-p-company" value="${esc(p.company)}"/></div>
+      <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-p-name" value="${escapeHtml(p.name)}"/></div>
+      <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-p-company" value="${escapeHtml(p.company)}"/></div>
       <div class="submit-actions">
         <button type="submit" class="btn-submit-form">Enregistrer</button>
         <button type="button" class="btn-remove-product" onclick="closeBuyerProfileForm()">Annuler</button>
@@ -126,11 +125,11 @@ function renderBuyerLeads(rows) {
     return `
       <div class="sup-lead">
         <div class="sup-lead-head">
-          <span class="sup-lead-who">${r.company_name}${r.product_name ? ' · ' + r.product_name : ''}</span>
+          <span class="sup-lead-who">${escapeHtml(r.company_name)}${r.product_name ? ' · ' + escapeHtml(r.product_name) : ''}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
         <div class="sup-lead-meta">${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
-        <p class="sup-lead-msg">${r.message}</p>
+        <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
       </div>`;
   }).join('');
 }

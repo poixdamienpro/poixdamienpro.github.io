@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     await loadTaxonomy();
     const indList = document.getElementById('industry-list');
-    if (indList) indList.innerHTML = INDUSTRIES.map(i => `<option value="${i}">`).join('');
+    if (indList) indList.innerHTML = INDUSTRIES.map(i => `<option value="${escapeHtml(i)}">`).join('');
   } catch (err) {
     console.error('Erreur Supabase:', err);
   }
@@ -208,7 +208,7 @@ async function submitSupplierForm(e) {
       <div class="lead-success">
         <div class="icon">✅</div>
         <h3>Merci !</h3>
-        <p>${rows.length} produit(s) envoyé(s) pour validation. Vous serez recontacté à <strong>${submitterEmail}</strong> une fois la fiche publiée, gratuitement, aucune carte bancaire n'a été demandée.</p>
+        <p>${rows.length} produit(s) envoyé(s) pour validation. Vous serez recontacté à <strong>${escapeHtml(submitterEmail)}</strong> une fois la fiche publiée, gratuitement, aucune carte bancaire n'a été demandée.</p>
         <a class="btn-quote" href="${ROOT_PREFIX}index.html" style="width:100%;justify-content:center">Retour à l'accueil</a>
       </div>`;
   } catch (err) {

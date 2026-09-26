@@ -64,8 +64,8 @@ function renderRfqList() {
   list.innerHTML = rfqDossierRows.map(d => `
     <div class="sup-prod">
       <div class="sup-prod-main">
-        <span class="sup-prod-name">${d.rfq_type} — ${d.title}${d.requires_custom_nda ? ' 🔒' : ''}</span>
-        <span class="sup-prod-cat">${d.company_name}${d.category ? ' · ' + d.category : ''}${d.deadline ? ' · avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}${d.requires_custom_nda ? ' · NDA personnalisé requis' : ''}</span>
+        <span class="sup-prod-name">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)}${d.requires_custom_nda ? ' 🔒' : ''}</span>
+        <span class="sup-prod-cat">${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.deadline ? ' · avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}${d.requires_custom_nda ? ' · NDA personnalisé requis' : ''}</span>
       </div>
       <button class="btn-add-product sup-btn-sm" onclick="openRfqDetail('${d.id}')">Voir le détail</button>
     </div>`).join('');
@@ -132,14 +132,14 @@ function renderRfqDetail(d) {
   const filename = d.attachment_path ? d.attachment_path.split('/').pop() : null;
   panel.innerHTML = `
     <div class="sup-panel-head">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">${d.rfq_type} — ${d.title}</span>
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)}</span>
       <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">Fermer</button>
     </div>
     <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">
-      ${d.company_name}${d.category ? ' · ' + d.category : ''}${d.industry ? ' · ' + d.industry : ''}${d.deadline ? ' · Réponse avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}
+      ${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.industry ? ' · ' + escapeHtml(d.industry) : ''}${d.deadline ? ' · Réponse avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}
     </p>
-    <p style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${d.description}</p>
-    ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${d.attachment_path}','${filename.replace(/'/g, "\\'")}')">📄 Télécharger le cahier des charges</button>` : ''}
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${escapeHtml(d.description)}</p>
+    ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.attachment_path)}','${escapeJsAttr(filename)}')">📄 Télécharger le cahier des charges</button>` : ''}
     <div class="submit-section-title" style="margin-top:20px">Répondre à ce dossier</div>
     <form onsubmit="submitRfqResponse(event,'${d.id}')">
       <div class="lead-field"><label>Votre message / proposition</label><textarea id="rfq-resp-message" rows="4" required></textarea></div>
@@ -159,17 +159,17 @@ function renderCustomNdaPanel(d) {
   const statusBlock = {
     none: `<p style="font-size:13px;color:var(--text2)">Ce dossier nécessite un NDA personnalisé fourni par le systémier, en plus de l'accord standard. Téléchargez-le, signez-le hors plateforme, puis uploadez votre copie signée.</p>`,
     pending: `<p style="font-size:13px;color:var(--text2)">Votre copie signée a été envoyée et est en attente de vérification par le systémier.</p>`,
-    rejected: `<p style="font-size:13px;color:#E06A52">Votre signature a été rejetée${d.custom_nda_rejection_reason ? ' : ' + d.custom_nda_rejection_reason : ''}. Vous pouvez renvoyer une copie corrigée ci-dessous.</p>`,
+    rejected: `<p style="font-size:13px;color:#E06A52">Votre signature a été rejetée${d.custom_nda_rejection_reason ? ' : ' + escapeHtml(d.custom_nda_rejection_reason) : ''}. Vous pouvez renvoyer une copie corrigée ci-dessous.</p>`,
   }[d.custom_nda_status] || '';
 
   panel.innerHTML = `
     <div class="sup-panel-head">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">${d.rfq_type} — ${d.title} 🔒</span>
+      <span class="submit-section-title" style="margin:0;border:none;padding:0">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)} 🔒</span>
       <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">Fermer</button>
     </div>
-    <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">${d.company_name}${d.category ? ' · ' + d.category : ''}</p>
+    <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}</p>
     ${statusBlock}
-    ${templateFilename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${d.custom_nda_template_path}','${templateFilename.replace(/'/g, "\\'")}')">📄 Télécharger le gabarit NDA</button>` : ''}
+    ${templateFilename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.custom_nda_template_path)}','${escapeJsAttr(templateFilename)}')">📄 Télécharger le gabarit NDA</button>` : ''}
     ${d.custom_nda_status !== 'pending' ? `
     <div class="submit-section-title" style="margin-top:20px">Envoyer ma copie signée</div>
     <form onsubmit="submitSignedNda(event,'${d.id}')">
@@ -296,7 +296,7 @@ async function loadRfqMyResponses() {
     list.innerHTML = rows.map(r => {
       const st = statusMap[r.status] || statusMap.sent;
       const preview = r.message.length > 70 ? r.message.slice(0, 70) + '…' : r.message;
-      return `<div class="admin-field-row"><span>${preview}</span><span class="sup-pill ${st.cls}">${st.txt}</span></div>`;
+      return `<div class="admin-field-row"><span>${escapeHtml(preview)}</span><span class="sup-pill ${st.cls}">${st.txt}</span></div>`;
     }).join('');
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;

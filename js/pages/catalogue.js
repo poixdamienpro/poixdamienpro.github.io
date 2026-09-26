@@ -378,10 +378,10 @@ function renderProducts() {
     row.setAttribute('role', 'option');
     row.style.animationDelay = (Math.min(i, 16) * 0.03) + 's';
     row.innerHTML = `
-      <span class="dir-logo">${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>` : p.icon}</span>
+      <span class="dir-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>` : escapeHtml(p.icon)}</span>
       <span class="dir-row-main">
-        <span class="dir-row-name">${p.name}</span>
-        <span class="dir-row-sub">${p.maker} · ${p.cat}</span>
+        <span class="dir-row-name">${escapeHtml(p.name)}</span>
+        <span class="dir-row-sub">${escapeHtml(p.maker)} · ${escapeHtml(p.cat)}</span>
       </span>
       <button class="dir-cmp ${inCompare ? 'on' : ''}" data-cmp="${p.id}" title="Ajouter au comparateur">${inCompare ? '✓' : '＋'}</button>`;
 
@@ -415,7 +415,7 @@ function renderProductPreview(p) {
   if(!el) return;
   const inCompare = compareIds.includes(p.id);
 
-  const specs = p.specs.map(s => `<tr><td>${localize(s.l, s.lEn)}</td><td>${localize(s.v, s.vEn)}</td></tr>`).join('');
+  const specs = p.specs.map(s => `<tr><td>${escapeHtml(localize(s.l, s.lEn))}</td><td>${escapeHtml(localize(s.v, s.vEn))}</td></tr>`).join('');
 
   const _t = typeof t==='function' ? t : k=>k;
   const bars = (p.bars || []).length ? `
@@ -423,35 +423,35 @@ function renderProductPreview(p) {
     <div class="dir-bars">
       ${p.bars.map(b => `
         <div class="dir-bar">
-          <div class="dir-bar-top"><span>${b.l}</span><span class="dir-bar-val">${b.v}%</span></div>
-          <div class="dir-bar-track"><div class="dir-bar-fill" style="--w:${b.v}%;background:${b.c}"></div></div>
+          <div class="dir-bar-top"><span>${escapeHtml(b.l)}</span><span class="dir-bar-val">${escapeHtml(b.v)}%</span></div>
+          <div class="dir-bar-track"><div class="dir-bar-fill" style="--w:${escapeHtml(b.v)}%;background:${escapeHtml(b.c)}"></div></div>
         </div>`).join('')}
     </div>` : '';
 
   const certs = (p.certs || []).length ? `
     <div class="dp-section-label">${_t('prod_certs')}</div>
-    <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+c+'</span>').join('')}</div>` : '';
+    <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+escapeHtml(c)+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
     <div class="dir-preview-card">
       <button class="dir-close" aria-label="Fermer l'aperçu">✕</button>
       <div class="dp-head">
-        <div class="dp-logo">${p.image ? `<img src="${p.image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : p.icon}</div>
+        <div class="dp-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : escapeHtml(p.icon)}</div>
         <div style="min-width:0">
-          <div class="dp-name">${p.name}</div>
-          <div class="dp-loc">${p.maker} · ${p.cat}</div>
+          <div class="dp-name">${escapeHtml(p.name)}</div>
+          <div class="dp-loc">${escapeHtml(p.maker)} · ${escapeHtml(p.cat)}</div>
         </div>
       </div>
-      <div class="dp-badges"><span class="tag tag-industry">${p.industry}</span></div>
-      <p class="dp-desc">${localize(p.desc, p.descEn)}</p>
+      <div class="dp-badges"><span class="tag tag-industry">${escapeHtml(p.industry)}</span></div>
+      <p class="dp-desc">${escapeHtml(localize(p.desc, p.descEn))}</p>
       <div class="dp-section-label">${_t('prod_specs')}</div>
       <table class="spec-table"><tbody>${specs}</tbody></table>
       ${bars}
       ${certs}
-      <div class="dp-price"><span class="price-tag">💰 ${p.price}</span></div>
+      <div class="dp-price"><span class="price-tag">💰 ${escapeHtml(p.price)}</span></div>
       <div class="dp-actions">
         <a class="btn-fiche" href="produit.html?id=${p.id}">${_t('btn_view_profile')}</a>
-        ${p.datasheetUrl ? `<a class="btn-datasheet-dark" href="${p.datasheetUrl}" target="_blank" rel="noopener">📄 Datasheet</a>` : ''}
+        ${p.datasheetUrl ? `<a class="btn-datasheet-dark" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">📄 Datasheet</a>` : ''}
         <button class="btn-cmp-add ${inCompare ? 'on' : ''}" data-cmp="${p.id}">${inCompare ? _t('prod_compare_in') : _t('prod_compare_add')}</button>
         <button class="btn-quote" id="dp-quote">${_t('prod_quote')}</button>
       </div>

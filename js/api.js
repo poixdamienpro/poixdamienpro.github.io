@@ -3,6 +3,32 @@
 // pour les scripts SQL). Chaque page n'appelle loadTaxonomy() que si elle
 // affiche des entreprises/produits/filtres — voir le plan de refactor.
 // ═══════════════════════════════
+
+// Échappement HTML — à appliquer à TOUTE donnée venant de Supabase avant de
+// l'injecter via innerHTML (RFQ, soumissions produit, comptes acheteur/
+// fournisseur... tout ce qui transite par une table à INSERT anon/
+// authenticated est une entrée utilisateur non fiable, même après relecture
+// admin). Chargé avant les scripts de page (voir index.html / pages/*.html).
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
+
+// Échappement pour une valeur passée en argument d'un onclick="fn('...')" —
+// échappe d'abord pour la chaîne JS (guillemet simple, antislash), puis pour
+// l'attribut HTML qui la contient. Nécessaire en plus de escapeHtml() dès
+// qu'une valeur texte (nom produit, titre RFQ...) est réinjectée dans un
+// gestionnaire d'évènement inline plutôt qu'affichée en simple texte.
+function escapeJsAttr(str) {
+  const jsSafe = String(str ?? '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\r?\n/g, '\\n');
+  return escapeHtml(jsSafe);
+}
+
 async function supabase(table, params = '') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${params ? '?' + params : ''}`;
   const res = await fetch(url, {

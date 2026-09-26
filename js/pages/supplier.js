@@ -113,19 +113,18 @@ function openCompanyEditForm() {
   const wrap = document.getElementById('sup-company-form-wrap');
   if (!wrap || !supplierCompany) return;
   const c = supplierCompany;
-  const esc = v => (v || '').replace(/"/g, '&quot;');
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <div class="sup-panel">
       <div class="submit-section-title">Modifier la fiche entreprise</div>
       <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Comme pour les produits, la modification est soumise à validation avant d'être publiée.</p>
       <form onsubmit="submitCompanyEditForm(event)">
-        <div class="lead-field"><label>Description</label><textarea id="sup-c-desc" rows="3">${c.desc || ''}</textarea></div>
-        <div class="lead-field"><label>Site web</label><input type="url" id="sup-c-site" value="${esc(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
-        <div class="lead-field"><label>Siège (ville)</label><input type="text" id="sup-c-hq" value="${esc(c.hq)}"/></div>
-        <div class="lead-field"><label>Pays</label><input type="text" id="sup-c-country" value="${esc(c.country)}"/></div>
-        <div class="lead-field"><label>Industrie</label><input type="text" id="sup-c-industry" value="${esc(c.industry)}"/></div>
-        <div class="lead-field"><label>Email de contact</label><input type="email" id="sup-c-contact" value="${esc(c.contact)}"/></div>
+        <div class="lead-field"><label>Description</label><textarea id="sup-c-desc" rows="3">${escapeHtml(c.desc || '')}</textarea></div>
+        <div class="lead-field"><label>Site web</label><input type="url" id="sup-c-site" value="${escapeHtml(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
+        <div class="lead-field"><label>Siège (ville)</label><input type="text" id="sup-c-hq" value="${escapeHtml(c.hq)}"/></div>
+        <div class="lead-field"><label>Pays</label><input type="text" id="sup-c-country" value="${escapeHtml(c.country)}"/></div>
+        <div class="lead-field"><label>Industrie</label><input type="text" id="sup-c-industry" value="${escapeHtml(c.industry)}"/></div>
+        <div class="lead-field"><label>Email de contact</label><input type="email" id="sup-c-contact" value="${escapeHtml(c.contact)}"/></div>
         <div class="submit-actions">
           <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
           <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-company-form-wrap').style.display='none'">Annuler</button>
@@ -338,8 +337,8 @@ async function searchCompanyToClaim() {
     if (!rows || !rows.length) { box.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucun résultat.</p>'; return; }
     box.innerHTML = rows.map(c => `
       <div class="admin-field-row">
-        <span>${c.name} (${c.country || '—'})</span>
-        <button class="btn-add-product" onclick="requestCompanyClaim('${c.id}','${c.name.replace(/'/g, "\\'")}')" style="padding:6px 14px;font-size:12px">Revendiquer</button>
+        <span>${escapeHtml(c.name)} (${escapeHtml(c.country || '—')})</span>
+        <button class="btn-add-product" onclick="requestCompanyClaim('${c.id}','${escapeJsAttr(c.name)}')" style="padding:6px 14px;font-size:12px">Revendiquer</button>
       </div>`).join('');
   } catch (err) {
     box.innerHTML = `<p style="color:#C0392B;font-size:13px">${err.message}</p>`;
@@ -377,13 +376,13 @@ async function loadSupplierProducts() {
     list.innerHTML = products.map(p => `
       <div class="sup-prod">
         <div class="sup-prod-main">
-          <span class="sup-prod-name">${p.name}</span>
-          <span class="sup-prod-cat">${p.category}</span>
+          <span class="sup-prod-name">${escapeHtml(p.name)}</span>
+          <span class="sup-prod-cat">${escapeHtml(p.category)}</span>
         </div>
         <span class="sup-pill sup-pill-ok">● Publié</span>
         <div class="sup-prod-actions">
           <button class="btn-add-product sup-btn-sm" onclick="openSupplierProductForm('${p.id}')">Modifier</button>
-          <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${p.name.replace(/'/g, "\\'")}')">Supprimer</button>
+          <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${escapeJsAttr(p.name)}')">Supprimer</button>
         </div>
       </div>`).join('');
   } catch (err) {
@@ -412,7 +411,7 @@ async function loadSupplierSubmissions() {
       return `
       <div class="sup-tl-row">
         <span class="sup-tl-dot ${st.cls}"></span>
-        <span class="sup-tl-main"><strong>${labels[r.submission_type] || r.submission_type}</strong> · ${r.product_name || ''}</span>
+        <span class="sup-tl-main"><strong>${escapeHtml(labels[r.submission_type] || r.submission_type)}</strong> · ${escapeHtml(r.product_name || '')}</span>
         <span class="sup-pill ${st.cls}">${st.txt}</span>
       </div>`;
     }).join('') + `</div>`;
@@ -562,11 +561,11 @@ function renderSupplierLeads(rows) {
     return `
       <div class="sup-lead">
         <div class="sup-lead-head">
-          <span class="sup-lead-who">${r.buyer_name} · ${r.buyer_company}</span>
+          <span class="sup-lead-who">${escapeHtml(r.buyer_name)} · ${escapeHtml(r.buyer_company)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${r.buyer_email} · ${r.product_name ? r.product_name + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
-        <p class="sup-lead-msg">${r.message}</p>
+        <div class="sup-lead-meta">${escapeHtml(r.buyer_email)} · ${r.product_name ? escapeHtml(r.product_name) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
         ${r.status === 'sent' ? `
         <div class="sup-lead-actions">
           <button class="btn-add-product sup-btn-sm" onclick="respondToLead('${r.id}','accepted')">✓ Accepter</button>
@@ -708,7 +707,7 @@ async function loadSupplierComparison() {
       return;
     }
     select.style.display = '';
-    select.innerHTML = ownProducts.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    select.innerHTML = ownProducts.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
     renderSupplierComparison();
   } catch (err) {
     table.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
@@ -728,7 +727,7 @@ function renderSupplierComparison() {
     .slice(0, 4);
 
   if (!competitors.length) {
-    table.innerHTML = `<p class="sup-empty">Aucun autre produit référencé dans la catégorie « ${own.cat} » pour l'instant.</p>`;
+    table.innerHTML = `<p class="sup-empty">Aucun autre produit référencé dans la catégorie « ${escapeHtml(own.cat)} » pour l'instant.</p>`;
     return;
   }
 
@@ -738,21 +737,21 @@ function renderSupplierComparison() {
   const hCols = prods.map((p, i) => `
     <th class="prod-col">
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-        <span style="font-size:18px">${p.icon}</span>
-        <strong style="font-size:11px">${p.name}</strong>
-        <span style="font-size:10px;opacity:.8">${i === 0 ? '★ Votre produit' : p.maker}</span>
+        <span style="font-size:18px">${escapeHtml(p.icon)}</span>
+        <strong style="font-size:11px">${escapeHtml(p.name)}</strong>
+        <span style="font-size:10px;opacity:.8">${i === 0 ? '★ Votre produit' : escapeHtml(p.maker)}</span>
       </div>
     </th>`).join('');
 
   const specRows = allLabels.map(label => {
     const cells = prods.map(p => {
       const s = p.specs.find(x => x.l === label);
-      return `<td>${s ? s.v : '—'}</td>`;
+      return `<td>${s ? escapeHtml(s.v) : '—'}</td>`;
     }).join('');
-    return `<tr><td class="row-label">${label}</td>${cells}</tr>`;
+    return `<tr><td class="row-label">${escapeHtml(label)}</td>${cells}</tr>`;
   }).join('');
 
-  const priceRow = `<tr><td class="row-label">Prix</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${p.price}</td>`).join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">Prix</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${escapeHtml(p.price)}</td>`).join('')}</tr>`;
 
   table.innerHTML = `
     <div style="overflow-x:auto">
@@ -829,8 +828,8 @@ function renderSupplierRfqDossiers() {
     return `
       <div class="sup-prod">
         <div class="sup-prod-main">
-          <span class="sup-prod-name">${d.rfq_type} — ${d.title}${d.requires_custom_nda ? ' 🔒' : ''}</span>
-          <span class="sup-prod-cat">${d.category || '—'}</span>
+          <span class="sup-prod-name">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)}${d.requires_custom_nda ? ' 🔒' : ''}</span>
+          <span class="sup-prod-cat">${escapeHtml(d.category || '—')}</span>
         </div>
         <span class="sup-pill ${st.cls}">${st.txt}</span>
         <div class="sup-prod-actions">
@@ -839,7 +838,7 @@ function renderSupplierRfqDossiers() {
           ${d.status === 'published' ? `<button class="btn-remove-product" onclick="closeRfqDossier('${d.id}')">Clôturer</button>` : ''}
         </div>
       </div>
-      ${d.status === 'rejected' && d.rejection_reason ? `<p style="font-size:12px;color:#E06A52;margin:-4px 0 10px">Motif du refus : ${d.rejection_reason}</p>` : ''}`;
+      ${d.status === 'rejected' && d.rejection_reason ? `<p style="font-size:12px;color:#E06A52;margin:-4px 0 10px">Motif du refus : ${escapeHtml(d.rejection_reason)}</p>` : ''}`;
   }).join('');
 }
 
@@ -983,17 +982,17 @@ function viewRfqResponses(rfqId) {
   };
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">Réponses reçues — ${dossier ? dossier.title : ''}</div>
+    <div class="submit-section-title">Réponses reçues — ${escapeHtml(dossier ? dossier.title : '')}</div>
     ${!responses.length ? '<p class="sup-empty">Aucune réponse pour le moment.</p>' : responses.map(r => {
       const st = statusMap[r.status] || statusMap.sent;
       return `
       <div class="sup-lead">
         <div class="sup-lead-head">
-          <span class="sup-lead-who">${r.submitter_name}</span>
+          <span class="sup-lead-who">${escapeHtml(r.submitter_name)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${r.submitter_email} · ${r.price_label ? r.price_label + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
-        <p class="sup-lead-msg">${r.message}</p>
+        <div class="sup-lead-meta">${escapeHtml(r.submitter_email)} · ${r.price_label ? escapeHtml(r.price_label) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
         ${r.status === 'sent' ? `
         <div class="sup-lead-actions">
           <button class="btn-add-product sup-btn-sm" onclick="respondToRfqResponse('${r.id}','accepted','${rfqId}')">✓ Accepter</button>
@@ -1034,18 +1033,18 @@ function viewRfqNdaSignatures(rfqId) {
   };
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">Signatures NDA — ${dossier ? dossier.title : ''}</div>
+    <div class="submit-section-title">Signatures NDA — ${escapeHtml(dossier ? dossier.title : '')}</div>
     ${!signatures.length ? '<p class="sup-empty">Aucune demande de signature pour le moment.</p>' : signatures.map(s => {
       const st = statusMap[s.status] || statusMap.pending;
       const filename = s.signed_document_path ? s.signed_document_path.split('/').pop() : null;
       return `
       <div class="sup-lead">
         <div class="sup-lead-head">
-          <span class="sup-lead-who">${s.submitter_name}</span>
+          <span class="sup-lead-who">${escapeHtml(s.submitter_name)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${s.submitter_email} · ${new Date(s.created_at).toLocaleDateString('fr-FR')}</div>
-        ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:6px 0" onclick="downloadRfqFileSupplier('${s.signed_document_path}','${filename.replace(/'/g, "\\'")}')">📄 Télécharger la copie signée</button>` : '<p style="font-size:12px;color:var(--muted)">Aucun document uploadé.</p>'}
+        <div class="sup-lead-meta">${escapeHtml(s.submitter_email)} · ${new Date(s.created_at).toLocaleDateString('fr-FR')}</div>
+        ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:6px 0" onclick="downloadRfqFileSupplier('${escapeJsAttr(s.signed_document_path)}','${escapeJsAttr(filename)}')">📄 Télécharger la copie signée</button>` : '<p style="font-size:12px;color:var(--muted)">Aucun document uploadé.</p>'}
         ${s.status === 'pending' ? `
         <div class="sup-lead-actions">
           <button class="btn-add-product sup-btn-sm" onclick="reviewRfqNdaSignature('${s.id}','approved','${rfqId}')">✓ Approuver</button>
