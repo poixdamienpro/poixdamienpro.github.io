@@ -101,6 +101,15 @@ function verifiedTotpFactor(user) {
   return ((user && user.factors) || []).find(f => f.factor_type === 'totp' && f.status === 'verified') || null;
 }
 
+// Selon la version de l'API Auth, totp.qr_code est soit déjà une URL data:
+// utilisable telle quelle en <img src>, soit du SVG brut (commence par "<")
+// qu'il faut envelopper nous-mêmes -- sans ce cas, l'image ne charge pas.
+function qrCodeDataUrl(qrCode) {
+  if (!qrCode) return '';
+  if (qrCode.startsWith('data:')) return qrCode;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(qrCode);
+}
+
 async function adminLogin(e) {
   e.preventDefault();
   const email = document.getElementById('admin-email').value;
@@ -232,12 +241,14 @@ async function startMfaEnrollment() {
       body: JSON.stringify({ factor_type: 'totp', friendly_name: 'Authenticator' }),
     });
     adminEnrollFactorId = factor.id;
+    const qrSrc = qrCodeDataUrl(factor.totp.qr_code);
     box.innerHTML = `
-      <p style="font-size:12px;color:var(--text2);line-height:1.6">Scanne ce QR code avec ton application d'authentification (Google Authenticator, 1Password, Authy...), puis entre le code généré pour confirmer.</p>
-      <img src="${escapeHtml(factor.totp.qr_code)}" alt="QR code MFA" style="width:180px;height:180px;border:1px solid var(--border);border-radius:8px;margin:10px 0"/>
-      <p style="font-size:11px;color:var(--muted);word-break:break-all">Clé manuelle (si le QR code ne scanne pas) : ${escapeHtml(factor.totp.secret)}</p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.6">1. Scanne ce QR code avec ton application d'authentification (Google Authenticator, 1Password, Authy...) — ou si ça ne marche pas, choisis "Saisir une clé manuellement" dans l'appli et colle la clé ci-dessous.</p>
+      ${qrSrc ? `<img src="${escapeHtml(qrSrc)}" alt="QR code MFA" style="width:180px;height:180px;border:1px solid var(--border);border-radius:8px;margin:10px 0"/>` : '<p style="font-size:12px;color:#C0392B">QR code indisponible, utilise la clé manuelle ci-dessous.</p>'}
+      <p style="font-size:11px;color:var(--muted);word-break:break-all">Clé manuelle (si le QR code ne scanne pas) : <strong>${escapeHtml(factor.totp.secret)}</strong></p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-top:10px">2. Une fois le compte ajouté dans l'appli, elle affiche un <strong>code à 6 chiffres qui change toutes les 30 secondes</strong> — recopie CE code ci-dessous (pas la clé manuelle).</p>
       <form onsubmit="confirmMfaEnrollment(event)">
-        <div class="lead-field"><label>Code de confirmation</label><input type="text" id="admin-mfa-enroll-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required/></div>
+        <div class="lead-field"><label>Code à 6 chiffres généré par l'appli</label><input type="text" id="admin-mfa-enroll-code" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="123456" required/></div>
         <button type="submit" class="btn-submit-form">Confirmer l'activation</button>
         <button type="button" class="btn-remove-product" style="margin-top:8px" onclick="loadAdminMfaStatus()">Annuler</button>
         <p id="admin-mfa-enroll-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
