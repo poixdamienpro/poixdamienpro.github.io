@@ -22,7 +22,7 @@ const TRANSLATIONS = {
     nav_referencer:      'Référencer mon entreprise',
     footer_cgv:          'CGV',
     nav_pill:            '✓ Annuaire & specs 100% gratuits',
-    ticker_label:        '// NOUVEAU',
+    ticker_label:        'NOUVEAU',
 
     // Footer
     footer_about:        'Qui sommes-nous',
@@ -267,7 +267,7 @@ const TRANSLATIONS = {
     nav_referencer:      'List my company',
     footer_cgv:          'Terms of sale',
     nav_pill:            '✓ Directory & specs 100% free',
-    ticker_label:        '// NEW',
+    ticker_label:        'NEW',
 
     // Footer
     footer_about:        'About us',
