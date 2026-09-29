@@ -6,8 +6,10 @@
 --      de bord, cartes d'extension, stockage, réseau spatial durci)
 --   2. Nimesis Space (Mécleuves, France) — 9 produits (actionneurs
 --      & mécanismes SMA : verrouillage, déploiement, désorbitation)
---   3. Anywaves (Toulouse, France)       — 8 produits (antennes RF
---      spatiales, électronique charge utile, équipement de test)
+--   3. Anywaves (Toulouse, France)       — 24 produits (catalogue réel
+--      anywaves.com/our-space-products/ : 18 antennes, 3 électroniques
+--      charge utile VILSA/LNB, 3 bancs de test sol), photos officielles
+--      incluses directement (image_url)
 --   4. Powell Electronics (Swedesboro, USA / présence Europe) —
 --      distributeur multi-marques (pas de gamme "maison" propre :
 --      3 grandes familles de produits distribués, pas des SKU
@@ -139,23 +141,82 @@ SELECT 'Anywaves', '🇫🇷 France', 'Toulouse', 'Spatial', 'https://anywaves.c
   TRUE, FALSE, 60, 2017, 'p.vedrenne@anywaves.com'
 WHERE NOT EXISTS (SELECT 1 FROM companies WHERE name = 'Anywaves');
 
-DELETE FROM products WHERE name = 'Antennes spatiales TT&C et liaison de données'
-  AND company_id = (SELECT id FROM companies WHERE name = 'Anywaves');
+-- Nettoie les fiches approximatives d'une version precedente de ce script
+-- (8 produits regroupes a la louche) : le vrai catalogue anywaves.com/our-space-products/
+-- compte 24 references distinctes, reprises ci-dessous avec leurs photos officielles.
+DELETE FROM product_specs WHERE product_id IN (
+  SELECT p.id FROM products p JOIN companies c ON c.id = p.company_id WHERE c.name = 'Anywaves'
+  AND p.name IN ('Antenne TT&C bande S', 'Antenne compacte bande X', 'Antenne compacte bande X bi-polarisation',
+    'Antenne bande X à faisceau large', 'Antenne bande X haut gain', 'Antenne GNSS multi-bandes',
+    'Antennes large bande compactes', 'Électronique de charge utile RF', 'Banc de test bande X (Test Hat)',
+    'Antennes spatiales TT&C et liaison de données')
+);
+DELETE FROM product_certs WHERE product_id IN (
+  SELECT p.id FROM products p JOIN companies c ON c.id = p.company_id WHERE c.name = 'Anywaves'
+  AND p.name IN ('Antenne TT&C bande S', 'Antenne compacte bande X', 'Antenne compacte bande X bi-polarisation',
+    'Antenne bande X à faisceau large', 'Antenne bande X haut gain', 'Antenne GNSS multi-bandes',
+    'Antennes large bande compactes', 'Électronique de charge utile RF', 'Banc de test bande X (Test Hat)',
+    'Antennes spatiales TT&C et liaison de données')
+);
+DELETE FROM products WHERE company_id = (SELECT id FROM companies WHERE name = 'Anywaves')
+  AND name IN ('Antenne TT&C bande S', 'Antenne compacte bande X', 'Antenne compacte bande X bi-polarisation',
+    'Antenne bande X à faisceau large', 'Antenne bande X haut gain', 'Antenne GNSS multi-bandes',
+    'Antennes large bande compactes', 'Électronique de charge utile RF', 'Banc de test bande X (Test Hat)',
+    'Antennes spatiales TT&C et liaison de données');
 
 WITH new_products AS (
-  INSERT INTO products (company_id, name, category, industry, description, price_label, icon, datasheet_url)
-  SELECT c.id, x.name, 'Communication & RF', 'Spatial', x.description, 'Sur devis', x.icon, 'https://anywaves.com/products/'
+  INSERT INTO products (company_id, name, category, industry, description, price_label, icon, datasheet_url, image_url)
+  SELECT c.id, x.name, 'Communication & RF', 'Spatial', x.description, 'Sur devis', x.icon, x.href, x.img
   FROM companies c, (VALUES
-    ('Antenne TT&C bande S', 'Antenne de télémesure, poursuite et télécommande (TT&C) en bande S.', '📡'),
-    ('Antenne compacte bande X', 'Antenne compacte flight-proven (TRL 9) pour la télémesure charge utile depuis un satellite LEO, 7.9–8.5 GHz, gain 15.5 dBi, encombrement 100×100 mm.', '📡'),
-    ('Antenne compacte bande X bi-polarisation', 'Variante bi-polarisation (LHCP et RHCP simultanées sur connecteurs séparés) de l''antenne compacte bande X.', '📡'),
-    ('Antenne bande X à faisceau large', 'Antenne bande X à faisceau large pour liaison de données.', '📡'),
-    ('Antenne bande X haut gain', 'Antenne bande X haut gain pour liaison de données.', '📡'),
-    ('Antenne GNSS multi-bandes', 'Antenne de navigation couvrant l''ensemble des bandes GNSS.', '📡'),
-    ('Antennes large bande compactes', 'Antennes compactes large bande pour applications charge utile.', '📡'),
-    ('Électronique de charge utile RF', 'Radios logicielles (gamme VILSA), dispositifs de communication haut débit et électronique RF bas bruit pour charge utile.', '📶'),
-    ('Banc de test bande X (Test Hat)', 'Équipement de test sol pour la validation RF fonctionnelle de l''antenne compacte bande X, une fois celle-ci déjà intégrée sur le satellite.', '🧪')
-  ) AS x(name, description, icon)
+    ('Antenne TT&C bande S compacte', 'Antenne compacte de télémesure, poursuite et télécommande (TT&C) en bande S.', '📡',
+      'https://anywaves.com/products/compact-s-band-ttc-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/compact-s-band-ttc.png'),
+    ('Antenne TT&C bande S', 'Antenne de télémesure, poursuite et télécommande (TT&C) en bande S.', '📡',
+      'https://anywaves.com/products/s-band-ttc-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/s-band-ttc.png'),
+    ('Antenne TT&C bande Ka', 'Antenne de télémesure, poursuite et télécommande (TT&C) en bande Ka.', '📡',
+      'https://anywaves.com/products/choke-ring-ttc-ka-band-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/ka-band-ttc.png'),
+    ('Antenne compacte bande X', 'Antenne compacte flight-proven (TRL 9) pour la télémesure charge utile depuis un satellite LEO, 7.9–8.5 GHz, gain 15.5 dBi, encombrement 100×100 mm.', '📡',
+      'https://anywaves.com/products/compact-x-band-payload-telemetry-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/compact-x-band.png'),
+    ('Antenne compacte bande X bi-polarisation', 'Variante bi-polarisation (LHCP et RHCP simultanées sur connecteurs séparés) de l''antenne compacte bande X.', '📡',
+      'https://anywaves.com/products/compact-x-band-dual-circularly-polarized-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/compact-x-band-dual-pol.png'),
+    ('Antenne bande X haut gain', 'Antenne bande X haut gain pour liaison de données à haut débit.', '📡',
+      'https://anywaves.com/products/high-gain-x-band-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/high-gain-x-band.png'),
+    ('Antenne bande X à faisceau large', 'Antenne bande X à faisceau large pour liaison de données.', '📡',
+      'https://anywaves.com/products/wide-beam-x-band-payload-telemetry-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/wide-beam-x-band.png'),
+    ('Antenne GNSS multi-bandes', 'Antenne de navigation couvrant l''ensemble des bandes GNSS.', '📡',
+      'https://anywaves.com/products/gnss-all-bands-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/gnss-all-bands.png'),
+    ('Antenne GNSS multi-bandes avec LNA intégré', 'Antenne GNSS multi-bandes avec carte amplificateur faible bruit (LNA) intégrée.', '📡',
+      'https://anywaves.com/products/gnss-all-bands-antenna-with-lna-integrated-card/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/gnss-all-bands-lna.png'),
+    ('Antenne GNSS bandes L1/E1', 'Antenne de navigation dédiée aux bandes GNSS L1/E1.', '📡',
+      'https://anywaves.com/products/gnss-l1-e1-bands-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/gnss-l1-e1.png'),
+    ('Antenne lanceur bande S', 'Antenne de télémesure bande S pour lanceur.', '📡',
+      'https://anywaves.com/products/s-band-launcher-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/s-band-launcher.png'),
+    ('Antenne lanceur GNSS multi-bandes', 'Antenne de navigation multi-bandes GNSS pour lanceur.', '📡',
+      'https://anywaves.com/products/gnss-all-bands-launcher-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/gnss-launcher.png'),
+    ('Antenne réseau à guide d''ondes à fentes', 'Antenne réseau à guide d''ondes à fentes pour applications charge utile.', '📡',
+      'https://anywaves.com/products/slotted-waveguide-array-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/slotted-waveguide.png'),
+    ('Antenne à réseau réflecteur', 'Antenne à réseau réflecteur pour applications charge utile haut gain.', '📡',
+      'https://anywaves.com/products/reflectarray-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/reflectarray.png'),
+    ('Antenne réseau à rayonnement direct', 'Antenne réseau à rayonnement direct pour applications charge utile.', '📡',
+      'https://anywaves.com/products/direct-radiating-array-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/direct-radiating.png'),
+    ('Antennes compactes large bande', 'Antennes compactes large bande pour applications charge utile.', '📡',
+      'https://anywaves.com/products/compact-wideband-antennas/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/compact-wideband.png'),
+    ('Antenne cornet à crêtes croisées', 'Antenne cornet à quatre crêtes (quad-ridged horn), large bande.', '📡',
+      'https://anywaves.com/products/quad-ridged-horn-antenna/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/quad-ridged-horn.png'),
+    ('Antenne hélice quadrifilaire', 'Antenne hélice quadrifilaire.', '📡',
+      'https://anywaves.com/products/quadrifilar-helix-antennas/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/quadrifilar-helix.png'),
+    ('VILSA — Radio logicielle (SDR)', 'Radio logicielle (SDR) de la gamme VILSA pour traitement de signal embarqué.', '📶',
+      'https://anywaves.com/products/vilsa-software-defined-radio/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/vilsa-sdr.png'),
+    ('VILSA XDL — Émetteur liaison descendante bande X', 'Émetteur de liaison descendante bande X de la gamme VILSA.', '📶',
+      'https://anywaves.com/products/vilsa-xdl-x-band-downlink-transmitter/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/vilsa-xdl.png'),
+    ('Convertisseur bas bruit (LNB)', 'Convertisseur de fréquence bas bruit (LNB) pour réception RF.', '📶',
+      'https://anywaves.com/products/low-noise-block-downconverter/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/lnb.png'),
+    ('Banc de test bande GNSS multi-bandes', 'Équipement de test sol pour la validation RF fonctionnelle des antennes GNSS multi-bandes, une fois intégrées sur le satellite.', '🧪',
+      'https://anywaves.com/products/test-cap-for-gnss-all-bands-antennas/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/test-hat-gnss.png'),
+    ('Banc de test bande S TT&C', 'Équipement de test sol pour la validation RF fonctionnelle des antennes TT&C bande S, une fois intégrées sur le satellite.', '🧪',
+      'https://anywaves.com/products/test-cap-for-s-band-ttc-antennas/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/test-hat-s-band.png'),
+    ('Banc de test bande X', 'Équipement de test sol pour la validation RF fonctionnelle des antennes bande X, une fois intégrées sur le satellite.', '🧪',
+      'https://anywaves.com/products/test-cap-for-x-band-antennas/', 'https://www.buy-inner.com/api/storage/v1/object/public/product-images/submissions/anywaves/test-hat-x-band.png')
+  ) AS x(name, description, icon, href, img)
   WHERE c.name = 'Anywaves'
     AND NOT EXISTS (
       SELECT 1 FROM products p2 JOIN companies c2 ON c2.id = p2.company_id
