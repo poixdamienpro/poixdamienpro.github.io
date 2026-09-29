@@ -76,12 +76,17 @@ function renderCompany(c, products) {
       ${c.isSystemier ? `<span class="tag tag-industry">${t('tag_systemier')}</span>` : ''}
       ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
     </div>
-    ${!c.premium ? `
+    ${!c.premium ? (c.claimed ? `
+    <div class="claim-banner gold">
+      <span style="font-size:16px">⭐</span>
+      <p>${t('ent_registered_text')} <strong>${escapeHtml(c.name)}</strong></p>
+      <a href="pricing.html">${t('ent_premium_link')}</a>
+    </div>` : `
     <div class="claim-banner">
       <span style="font-size:16px">ℹ️</span>
       <p>${t('ent_claim_text')} <strong>${escapeHtml(c.name)}</strong> ?</p>
       <a href="supplier.html">${t('ent_claim_link')}</a>
-    </div>` : ''}
+    </div>`) : ''}
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_description')}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(localize(c.desc, c.descEn))}</p>

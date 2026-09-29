@@ -202,6 +202,8 @@ const TRANSLATIONS = {
     // Fiches entreprise / produit
     ent_claim_text:      'Fiche non revendiquée — construite à partir de données publiques. Êtes-vous',
     ent_claim_link:      'Revendiquer',
+    ent_registered_text: 'Référencée par l\'entreprise elle-même, mais pas encore premium :',
+    ent_premium_link:    'Passer premium',
     modal_see_products:  '🔧 Voir tous leurs produits →',
     prod_download_datasheet: '📄 Télécharger la datasheet',
     prod_view_maker_prefix:  '↗ Voir la fiche',
@@ -447,6 +449,8 @@ const TRANSLATIONS = {
     // Fiches entreprise / produit
     ent_claim_text:      'Unclaimed listing — built from public data. Are you',
     ent_claim_link:      'Claim it',
+    ent_registered_text: 'Listed by the company itself, not yet on Premium:',
+    ent_premium_link:    'Go Premium',
     modal_see_products:  '🔧 View all their products →',
     prod_download_datasheet: '📄 Download datasheet',
     prod_view_maker_prefix:  '↗ View',

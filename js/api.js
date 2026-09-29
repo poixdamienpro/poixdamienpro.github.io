@@ -140,6 +140,7 @@ function mapCompany(row) {
     logo:      row.logo       || '🏭',
     verified:  row.verified   || false,
     premium:   row.premium    || false,
+    claimed:   row.claimed    || false,
     employees: row.employees  || 'N/A',
     founded:   row.founded    || 'N/A',
     contact:   row.contact_email || '',

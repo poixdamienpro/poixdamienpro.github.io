@@ -667,6 +667,7 @@ async function applyNewSubmission(sub) {
           description: sub.company_description,
           verified: false,
           premium: false,
+          claimed: true,
           employees: null,
           founded: null,
           contact_email: sub.company_contact_email,

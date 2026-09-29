@@ -403,7 +403,10 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 /* CLAIM LISTING BANNER */
 .claim-banner{display:flex;align-items:center;gap:10px;background:var(--steel-soft);border:1px solid #B8CCDE;border-radius:6px;padding:9px 12px;margin-bottom:14px}
 .claim-banner p{font-size:11px;color:var(--steel);line-height:1.5;margin:0;flex:1}
-.claim-banner button{flex-shrink:0;padding:6px 12px;border-radius:4px;background:var(--steel);border:none;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.claim-banner a,.claim-banner button{flex-shrink:0;padding:6px 12px;border-radius:4px;background:var(--steel);border:none;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.claim-banner.gold{background:var(--gold-soft);border-color:#E8C96A}
+.claim-banner.gold p{color:var(--gold)}
+.claim-banner.gold a{background:var(--gold)}
 
 /* REQUEST QUOTE / LEAD */
 .btn-quote{padding:10px 20px;border-radius:4px;background:var(--sage);border:none;color:#fff;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px}
