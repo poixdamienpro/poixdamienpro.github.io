@@ -39,7 +39,11 @@ async function adminFetch(path, options = {}) {
     adminLogout();
     throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
   }
-  if (!res.ok) throw new Error(`HTTP ${res.status} sur ${path}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    const detail = body && (body.message || body.details || body.hint);
+    throw new Error(`HTTP ${res.status} sur ${path}` + (detail ? ` — ${detail}` : ''));
+  }
   if (res.status === 204) return null;
   return res.json().catch(() => null);
 }
