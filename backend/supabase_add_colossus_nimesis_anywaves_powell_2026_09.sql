@@ -185,12 +185,12 @@ INSERT INTO company_product_categories (company_id, category) SELECT id, 'Commun
 
 
 -- 4. POWELL ELECTRONICS ---------------------------------------------
--- Powell est un DISTRIBUTEUR multi-marques (TE Connectivity, Amphenol,
--- etc.), pas un fabricant avec une gamme "maison" : impossible de lister
--- "tous ses produits" comme pour un OEM (catalogue de plusieurs dizaines
--- de milliers de références tierces). On référence donc ses 3 grandes
--- familles de produits distribués comme fiches distinctes, plutôt qu'un
--- unique produit générique — à ajuster si tu préfères un traitement différent.
+-- Powell est un DISTRIBUTEUR/REVENDEUR multi-marques (TE Connectivity,
+-- Amphenol, etc.), pas un fabricant avec une gamme "maison" -- classé
+-- comme prestataire de service ("Distribution de composants", nouvelle
+-- catégorie ajoutée à SERVICE_CATS dans js/pages/prestations.js et
+-- js/pages/carte.js + CATALOGUE_EXCLUDED_CATS dans js/pages/catalogue.js),
+-- donc absent du catalogue produit comme les autres prestataires.
 INSERT INTO companies (name, country, hq, industry, site, logo, description, verified, premium, employees, founded, contact_email)
 SELECT 'Powell Electronics', '🇺🇸 États-Unis', 'Swedesboro, New Jersey', 'Aéronautique & Défense', 'https://www.powell.com', '🔌',
   'Distributeur à valeur ajoutée de composants électroniques haute fiabilité pour environnements sévères : connecteurs, interrupteurs, capteurs et produits électromécaniques multi-marques. Distributeur agréé et qualifié QPL sur plus de 50 spécifications militaires, certifié ISO. Fondé en 1946, plus de 200 collaborateurs, 11 sites aux USA et présence dans 6 pays européens. Sert l''aérospatial, la défense, le spatial, les télécoms, le transport et l''imagerie médicale.',
@@ -206,12 +206,12 @@ DELETE FROM products WHERE name = 'Connecteurs & composants électromécaniques 
 
 WITH new_products AS (
   INSERT INTO products (company_id, name, category, industry, description, price_label, icon, datasheet_url)
-  SELECT c.id, x.name, x.category, 'Aéronautique & Défense', x.description, 'Sur devis', x.icon, 'https://www.powell.com'
+  SELECT c.id, x.name, 'Distribution de composants', 'Aéronautique & Défense', x.description, 'Sur devis', x.icon, 'https://www.powell.com'
   FROM companies c, (VALUES
-    ('Connecteurs haute fiabilité multi-marques',           'Câblage & Connecteurs', 'Distribution de connecteurs multi-marques qualifiés pour environnements sévères (aérospatial, défense, spatial).', '🔌'),
-    ('Interrupteurs & relais électromécaniques',            'Câblage & Connecteurs', 'Distribution d''interrupteurs et relais électromécaniques qualifiés pour applications critiques.', '🔘'),
-    ('Capteurs pour environnements sévères',                'Capteurs & Instrumentation', 'Distribution de capteurs qualifiés pour environnements sévères (aérospatial, défense, spatial, industriel).', '📟')
-  ) AS x(name, category, description, icon)
+    ('Connecteurs haute fiabilité multi-marques', 'Distribution de connecteurs multi-marques qualifiés pour environnements sévères (aérospatial, défense, spatial).', '🔌'),
+    ('Interrupteurs & relais électromécaniques',  'Distribution d''interrupteurs et relais électromécaniques qualifiés pour applications critiques.', '🔘'),
+    ('Capteurs pour environnements sévères',      'Distribution de capteurs qualifiés pour environnements sévères (aérospatial, défense, spatial, industriel).', '📟')
+  ) AS x(name, description, icon)
   WHERE c.name = 'Powell Electronics'
     AND NOT EXISTS (
       SELECT 1 FROM products p2 JOIN companies c2 ON c2.id = p2.company_id
@@ -228,7 +228,4 @@ JOIN (VALUES
   ('Capteurs pour environnements sévères',      'Qualification', 'QPL sur 50+ spécifications militaires, certifié ISO', 1, FALSE)
 ) AS s(name, label, value, sort_order, is_premium) ON s.name = np.name;
 
-INSERT INTO company_product_categories (company_id, category)
-SELECT id, cat FROM companies, unnest(ARRAY['Câblage & Connecteurs','Capteurs & Instrumentation']) AS cat
-WHERE name = 'Powell Electronics'
-ON CONFLICT DO NOTHING;
+INSERT INTO company_product_categories (company_id, category) SELECT id, 'Distribution de composants' FROM companies WHERE name = 'Powell Electronics' LIMIT 1 ON CONFLICT DO NOTHING;

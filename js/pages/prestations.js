@@ -21,6 +21,10 @@ const SERVICE_CATS = [
   // conception/fabrication de cartes et equipements electroniques pour
   // le compte d'autres entreprises (ex: Selha Group).
   'Sous-traitance électronique (EMS)',
+  // Revendeurs/distributeurs de composants multi-marques (ex: Powell
+  // Electronics) -- pas des fabricants avec une gamme "maison", donc
+  // hors catalogue produit comme les autres categories de service.
+  'Distribution de composants',
 ];
 
 let dirCurrentId = null;
