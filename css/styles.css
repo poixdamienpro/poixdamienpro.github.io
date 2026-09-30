@@ -994,6 +994,7 @@ body.theme-dark::after{
 /* ── Vue éclatée (section .evx, pilotée par js/ev-explode.js) ──
    .is-scrub : desktop, section épinglée + vidéo pilotée par le scroll.
    .is-open  : voiture éclatée, repères et menu visibles. */
+.evx{scroll-margin-top:96px}
 .evx-track{position:relative;margin-top:22px}
 .evx.is-scrub .evx-track{height:260vh}
 .evx.is-scrub .evx-sticky{position:sticky;top:96px;height:calc(100vh - 106px);display:flex;flex-direction:column;justify-content:center;gap:2px}

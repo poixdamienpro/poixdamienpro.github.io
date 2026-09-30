@@ -77,6 +77,7 @@ const TRANSLATIONS = {
     st4_p:               'Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, sans compte, directement au fabricant.',
     st4_link:            'Voir les actionneurs →',
     st4_guide:           'Comment choisir un actionneur ?',
+    st4_explode:         'Voir une voiture électrique en éclaté',
 
     st5_tag:             'Régulation',
     st5_h2:              'Le flux, <em>maîtrisé</em>.',
@@ -324,6 +325,7 @@ const TRANSLATIONS = {
     st4_p:               'Actuators, cylinders, eAxles. Once you\'ve found the right one, request a quote in one click, for free, no account needed, directly from the manufacturer.',
     st4_link:            'Browse actuators →',
     st4_guide:           'How to choose an actuator?',
+    st4_explode:         'See an electric car, exploded',
 
     st5_tag:             'Regulation',
     st5_h2:              'Flow, <em>mastered</em>.',
@@ -554,6 +556,12 @@ function applyLang() {
     const key = el.dataset.i18nPlaceholder;
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
     if (val !== undefined) el.placeholder = val;
+  });
+  // Liens vers une page qui existe dans les deux langues : data-href-en porte
+  // la cible anglaise, le href d'origine (FR) est mémorisé au premier passage.
+  document.querySelectorAll('[data-href-en]').forEach(el => {
+    if (!el.dataset.hrefFr) el.dataset.hrefFr = el.getAttribute('href');
+    el.setAttribute('href', lang === 'en' ? el.dataset.hrefEn : el.dataset.hrefFr);
   });
   // Re-rendu du contenu dynamique (liste entreprises / produits) — chaque
   // page définit la fonction qui la concerne, les autres restent undefined.

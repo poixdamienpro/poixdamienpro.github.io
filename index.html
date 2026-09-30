@@ -260,6 +260,12 @@ a{color:inherit;text-decoration:none}
 .st-guide::before{content:'?';display:grid;place-items:center;width:18px;height:18px;flex-shrink:0;
   border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);font-size:11px;font-weight:700}
 .st-guide:hover{color:var(--t-hi);gap:11px}
+.st-explode{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;
+  color:var(--t-mid);transition:color .25s,gap .25s}
+.st-explode::before{content:'';width:16px;height:16px;flex-shrink:0;border-radius:3px;
+  border:1.5px dashed var(--accent);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.st-explode:hover{color:var(--t-hi);gap:11px}
+.st-explode:hover::before{transform:rotate(45deg) scale(.9)}
 
 /* bloc schéma : le composant qui « zoome » à l'entrée */
 .schematic{display:grid;place-items:center;position:relative}
@@ -356,10 +362,11 @@ a{color:inherit;text-decoration:none}
   .reveal,.schematic .frame{opacity:1;transform:none}
   .cable-live{stroke-dashoffset:0!important}
   .pulse,.pulse-ring{display:none}
+  .st-explode:hover::before{transform:none}
 }
 .skip{position:absolute;left:-999px;top:0;background:#fff;color:var(--ink);padding:10px 16px;z-index:99;border-radius:0 0 6px 0}
 .skip:focus{left:0}
-.st-link:focus-visible,.btn:focus-visible,.hud-cta:focus-visible{outline:2px solid var(--steel);outline-offset:3px}
+.st-link:focus-visible,.st-explode:focus-visible,.btn:focus-visible,.hud-cta:focus-visible{outline:2px solid var(--steel);outline-offset:3px}
 </style>
 </head>
 <body>
@@ -607,6 +614,7 @@ a{color:inherit;text-decoration:none}
         <div class="st-links reveal d4">
           <a class="st-link" href="pages/catalogue.html?cat=Vannes%20%26%20Actionneurs" data-i18n="st4_link">Voir les actionneurs →</a>
           <a class="st-guide" href="pages/vannes-actionneurs.html" data-i18n="st4_guide">Comment choisir un actionneur ?</a>
+          <a class="st-explode" href="pages/fournisseurs-vehicules-electriques.html#anatomie" data-href-en="en/ev-components-suppliers.html#anatomie" data-i18n="st4_explode">Voir une voiture électrique en éclaté</a>
         </div>
       </div>
       <div class="schematic"><div class="frame" data-tag="ACT-04">
