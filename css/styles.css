@@ -990,3 +990,55 @@ body.theme-dark::after{
 
 /* Pages secteurs : aère le paragraphe qui précède la grille de fabricants */
 .cat-intro + .cat-makers{margin-top:20px}
+
+/* ── Vue éclatée (section .evx, pilotée par js/ev-explode.js) ──
+   .is-scrub : desktop, section épinglée + vidéo pilotée par le scroll.
+   .is-open  : voiture éclatée, repères et menu visibles. */
+.evx-track{position:relative;margin-top:22px}
+.evx.is-scrub .evx-track{height:260vh}
+.evx.is-scrub .evx-sticky{position:sticky;top:96px;height:calc(100vh - 106px);display:flex;flex-direction:column;justify-content:center;gap:2px}
+.evx-frame{position:relative;aspect-ratio:1344/752;width:100%;margin:0 auto;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#0E161D}
+.evx.is-scrub .evx-frame{width:min(100%,calc((100vh - 270px) * 1.787))}
+.evx-still,.evx-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.evx:not(.is-scrub) .evx-video{display:none}
+.evx.is-scrub .evx-still{opacity:0;transition:opacity .45s cubic-bezier(.2,.7,.2,1)}
+.evx.is-scrub.is-open .evx-still{opacity:1}
+.evx-hots{list-style:none;margin:0;padding:0}
+.evx-hot{position:absolute;left:var(--x);top:var(--y);display:flex;align-items:center;gap:8px;text-decoration:none;opacity:0;pointer-events:none;
+  transform:translate(-13px,-50%) scale(.6);transform-origin:13px 50%;
+  transition:opacity .3s cubic-bezier(.2,.7,.2,1),transform .35s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 50ms)}
+.evx.is-open .evx-hot{opacity:1;pointer-events:auto;transform:translate(-13px,-50%) scale(1)}
+.evx-n{position:relative;flex-shrink:0;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:11px;font-weight:500;color:#F3F1EC;
+  background:rgba(14,22,29,.88);border:1.5px solid var(--rust);box-shadow:0 0 14px rgba(212,80,10,.35);transition:background-color .15s,transform .2s cubic-bezier(.2,.7,.2,1)}
+.evx-hot .evx-n::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(212,80,10,.55);animation:evxPulse 2.6s cubic-bezier(.2,.7,.2,1) infinite;animation-delay:calc(var(--i,0) * 320ms)}
+@keyframes evxPulse{0%{transform:scale(.8);opacity:.9}70%,100%{transform:scale(1.7);opacity:0}}
+.evx-tip{font-size:12px;font-weight:600;color:#F3F1EC;white-space:nowrap;background:rgba(14,22,29,.9);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:4px 9px;
+  opacity:0;transform:translateX(-4px);transition:opacity .15s,transform .2s cubic-bezier(.2,.7,.2,1);pointer-events:none}
+.evx-hot.is-hl .evx-n{background:var(--rust);transform:scale(1.12)}
+.evx-hot.is-hl .evx-tip{opacity:1;transform:none}
+.evx-hot.tip-left{flex-direction:row-reverse;transform:translate(calc(-100% + 13px),-50%) scale(.6);transform-origin:calc(100% - 13px) 50%}
+.evx.is-open .evx-hot.tip-left{transform:translate(calc(-100% + 13px),-50%) scale(1)}
+.evx-hot.tip-left .evx-tip{transform:translateX(4px)}
+.evx-hot.tip-left.is-hl .evx-tip{transform:none}
+.evx-menu{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.evx-menu li{transition:opacity .35s cubic-bezier(.2,.7,.2,1),transform .35s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 40ms)}
+.evx.is-scrub:not(.is-open) .evx-menu li{opacity:0;transform:translateY(8px)}
+.evx-menu a{display:flex;align-items:center;gap:10px;height:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--white);text-decoration:none;
+  transition:border-color .15s,background-color .15s,transform .2s cubic-bezier(.2,.7,.2,1)}
+.evx-menu a:hover,.evx-menu a.is-hl,.evx-menu a:focus-visible{border-color:var(--rust);background:color-mix(in srgb,var(--rust) 8%,var(--white));transform:translateY(-2px)}
+.evx-menu .evx-n{width:22px;height:22px;font-size:10px;box-shadow:none}
+.evx-menu a.is-hl .evx-n{background:var(--rust)}
+.evx-m-txt{display:flex;flex-direction:column;min-width:0}
+.evx-m-name{font-size:13px;font-weight:600;color:#F3F1EC;line-height:1.25}
+.evx-m-cat{font-size:11px;color:var(--muted);margin-top:2px}
+@media(max-width:899px){
+  .evx-menu{grid-template-columns:1fr 1fr}
+  .evx-n{width:22px;height:22px;font-size:10px}
+  .evx-hot{transform:translate(-11px,-50%) scale(1)}
+  .evx-tip{display:none}
+}
+@media(max-width:520px){.evx-menu{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){
+  .evx-hot .evx-n::after{animation:none;display:none}
+  .evx-hot,.evx-menu li,.evx-menu a,.evx-still{transition:none}
+}
