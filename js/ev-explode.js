@@ -1,5 +1,6 @@
 // ═══════════════════════════════
-// VUE ÉCLATÉE — section « anatomie » des pages secteur (véhicules électriques).
+// VUE ÉCLATÉE — section « anatomie » des pages secteur (véhicule, satellite,
+// navire, avion, conteneur de stockage).
 // Desktop : la section reste épinglée pendant le scroll, la vidéo (encodée
 // tout-intra pour un seek fluide) avance avec la progression, puis les
 // repères numérotés apparaissent sur la vue éclatée.
