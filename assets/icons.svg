@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- Pictos des 5 stations de la home (index.html), en symboles réutilisables.
+       Pas de stroke/fill ici : ils sont hérités du <svg class="ico"> hôte (voir .ico dans css/styles.css). -->
+  <symbol id="i-battery" viewBox="14 18 92 92">
+    <rect x="22" y="34" width="76" height="62" rx="6"/>
+    <path d="M44 34v-8h12v8M64 34v-8h12v8"/>
+    <path d="M52 46v38M66 46v38M80 46v38"/>
+    <path d="M30 64l8-12 0 9 8 0-8 12 0-9z"/>
+  </symbol>
+  <symbol id="i-pdu" viewBox="0 0 120 120">
+    <rect x="16" y="42" width="88" height="36" rx="5"/>
+    <circle cx="34" cy="60" r="5"/><circle cx="52" cy="60" r="5"/>
+    <circle cx="70" cy="60" r="5"/><circle cx="88" cy="60" r="5"/>
+    <path d="M16 60H4M104 60h12"/>
+  </symbol>
+  <symbol id="i-control" viewBox="12 22 96 76">
+    <rect x="20" y="30" width="80" height="60" rx="5"/>
+    <rect x="48" y="50" width="24" height="24" rx="3"/>
+    <path d="M48 56h-8M48 64h-8M72 56h8M72 64h8M56 50v-8M64 50v-8M56 74v8M64 74v8"/>
+  </symbol>
+  <symbol id="i-actuator" viewBox="10 14 104 92">
+    <rect x="26" y="46" width="48" height="28" rx="5"/>
+    <path d="M74 60h24"/>
+    <circle cx="102" cy="60" r="6"/>
+    <path d="M26 52h-8v16h8"/>
+    <path d="M38 46v28M50 46v28M62 46v28"/>
+  </symbol>
+  <symbol id="i-valve" viewBox="10 14 100 92">
+    <path d="M16 60h22M82 60h22"/>
+    <path d="M44 44l32 32M76 44l-32 32"/>
+    <path d="M60 44V26M44 22h32"/>
+  </symbol>
+
+  <!-- Pictos complémentaires des pages catégories, même grille 120 et même trait -->
+  <symbol id="i-charger" viewBox="14 18 92 92">
+    <rect x="34" y="46" width="52" height="40" rx="6"/>
+    <path d="M48 46V30M72 46V30M60 86v18"/>
+    <path d="M63 54l-9 12h12l-9 12"/>
+  </symbol>
+  <symbol id="i-inverter" viewBox="12 22 96 76">
+    <rect x="20" y="30" width="80" height="60" rx="5"/>
+    <path d="M24 86L96 34"/>
+    <path d="M32 44h20M32 52h6M44 52h8"/>
+    <path d="M64 74c4-9 8-9 12 0s8 9 12 0"/>
+  </symbol>
+  <symbol id="i-connector" viewBox="18 18 84 84">
+    <circle cx="60" cy="60" r="34"/>
+    <circle cx="60" cy="60" r="22"/>
+    <circle cx="52" cy="54" r="3.5"/><circle cx="68" cy="54" r="3.5"/>
+    <circle cx="52" cy="68" r="3.5"/><circle cx="68" cy="68" r="3.5"/>
+    <path d="M60 26v8"/>
+  </symbol>
+  <symbol id="i-sensor" viewBox="16 20 88 80">
+    <path d="M28 80a34 34 0 1 1 64 0"/>
+    <path d="M60 76l16-22"/>
+    <circle cx="60" cy="76" r="4"/>
+    <path d="M36 54l6 4M60 42v8M84 54l-6 4"/>
+    <path d="M42 92h36"/>
+  </symbol>
+  <symbol id="i-thruster" viewBox="14 14 92 100">
+    <rect x="44" y="20" width="32" height="34" rx="5"/>
+    <path d="M52 54l-12 30h40l-12-30"/>
+    <path d="M50 94v8M60 94v14M70 94v8"/>
+  </symbol>
+</svg>
