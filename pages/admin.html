@@ -52,6 +52,14 @@
     </div>
     <div id="admin-mfa-status" style="margin-bottom:28px"></div>
 
+    <form id="admin-change-password-form" onsubmit="adminChangePassword(event)" style="margin-bottom:28px;max-width:360px">
+      <div class="lead-field"><label>Nouveau mot de passe</label><input type="password" id="admin-change-pw1" minlength="8" autocomplete="new-password" required/></div>
+      <div class="lead-field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="admin-change-pw2" minlength="8" autocomplete="new-password" required/></div>
+      <button type="submit" class="btn-submit-form">Changer mon mot de passe</button>
+      <p id="admin-change-password-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+      <p id="admin-change-password-success" style="color:#2D6A4F;font-size:12px;margin-top:8px;display:none">Mot de passe mis à jour.</p>
+    </form>
+
     <div class="product-block-header" style="margin-bottom:18px">
       <span class="submit-section-title" style="margin:0;border:none;padding:0">Gestion des comptes admin</span>
     </div>

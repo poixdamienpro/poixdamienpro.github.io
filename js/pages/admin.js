@@ -589,6 +589,52 @@ async function approveSubmission(id) {
   }
 }
 
+// Changement du mot de passe de son propre compte — passe directement
+// par l'API Auth de Supabase (PUT /auth/v1/user avec le propre token de
+// la personne connectée), pas besoin de la clé service_role ni du Worker :
+// cet endpoint n'autorise de toute façon qu'à modifier SON PROPRE compte.
+async function adminChangePassword(event) {
+  event.preventDefault();
+  const pw1 = document.getElementById('admin-change-pw1');
+  const pw2 = document.getElementById('admin-change-pw2');
+  const errorEl = document.getElementById('admin-change-password-error');
+  const successEl = document.getElementById('admin-change-password-success');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if (pw1.value !== pw2.value) {
+    errorEl.textContent = 'Les deux mots de passe ne correspondent pas.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  try {
+    const token = sessionStorage.getItem('admin_access_token');
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: 'PUT',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password: pw1.value }),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && (data.msg || data.message || data.error_description)) || `HTTP ${res.status}`);
+
+    successEl.style.display = 'block';
+    pw1.value = '';
+    pw2.value = '';
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 // Création d'un nouveau compte admin — voir
 // cloudflare/supabase-proxy-worker.js /api/admin-create-user : le Worker
 // vérifie lui-même que l'appelant est admin avant de toucher à la clé
