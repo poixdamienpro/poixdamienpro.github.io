@@ -202,10 +202,14 @@ async function handleAdminCreateUser(request, env) {
   // 2. Vérifie que l'appelant est bien dans la table admins (lecture
   //    avec la clé service_role, qui ignore la RLS — c'est la seule
   //    source de vérité ici, pas confiance dans le token seul).
-  const checkRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins?user_id=eq.${caller.id}&select=id`, {
+  const checkRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins?user_id=eq.${caller.id}&select=user_id`, {
     headers: { 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` },
   });
-  const checkRows = checkRes.ok ? await checkRes.json() : [];
+  if (!checkRes.ok) {
+    const detail = await checkRes.text();
+    return json({ error: 'Échec de la vérification admin', detail }, 502);
+  }
+  const checkRows = await checkRes.json();
   if (!checkRows.length) return json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403);
 
   // 3. Crée le compte Supabase Auth.
