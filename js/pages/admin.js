@@ -184,12 +184,24 @@ function adminMfaCancel() {
   document.getElementById('admin-login-box').style.display = 'block';
 }
 
+// Onglets du panneau admin — tout restait auparavant empilé sur une
+// seule page qui s'allongeait à chaque nouvelle fonctionnalité. Le
+// contenu de chaque onglet reste chargé en une fois à la connexion
+// (voir completeAdminLogin/tryRestoreAdminSession) : seul l'affichage
+// est découpé, pas le chargement des données.
+function adminShowTab(name) {
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
+  sessionStorage.setItem('admin_active_tab', name);
+}
+
 function completeAdminLogin(accessToken, email) {
   sessionStorage.setItem('admin_access_token', accessToken);
   sessionStorage.setItem('admin_email', email);
   document.getElementById('admin-login-box').style.display = 'none';
   document.getElementById('admin-mfa-box').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
+  adminShowTab(sessionStorage.getItem('admin_active_tab') || 'submissions');
   loadAdminMfaStatus();
   loadAnalytics();
   loadPendingSubmissions();
@@ -208,6 +220,7 @@ function tryRestoreAdminSession() {
   if (!sessionStorage.getItem('admin_access_token')) return;
   document.getElementById('admin-login-box').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
+  adminShowTab(sessionStorage.getItem('admin_active_tab') || 'submissions');
   loadAdminMfaStatus();
   loadAnalytics();
   loadPendingSubmissions();

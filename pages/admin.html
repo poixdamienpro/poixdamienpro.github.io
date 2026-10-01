@@ -12,6 +12,16 @@
 <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'admin';</script>
+<style>
+.admin-tabs-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:24px;padding-bottom:4px}
+.admin-tabs{display:flex;gap:2px;flex-wrap:wrap}
+.admin-tabs-row .btn-remove-product{flex-shrink:0;margin-top:4px}
+.admin-tab-btn{padding:10px 10px;border:none;background:none;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-5px;white-space:nowrap;transition:color .15s,border-color .15s}
+.admin-tab-btn:hover{color:var(--ink)}
+.admin-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust)}
+.admin-tab-panel{display:none}
+.admin-tab-panel.active{display:block}
+</style>
 </head>
 <body>
 
@@ -46,78 +56,97 @@
     </form>
   </div>
   <div id="admin-panel" style="display:none">
-    <div class="product-block-header" style="margin-bottom:18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Sécurité du compte</span>
+    <div class="admin-tabs-row">
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab-btn" data-tab="submissions" onclick="adminShowTab('submissions')">Soumissions</button>
+        <button type="button" class="admin-tab-btn" data-tab="claims" onclick="adminShowTab('claims')">Revendications</button>
+        <button type="button" class="admin-tab-btn" data-tab="rfq" onclick="adminShowTab('rfq')">RFQ/RFI/RFP</button>
+        <button type="button" class="admin-tab-btn" data-tab="analytics" onclick="adminShowTab('analytics')">Analytics</button>
+        <button type="button" class="admin-tab-btn" data-tab="admins" onclick="adminShowTab('admins')">Comptes admin</button>
+        <button type="button" class="admin-tab-btn" data-tab="security" onclick="adminShowTab('security')">Sécurité</button>
+      </div>
       <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
     </div>
-    <div id="admin-mfa-status" style="margin-bottom:28px"></div>
 
-    <form id="admin-change-password-form" onsubmit="adminChangePassword(event)" style="margin-bottom:28px;max-width:360px">
-      <div class="lead-field"><label>Nouveau mot de passe</label><input type="password" id="admin-change-pw1" minlength="8" autocomplete="new-password" required/></div>
-      <div class="lead-field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="admin-change-pw2" minlength="8" autocomplete="new-password" required/></div>
-      <button type="submit" class="btn-submit-form">Changer mon mot de passe</button>
-      <p id="admin-change-password-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
-      <p id="admin-change-password-success" style="color:#2D6A4F;font-size:12px;margin-top:8px;display:none">Mot de passe mis à jour.</p>
-    </form>
-
-    <div class="product-block-header" style="margin-bottom:18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Gestion des comptes admin</span>
-    </div>
-    <form id="admin-create-user-form" onsubmit="adminCreateUser(event)" style="margin-bottom:28px">
-      <div class="lead-field"><label>Email du nouveau compte</label><input type="email" id="admin-new-email" required/></div>
-      <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0 14px"><input type="checkbox" id="admin-new-is-admin" style="margin:0"/> Rendre administrateur</label>
-      <button type="submit" class="btn-submit-form">Créer le compte</button>
-      <p id="admin-create-user-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
-      <div id="admin-create-user-result" style="display:none;margin-top:14px;padding:14px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:13px"></div>
-    </form>
-
-    <div class="product-block-header" style="margin-bottom:18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Analytics</span>
+    <div class="admin-tab-panel" data-tab="submissions">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Soumissions en attente</span>
+      </div>
+      <div id="admin-submissions-list"></div>
     </div>
 
-    <div class="product-block-header" style="margin-bottom:10px">
-      <span></span>
-      <select id="admin-range-filter" onchange="onAnalyticsRangeChange()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
-        <option value="1">1 jour</option>
-        <option value="7">1 semaine</option>
-        <option value="30" selected>1 mois</option>
-        <option value="90">3 mois</option>
-        <option value="180">6 mois</option>
-        <option value="365">1 an</option>
-      </select>
-    </div>
-    <div id="admin-analytics-kpis" class="kpi-row" style="margin-bottom:18px"></div>
-
-    <div class="product-block-header" style="margin-bottom:10px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0;font-size:13px">Évolution des visites</span>
-      <select id="admin-chart-page-filter" onchange="renderAnalyticsChart()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
-        <option value="__all__">Toutes les pages</option>
-      </select>
-    </div>
-    <div id="admin-analytics-chart" style="margin-bottom:28px"></div>
-
-    <div id="admin-analytics-top" style="margin-bottom:28px"></div>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:28px">
-      <div id="admin-analytics-top-products"></div>
-      <div id="admin-analytics-top-categories"></div>
-      <div id="admin-analytics-top-domains"></div>
+    <div class="admin-tab-panel" data-tab="claims">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Revendications d'entreprise en attente</span>
+      </div>
+      <div id="admin-claims-list"></div>
     </div>
 
-    <div class="product-block-header" style="margin-bottom:18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Soumissions en attente</span>
+    <div class="admin-tab-panel" data-tab="rfq">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Dossiers RFQ/RFI/RFP en attente</span>
+      </div>
+      <div id="admin-rfq-list"></div>
     </div>
-    <div id="admin-submissions-list"></div>
 
-    <div class="product-block-header" style="margin:28px 0 18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Revendications d'entreprise en attente</span>
-    </div>
-    <div id="admin-claims-list"></div>
+    <div class="admin-tab-panel" data-tab="analytics">
+      <div class="product-block-header" style="margin-bottom:10px">
+        <span></span>
+        <select id="admin-range-filter" onchange="onAnalyticsRangeChange()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+          <option value="1">1 jour</option>
+          <option value="7">1 semaine</option>
+          <option value="30" selected>1 mois</option>
+          <option value="90">3 mois</option>
+          <option value="180">6 mois</option>
+          <option value="365">1 an</option>
+        </select>
+      </div>
+      <div id="admin-analytics-kpis" class="kpi-row" style="margin-bottom:18px"></div>
 
-    <div class="product-block-header" style="margin:28px 0 18px">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Dossiers RFQ/RFI/RFP en attente</span>
+      <div class="product-block-header" style="margin-bottom:10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0;font-size:13px">Évolution des visites</span>
+        <select id="admin-chart-page-filter" onchange="renderAnalyticsChart()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+          <option value="__all__">Toutes les pages</option>
+        </select>
+      </div>
+      <div id="admin-analytics-chart" style="margin-bottom:28px"></div>
+
+      <div id="admin-analytics-top" style="margin-bottom:28px"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        <div id="admin-analytics-top-products"></div>
+        <div id="admin-analytics-top-categories"></div>
+        <div id="admin-analytics-top-domains"></div>
+      </div>
     </div>
-    <div id="admin-rfq-list"></div>
+
+    <div class="admin-tab-panel" data-tab="admins">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Gestion des comptes admin</span>
+      </div>
+      <form id="admin-create-user-form" onsubmit="adminCreateUser(event)">
+        <div class="lead-field"><label>Email du nouveau compte</label><input type="email" id="admin-new-email" required/></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0 14px"><input type="checkbox" id="admin-new-is-admin" style="margin:0"/> Rendre administrateur</label>
+        <button type="submit" class="btn-submit-form">Créer le compte</button>
+        <p id="admin-create-user-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+        <div id="admin-create-user-result" style="display:none;margin-top:14px;padding:14px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:13px"></div>
+      </form>
+    </div>
+
+    <div class="admin-tab-panel" data-tab="security">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Sécurité du compte</span>
+      </div>
+      <div id="admin-mfa-status" style="margin-bottom:28px"></div>
+
+      <form id="admin-change-password-form" onsubmit="adminChangePassword(event)" style="max-width:360px">
+        <div class="lead-field"><label>Nouveau mot de passe</label><input type="password" id="admin-change-pw1" minlength="8" autocomplete="new-password" required/></div>
+        <div class="lead-field"><label>Confirmer le nouveau mot de passe</label><input type="password" id="admin-change-pw2" minlength="8" autocomplete="new-password" required/></div>
+        <button type="submit" class="btn-submit-form">Changer mon mot de passe</button>
+        <p id="admin-change-password-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+        <p id="admin-change-password-success" style="color:#2D6A4F;font-size:12px;margin-top:8px;display:none">Mot de passe mis à jour.</p>
+      </form>
+    </div>
   </div>
 </div>
 
