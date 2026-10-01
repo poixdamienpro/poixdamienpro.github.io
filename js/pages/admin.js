@@ -589,6 +589,49 @@ async function approveSubmission(id) {
   }
 }
 
+// Création d'un nouveau compte admin — voir
+// cloudflare/supabase-proxy-worker.js /api/admin-create-user : le Worker
+// vérifie lui-même que l'appelant est admin avant de toucher à la clé
+// service_role, donc pas besoin de dupliquer cette vérification ici.
+async function adminCreateUser(event) {
+  event.preventDefault();
+  const emailInput = document.getElementById('admin-new-email');
+  const makeAdminInput = document.getElementById('admin-new-is-admin');
+  const errorEl = document.getElementById('admin-create-user-error');
+  const resultEl = document.getElementById('admin-create-user-result');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errorEl.style.display = 'none';
+  resultEl.style.display = 'none';
+  btn.disabled = true;
+
+  try {
+    const token = sessionStorage.getItem('admin_access_token');
+    const res = await fetch(`${SUPABASE_URL}/admin-create-user`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        newEmail: emailInput.value.trim(),
+        makeAdmin: makeAdminInput.checked,
+      }),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+      <p style="margin:0 0 6px"><strong>Compte créé${data.isAdmin ? ' (administrateur)' : ''} :</strong> ${escapeHtml(data.email)}</p>
+      <p style="margin:0">Mot de passe temporaire (à transmettre toi-même — il ne sera plus jamais affiché) :</p>
+      <code style="display:block;margin-top:6px;padding:8px;background:var(--white);border:1px solid var(--border);border-radius:4px;font-size:13px;word-break:break-all">${escapeHtml(data.tempPassword)}</code>`;
+    emailInput.value = '';
+    makeAdminInput.checked = false;
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 async function applyDeleteSubmission(sub) {
   const productId = sub.target_product_id;
   if (!productId) return;

@@ -11,6 +11,10 @@
 //    (abonnement Premium 1500€/an) pour une entreprise deja revendiquee.
 //  - /api/stripe-webhook : recoit les evenements Stripe (paiement reussi,
 //    abonnement annule/impaye) et met a jour companies.premium en base.
+//  - /api/admin-create-user : cree un compte Supabase Auth (et
+//    eventuellement l'ajoute a la table admins), appele depuis
+//    pages/admin.html. Verifie d'abord que l'appelant est lui-meme
+//    admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
 //  - /pages/entreprise.html et /pages/produit.html : injecte le vrai
 //    contenu (nom, description, specs) dans le HTML AVANT de le servir,
 //    pour tout le monde (pas seulement les robots — zero risque de
@@ -164,6 +168,89 @@ async function handleCreateCheckoutSession(request, env) {
   const data = await res.json();
   if (!res.ok) return json({ error: data.error?.message || 'Erreur Stripe' }, 502);
   return json({ url: data.url });
+}
+
+// Génère un mot de passe temporaire aléatoire (affiché une seule fois
+// à l'admin appelant, qui le transmet lui-même à la nouvelle personne).
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => chars[b % chars.length]).join('');
+}
+
+// ── Admin : création d'un nouveau compte (et éventuellement admin) ──
+// Nécessite SUPABASE_SERVICE_ROLE_KEY (contourne toute la RLS) : on
+// vérifie donc nous-mêmes, ici, que l'appelant est déjà un admin
+// authentifié AVANT de faire quoi que ce soit avec cette clé.
+async function handleAdminCreateUser(request, env) {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    return json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500);
+  }
+
+  const authHeader = request.headers.get('Authorization') || '';
+  const callerToken = authHeader.replace(/^Bearer\s+/i, '');
+  if (!callerToken) return json({ error: 'Non authentifié' }, 401);
+
+  // 1. Résout l'identité de l'appelant à partir de son propre token.
+  const whoRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/user`, {
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${callerToken}` },
+  });
+  if (!whoRes.ok) return json({ error: 'Session invalide' }, 401);
+  const caller = await whoRes.json();
+
+  // 2. Vérifie que l'appelant est bien dans la table admins (lecture
+  //    avec la clé service_role, qui ignore la RLS — c'est la seule
+  //    source de vérité ici, pas confiance dans le token seul).
+  const checkRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins?user_id=eq.${caller.id}&select=id`, {
+    headers: { 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` },
+  });
+  const checkRows = checkRes.ok ? await checkRes.json() : [];
+  if (!checkRows.length) return json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403);
+
+  // 3. Crée le compte Supabase Auth.
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+  const newEmail = (body && body.newEmail || '').trim().toLowerCase();
+  const makeAdmin = !!(body && body.makeAdmin);
+  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    return json({ error: 'Email invalide' }, 400);
+  }
+
+  const tempPassword = generateTempPassword();
+  const createRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/admin/users`, {
+    method: 'POST',
+    headers: {
+      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email: newEmail, password: tempPassword, email_confirm: true }),
+  });
+  const created = await createRes.json();
+  if (!createRes.ok) {
+    return json({ error: created.msg || created.message || 'Échec de la création du compte' }, 502);
+  }
+
+  // 4. Si demandé, ajoute le nouveau compte à la table admins.
+  if (makeAdmin) {
+    const addRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins`, {
+      method: 'POST',
+      headers: {
+        'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ user_id: created.id, email: newEmail }),
+    });
+    if (!addRes.ok) {
+      const detail = await addRes.text();
+      return json({ error: 'Compte créé mais échec de l\'ajout comme admin', detail }, 502);
+    }
+  }
+
+  return json({ success: true, email: newEmail, tempPassword, isAdmin: makeAdmin });
 }
 
 // Vérifie la signature Stripe (HMAC-SHA256 sur "timestamp.rawBody"),
@@ -372,6 +459,12 @@ export default {
     if (url.pathname === '/api/create-checkout-session') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
       if (request.method === 'POST') return handleCreateCheckoutSession(request, env);
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
+    if (url.pathname === '/api/admin-create-user') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (request.method === 'POST') return handleAdminCreateUser(request, env);
       return json({ error: 'Method not allowed' }, 405);
     }
 
