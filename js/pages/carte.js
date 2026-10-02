@@ -18,6 +18,17 @@ const mapTypeEmpty = type => t({ fournisseurs: 'map_empty_fournisseurs', prestat
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  // Carte réservée aux comptes gratuits : sans session, on garde la page
+  // explicative (contenu statique de carte.html) et on ne charge ni la carte
+  // ni les données entreprises.
+  const member = typeof isBuyerLoggedIn === 'function' && isBuyerLoggedIn();
+  document.documentElement.classList.toggle('map-open', member);
+  if (!member) {
+    const href = lockAccountHref();
+    ['map-gate-signup', 'map-gate-login'].forEach(id => { const el = document.getElementById(id); if (el) el.href = href; });
+    trackLockEvent('lock_view', 'carte');
+    return;
+  }
   sizeMapWrap();
   window.addEventListener('resize', sizeMapWrap);
   initMap();
