@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function renderCompany(c, products) {
+  // Verrou "compte gratuit" (visuel, voir js/buyer.js lockBoxHtml) : les
+  // détails société, les specs des cartes produit, le site officiel et la
+  // demande de devis sont réservés aux comptes connectés.
+  const loggedIn = typeof isBuyerLoggedIn === 'function' && isBuyerLoggedIn();
+  if (!loggedIn && !window._lockViewTracked) { window._lockViewTracked = true; trackLockEvent('lock_view', 'entreprise'); }
   const isPrestataire = c.products.some(cat => SERVICE_CATS.includes(cat));
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const equipmentCats = c.products.filter(cat => !SERVICE_CATS.includes(cat));
@@ -94,7 +99,7 @@ function renderCompany(c, products) {
     <div class="modal-section">
       <div class="modal-section-title">${t('prev_info')}</div>
       <div class="detail-grid">
-        ${[[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), industryLabel], [t('prev_hq'), [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
+        ${[[t('prev_founded'), loggedIn ? c.founded : '🔒'], [t('prev_employees'), loggedIn ? c.employees : '🔒'], [t('prev_sector'), industryLabel], [t('prev_hq'), [c.city, c.region].filter(Boolean).join(' · ') || c.hq]]
           .map(([l, v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v)}</div></div>`).join('')}
       </div>
     </div>
@@ -115,14 +120,18 @@ function renderCompany(c, products) {
         ${products.map(p => `
           <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
             <div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div>
-            <div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => escapeHtml(localize(s.l, s.lEn)) + ' : ' + escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div>
+            ${loggedIn ? `<div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => escapeHtml(localize(s.l, s.lEn)) + ' : ' + escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div>` : ''}
             <div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div>
           </a>`).join('')}
       </div>
     </div>` : ''}
+    ${loggedIn ? '' : lockBoxHtml('')}
     <div class="modal-actions">
-      <a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${t('btn_visit_site')}</a>
-      <button class="btn-quote" onclick="openLeadModal('${escapeJsAttr(c.name)}', null, '${c.id}')">${t('btn_request_quote')}</button>
+      ${loggedIn
+        ? `<a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${t('btn_visit_site')}</a>
+      <button class="btn-quote" onclick="openLeadModal('${escapeJsAttr(c.name)}', null, '${c.id}')">${t('btn_request_quote')}</button>`
+        : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_site')}</a>
+      <a class="btn-locked" href="${lockAccountHref()}">${t('lock_quote')}</a>`}
     </div>
   `;
 

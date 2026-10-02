@@ -980,3 +980,16 @@ body.theme-dark::after{
 
 /* Pages secteurs : aère le paragraphe qui précède la grille de fabricants */
 .cat-intro + .cat-makers{margin-top:20px}
+
+/* VERROU "compte gratuit" — fiches produit/entreprise (voir js/buyer.js lockBoxHtml) */
+.lock-box{border:1px solid var(--border);border-radius:8px;background:var(--white);padding:16px;margin:0 0 18px}
+.lock-ghost{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;filter:blur(3px);opacity:.55;user-select:none;pointer-events:none}
+.lock-ghost span{display:block;height:11px;border-radius:3px;background:var(--border2)}
+.lock-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.lock-text{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 12px}
+.lock-actions{display:flex;gap:10px;flex-wrap:wrap}
+.lock-actions a{padding:8px 16px;border-radius:4px;font-size:12px;font-weight:700;text-decoration:none}
+.lock-actions .lock-signup{background:var(--rust);color:#fff}
+.lock-actions .lock-login{border:1px solid var(--border2);color:var(--ink)}
+.btn-locked{display:inline-flex;align-items:center;padding:10px 20px;border-radius:4px;border:1px dashed var(--border2);background:var(--paper);color:var(--muted);font-size:13px;font-weight:700;text-decoration:none}
+.btn-locked:hover{border-color:var(--rust);color:var(--rust)}

@@ -27,7 +27,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+// Nombre de caractéristiques visibles sans compte (le reste, les barres de
+// performance, la datasheet et la demande de devis sont réservés aux
+// comptes gratuits — verrou visuel, voir js/buyer.js lockBoxHtml).
+const FREE_SPEC_COUNT = 3;
+
 function renderProduct(p) {
+  const loggedIn = typeof isBuyerLoggedIn === 'function' && isBuyerLoggedIn();
+  // Hors connexion : les specs non-premium d'abord, puis tronqué à FREE_SPEC_COUNT.
+  const specs = loggedIn ? p.specs : [...p.specs].sort((a, b) => (a.premium ? 1 : 0) - (b.premium ? 1 : 0)).slice(0, FREE_SPEC_COUNT);
+  const hiddenSpecs = loggedIn ? 0 : Math.max(0, p.specs.length - FREE_SPEC_COUNT);
+  if (!loggedIn && !window._lockViewTracked) { window._lockViewTracked = true; trackLockEvent('lock_view', 'produit'); }
+
   document.title = `${p.name} — ${p.maker} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute('content', (localize(p.desc, p.descEn) || `${p.name} par ${p.maker}`).slice(0, 160));
@@ -46,22 +57,28 @@ function renderProduct(p) {
     <div class="modal-section">
       <div class="modal-section-title">${t('prod_specs')}</div>
       <table class="spec-table">
-        <tbody>${p.specs.map(s => `<tr><td>${escapeHtml(localize(s.l, s.lEn))}</td><td>${escapeHtml(localize(s.v, s.vEn))}</td></tr>`).join('')}</tbody>
+        <tbody>${specs.map(s => `<tr><td>${escapeHtml(localize(s.l, s.lEn))}</td><td>${escapeHtml(localize(s.v, s.vEn))}</td></tr>`).join('')}</tbody>
       </table>
-      ${p.bars.map(b => `
+      ${loggedIn ? p.bars.map(b => `
         <div class="bar-row">
           <div class="bar-labels"><span>${escapeHtml(b.l)}</span><span style="font-weight:700">${escapeHtml(b.v)}%</span></div>
           <div class="bar-track"><div class="bar-fill" style="width:${escapeHtml(b.v)}%;background:${escapeHtml(b.c)}"></div></div>
-        </div>`).join('')}
+        </div>`).join('') : ''}
       ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + escapeHtml(c) + '</span>').join('')}</div>` : ''}
     </div>
+    ${loggedIn ? '' : lockBoxHtml(hiddenSpecs ? `+${hiddenSpecs} ${t('lock_more_specs')}` : '')}
     <div class="modal-actions">
       <a class="btn-visit" href="entreprise.html?id=${p.companyId}">${t('prod_view_maker_prefix')} ${escapeHtml(p.maker)}</a>
-      ${p.datasheetUrl ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>` : ''}
-      <button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(p.price)}</button>
+      ${p.datasheetUrl ? (loggedIn
+        ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>`
+        : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_datasheet')}</a>`) : ''}
+      ${loggedIn
+        ? `<button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(p.price)}</button>`
+        : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_quote')}</a>`}
     </div>
   `;
-  document.getElementById('prod-quote-btn').onclick = () => openLeadModal(p.maker, p.name, p.companyId);
+  const quoteBtn = document.getElementById('prod-quote-btn');
+  if (quoteBtn) quoteBtn.onclick = () => openLeadModal(p.maker, p.name, p.companyId);
 
   injectProductJsonLd(p);
 }

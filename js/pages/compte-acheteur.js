@@ -8,6 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderAccountState();
 });
 
+// Retour vers la page d'où vient le visiteur (verrou "compte gratuit") —
+// uniquement une URL du même site, jamais un lien externe.
+function buyerNextUrl() {
+  const next = new URLSearchParams(window.location.search).get('next');
+  if (!next) return null;
+  try {
+    const u = new URL(next, window.location.origin);
+    return u.origin === window.location.origin ? u.pathname + u.search : null;
+  } catch { return null; }
+}
+
 function renderAccountState() {
   const session = buyerSession();
   document.getElementById('acc-auth-box').style.display = session ? 'none' : 'block';
@@ -74,6 +85,8 @@ async function handleBuyerLogin(e) {
   const password = document.getElementById('acc-login-password').value;
   try {
     await buyerLogin(email, password);
+    const next = buyerNextUrl();
+    if (next) { window.location.href = next; return; }
     renderAccountState();
   } catch (err) {
     showAccMessage(err.message, true);
@@ -88,6 +101,11 @@ async function handleBuyerSignup(e) {
   const password = document.getElementById('acc-signup-password').value;
   try {
     await buyerSignup(email, password, name, company);
+    if (typeof window.gtag === 'function' && new URLSearchParams(window.location.search).get('src') === 'lock') {
+      window.gtag('event', 'sign_up', { method: 'lock_wall' });
+    }
+    const next = buyerNextUrl();
+    if (next) { window.location.href = next; return; }
     renderAccountState();
   } catch (err) {
     const confirmNeeded = err.message.includes('Vérifie ta boîte mail');

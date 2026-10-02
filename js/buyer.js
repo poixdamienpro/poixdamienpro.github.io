@@ -157,3 +157,38 @@ function buyerLogout() {
   buyerProfile = null;
   updateBuyerNavUI();
 }
+
+// ── Verrou "compte gratuit" (fiches produit / entreprise) ─────────────
+// Verrou VISUEL uniquement (phase 1) : les données restent servies par
+// les RPC publiques, voir js/pages/produit.js / entreprise.js.
+function isBuyerLoggedIn() {
+  return !!buyerSession();
+}
+
+// Lien vers la page compte, qui renvoie ensuite l'utilisateur ici (?next=).
+function lockAccountHref() {
+  const next = window.location.pathname + window.location.search;
+  return ROOT_PREFIX + 'pages/compte-acheteur.html?src=lock&next=' + encodeURIComponent(next);
+}
+
+function trackLockEvent(name, page) {
+  if (typeof window.gtag === 'function') window.gtag('event', name, { page_type: page });
+}
+
+// Bloc d'invitation affiché à la place des infos verrouillées. Les lignes
+// "fantômes" sont de simples barres factices : aucune vraie donnée verrouillée
+// n'est mise dans le DOM.
+function lockBoxHtml(extraLine) {
+  const tr = typeof t === 'function' ? t : k => k;
+  const href = lockAccountHref();
+  return `
+    <div class="lock-box">
+      <div class="lock-ghost"><span style="width:90%"></span><span style="width:70%"></span><span style="width:80%"></span></div>
+      <div class="lock-title">🔒 ${tr('lock_title')}</div>
+      <p class="lock-text">${extraLine ? extraLine + ' — ' : ''}${tr('lock_text')}</p>
+      <div class="lock-actions">
+        <a class="lock-signup" href="${href}" onclick="trackLockEvent('lock_cta_click','${window.CURRENT_PAGE || ''}')">${tr('lock_cta_signup')}</a>
+        <a class="lock-login" href="${href}" onclick="trackLockEvent('lock_cta_click','${window.CURRENT_PAGE || ''}')">${tr('lock_cta_login')}</a>
+      </div>
+    </div>`;
+}
