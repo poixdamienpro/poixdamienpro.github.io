@@ -1247,6 +1247,10 @@ function t(key) {
 function localize(fr, en) {
   return (getLang() === 'en' && en) ? en : (fr || '');
 }
+// Nom d'un produit : name_en (base) en anglais, repli sur le nom d'origine.
+function pName(p) {
+  return localize(p.name, p.nameEn);
+}
 
 // Libellés anglais des catégories, groupes du catalogue et industries. Les
 // valeurs FR restent la clé de filtre en base ; seul l'affichage change.

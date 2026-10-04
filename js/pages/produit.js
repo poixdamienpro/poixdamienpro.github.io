@@ -39,17 +39,17 @@ function renderProduct(p) {
   const hiddenSpecs = loggedIn ? 0 : Math.max(0, p.specs.length - FREE_SPEC_COUNT);
   if (!loggedIn && !window._lockViewTracked) { window._lockViewTracked = true; trackLockEvent('lock_view', 'produit'); }
 
-  document.title = `${p.name} — ${p.maker} — Buy-inner`;
+  document.title = `${pName(p)} — ${p.maker} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
-  if (metaDesc) metaDesc.setAttribute('content', (localize(p.desc, p.descEn) || `${p.name} par ${p.maker}`).slice(0, 160));
+  if (metaDesc) metaDesc.setAttribute('content', (localize(p.desc, p.descEn) || (getLang() === 'en' ? `${pName(p)} by ${p.maker}` : `${p.name} par ${p.maker}`)).slice(0, 160));
 
   document.getElementById('prod-header').innerHTML = `
-    <h1 class="page-title">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</h1>
+    <h1 class="page-title">${escapeHtml(p.icon)} ${escapeHtml(pName(p))}</h1>
     <p class="page-subtitle">${escapeHtml(p.maker)} — ${escapeHtml(taxLabel(p.cat))} ${p.industry ? '· ' + escapeHtml(taxLabel(p.industry)) : ''}</p>
   `;
 
   document.getElementById('prod-body').innerHTML = `
-    ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
+    ${p.image ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(pName(p))}" style="max-width:280px;border-radius:8px;border:1px solid var(--border);margin-bottom:16px"/>` : ''}
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_description')}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(localize(p.desc, p.descEn))}</p>
@@ -78,7 +78,7 @@ function renderProduct(p) {
     </div>
   `;
   const quoteBtn = document.getElementById('prod-quote-btn');
-  if (quoteBtn) quoteBtn.onclick = () => openLeadModal(p.maker, p.name, p.companyId);
+  if (quoteBtn) quoteBtn.onclick = () => openLeadModal(p.maker, p.name, p.companyId, pName(p));
 
   injectProductJsonLd(p);
 }
@@ -100,7 +100,7 @@ function injectProductJsonLd(p) {
   script.textContent = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Thing',
-    name: p.name,
+    name: pName(p),
     description: localize(p.desc, p.descEn),
     additionalType: p.cat,
   });

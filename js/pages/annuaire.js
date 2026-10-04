@@ -114,7 +114,7 @@ function renderCompanyPreview(c) {
   const prodsBlock = prods.length ? `
     <div class="dp-section-label">${prods.length} ${prodLabel}</div>
     <div class="dp-prods">
-      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => escapeHtml(localize(s.l, s.lEn))+' : '+escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div><div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div></div>`).join('')}
+      ${prods.slice(0,4).map(p => `<div class="modal-prod-card"><div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(pName(p))}</div><div class="modal-prod-specs">${p.specs.slice(0,2).map(s => escapeHtml(localize(s.l, s.lEn))+' : '+escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div><div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div></div>`).join('')}
     </div>
     ${prods.length > 4 ? '<button class="btn-see-products" id="dp-see">'+_t('prev_see')+' '+prods.length+' '+_t('prev_see_suffix')+'</button>' : ''}` : '';
 

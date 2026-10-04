@@ -148,7 +148,7 @@ function baseFilteredProducts() {
   const q = (document.getElementById('cat-search')?.value || '').toLowerCase();
   return PRODUCTS.filter(p => {
     if (CATALOGUE_EXCLUDED_CATS.includes(p.cat)) return false;
-    const ms = !q || p.name.toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || localize(p.desc, p.descEn).toLowerCase().includes(q);
+    const ms = !q || p.name.toLowerCase().includes(q) || (p.nameEn || '').toLowerCase().includes(q) || p.maker.toLowerCase().includes(q) || localize(p.desc, p.descEn).toLowerCase().includes(q);
     const matchesGroup = catGroup === 'all' || groupOfCat(p.cat) === catGroup;
     const matchesSub = catSubCat === 'all' || p.cat === catSubCat;
     return ms && matchesGroup && matchesSub && (catInd === 'all' || p.industry === catInd);
@@ -381,7 +381,7 @@ function renderProducts() {
     row.innerHTML = `
       <span class="dir-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>` : escapeHtml(p.icon)}</span>
       <span class="dir-row-main">
-        <span class="dir-row-name">${escapeHtml(p.name)}</span>
+        <span class="dir-row-name">${escapeHtml(pName(p))}</span>
         <span class="dir-row-sub">${escapeHtml(p.maker)} · ${escapeHtml(taxLabel(p.cat))}</span>
       </span>
       <button class="dir-cmp ${inCompare ? 'on' : ''}" data-cmp="${p.id}" title="Ajouter au comparateur">${inCompare ? '✓' : '＋'}</button>`;
@@ -439,7 +439,7 @@ function renderProductPreview(p) {
       <div class="dp-head">
         <div class="dp-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : escapeHtml(p.icon)}</div>
         <div style="min-width:0">
-          <div class="dp-name">${escapeHtml(p.name)}</div>
+          <div class="dp-name">${escapeHtml(pName(p))}</div>
           <div class="dp-loc">${escapeHtml(p.maker)} · ${escapeHtml(taxLabel(p.cat))}</div>
         </div>
       </div>
@@ -463,7 +463,7 @@ function renderProductPreview(p) {
     el.querySelectorAll('.dir-bar-fill').forEach(f => { f.style.width = f.style.getPropertyValue('--w'); });
   }));
 
-  el.querySelector('#dp-quote').onclick = () => openLeadModal(p.maker, p.name, p.companyId);
+  el.querySelector('#dp-quote').onclick = () => openLeadModal(p.maker, p.name, p.companyId, pName(p));
   el.querySelector('.btn-cmp-add').onclick = function() { toggleCompare(p.id, this); };
   const close = el.querySelector('.dir-close');
   if(close) close.onclick = () => el.classList.remove('open');

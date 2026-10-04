@@ -128,7 +128,7 @@ function renderSystemierPreview(c) {
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
       ${systems.map(s => `
         <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-          <div style="font-weight:600;font-size:13px;margin-bottom:2px">${escapeHtml(s.icon || '🛰️')} ${escapeHtml(s.name)}</div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:2px">${escapeHtml(s.icon || '🛰️')} ${escapeHtml(pName(s))}</div>
           <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${escapeHtml(taxLabel(s.cat))}</div>
           ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${escapeHtml(localize(sp.l, sp.lEn))} : <strong style="color:var(--ink)">${escapeHtml(localize(sp.v, sp.vEn))}</strong>`).join(' · ')}</div>` : ''}
         </div>`).join('')}

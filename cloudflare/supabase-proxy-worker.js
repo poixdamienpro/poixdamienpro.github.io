@@ -482,13 +482,14 @@ function productContent(p, lang) {
   const category = en ? taxEn(p.category || '') : (p.category || '');
   const industry = en ? taxEn(p.industry || '') : (p.industry || '');
   const description = (en && p.description_en) ? p.description_en : (p.description || '');
+  const name = (en && p.name_en) ? p.name_en : p.name;   // name_en : voir backend/supabase_add_product_names_en_2026_10.sql
   const L = en
-    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', fallback: `${p.name} by ${p.company_name || ''}` }
-    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', fallback: `${p.name} par ${p.company_name || ''}` };
+    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', fallback: `${name} by ${p.company_name || ''}` }
+    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', fallback: `${name} par ${p.company_name || ''}` };
   return {
-    title: `${p.name} — ${p.company_name || ''} — Buy-inner`,
+    title: `${name} — ${p.company_name || ''} — Buy-inner`,
     desc: (description || L.fallback).slice(0, 160),
-    headerHtml: `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(p.name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(category)} ${industry ? '· ' + escapeHtml(industry) : ''}</p>`,
+    headerHtml: `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(category)} ${industry ? '· ' + escapeHtml(industry) : ''}</p>`,
     bodyHtml: `
     <div class="modal-section">
       <div class="modal-section-title">${L.desc}</div>

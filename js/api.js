@@ -172,6 +172,7 @@ function mapProduct(row) {
     id:       row.id,
     companyId: row.company_id,
     name:     row.name,
+    nameEn:   row.name_en || '',
     maker:    row.company_name || '',
     cat:      row.category,
     industry: row.industry,

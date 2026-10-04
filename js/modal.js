@@ -41,7 +41,8 @@ function updateCompareBanner() {
   pills.innerHTML = compareIds.map(id => {
     const p = PRODUCTS.find(x => x.id === id);
     if(!p) return '';
-    const label = p.name.length > 20 ? p.name.slice(0,20)+'…' : p.name;
+    const shown = pName(p);
+    const label = shown.length > 20 ? shown.slice(0,20)+'…' : shown;
     return `<div class="compare-pill">${escapeHtml(p.icon)} ${escapeHtml(label)}<button onclick="toggleCompare('${id}')">✕</button></div>`;
   }).join('');
   banner.classList.toggle('visible', n >= 2);
@@ -56,7 +57,7 @@ function openCompareModal() {
   const allLabels = [...new Set(localizedSpecs.flat().map(s => s.l))];
   const allBars   = [...new Set(prods.flatMap(p => p.bars.map(b => b.l)))];
 
-  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${escapeHtml(p.icon)}</span><strong style="font-size:11px">${escapeHtml(p.name)}</strong><span style="font-size:10px;opacity:.8">${escapeHtml(p.maker)}</span></div></th>`).join('');
+  const hCols = prods.map(p => `<th class="prod-col"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:18px">${escapeHtml(p.icon)}</span><strong style="font-size:11px">${escapeHtml(pName(p))}</strong><span style="font-size:10px;opacity:.8">${escapeHtml(p.maker)}</span></div></th>`).join('');
 
   const specRows = allLabels.map((label) => {
     const cells = localizedSpecs.map(specs => {

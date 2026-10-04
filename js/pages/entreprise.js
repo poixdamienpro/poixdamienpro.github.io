@@ -121,7 +121,7 @@ function renderCompany(c, products) {
       <div class="modal-prod-grid">
         ${products.map(p => `
           <a class="modal-prod-card" href="${entityUrl('product', p.id)}" style="text-decoration:none;color:inherit;display:block">
-            <div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div>
+            <div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(pName(p))}</div>
             ${loggedIn ? `<div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => escapeHtml(localize(s.l, s.lEn)) + ' : ' + escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div>` : ''}
             <div class="modal-prod-price">💰 ${escapeHtml(priceLabel(p.price))}</div>
           </a>`).join('')}

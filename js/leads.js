@@ -9,10 +9,10 @@
 // pour garder une trace exploitable — l'email reste le canal principal,
 // l'enregistrement en base est best-effort et ne bloque jamais l'envoi.
 // ═══════════════════════════════
-function openLeadModal(targetName, productName, companyId) {
+function openLeadModal(targetName, productName, companyId, displayProduct) {
   leadTarget = { company: targetName, product: productName, companyId: companyId || null };
   document.getElementById('lead-target').textContent = productName
-    ? `${productName} · ${targetName}`
+    ? `${displayProduct || productName} · ${targetName}`
     : targetName;
   resetLeadForm();
   document.getElementById('lead-overlay').classList.add('open');
