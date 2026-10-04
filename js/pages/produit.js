@@ -45,7 +45,7 @@ function renderProduct(p) {
 
   document.getElementById('prod-header').innerHTML = `
     <h1 class="page-title">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</h1>
-    <p class="page-subtitle">${escapeHtml(p.maker)} — ${escapeHtml(p.cat)} ${p.industry ? '· ' + escapeHtml(p.industry) : ''}</p>
+    <p class="page-subtitle">${escapeHtml(p.maker)} — ${escapeHtml(taxLabel(p.cat))} ${p.industry ? '· ' + escapeHtml(taxLabel(p.industry)) : ''}</p>
   `;
 
   document.getElementById('prod-body').innerHTML = `

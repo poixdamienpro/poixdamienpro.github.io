@@ -286,7 +286,7 @@ async function loadTaxonomy() {
 function showLoading(ids) {
   const msg = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px">' +
     '<div style="font-size:30px;display:inline-block;animation:spin 1s linear infinite">⚙️</div>' +
-    '<p style="color:var(--muted);margin-top:12px;font-size:13px">Chargement des données…</p></div>';
+    '<p style="color:var(--muted);margin-top:12px;font-size:13px">' + (typeof t === 'function' ? t('loading') : 'Chargement des données…') + '</p></div>';
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = msg;

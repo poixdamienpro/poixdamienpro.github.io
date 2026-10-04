@@ -81,7 +81,7 @@ function renderSystemiers() {
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${escapeHtml(c.name)}</span>
-        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
+        <span class="dir-row-sub">${escapeHtml(countryLabel(c.country))} · ${c.industries.map(i => escapeHtml(taxLabel(i))).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
@@ -115,7 +115,7 @@ function renderSystemierPreview(c) {
   const el = document.getElementById('company-preview');
   if(!el) return;
 
-  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
+  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.map(taxLabel).join(', ')], [t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   // Systemes references pour cette entreprise (produits "systeme
@@ -129,7 +129,7 @@ function renderSystemierPreview(c) {
       ${systems.map(s => `
         <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px">
           <div style="font-weight:600;font-size:13px;margin-bottom:2px">${escapeHtml(s.icon || '🛰️')} ${escapeHtml(s.name)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${escapeHtml(s.cat)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${escapeHtml(taxLabel(s.cat))}</div>
           ${s.specs.length ? `<div style="font-size:11px;color:var(--muted);line-height:1.6">${s.specs.slice(0,4).map(sp => `${escapeHtml(localize(sp.l, sp.lEn))} : <strong style="color:var(--ink)">${escapeHtml(localize(sp.v, sp.vEn))}</strong>`).join(' · ')}</div>` : ''}
         </div>`).join('')}
     </div>` : '';
@@ -140,14 +140,14 @@ function renderSystemierPreview(c) {
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
           <div class="dp-name">${escapeHtml(c.name)}</div>
-          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
+          <div class="dp-loc">${escapeHtml(countryLabel(c.country))} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
         <span class="tag tag-industry">${t('tag_systemier')}</span>
-        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
       </div>
       <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>

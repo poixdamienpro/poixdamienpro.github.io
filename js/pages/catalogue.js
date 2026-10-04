@@ -356,7 +356,7 @@ function renderProducts() {
   const filtered = filteredProducts();
 
   const count = document.getElementById('cat-count');
-  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> produit' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + t(filtered.length !== 1 ? 'cat_count_many' : 'cat_count_one');
 
   const list = document.getElementById('products-list');
   const preview = document.getElementById('product-preview');
@@ -381,7 +381,7 @@ function renderProducts() {
       <span class="dir-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px"/>` : escapeHtml(p.icon)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${escapeHtml(p.name)}</span>
-        <span class="dir-row-sub">${escapeHtml(p.maker)} · ${escapeHtml(p.cat)}</span>
+        <span class="dir-row-sub">${escapeHtml(p.maker)} · ${escapeHtml(taxLabel(p.cat))}</span>
       </span>
       <button class="dir-cmp ${inCompare ? 'on' : ''}" data-cmp="${p.id}" title="Ajouter au comparateur">${inCompare ? '✓' : '＋'}</button>`;
 
@@ -439,10 +439,10 @@ function renderProductPreview(p) {
         <div class="dp-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : escapeHtml(p.icon)}</div>
         <div style="min-width:0">
           <div class="dp-name">${escapeHtml(p.name)}</div>
-          <div class="dp-loc">${escapeHtml(p.maker)} · ${escapeHtml(p.cat)}</div>
+          <div class="dp-loc">${escapeHtml(p.maker)} · ${escapeHtml(taxLabel(p.cat))}</div>
         </div>
       </div>
-      <div class="dp-badges"><span class="tag tag-industry">${escapeHtml(p.industry)}</span></div>
+      <div class="dp-badges"><span class="tag tag-industry">${escapeHtml(taxLabel(p.industry))}</span></div>
       <p class="dp-desc">${escapeHtml(localize(p.desc, p.descEn))}</p>
       <div class="dp-section-label">${_t('prod_specs')}</div>
       <table class="spec-table"><tbody>${specs}</tbody></table>

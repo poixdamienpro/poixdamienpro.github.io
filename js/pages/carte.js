@@ -155,7 +155,7 @@ function companyPopupHtml(c, loc, siteLabel) {
     <div class="map-popup">
       <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${escapeHtml(c.name)}</div>
       <div class="map-popup-loc">${siteLabel ? `<strong>${escapeHtml(siteLabel)}</strong> — ` : ''}${escapeHtml(loc)}</div>
-      <div class="map-popup-industry">${c.industries.map(escapeHtml).join(', ')}</div>
+      <div class="map-popup-industry">${c.industries.map(i => escapeHtml(taxLabel(i))).join(', ')}</div>
       <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">${t('map_popup_link')}</a>
     </div>
   `;
@@ -180,7 +180,7 @@ function renderMarkers() {
     (c.locations || []).forEach(site => {
       if (typeof site.lat !== 'number' || isNaN(site.lat) || typeof site.lng !== 'number' || isNaN(site.lng)) return;
       const siteMarker = L.marker([site.lat, site.lng], { icon: dot });
-      const siteLoc = [site.city, site.country].filter(Boolean).join(' · ');
+      const siteLoc = [site.city, countryLabel(site.country)].filter(Boolean).join(' · ');
       siteMarker.bindPopup(companyPopupHtml(c, siteLoc, site.label || t('map_popup_site')), { maxWidth: 210, autoPan: false });
       markerCluster.addLayer(siteMarker);
     });

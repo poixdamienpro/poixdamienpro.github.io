@@ -62,7 +62,7 @@ function renderCompany(c, products) {
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const equipmentCats = c.products.filter(cat => !SERVICE_CATS.includes(cat));
 
-  const industryLabel = c.industries.join(' & ');
+  const industryLabel = c.industries.map(taxLabel).join(' & ');
   document.title = `${c.name} — ${industryLabel} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
   const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${industryLabel}` : `${c.name}, équipementier ${industryLabel}`;
@@ -70,7 +70,7 @@ function renderCompany(c, products) {
 
   document.getElementById('ent-header').innerHTML = `
     <h1 class="page-title"><span style="display:inline-flex;width:40px;height:40px;vertical-align:middle;align-items:center;justify-content:center;margin-right:10px;border-radius:9px;background:rgba(0,0,0,.04);overflow:hidden">${companyLogoHtml(c, 40)}</span>${escapeHtml(c.name)}</h1>
-    <p class="page-subtitle">${escapeHtml(c.country)} · ${escapeHtml(c.hq)} — ${escapeHtml(industryLabel)}</p>
+    <p class="page-subtitle">${escapeHtml(countryLabel(c.country))} · ${escapeHtml(c.hq)} — ${escapeHtml(industryLabel)}</p>
   `;
 
   document.getElementById('ent-body').innerHTML = `
@@ -79,7 +79,7 @@ function renderCompany(c, products) {
       ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
       ${isPrestataire ? `<span class="tag tag-industry">${t('tag_prestataire')}</span>` : ''}
       ${c.isSystemier ? `<span class="tag tag-industry">${t('tag_systemier')}</span>` : ''}
-      ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
+      ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
     </div>
     ${!c.premium ? (c.claimed ? `
     <div class="claim-banner gold">
@@ -106,12 +106,12 @@ function renderCompany(c, products) {
     ${services.length ? `
     <div class="modal-section">
       <div class="modal-section-title">${t('presta_services_label')}</div>
-      <div class="modal-tags">${services.map(s => `<span class="tag">${escapeHtml(s)}</span>`).join('')}</div>
+      <div class="modal-tags">${services.map(s => `<span class="tag">${escapeHtml(taxLabel(s))}</span>`).join('')}</div>
     </div>` : ''}
     ${equipmentCats.length || c.tags.length ? `
     <div class="modal-section">
       <div class="modal-section-title">${t('lbl_ranges_tech')}</div>
-      <div class="modal-tags">${[...equipmentCats, ...c.tags].map(g => `<span class="tag">${escapeHtml(g)}</span>`).join('')}</div>
+      <div class="modal-tags">${[...equipmentCats.map(taxLabel), ...c.tags].map(g => `<span class="tag">${escapeHtml(g)}</span>`).join('')}</div>
     </div>` : ''}
     ${products.length ? `
     <div class="modal-section">

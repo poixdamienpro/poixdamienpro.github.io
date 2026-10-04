@@ -45,7 +45,7 @@ function renderCompanies() {
   const filtered = filteredCompanies();
 
   const count = document.getElementById('ann-count');
-  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> entreprise' + (filtered.length !== 1 ? 's' : '');
+  if(count) count.innerHTML = ' · <strong>' + filtered.length + '</strong> ' + t(filtered.length !== 1 ? 'ann_count_many' : 'ann_count_one');
 
   const list = document.getElementById('companies-list');
   const preview = document.getElementById('company-preview');
@@ -70,7 +70,7 @@ function renderCompanies() {
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${escapeHtml(c.name)}</span>
-        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
+        <span class="dir-row-sub">${escapeHtml(countryLabel(c.country))} · ${c.industries.map(i => escapeHtml(taxLabel(i))).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}${prodCount ? '<span class="n">'+prodCount+'</span>' : ''}</span>`;
 
@@ -107,7 +107,7 @@ function renderCompanyPreview(c) {
   const prods = PRODUCTS.filter(p => p.maker === c.name);
 
   const _t = typeof t==='function' ? t : k=>k;
-  const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industries.join(', ')], [_t('prev_hq'), c.hq]]
+  const details = [[_t('prev_founded'), c.founded], [_t('prev_employees'), c.employees], [_t('prev_sector'), c.industries.map(taxLabel).join(', ')], [_t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   const prodLabel = prods.length===1 ? _t('prev_products_1') : _t('prev_products_n');
@@ -124,13 +124,13 @@ function renderCompanyPreview(c) {
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
           <div class="dp-name">${escapeHtml(c.name)}</div>
-          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
+          <div class="dp-loc">${escapeHtml(countryLabel(c.country))} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${_t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
-        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
       </div>
       <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${_t('prev_info')}</div>

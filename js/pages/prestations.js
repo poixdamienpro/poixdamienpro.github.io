@@ -95,7 +95,7 @@ function renderCompanies() {
       <span class="dir-logo">${companyLogoHtml(c, 34)}</span>
       <span class="dir-row-main">
         <span class="dir-row-name">${escapeHtml(c.name)}</span>
-        <span class="dir-row-sub">${escapeHtml(c.country)} · ${c.industries.map(escapeHtml).join(', ')}</span>
+        <span class="dir-row-sub">${escapeHtml(countryLabel(c.country))} · ${c.industries.map(i => escapeHtml(taxLabel(i))).join(', ')}</span>
       </span>
       <span class="dir-row-meta">${c.premium ? '<span class="star">★</span>' : ''}</span>`;
 
@@ -129,13 +129,13 @@ function renderCompanyPreview(c) {
   const el = document.getElementById('company-preview');
   if(!el) return;
 
-  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.join(', ')], [t('prev_hq'), c.hq]]
+  const details = [[t('prev_founded'), c.founded], [t('prev_employees'), c.employees], [t('prev_sector'), c.industries.map(taxLabel).join(', ')], [t('prev_hq'), c.hq]]
     .map(([l,v]) => `<div class="detail-item"><div class="detail-label">${escapeHtml(l)}</div><div class="detail-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
   const services = c.products.filter(cat => SERVICE_CATS.includes(cat));
   const servicesBlock = services.length ? `
     <div class="dp-section-label">${t('presta_services_label')}</div>
-    <div class="cat-tags" style="margin-top:8px">${services.map(s => '<span class="cat-tag">'+escapeHtml(s)+'</span>').join('')}</div>` : '';
+    <div class="cat-tags" style="margin-top:8px">${services.map(s => '<span class="cat-tag">'+escapeHtml(taxLabel(s))+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
     <div class="dir-preview-card">
@@ -143,13 +143,13 @@ function renderCompanyPreview(c) {
         <div class="dp-logo">${companyLogoHtml(c, 52)}</div>
         <div style="min-width:0">
           <div class="dp-name">${escapeHtml(c.name)}</div>
-          <div class="dp-loc">${escapeHtml(c.country)} · ${escapeHtml(c.hq)}</div>
+          <div class="dp-loc">${escapeHtml(countryLabel(c.country))} · ${escapeHtml(c.hq)}</div>
         </div>
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
         ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
-        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(ind)}</span>`).join('')}
+        ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
       </div>
       <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>
       <div class="dp-section-label">${t('lbl_info')}</div>

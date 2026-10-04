@@ -176,6 +176,10 @@ const TRANSLATIONS = {
     map_gate_cta_t:      'Connectez-vous pour accéder gratuitement à la carte',
     map_gate_cta_p:      'La création d\'un compte est gratuite et prend moins d\'une minute.',
     map_gate_note:       'Illustration — les positions réelles sont visibles une fois connecté.',
+    ann_count_one: 'entreprise',
+    ann_count_many: 'entreprises',
+    cat_count_one: 'produit',
+    cat_count_many: 'produits',
     doc_index: 'Le Circuit Buy-inner : voyagez au cœur des systèmes industriels',
     desc_index: 'Suivez le courant à travers un système industriel : batteries, PDU, calculateurs, actionneurs, vannes. La base de référence des équipementiers pour ingénieurs et acheteurs.',
     doc_annuaire: 'Annuaire des fabricants · Buy-inner',
@@ -759,6 +763,10 @@ const TRANSLATIONS = {
     map_gate_cta_t:      'Log in to access the map for free',
     map_gate_cta_p:      'Creating an account is free and takes less than a minute.',
     map_gate_note:       'Illustration — real locations are shown once you are logged in.',
+    ann_count_one: 'company',
+    ann_count_many: 'companies',
+    cat_count_one: 'product',
+    cat_count_many: 'products',
     doc_index: 'The Buy-inner Circuit: journey through the heart of industrial systems',
     desc_index: 'Follow the current through an industrial system: batteries, PDUs, computers, actuators, valves. The reference database of equipment makers for engineers and buyers.',
     doc_annuaire: 'Manufacturer directory · Buy-inner',
@@ -1210,6 +1218,117 @@ function localize(fr, en) {
   return (getLang() === 'en' && en) ? en : (fr || '');
 }
 
+// Libellés anglais des catégories, groupes du catalogue et industries. Les
+// valeurs FR restent la clé de filtre en base ; seul l'affichage change.
+const TAXONOMY_EN = {
+  'Actionneurs & GNC': 'Actuators & GNC',
+  'Amplificateurs RF': 'RF amplifiers',
+  'Batteries & Stockage': 'Batteries & Storage',
+  'BMS': 'BMS',
+  'Bornes de recharge': 'Charging stations',
+  'Calculateurs embarqués': 'Onboard computers',
+  'Calculateurs embarqués Edge IA': 'Onboard Edge AI computers',
+  'Capteurs & Instrumentation': 'Sensors & Instrumentation',
+  'Capteurs ADAS': 'ADAS sensors',
+  'Cellules accumulateurs': 'Battery cells',
+  'Chargeur embarqué': 'Onboard charger',
+  'Connecteurs sous-marins': 'Underwater connectors',
+  'Contrôle thermique': 'Thermal control',
+  'Convertisseurs & Onduleurs': 'Converters & Inverters',
+  'Câblage & Connecteurs': 'Cabling & Connectors',
+  'Distribution de composants': 'Component distribution',
+  'Drones & UAV': 'Drones & UAVs',
+  'Développement d\'équipements': 'Equipment development',
+  'Essais & qualification': 'Testing & qualification',
+  'Fabrication de faisceaux électriques': 'Wiring harness manufacturing',
+  'Hydrogène & Énergie': 'Hydrogen & Energy',
+  'Impression 3D béton': 'Concrete 3D printing',
+  'Impression 3D métal': 'Metal 3D printing',
+  'Informatique quantique': 'Quantum computing',
+  'Infrastructure SpaceVPX': 'SpaceVPX infrastructure',
+  'Intégration & assemblage système': 'System integration & assembly',
+  'Lanceurs': 'Launch vehicles',
+  'Logiciels & Systèmes MRO': 'MRO software & systems',
+  'Logiciels de cybersécurité': 'Cybersecurity software',
+  'Logiciels de supervision': 'Monitoring software',
+  'MGSE & Outillage sol': 'MGSE & ground tooling',
+  'Manipulateurs sous-marins': 'Underwater manipulators',
+  'Modules batteries': 'Battery modules',
+  'Moteurs & Entraînements': 'Motors & Drives',
+  'Mémoires': 'Memory',
+  'Navigation inertielle': 'Inertial navigation',
+  'Panneaux solaires': 'Solar panels',
+  'Photonique & Optique': 'Photonics & Optics',
+  'Pièces & MRO': 'Parts & MRO',
+  'Plateformes satellites': 'Satellite platforms',
+  'Prestation de talents': 'Contract talent',
+  'Recyclage & Économie circulaire': 'Recycling & Circular economy',
+  'Robotique & Automatisation': 'Robotics & Automation',
+  'Segment sol & opérations': 'Ground segment & operations',
+  'Sous-traitance électronique (EMS)': 'Electronics contract manufacturing (EMS)',
+  'Stockage de données spatiales': 'Space data storage',
+  'Traitement charge utile': 'Payload processing',
+  'Traitement de données': 'Data processing',
+  'Usinage & fabrication mécanique': 'Machining & mechanical manufacturing',
+  'Vannes & Actionneurs': 'Valves & Actuators',
+  'Véhicules': 'Vehicles',
+  'Électrification': 'Electrification',
+  'Battery & stockage d\'énergie': 'Battery & energy storage',
+  'Intelligence embarquée': 'Embedded intelligence',
+  'Capteurs & instrumentation': 'Sensors & instrumentation',
+  'Mobilité': 'Mobility',
+  'Câblage & Connectique': 'Cabling & Connectivity',
+  'Thermique': 'Thermal',
+  'Photonique & Quantique': 'Photonics & Quantum',
+  'Autres': 'Other',
+  'Automobile & Mobilité électrique': 'Automotive & E-mobility',
+  'Aéronautique & Défense': 'Aerospace & Defense',
+  'Ferroviaire': 'Rail',
+  'Industrie & Manufacturing': 'Industry & Manufacturing',
+  'Spatial': 'Space',
+  'Énergie & Utilities': 'Energy & Utilities',
+};
+function taxLabel(name) {
+  return (getLang() === 'en' && TAXONOMY_EN[name]) || name;
+}
+
+// Pays : la base stocke le nom français (parfois précédé d'un drapeau, parfois
+// plusieurs pays séparés par « / »). On remplace chaque nom connu par son
+// équivalent anglais, le reste de la chaîne (drapeaux, séparateurs) est conservé.
+const COUNTRY_EN = {
+  'Autriche': 'Austria',
+  'Bulgarie': 'Bulgaria',
+  'Suisse': 'Switzerland',
+  'Chine': 'China',
+  'République tchèque': 'Czech Republic',
+  'Allemagne': 'Germany',
+  'Danemark': 'Denmark',
+  'Estonie': 'Estonia',
+  'Espagne': 'Spain',
+  'Royaume-Uni': 'United Kingdom',
+  'Irlande': 'Ireland',
+  'Inde': 'India',
+  'Italie': 'Italy',
+  'Japon': 'Japan',
+  'Corée du Sud': 'South Korea',
+  'Lituanie': 'Lithuania',
+  'Pays-Bas': 'Netherlands',
+  'Norvège': 'Norway',
+  'Nouvelle-Zélande': 'New Zealand',
+  'Pologne': 'Poland',
+  'Suède': 'Sweden',
+  'Slovénie': 'Slovenia',
+  'Slovaquie': 'Slovakia',
+  'Taïwan': 'Taiwan',
+  'États-Unis': 'United States',
+  'Afrique du Sud': 'South Africa',
+};
+const COUNTRY_EN_RE = new RegExp(Object.keys(COUNTRY_EN).join('|'), 'g');
+function countryLabel(s) {
+  if (getLang() !== 'en' || !s) return s || '';
+  return s.replace(COUNTRY_EN_RE, n => COUNTRY_EN[n]);
+}
+
 function applyLang() {
   const lang = getLang();
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1245,6 +1364,7 @@ function applyLang() {
   });
   // Re-rendu du contenu dynamique (liste entreprises / produits) — chaque
   // page définit la fonction qui la concerne, les autres restent undefined.
+  if (typeof relabelChips === 'function') relabelChips();
   if (typeof renderCompanies === 'function') renderCompanies();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderSystemiers === 'function') renderSystemiers();
