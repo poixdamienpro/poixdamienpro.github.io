@@ -204,6 +204,7 @@ function completeAdminLogin(accessToken, email) {
   adminShowTab(sessionStorage.getItem('admin_active_tab') || 'submissions');
   loadAdminMfaStatus();
   loadAnalytics();
+  loadSignupStats();
   loadPendingSubmissions();
   loadPendingClaims();
   loadPendingRfqDossiers();
@@ -223,6 +224,7 @@ function tryRestoreAdminSession() {
   adminShowTab(sessionStorage.getItem('admin_active_tab') || 'submissions');
   loadAdminMfaStatus();
   loadAnalytics();
+  loadSignupStats();
   loadPendingSubmissions();
   loadPendingClaims();
   loadPendingRfqDossiers();
@@ -492,6 +494,114 @@ function renderAnalyticsChart() {
       ${dots}
       ${xLabels}
     </svg>`;
+}
+
+// ── Inscrits — courbes du nombre de comptes créés dans le temps ──
+// Données : RPC admin-only get_signup_stats (voir
+// backend/supabase_add_signup_stats_2026_10.sql), un agrégat par jour.
+let adminSignupRows = [];
+
+async function loadSignupStats() {
+  const kpis = document.getElementById('admin-signups-kpis');
+  if (!kpis) return;
+  kpis.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  try {
+    adminSignupRows = (await adminFetch('rpc/get_signup_stats', { method: 'POST', body: '{}' })) || [];
+    renderSignups();
+  } catch (err) {
+    kpis.innerHTML = `<div class="admin-empty">${escapeHtml(err.message)} (backend/supabase_add_signup_stats_2026_10.sql exécuté ?)</div>`;
+  }
+}
+
+function signupDayString(offsetFromToday = 0) {
+  const parisToday = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+  const d = new Date(parisToday + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + offsetFromToday);
+  return d.toISOString().slice(0, 10);
+}
+
+function renderSignups() {
+  const kpis = document.getElementById('admin-signups-kpis');
+  if (!kpis) return;
+  const rows = adminSignupRows;
+  const rangeDays = Number(document.getElementById('admin-signups-range').value);
+  const today = signupDayString(0);
+  const firstDay = rows.length ? rows[0].day : today;
+  const startDay = rangeDays === 0 ? firstDay : signupDayString(-(rangeDays - 1));
+
+  const byDay = {};
+  rows.forEach(r => { byDay[r.day] = r; });
+
+  // Liste continue des jours de la plage (les jours sans inscription valent 0).
+  const days = [];
+  for (let d = new Date(startDay + 'T00:00:00Z'); d.toISOString().slice(0, 10) <= today; d.setUTCDate(d.getUTCDate() + 1)) {
+    days.push(d.toISOString().slice(0, 10));
+  }
+  const daily = days.map(d => (byDay[d] ? byDay[d].signups : 0));
+  const baseline = rows.filter(r => r.day < startDay).reduce((n, r) => n + r.signups, 0);
+  let running = baseline;
+  const cumulative = daily.map(n => (running += n));
+
+  const total = rows.reduce((n, r) => n + r.signups, 0);
+  const totalConfirmed = rows.reduce((n, r) => n + r.confirmed, 0);
+  const inRange = daily.reduce((a, b) => a + b, 0);
+  const rangeLabel = rangeDays === 0 ? 'depuis le début' : (ANALYTICS_RANGES[rangeDays] || `${rangeDays} j`);
+  const last7 = days.slice(-7).reduce((n, d) => n + (byDay[d] ? byDay[d].signups : 0), 0);
+
+  kpis.innerHTML = [
+    ['Inscrits · total', total],
+    ['dont e-mail confirmé', totalConfirmed],
+    [`Nouveaux · ${rangeLabel}`, inRange],
+    ['Nouveaux · 7 derniers jours', last7],
+  ].map(([label, n]) => `<div class="kpi"><div><div class="kpi-n">${n}</div><div class="kpi-l">${label}</div></div></div>`).join('');
+
+  const fmt = d => new Date(d + 'T00:00:00Z').toLocaleDateString('fr-FR', { timeZone: 'UTC' });
+  renderSeriesChart('admin-signups-total-chart', days, cumulative, 'line', fmt, 'inscrit');
+  renderSeriesChart('admin-signups-daily-chart', days, daily, 'bar', fmt, 'inscription');
+}
+
+// Graphique SVG générique (courbe ou barres) : mêmes dimensions/style que
+// renderAnalyticsChart.
+function renderSeriesChart(elId, days, values, kind, fmt, unit) {
+  const wrap = document.getElementById(elId);
+  if (!wrap) return;
+  if (!values.length) { wrap.innerHTML = '<div class="admin-empty">Aucune donnée.</div>'; return; }
+
+  const W = 760, H = 220, padL = 36, padB = 26, padT = 10, padR = 10;
+  const chartW = W - padL - padR, chartH = H - padT - padB;
+  const max = Math.max(1, ...values);
+  const n = values.length;
+  const x = i => padL + (n === 1 ? chartW / 2 : (i / (n - 1)) * chartW);
+  const y = v => padT + chartH - (v / max) * chartH;
+
+  const gridLines = [0, 0.5, 1].map(f => {
+    const yy = padT + chartH - f * chartH;
+    return `<line x1="${padL}" y1="${yy}" x2="${padL + chartW}" y2="${yy}" stroke="var(--border)" stroke-width="1"/>
+            <text x="${padL - 8}" y="${yy + 4}" font-size="10" fill="var(--muted)" text-anchor="end">${Math.round(f * max)}</text>`;
+  }).join('');
+
+  const stride = Math.max(1, Math.ceil(n / 8));
+  const xLabels = days.map((d, i) => {
+    if (i % stride !== 0 && i !== n - 1) return '';
+    const [, m, dd] = d.split('-');
+    return `<text x="${x(i)}" y="${H - 6}" font-size="9" fill="var(--muted)" text-anchor="middle">${Number(dd)}/${Number(m)}</text>`;
+  }).join('');
+
+  const title = (i) => `<title>${fmt(days[i])} : ${values[i]} ${unit}${values[i] !== 1 ? 's' : ''}</title>`;
+  let body;
+  if (kind === 'bar') {
+    const bw = Math.max(1, Math.min(18, chartW / n - 2));
+    body = values.map((v, i) => `<rect x="${x(i) - bw / 2}" y="${y(v)}" width="${bw}" height="${padT + chartH - y(v)}" fill="var(--accent, #2563eb)" opacity="0.75">${title(i)}</rect>`).join('');
+  } else {
+    const points = values.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+    const area = `${padL},${padT + chartH} ${points} ${padL + chartW},${padT + chartH}`;
+    const dots = n > 60 ? '' : values.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="var(--accent, #2563eb)">${title(i)}</circle>`).join('');
+    body = `<polygon points="${area}" fill="var(--accent, #2563eb)" opacity="0.08"/>
+      <polyline points="${points}" fill="none" stroke="var(--accent, #2563eb)" stroke-width="2"/>${dots}`;
+  }
+
+  wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;background:var(--white);border:1px solid var(--border);border-radius:8px">
+    ${gridLines}${body}${xLabels}</svg>`;
 }
 
 async function loadPendingSubmissions() {
