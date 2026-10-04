@@ -20,7 +20,7 @@
 
 <div class="legal-page">
   <h1>Politique de confidentialité</h1>
-  <p class="legal-updated">Dernière mise à jour : 28/06/2026</p>
+  <p class="legal-updated">Dernière mise à jour : 04/10/2026</p>
 
   <p>
     Cette politique décrit quelles données personnelles sont collectées sur Buy-inner (www.buy-inner.com),
@@ -29,60 +29,80 @@
   </p>
 
   <h2>1. Données collectées</h2>
-  <p>Le site collecte des données personnelles uniquement lorsque vous les fournissez volontairement, dans les cas suivants :</p>
+  <p>Le site collecte des données personnelles dans les cas suivants :</p>
   <ul>
-    <li><strong>Demande de devis</strong> (formulaire « Demander un devis ») : nom, email professionnel, entreprise, description du besoin. Ces informations sont transmises par email au responsable du site (via le service tiers Web3Forms) puis relayées au fournisseur concerné s'il accepte le contact.</li>
+    <li><strong>Compte acheteur</strong> (page « Mon compte ») : nom, email, entreprise et mot de passe. Le mot de passe est géré par le service d'authentification Supabase, qui n'en conserve qu'une empreinte chiffrée ; l'éditeur n'y a pas accès. Les demandes de devis envoyées depuis un compte sont rattachées à ce compte, ce qui permet d'en afficher l'historique.</li>
+    <li><strong>Demande de devis</strong> (formulaire « Demander un devis ») : nom, email professionnel, entreprise, description du besoin, ainsi que le fournisseur et le produit visés. Ces informations sont enregistrées dans notre base de données et transmises par email au responsable du site (via le service tiers Web3Forms), puis relayées au fournisseur concerné s'il accepte le contact.</li>
     <li><strong>Référencement d'une fiche fournisseur</strong> (formulaire « Référencer mon entreprise ») : informations sur l'entreprise et ses produits, ainsi que l'email du soumissionnaire.</li>
-    <li><strong>Espace fournisseur</strong> (connexion, revendication de fiche) : email utilisateur, associé à la fiche entreprise concernée.</li>
-    <li><strong>Mesure d'audience anonyme</strong> : à chaque page visitée, la page consultée, la page d'origine (referrer) et le user-agent du navigateur sont enregistrés à des fins statistiques internes. Aucune adresse IP n'est stockée, et aucun cookie de suivi n'est déposé pour cette mesure.</li>
+    <li><strong>Espace fournisseur</strong> (connexion, revendication de fiche, abonnement Premium) : email utilisateur, associé à la fiche entreprise concernée. En cas d'abonnement Premium, le paiement est réalisé sur la page sécurisée de Stripe : l'éditeur ne voit ni ne conserve votre numéro de carte bancaire et reçoit uniquement l'état de l'abonnement.</li>
+    <li><strong>Emails de service</strong> (confirmation de soumission, publication de fiche, revendication approuvée) : votre adresse email est transmise à notre prestataire d'envoi (Resend) pour acheminer ces messages.</li>
+    <li><strong>Mesure d'audience interne</strong> : à chaque page visitée, la page consultée, la page d'origine (referrer) et le user-agent du navigateur sont enregistrés à des fins statistiques. Aucune adresse IP n'est stockée dans cette base.</li>
+    <li><strong>Mesure d'audience Google Analytics 4</strong> : le site charge Google Analytics 4 sur l'ensemble de ses pages. Google dépose des cookies (<code>_ga</code> et <code>_ga_*</code>) et traite des données de navigation (pages vues, durée, type d'appareil, pays, source de trafic, adresse IP) pour produire des statistiques. Les événements de parcours liés au compte gratuit (affichage d'un verrou, inscription) sont également mesurés.</li>
   </ul>
-  <p>
-    Le site n'utilise pas de cookies publicitaires ou de traceurs tiers. Un identifiant de session technique
-    (sessionStorage, supprimé à la fermeture du navigateur) est utilisé uniquement pour maintenir la connexion
-    d'un compte fournisseur ou administrateur pendant la session de navigation.
-  </p>
 
-  <h2>2. Finalités du traitement</h2>
+  <h2>2. Cookies et stockage dans le navigateur</h2>
   <ul>
+    <li><strong>Cookies Google Analytics</strong> (<code>_ga</code>, <code>_ga_*</code>) : mesure d'audience, durée de vie pouvant aller jusqu'à 2 ans. Vous pouvez vous y opposer avec le <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">module de désactivation de Google Analytics</a> ou en bloquant ces cookies dans votre navigateur.</li>
+    <li><strong>Stockage local (localStorage)</strong> : la session du compte acheteur (jetons de connexion, identifiant) est conservée dans votre navigateur jusqu'à la déconnexion, afin de ne pas vous redemander vos identifiants ; la langue choisie y est aussi mémorisée.</li>
+    <li><strong>Stockage de session (sessionStorage)</strong> : un identifiant de session technique, supprimé à la fermeture du navigateur, maintient la connexion d'un compte fournisseur ou administrateur pendant la navigation.</li>
+  </ul>
+  <p>Le site n'utilise pas de cookies publicitaires.</p>
+
+  <h2>3. Finalités du traitement</h2>
+  <ul>
+    <li>Créer et gérer votre compte acheteur, et vous donner accès aux informations détaillées des fiches et à la carte des fournisseurs</li>
     <li>Mettre en relation un acheteur avec un fournisseur référencé, à la demande explicite de l'acheteur</li>
-    <li>Traiter les demandes de référencement et de revendication de fiche entreprise</li>
-    <li>Mesurer l'audience du site de façon agrégée et anonyme, pour piloter son développement</li>
+    <li>Traiter les demandes de référencement, de revendication de fiche et d'abonnement Premium</li>
+    <li>Envoyer les emails de service liés à ces opérations</li>
+    <li>Mesurer l'audience du site pour piloter son développement</li>
   </ul>
 
-  <h2>3. Base légale</h2>
+  <h2>4. Base légale</h2>
   <p>
-    Les traitements liés aux formulaires (devis, référencement, revendication) reposent sur votre consentement
-    explicite au moment de l'envoi du formulaire. La mesure d'audience anonyme repose sur l'intérêt légitime de
-    l'éditeur à comprendre l'usage du site, sans constituer un profilage individuel (les données collectées ne
-    permettent pas d'identifier un visiteur précis).
+    La création de compte, les demandes de devis, le référencement, la revendication et l'abonnement reposent sur
+    l'exécution du service que vous demandez et, pour les formulaires, sur votre consentement explicite au moment
+    de l'envoi. La mesure d'audience repose sur l'intérêt légitime de l'éditeur à comprendre l'usage du site ;
+    vous pouvez vous y opposer à tout moment (voir les sections 2 et 7).
   </p>
 
-  <h2>4. Destinataires et sous-traitants</h2>
+  <h2>5. Destinataires et sous-traitants</h2>
   <p>Les données peuvent être transmises aux prestataires techniques suivants, dans la stricte mesure nécessaire au fonctionnement du site :</p>
   <ul>
-    <li><strong>Supabase Inc.</strong> — hébergement de la base de données et de l'authentification</li>
-    <li><strong>Web3Forms</strong> — service tiers utilisé pour l'envoi des emails de demande de devis</li>
+    <li><strong>Supabase Inc.</strong> — base de données et authentification</li>
+    <li><strong>Cloudflare, Inc.</strong> — relais technique des requêtes entre le site et la base de données (Cloudflare Workers)</li>
     <li><strong>GitHub Pages (GitHub Inc.)</strong> — hébergement du site statique</li>
+    <li><strong>Web3Forms</strong> — envoi des emails de demande de devis</li>
+    <li><strong>Resend</strong> — envoi des emails de service</li>
+    <li><strong>Stripe</strong> — paiement de l'abonnement Premium</li>
+    <li><strong>Google LLC</strong> — Google Analytics 4 et polices Google Fonts</li>
+    <li><strong>Logo.dev</strong> — affichage des logos d'entreprises, à partir du nom de domaine de l'entreprise concernée</li>
+    <li><strong>CARTO / OpenStreetMap</strong> et <strong>unpkg</strong> — fonds de carte et bibliothèque d'affichage de la carte des fournisseurs</li>
   </ul>
-  <p>Aucune donnée n'est vendue ni partagée à des fins publicitaires.</p>
-
-  <h2>5. Durée de conservation</h2>
   <p>
-    Les données liées à une demande de devis ou à une soumission de fiche sont conservées le temps nécessaire à
-    leur traitement, puis archivées ou supprimées. Les données de mesure d'audience anonyme sont conservées
-    13 mois maximum.
+    Lors de l'affichage d'une page, certains de ces prestataires (polices, logos, fonds de carte, bibliothèques)
+    reçoivent techniquement l'adresse IP de votre navigateur. Plusieurs sont établis aux États-Unis ; les transferts
+    de données hors de l'Union européenne reposent, selon les cas, sur le cadre de protection des données UE–États-Unis
+    ou sur des clauses contractuelles types. Aucune donnée n'est vendue ni partagée à des fins publicitaires.
   </p>
 
-  <h2>6. Vos droits</h2>
+  <h2>6. Durée de conservation</h2>
+  <ul>
+    <li><strong>Compte acheteur</strong> : jusqu'à la suppression du compte à votre demande.</li>
+    <li><strong>Demandes de devis et soumissions de fiche</strong> : le temps nécessaire à leur traitement, puis archivées ou supprimées.</li>
+    <li><strong>Mesure d'audience</strong> : 13 mois maximum (base interne), 14 mois maximum (Google Analytics).</li>
+    <li><strong>Données de facturation</strong> : conservées selon les durées légales applicables.</li>
+  </ul>
+
+  <h2>7. Vos droits</h2>
   <p>
     Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés,
-    vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et d'opposition concernant
-    vos données personnelles. Vous pouvez exercer ces droits en écrivant à
+    vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, de portabilité et d'opposition
+    concernant vos données personnelles, y compris la suppression de votre compte acheteur. Vous pouvez exercer ces droits en écrivant à
     <a href="mailto:contact@buy-inner.com">contact@buy-inner.com</a>. Vous disposez également du droit d'introduire
     une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>).
   </p>
 
-  <h2>7. Modifications</h2>
+  <h2>8. Modifications</h2>
   <p>
     Cette politique peut être mise à jour pour refléter l'évolution du site ou de la réglementation. La date de
     dernière mise à jour figure en haut de cette page.

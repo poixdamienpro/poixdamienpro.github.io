@@ -20,7 +20,7 @@
 
 <div class="legal-page">
   <h1>Privacy Policy</h1>
-  <p class="legal-updated">Last updated: 28/06/2026</p>
+  <p class="legal-updated">Last updated: 04/10/2026</p>
 
   <p>
     This policy describes what personal data is collected on Buy-inner (www.buy-inner.com), why, and how to
@@ -29,59 +29,80 @@
   </p>
 
   <h2>1. Data collected</h2>
-  <p>The site collects personal data only when you provide it voluntarily, in the following cases:</p>
+  <p>The site collects personal data in the following cases:</p>
   <ul>
-    <li><strong>Quote request</strong> (“Request a quote” form): name, business email, company, description of your need. This information is sent by email to the site manager (via the third-party service Web3Forms) and then passed on to the supplier concerned if they accept the contact.</li>
+    <li><strong>Buyer account</strong> (“My account” page): name, email, company and password. The password is handled by the Supabase authentication service, which keeps only an encrypted hash of it; the publisher has no access to it. Quote requests sent from an account are linked to that account, which makes it possible to show their history.</li>
+    <li><strong>Quote request</strong> (“Request a quote” form): name, business email, company, description of your need, and the supplier and product concerned. This information is saved in our database and sent by email to the site manager (via the third-party service Web3Forms), then passed on to the supplier concerned if they accept the contact.</li>
     <li><strong>Listing a supplier profile</strong> (“List my company” form): information about the company and its products, and the submitter's email.</li>
-    <li><strong>Supplier area</strong> (login, listing claim): user email, linked to the company listing concerned.</li>
-    <li><strong>Anonymous audience measurement</strong>: for each page visited, the page viewed, the referring page (referrer) and the browser user-agent are recorded for internal statistical purposes. No IP address is stored, and no tracking cookie is set for this measurement.</li>
+    <li><strong>Supplier area</strong> (login, listing claim, Premium subscription): user email, linked to the company listing concerned. For a Premium subscription, payment is made on Stripe's secure page: the publisher neither sees nor stores your card number and receives only the subscription status.</li>
+    <li><strong>Service emails</strong> (submission confirmation, listing published, claim approved): your email address is passed to our email delivery provider (Resend) to send these messages.</li>
+    <li><strong>Internal audience measurement</strong>: for each page visited, the page viewed, the referring page (referrer) and the browser user-agent are recorded for statistical purposes. No IP address is stored in this database.</li>
+    <li><strong>Google Analytics 4 audience measurement</strong>: the site loads Google Analytics 4 on all its pages. Google sets cookies (<code>_ga</code> and <code>_ga_*</code>) and processes browsing data (page views, duration, device type, country, traffic source, IP address) to produce statistics. Journey events linked to the free account (a lock being shown, sign-up) are also measured.</li>
   </ul>
-  <p>
-    The site does not use advertising cookies or third-party trackers. A technical session identifier
-    (sessionStorage, deleted when the browser is closed) is used solely to keep a supplier or administrator
-    account logged in during the browsing session.
-  </p>
 
-  <h2>2. Purposes of processing</h2>
+  <h2>2. Cookies and browser storage</h2>
   <ul>
+    <li><strong>Google Analytics cookies</strong> (<code>_ga</code>, <code>_ga_*</code>): audience measurement, lifetime of up to 2 years. You can object using the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics opt-out browser add-on</a> or by blocking these cookies in your browser.</li>
+    <li><strong>Local storage (localStorage)</strong>: the buyer account session (login tokens, identifier) is kept in your browser until you log out, so that you are not asked for your credentials again; the language you chose is also remembered there.</li>
+    <li><strong>Session storage (sessionStorage)</strong>: a technical session identifier, deleted when the browser is closed, keeps a supplier or administrator account logged in while you browse.</li>
+  </ul>
+  <p>The site does not use advertising cookies.</p>
+
+  <h2>3. Purposes of processing</h2>
+  <ul>
+    <li>Create and manage your buyer account, and give you access to the detailed information on listings and to the supplier map</li>
     <li>Connect a buyer with a listed supplier, at the buyer's explicit request</li>
-    <li>Process requests to list a company and to claim a company listing</li>
-    <li>Measure site audience in an aggregated, anonymous way, to guide its development</li>
+    <li>Process requests to list a company, to claim a listing and to subscribe to Premium</li>
+    <li>Send the service emails linked to these operations</li>
+    <li>Measure site audience to guide its development</li>
   </ul>
 
-  <h2>3. Legal basis</h2>
+  <h2>4. Legal basis</h2>
   <p>
-    Processing linked to forms (quote, listing, claim) is based on your explicit consent at the time the form
-    is submitted. Anonymous audience measurement is based on the publisher's legitimate interest in
-    understanding how the site is used, and does not constitute individual profiling (the data collected does
-    not make it possible to identify a specific visitor).
+    Account creation, quote requests, listing, claims and subscriptions are based on performing the service you
+    request and, for forms, on your explicit consent when the form is submitted. Audience measurement is based on
+    the publisher's legitimate interest in understanding how the site is used; you may object at any time (see
+    sections 2 and 7).
   </p>
 
-  <h2>4. Recipients and processors</h2>
+  <h2>5. Recipients and processors</h2>
   <p>Data may be transmitted to the following technical providers, strictly to the extent necessary for the site to operate:</p>
   <ul>
-    <li><strong>Supabase Inc.</strong> — hosting of the database and authentication</li>
-    <li><strong>Web3Forms</strong> — third-party service used to send quote-request emails</li>
+    <li><strong>Supabase Inc.</strong> — database and authentication</li>
+    <li><strong>Cloudflare, Inc.</strong> — technical relay of requests between the site and the database (Cloudflare Workers)</li>
     <li><strong>GitHub Pages (GitHub Inc.)</strong> — hosting of the static site</li>
+    <li><strong>Web3Forms</strong> — sending of quote-request emails</li>
+    <li><strong>Resend</strong> — sending of service emails</li>
+    <li><strong>Stripe</strong> — payment of the Premium subscription</li>
+    <li><strong>Google LLC</strong> — Google Analytics 4 and Google Fonts</li>
+    <li><strong>Logo.dev</strong> — display of company logos, based on the domain name of the company concerned</li>
+    <li><strong>CARTO / OpenStreetMap</strong> and <strong>unpkg</strong> — map tiles and display library for the supplier map</li>
   </ul>
-  <p>No data is sold or shared for advertising purposes.</p>
-
-  <h2>5. Retention period</h2>
   <p>
-    Data linked to a quote request or a listing submission is kept for as long as necessary to process it, then
-    archived or deleted. Anonymous audience measurement data is kept for 13 months at most.
+    When a page is displayed, some of these providers (fonts, logos, map tiles, libraries) technically receive
+    your browser's IP address. Several are based in the United States; transfers of data outside the European
+    Union rely, as the case may be, on the EU–US Data Privacy Framework or on standard contractual clauses. No
+    data is sold or shared for advertising purposes.
   </p>
 
-  <h2>6. Your rights</h2>
+  <h2>6. Retention period</h2>
+  <ul>
+    <li><strong>Buyer account</strong>: until the account is deleted at your request.</li>
+    <li><strong>Quote requests and listing submissions</strong>: as long as necessary to process them, then archived or deleted.</li>
+    <li><strong>Audience measurement</strong>: 13 months at most (internal database), 14 months at most (Google Analytics).</li>
+    <li><strong>Billing data</strong>: kept for the applicable statutory periods.</li>
+  </ul>
+
+  <h2>7. Your rights</h2>
   <p>
     In accordance with the General Data Protection Regulation (GDPR) and the French Data Protection Act, you
-    have the right to access, rectify, erase, restrict and object to the processing of your personal data. You
-    can exercise these rights by writing to
+    have the right to access, rectify, erase, restrict, port and object to the processing of your personal data,
+    including deletion of your buyer account. You can exercise these rights by writing to
     <a href="mailto:contact@buy-inner.com">contact@buy-inner.com</a>. You also have the right to lodge a
     complaint with the CNIL, the French data protection authority (<a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>).
   </p>
 
-  <h2>7. Changes</h2>
+  <h2>8. Changes</h2>
   <p>
     This policy may be updated to reflect changes to the site or to the regulations. The date of the last
     update appears at the top of this page.
