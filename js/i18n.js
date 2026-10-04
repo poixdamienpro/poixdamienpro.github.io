@@ -1176,6 +1176,12 @@ function applyLang() {
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
     if (val !== undefined) el.setAttribute('aria-label', val);
   });
+  // Liens qui pointent vers une page dédiée en anglais (ex. pages légales du
+  // pied de page) : data-href-en remplace le href tant que la langue est EN.
+  document.querySelectorAll('[data-href-en]').forEach(el => {
+    if (!el.dataset.hrefFr) el.dataset.hrefFr = el.getAttribute('href');
+    el.setAttribute('href', lang === 'en' ? el.dataset.hrefEn : el.dataset.hrefFr);
+  });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];
