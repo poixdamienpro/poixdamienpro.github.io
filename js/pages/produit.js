@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) {
-    document.getElementById('prod-body').innerHTML = '<p style="color:#C0392B">Fiche introuvable — identifiant manquant dans l\'URL.</p>';
+    document.getElementById('prod-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_noid')}</p>`;
     return;
   }
   try {
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   } catch (err) {
     console.error('Erreur chargement fiche produit:', err);
-    document.getElementById('prod-body').innerHTML = '<p style="color:#C0392B">Cette fiche produit n\'existe pas ou plus.</p>';
+    document.getElementById('prod-body').innerHTML = `<p style="color:#C0392B">${t('prod_err_gone')}</p>`;
   }
 });
 

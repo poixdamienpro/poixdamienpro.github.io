@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) {
-    document.getElementById('ent-body').innerHTML = '<p style="color:#C0392B">Fiche introuvable — identifiant manquant dans l\'URL.</p>';
+    document.getElementById('ent-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_noid')}</p>`;
     return;
   }
   try {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     logEntityView({ type: 'company', companyId: c.id, companyName: c.name, industry: c.industry });
   } catch (err) {
     console.error('Erreur chargement fiche entreprise:', err);
-    document.getElementById('ent-body').innerHTML = '<p style="color:#C0392B">Cette fiche entreprise n\'existe pas ou plus.</p>';
+    document.getElementById('ent-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_gone')}</p>`;
   }
 });
 
