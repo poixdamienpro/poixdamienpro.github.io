@@ -61,6 +61,7 @@ function groupOfCat(cat) {
 let charFilters = {};
 
 const AXIS_LABELS = { electrique: 'Électrique', mecanique: 'Mécanique', environnemental: 'Environnemental' };
+const axisLabel = a => (getLang() === 'en' && AXIS_LABEL_EN[a]) || AXIS_LABELS[a] || a;
 
 // Filtres catégoriels (cases à cocher, pas une plage numérique) — voir
 // backend/supabase_add_product_tags_2026_09.sql. "Qualification" réutilise
@@ -232,8 +233,8 @@ function renderCharFilters() {
     wrap.innerHTML = `
       <div class="sidebar-divider"></div>
       <div class="sidebar-section">
-        <div class="sidebar-label">Caractéristiques</div>
-        <p class="char-filters-hint">Choisissez une catégorie précise ci-dessus pour filtrer par tension, masse, température…</p>
+        <div class="sidebar-label">${t('cat_char_title')}</div>
+        <p class="char-filters-hint">${t('cat_char_hint')}</p>
       </div>`;
     return;
   }
@@ -249,7 +250,7 @@ function renderCharFilters() {
   wrap.innerHTML = Object.keys(byAxis).map(axis => `
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
-      <div class="sidebar-label">${AXIS_LABELS[axis] || axis}</div>
+      <div class="sidebar-label">${axisLabel(axis)}</div>
       ${byAxis[axis].map(key => {
         const b = bounds[key];
         const cur = charFilters[key] || { min: b.dataMin, max: b.dataMax };
@@ -257,7 +258,7 @@ function renderCharFilters() {
         return `
         <div class="range-filter" data-char="${key}">
           <div class="range-filter-head">
-            <span>${b.label} (${b.unit})</span>
+            <span>${charLabel(b.label)} (${b.unit})</span>
             <span class="range-filter-vals"><span class="rf-min">${fmtCharVal(cur.min)}</span> – <span class="rf-max">${fmtCharVal(cur.max)}</span></span>
           </div>
           <div class="range-track">
@@ -331,7 +332,7 @@ function renderTagFilters() {
         ${values.map(v => `
           <label class="tag-filter-item">
             <input type="checkbox" value="${v}" ${tagFilters[g.key].has(v) ? 'checked' : ''}>
-            <span>${v}</span>
+            <span>${g.key === 'qualification' ? certLabel(v) : v}</span>
             <span class="tag-filter-count">${counts[v]}</span>
           </label>`).join('')}
       </div>
@@ -430,11 +431,11 @@ function renderProductPreview(p) {
 
   const certs = (p.certs || []).length ? `
     <div class="dp-section-label">${_t('prod_certs')}</div>
-    <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+escapeHtml(c)+'</span>').join('')}</div>` : '';
+    <div class="cert-row" style="margin-bottom:14px">${p.certs.map(c => '<span class="tag tag-sage">'+escapeHtml(certLabel(c))+'</span>').join('')}</div>` : '';
 
   el.innerHTML = `
     <div class="dir-preview-card">
-      <button class="dir-close" aria-label="Fermer l'aperçu">✕</button>
+      <button class="dir-close" aria-label="${t('close_preview')}">✕</button>
       <div class="dp-head">
         <div class="dp-logo">${p.image ? `<img src="${escapeHtml(p.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>` : escapeHtml(p.icon)}</div>
         <div style="min-width:0">
@@ -448,7 +449,7 @@ function renderProductPreview(p) {
       <table class="spec-table"><tbody>${specs}</tbody></table>
       ${bars}
       ${certs}
-      <div class="dp-price"><span class="price-tag">💰 ${escapeHtml(p.price)}</span></div>
+      <div class="dp-price"><span class="price-tag">💰 ${escapeHtml(priceLabel(p.price))}</span></div>
       <div class="dp-actions">
         <a class="btn-fiche" href="${entityUrl('product', p.id)}">${_t('btn_view_profile')}</a>
         ${p.datasheetUrl ? `<a class="btn-datasheet-dark" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">📄 Datasheet</a>` : ''}
@@ -481,6 +482,7 @@ function onCatSearchInput() {
 // data-i18n. Garde sur catCurrentId : ne s'exécute qu'une fois une fiche
 // déjà sélectionnée (donc PRODUCTS forcément déjà chargé à ce stade).
 function onLangChange() {
+  if (typeof renderCharFilters === 'function' && PRODUCTS.length) { renderCharFilters(); renderTagFilters(); }
   if (!catCurrentId) return;
   const p = PRODUCTS.find(x => x.id === catCurrentId);
   if (p) renderProductPreview(p);

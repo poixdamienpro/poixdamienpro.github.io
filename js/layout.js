@@ -157,7 +157,8 @@ function closeModal(id) {
 }
 
 function initTicker() {
-  const text = TICKER_ITEMS.join('   ·   ');
+  const items = (typeof getLang === 'function' && getLang() === 'en') ? TICKER_ITEMS_EN : TICKER_ITEMS;
+  const text = items.join('   ·   ');
   const el = document.getElementById('tickerText');
   if (el) el.textContent = text + '     ' + text;
 }

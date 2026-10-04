@@ -176,6 +176,9 @@ const TRANSLATIONS = {
     map_gate_cta_t:      'Connectez-vous pour accéder gratuitement à la carte',
     map_gate_cta_p:      'La création d\'un compte est gratuite et prend moins d\'une minute.',
     map_gate_note:       'Illustration — les positions réelles sont visibles une fois connecté.',
+    cat_char_title: 'Caractéristiques',
+    cat_char_hint: 'Choisissez une catégorie précise ci-dessus pour filtrer par tension, masse, température…',
+    close_preview: 'Fermer l\'aperçu',
     ann_count_one: 'entreprise',
     ann_count_many: 'entreprises',
     cat_count_one: 'produit',
@@ -763,6 +766,9 @@ const TRANSLATIONS = {
     map_gate_cta_t:      'Log in to access the map for free',
     map_gate_cta_p:      'Creating an account is free and takes less than a minute.',
     map_gate_note:       'Illustration — real locations are shown once you are logged in.',
+    cat_char_title: 'Characteristics',
+    cat_char_hint: 'Pick a specific category above to filter by voltage, mass, temperature…',
+    close_preview: 'Close preview',
     ann_count_one: 'company',
     ann_count_many: 'companies',
     cat_count_one: 'product',
@@ -1353,6 +1359,75 @@ function countryLabel(s) {
   return s.replace(COUNTRY_EN_RE, n => COUNTRY_EN[n]);
 }
 
+// Libellés de filtres (caractéristiques normalisées), certifications FR et prix :
+// affichage seulement, la valeur d'origine reste la clé de filtre.
+const CHAR_LABEL_EN = {
+  'Tension': 'Voltage',
+  'Consommation': 'Power consumption',
+  'Masse': 'Mass',
+  'Tolérance radiations': 'Radiation tolerance',
+  'Durée de vie': 'Lifetime',
+  'Fréquence': 'Frequency',
+  'Champ de vue': 'Field of view',
+  'Puissance': 'Power',
+  'Rendement': 'Efficiency',
+  'Tension entrée': 'Input voltage',
+  'Température': 'Temperature',
+  'Couple': 'Torque',
+  'Énergie': 'Energy',
+  'Tension sortie': 'Output voltage',
+  'Cycle de vie': 'Cycle life',
+  'Capacité': 'Capacity',
+  'Pression': 'Pressure',
+  'Vitesse': 'Speed',
+  'Courant': 'Current',
+  'Énergie spécifique': 'Specific energy',
+  'Courant entrée': 'Input current',
+};
+const AXIS_LABEL_EN = { electrique: 'Electrical', mecanique: 'Mechanical', environnemental: 'Environmental' };
+const CERT_EN = {
+  'Volé sur mission lunaire NASA CLPS': 'Flown on NASA CLPS lunar mission',
+  'Isolation galvanique complète': 'Full galvanic isolation',
+  'Conforme standard ESA ADHA': 'ESA ADHA standard compliant',
+  'Volé sur mission SWOT (NASA/CNES)': 'Flown on SWOT mission (NASA/CNES)',
+  'Conforme standard ESA TMTC PUS': 'ESA TMTC PUS standard compliant',
+  'Compatible déploiement cloud': 'Cloud deployment compatible',
+  'ESA qualifié': 'ESA qualified',
+  'Ariane 6 héritage': 'Ariane 6 heritage',
+  'Ariane 6 qualifie': 'Ariane 6 qualified',
+  'Héritage de vol confirmé': 'Confirmed flight heritage',
+  'Qualifié vol': 'Flight-qualified',
+  'ISO qualité': 'ISO quality',
+  'En cours de qualification': 'Qualification in progress',
+  'Blindage magnétique mu-métal': 'Mu-metal magnetic shielding',
+  'Qualifié vol habité (ISS)': 'Human-flight qualified (ISS)',
+  'Développé, vérifié et livré pour JAXA/CNES MMX': 'Developed, verified and delivered for JAXA/CNES MMX',
+  'Volé sur la constellation Iridium NEXT (66+ satellites)': 'Flown on the Iridium NEXT constellation (66+ satellites)',
+  'NASA qualifié': 'NASA qualified',
+  'Gamme SubConn (standard de référence subsea)': 'SubConn range (subsea reference standard)',
+  'Système entièrement électrique': 'All-electric system',
+  'Plus de 200 satellites en orbite': 'More than 200 satellites in orbit',
+  'Volé sur ESA CryoSat-2': 'Flown on ESA CryoSat-2',
+  'Qualifié vol ESA (multiples missions)': 'ESA flight-qualified (multiple missions)',
+  'Compatible objectifs de réduction CO2 2030': 'Compatible with 2030 CO2 reduction targets',
+  'Equipe les véhicules certifiés niveau d\'autonomie 3': 'Equips vehicles certified for level 3 autonomy',
+  'Conforme normes ferroviaires et défense': 'Compliant with rail and defense standards',
+};
+const charLabel = l => (getLang() === 'en' && CHAR_LABEL_EN[l]) || l;
+const certLabel = c => (getLang() === 'en' && CERT_EN[c]) || c;
+// Prix libre (« Sur devis », « ~80 € / u », « 1 690 € HT »…) : traduit les mots
+// courants et convertit le format des nombres quand la langue est l'anglais.
+function priceLabel(s) {
+  if (getLang() !== 'en' || !s) return s || '';
+  return String(s)
+    .replace(/Sur devis/gi, 'On request')
+    .replace(/\bHT\b/g, 'excl. VAT')
+    .replace(/\/ u\b/g, '/ unit')
+    .replace(/mod[eè]le de base/gi, 'base model')
+    .replace(/(\d),(\d)/g, '$1.$2')
+    .replace(/(\d) (\d{3})(?!\d)/g, '$1,$2');
+}
+
 function applyLang() {
   const lang = getLang();
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1389,6 +1464,7 @@ function applyLang() {
   // Re-rendu du contenu dynamique (liste entreprises / produits) — chaque
   // page définit la fonction qui la concerne, les autres restent undefined.
   if (typeof relabelChips === 'function') relabelChips();
+  if (typeof initTicker === 'function') initTicker();
   if (typeof renderCompanies === 'function') renderCompanies();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderSystemiers === 'function') renderSystemiers();

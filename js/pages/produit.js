@@ -64,7 +64,7 @@ function renderProduct(p) {
           <div class="bar-labels"><span>${escapeHtml(b.l)}</span><span style="font-weight:700">${escapeHtml(b.v)}%</span></div>
           <div class="bar-track"><div class="bar-fill" style="width:${escapeHtml(b.v)}%;background:${escapeHtml(b.c)}"></div></div>
         </div>`).join('') : ''}
-      ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + escapeHtml(c) + '</span>').join('')}</div>` : ''}
+      ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + escapeHtml(certLabel(c)) + '</span>').join('')}</div>` : ''}
     </div>
     ${loggedIn ? '' : lockBoxHtml(hiddenSpecs ? `+${hiddenSpecs} ${t('lock_more_specs')}` : '')}
     <div class="modal-actions">
@@ -73,7 +73,7 @@ function renderProduct(p) {
         ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>`
         : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_datasheet')}</a>`) : ''}
       ${loggedIn
-        ? `<button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(p.price)}</button>`
+        ? `<button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(priceLabel(p.price))}</button>`
         : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_quote')}</a>`}
     </div>
   `;

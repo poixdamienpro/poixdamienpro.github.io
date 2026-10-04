@@ -65,7 +65,9 @@ function renderCompany(c, products) {
   const industryLabel = c.industries.map(taxLabel).join(' & ');
   document.title = `${c.name} — ${industryLabel} — Buy-inner`;
   const metaDesc = document.querySelector('meta[name="description"]');
-  const metaFallback = isPrestataire ? `${c.name}, prestataire de services ${industryLabel}` : `${c.name}, équipementier ${industryLabel}`;
+  const metaFallback = getLang() === 'en'
+    ? (isPrestataire ? `${c.name}, ${industryLabel} service provider` : `${c.name}, ${industryLabel} equipment manufacturer`)
+    : (isPrestataire ? `${c.name}, prestataire de services ${industryLabel}` : `${c.name}, équipementier ${industryLabel}`);
   if (metaDesc) metaDesc.setAttribute('content', (localize(c.desc, c.descEn) || metaFallback).slice(0, 160));
 
   document.getElementById('ent-header').innerHTML = `
@@ -121,7 +123,7 @@ function renderCompany(c, products) {
           <a class="modal-prod-card" href="${entityUrl('product', p.id)}" style="text-decoration:none;color:inherit;display:block">
             <div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div>
             ${loggedIn ? `<div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => escapeHtml(localize(s.l, s.lEn)) + ' : ' + escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div>` : ''}
-            <div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div>
+            <div class="modal-prod-price">💰 ${escapeHtml(priceLabel(p.price))}</div>
           </a>`).join('')}
       </div>
     </div>` : ''}
