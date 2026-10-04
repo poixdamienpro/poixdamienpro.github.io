@@ -32,6 +32,7 @@ const TRANSLATIONS = {
     footer_supplier:     'Devenir fournisseur',
     footer_legal:        'Mentions légales',
     footer_privacy:      'Politique de confidentialité',
+    footer_cookies:      'Gérer les cookies',
 
     // Index HUD
     hud_tagline:         'SOURCER EN MINUTES, PAS EN SEMAINES',
@@ -587,6 +588,7 @@ const TRANSLATIONS = {
     footer_supplier:     'Become a supplier',
     footer_legal:        'Legal notice',
     footer_privacy:      'Privacy policy',
+    footer_cookies:      'Cookie settings',
 
     // Index HUD
     hud_tagline:         'SOURCE IN MINUTES, NOT WEEKS',

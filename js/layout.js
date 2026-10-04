@@ -19,6 +19,8 @@ async function loadLayout() {
     footerSlot.innerHTML = footerHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
     const yearEl = document.getElementById('footer-year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
+    const ckEl = document.getElementById('footer-cookies');
+    if (ckEl && typeof window.biCookieSettings === 'function') ckEl.hidden = false;
   }
   markActiveNavLink();
   initTicker();
