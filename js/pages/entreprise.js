@@ -118,7 +118,7 @@ function renderCompany(c, products) {
       <div class="modal-section-title">${isPrestataire ? t('presta_services_label') : t('lbl_products_referenced')}</div>
       <div class="modal-prod-grid">
         ${products.map(p => `
-          <a class="modal-prod-card" href="produit.html?id=${p.id}" style="text-decoration:none;color:inherit;display:block">
+          <a class="modal-prod-card" href="${entityUrl('product', p.id)}" style="text-decoration:none;color:inherit;display:block">
             <div class="modal-prod-name">${escapeHtml(p.icon)} ${escapeHtml(p.name)}</div>
             ${loggedIn ? `<div class="modal-prod-specs">${p.specs.slice(0, 2).map(s => escapeHtml(localize(s.l, s.lEn)) + ' : ' + escapeHtml(localize(s.v, s.vEn))).join(' · ')}</div>` : ''}
             <div class="modal-prod-price">💰 ${escapeHtml(p.price)}</div>

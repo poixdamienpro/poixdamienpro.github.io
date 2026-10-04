@@ -156,7 +156,7 @@ function companyPopupHtml(c, loc, siteLabel) {
       <div class="map-popup-name"><span style="display:inline-flex;width:20px;height:20px;vertical-align:middle;align-items:center;justify-content:center;margin-right:4px;border-radius:5px;background:rgba(0,0,0,.05);overflow:hidden">${companyLogoHtml(c, 20)}</span>${escapeHtml(c.name)}</div>
       <div class="map-popup-loc">${siteLabel ? `<strong>${escapeHtml(siteLabel)}</strong> — ` : ''}${escapeHtml(loc)}</div>
       <div class="map-popup-industry">${c.industries.map(i => escapeHtml(taxLabel(i))).join(', ')}</div>
-      <a class="map-popup-link" href="entreprise.html?id=${encodeURIComponent(c.id)}">${t('map_popup_link')}</a>
+      <a class="map-popup-link" href="${entityUrl('company', c.id)}">${t('map_popup_link')}</a>
     </div>
   `;
 }

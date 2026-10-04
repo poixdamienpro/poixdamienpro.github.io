@@ -15,6 +15,15 @@
 //    eventuellement l'ajoute a la table admins), appele depuis
 //    pages/admin.html. Verifie d'abord que l'appelant est lui-meme
 //    admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
+//  - /en/company.html et /en/product.html : versions anglaises des deux
+//    pages ci-dessous (mêmes données, description_en, catégories/pays
+//    traduits). Une fiche anglaise n'est indexable (robots index,follow +
+//    balises hreflang fr/en/x-default sur les DEUX versions) que si elle
+//    a une description_en ; sinon elle reste noindex et aucune balise
+//    hreflang n'est émise, pour ne jamais présenter à Google une page
+//    « anglaise » qui serait en fait du français.
+//  - /sitemap-en.xml : sitemap dynamique des fiches anglaises traduites
+//    (déclaré dans robots.txt), régénéré à partir de la base (cache 1 h).
 //  - /pages/entreprise.html et /pages/produit.html : injecte le vrai
 //    contenu (nom, description, specs) dans le HTML AVANT de le servir,
 //    pour tout le monde (pas seulement les robots — zero risque de
@@ -40,6 +49,9 @@
 //   www.buy-inner.com/api/*
 //   www.buy-inner.com/pages/entreprise.html*
 //   www.buy-inner.com/pages/produit.html*
+//   www.buy-inner.com/en/company.html*
+//   www.buy-inner.com/en/product.html*
+//   www.buy-inner.com/sitemap-en.xml
 //
 // Cote site : js/data.js doit avoir
 //   const SUPABASE_URL = 'https://www.buy-inner.com/api';
@@ -309,89 +321,267 @@ class SetAttr {
   element(el) { el.setAttribute(this.attr, this.value); }
 }
 
-async function handleEntreprisePage(request, env, ctx) {
+// ── Pré-rendu bilingue ──────────────────────────────────────────────
+// Dictionnaires EN : copie de TAXONOMY_EN / COUNTRY_EN de js/i18n.js — à
+// remettre à jour ici quand une catégorie, une industrie ou un pays est
+// ajouté côté site (sinon le nom français reste affiché, sans casser).
+const TAXONOMY_EN = {
+  'Actionneurs & GNC': 'Actuators & GNC',
+  'Amplificateurs RF': 'RF amplifiers',
+  'Batteries & Stockage': 'Batteries & Storage',
+  'BMS': 'BMS',
+  'Bornes de recharge': 'Charging stations',
+  'Calculateurs embarqués': 'Onboard computers',
+  'Calculateurs embarqués Edge IA': 'Onboard Edge AI computers',
+  'Capteurs & Instrumentation': 'Sensors & Instrumentation',
+  'Capteurs ADAS': 'ADAS sensors',
+  'Cellules accumulateurs': 'Battery cells',
+  'Chargeur embarqué': 'Onboard charger',
+  'Connecteurs sous-marins': 'Underwater connectors',
+  'Contrôle thermique': 'Thermal control',
+  'Convertisseurs & Onduleurs': 'Converters & Inverters',
+  'Câblage & Connecteurs': 'Cabling & Connectors',
+  'Distribution de composants': 'Component distribution',
+  'Drones & UAV': 'Drones & UAVs',
+  'Développement d\'équipements': 'Equipment development',
+  'Essais & qualification': 'Testing & qualification',
+  'Fabrication de faisceaux électriques': 'Wiring harness manufacturing',
+  'Hydrogène & Énergie': 'Hydrogen & Energy',
+  'Impression 3D béton': 'Concrete 3D printing',
+  'Impression 3D métal': 'Metal 3D printing',
+  'Informatique quantique': 'Quantum computing',
+  'Infrastructure SpaceVPX': 'SpaceVPX infrastructure',
+  'Intégration & assemblage système': 'System integration & assembly',
+  'Lanceurs': 'Launch vehicles',
+  'Logiciels & Systèmes MRO': 'MRO software & systems',
+  'Logiciels de cybersécurité': 'Cybersecurity software',
+  'Logiciels de supervision': 'Monitoring software',
+  'MGSE & Outillage sol': 'MGSE & ground tooling',
+  'Manipulateurs sous-marins': 'Underwater manipulators',
+  'Modules batteries': 'Battery modules',
+  'Moteurs & Entraînements': 'Motors & Drives',
+  'Mémoires': 'Memory',
+  'Navigation inertielle': 'Inertial navigation',
+  'Panneaux solaires': 'Solar panels',
+  'Photonique & Optique': 'Photonics & Optics',
+  'Pièces & MRO': 'Parts & MRO',
+  'Plateformes satellites': 'Satellite platforms',
+  'Prestation de talents': 'Contract talent',
+  'Recyclage & Économie circulaire': 'Recycling & Circular economy',
+  'Robotique & Automatisation': 'Robotics & Automation',
+  'Segment sol & opérations': 'Ground segment & operations',
+  'Sous-traitance électronique (EMS)': 'Electronics contract manufacturing (EMS)',
+  'Stockage de données spatiales': 'Space data storage',
+  'Traitement charge utile': 'Payload processing',
+  'Traitement de données': 'Data processing',
+  'Usinage & fabrication mécanique': 'Machining & mechanical manufacturing',
+  'Vannes & Actionneurs': 'Valves & Actuators',
+  'Véhicules': 'Vehicles',
+  'Électrification': 'Electrification',
+  'Battery & stockage d\'énergie': 'Battery & energy storage',
+  'Intelligence embarquée': 'Embedded intelligence',
+  'Capteurs & instrumentation': 'Sensors & instrumentation',
+  'Mobilité': 'Mobility',
+  'Câblage & Connectique': 'Cabling & Connectivity',
+  'Thermique': 'Thermal',
+  'Photonique & Quantique': 'Photonics & Quantum',
+  'Autres': 'Other',
+  'Automobile & Mobilité électrique': 'Automotive & E-mobility',
+  'Aéronautique & Défense': 'Aerospace & Defense',
+  'Ferroviaire': 'Rail',
+  'Industrie & Manufacturing': 'Industry & Manufacturing',
+  'Spatial': 'Space',
+  'Énergie & Utilities': 'Energy & Utilities',
+};
+const COUNTRY_EN = {
+  'Autriche': 'Austria',
+  'Bulgarie': 'Bulgaria',
+  'Suisse': 'Switzerland',
+  'Chine': 'China',
+  'République tchèque': 'Czech Republic',
+  'Allemagne': 'Germany',
+  'Danemark': 'Denmark',
+  'Estonie': 'Estonia',
+  'Espagne': 'Spain',
+  'Royaume-Uni': 'United Kingdom',
+  'Irlande': 'Ireland',
+  'Inde': 'India',
+  'Italie': 'Italy',
+  'Japon': 'Japan',
+  'Corée du Sud': 'South Korea',
+  'Lituanie': 'Lithuania',
+  'Pays-Bas': 'Netherlands',
+  'Norvège': 'Norway',
+  'Nouvelle-Zélande': 'New Zealand',
+  'Pologne': 'Poland',
+  'Suède': 'Sweden',
+  'Slovénie': 'Slovenia',
+  'Slovaquie': 'Slovakia',
+  'Taïwan': 'Taiwan',
+  'États-Unis': 'United States',
+  'Afrique du Sud': 'South Africa',
+};
+const COUNTRY_EN_RE = new RegExp(Object.keys(COUNTRY_EN).join('|'), 'g');
+const taxEn = name => TAXONOMY_EN[name] || name;
+const countryEn = str => String(str || '').replace(COUNTRY_EN_RE, m => COUNTRY_EN[m]);
+
+const ENTITY_PATHS = {
+  company: { fr: '/pages/entreprise.html', en: '/en/company.html' },
+  product: { fr: '/pages/produit.html',    en: '/en/product.html' },
+};
+const entityUrlAbs = (kind, lang, id) => SITE_URL + ENTITY_PATHS[kind][lang] + '?id=' + encodeURIComponent(id);
+const hasEnglish = row => !!(row && row.description_en && String(row.description_en).trim()) && !row.hidden;
+
+function hreflangTags(kind, id) {
+  const fr = escapeHtml(entityUrlAbs(kind, 'fr', id));
+  const en = escapeHtml(entityUrlAbs(kind, 'en', id));
+  return `<link rel="alternate" hreflang="fr" href="${fr}"/><link rel="alternate" hreflang="en" href="${en}"/><link rel="alternate" hreflang="x-default" href="${fr}"/>`;
+}
+
+class AppendHtml {
+  constructor(html) { this.html = html; }
+  element(el) { el.append(this.html, { html: true }); }
+}
+
+// Contenu (titre, description, en-tête, corps) d'une fiche dans une langue.
+// Le français reproduit exactement l'ancien rendu ; l'anglais utilise
+// description_en (repli sur le français si vide) et les libellés traduits.
+function companyContent(c, lang) {
+  const en = lang === 'en';
+  const industry = en ? taxEn(c.industry || '') : (c.industry || '');
+  const country = en ? countryEn(c.country) : (c.country || '');
+  const description = (en && c.description_en) ? c.description_en : (c.description || '');
+  const L = en
+    ? { desc: 'Description', info: 'Company information', founded: 'Founded', employees: 'Employees', sector: 'Sector', hq: 'Headquarters', fallback: `${c.name}, ${industry} equipment manufacturer` }
+    : { desc: 'Description', info: 'Informations société', founded: 'Fondée en', employees: 'Effectifs', sector: 'Secteur', hq: 'Siège', fallback: `${c.name}, équipementier ${industry}` };
+  return {
+    title: `${c.name} — ${industry} — Buy-inner`,
+    desc: (description || L.fallback).slice(0, 160),
+    headerHtml: `<h1 class="page-title">${escapeHtml(c.name)}</h1><p class="page-subtitle">${escapeHtml(country)} · ${escapeHtml(c.hq || '')} — ${escapeHtml(industry)}</p>`,
+    bodyHtml: `
+    <div class="modal-section">
+      <div class="modal-section-title">${L.desc}</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(description)}</p>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">${L.info}</div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">${L.founded}</div><div class="detail-value">${escapeHtml(c.founded || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">${L.employees}</div><div class="detail-value">${escapeHtml(c.employees || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">${L.sector}</div><div class="detail-value">${escapeHtml(industry || '—')}</div></div>
+        <div class="detail-item"><div class="detail-label">${L.hq}</div><div class="detail-value">${escapeHtml(c.hq || '—')}</div></div>
+      </div>
+    </div>`,
+  };
+}
+
+function productContent(p, lang) {
+  const en = lang === 'en';
+  const category = en ? taxEn(p.category || '') : (p.category || '');
+  const industry = en ? taxEn(p.industry || '') : (p.industry || '');
+  const description = (en && p.description_en) ? p.description_en : (p.description || '');
+  const L = en
+    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', fallback: `${p.name} by ${p.company_name || ''}` }
+    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', fallback: `${p.name} par ${p.company_name || ''}` };
+  return {
+    title: `${p.name} — ${p.company_name || ''} — Buy-inner`,
+    desc: (description || L.fallback).slice(0, 160),
+    headerHtml: `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(p.name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(category)} ${industry ? '· ' + escapeHtml(industry) : ''}</p>`,
+    bodyHtml: `
+    <div class="modal-section">
+      <div class="modal-section-title">${L.desc}</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(description)}</p>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">${L.maker}</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.company_name || '')} — <a href="${L.page}?id=${escapeHtml(p.company_id || '')}">${L.link}</a></p>
+    </div>`,
+  };
+}
+
+async function handleEntityPage(kind, lang, request, env, ctx) {
   const url = new URL(request.url);
   const cache = caches.default;
   const cacheKey = new Request(url.toString(), request);
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
-  const originRes = await fetch(GITHUB_PAGES_ORIGIN + '/pages/entreprise.html' + url.search);
+  const originRes = await fetch(GITHUB_PAGES_ORIGIN + ENTITY_PATHS[kind][lang] + url.search);
   const id = url.searchParams.get('id');
   if (!id) return originRes;
 
-  const c = await fetchRpcRow('get_company_by_id', { p_id: id });
-  if (!c) return originRes;
+  const row = await fetchRpcRow(kind === 'company' ? 'get_company_by_id' : 'get_product_by_id', { p_id: id });
+  if (!row) return originRes;
 
-  const title = `${c.name} — ${c.industry || ''} — Buy-inner`;
-  const desc = (c.description || `${c.name}, équipementier ${c.industry || ''}`).slice(0, 160);
-  const headerHtml = `<h1 class="page-title">${escapeHtml(c.name)}</h1><p class="page-subtitle">${escapeHtml(c.country || '')} · ${escapeHtml(c.hq || '')} — ${escapeHtml(c.industry || '')}</p>`;
-  const bodyHtml = `
-    <div class="modal-section">
-      <div class="modal-section-title">Description</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(c.description || '')}</p>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Informations société</div>
-      <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">Fondée en</div><div class="detail-value">${escapeHtml(c.founded || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">Effectifs</div><div class="detail-value">${escapeHtml(c.employees || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">Secteur</div><div class="detail-value">${escapeHtml(c.industry || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">Siège</div><div class="detail-value">${escapeHtml(c.hq || '—')}</div></div>
-      </div>
-    </div>`;
+  const content = (kind === 'company' ? companyContent : productContent)(row, lang);
+  const [headerSel, bodySel] = kind === 'company' ? ['#ent-header', '#ent-body'] : ['#prod-header', '#prod-body'];
+  const translated = hasEnglish(row);
 
-  let response = new HTMLRewriter()
-    .on('title', new SetHtml(escapeHtml(title)))
-    .on('meta[name="description"]', new SetAttr('content', desc))
-    .on('link[rel="canonical"]', new SetAttr('href', `https://www.buy-inner.com/pages/entreprise.html?id=${encodeURIComponent(id)}`))
-    .on('#ent-header', new SetHtml(headerHtml))
-    .on('#ent-body', new SetHtml(bodyHtml))
-    .transform(originRes);
+  let rewriter = new HTMLRewriter()
+    .on('title', new SetHtml(escapeHtml(content.title)))
+    .on('meta[name="description"]', new SetAttr('content', content.desc))
+    .on('link[rel="canonical"]', new SetAttr('href', entityUrlAbs(kind, lang, id)))
+    .on(headerSel, new SetHtml(content.headerHtml))
+    .on(bodySel, new SetHtml(content.bodyHtml));
+  // Version anglaise : indexable seulement si traduite (sinon noindex, déjà
+  // la valeur par défaut de en/company.html et en/product.html).
+  if (lang === 'en') rewriter = rewriter.on('meta[name="robots"]', new SetAttr('content', translated ? 'index,follow' : 'noindex,follow'));
+  // hreflang réciproque sur les deux versions, uniquement si l'anglais existe.
+  if (translated) rewriter = rewriter.on('head', new AppendHtml(hreflangTags(kind, id)));
 
+  let response = rewriter.transform(originRes);
   response = new Response(response.body, response);
   response.headers.set('Cache-Control', 'public, max-age=600');
   ctx.waitUntil(cache.put(cacheKey, response.clone()));
   return response;
 }
 
-async function handleProduitPage(request, env, ctx) {
-  const url = new URL(request.url);
+// Toutes les lignes d'une RPC paginée (plafond serveur de 50 par page).
+async function fetchAllRpc(rpcName) {
+  let all = [];
+  for (let offset = 0; ; offset += 50) {
+    const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/${rpcName}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_limit: 50, p_offset: offset }),
+    });
+    if (!res.ok) throw new Error(`${rpcName}: HTTP ${res.status}`);
+    const page = await res.json();
+    all = all.concat(page);
+    if (page.length < 50) break;
+  }
+  return all;
+}
+
+// Sitemap des fiches anglaises traduites, avec leurs alternates FR.
+async function handleSitemapEn(request, env, ctx) {
   const cache = caches.default;
-  const cacheKey = new Request(url.toString(), request);
+  const cacheKey = new Request(new URL(request.url).toString(), request);
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
-  const originRes = await fetch(GITHUB_PAGES_ORIGIN + '/pages/produit.html' + url.search);
-  const id = url.searchParams.get('id');
-  if (!id) return originRes;
-
-  const p = await fetchRpcRow('get_product_by_id', { p_id: id });
-  if (!p) return originRes;
-
-  const title = `${p.name} — ${p.company_name || ''} — Buy-inner`;
-  const desc = (p.description || `${p.name} par ${p.company_name || ''}`).slice(0, 160);
-  const headerHtml = `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(p.name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(p.category || '')} ${p.industry ? '· ' + escapeHtml(p.industry) : ''}</p>`;
-  const bodyHtml = `
-    <div class="modal-section">
-      <div class="modal-section-title">Description</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.description || '')}</p>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Fabricant</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.company_name || '')} — <a href="entreprise.html?id=${escapeHtml(p.company_id || '')}">Voir la fiche →</a></p>
-    </div>`;
-
-  let response = new HTMLRewriter()
-    .on('title', new SetHtml(escapeHtml(title)))
-    .on('meta[name="description"]', new SetAttr('content', desc))
-    .on('link[rel="canonical"]', new SetAttr('href', `https://www.buy-inner.com/pages/produit.html?id=${encodeURIComponent(id)}`))
-    .on('#prod-header', new SetHtml(headerHtml))
-    .on('#prod-body', new SetHtml(bodyHtml))
-    .transform(originRes);
-
-  response = new Response(response.body, response);
-  response.headers.set('Cache-Control', 'public, max-age=600');
+  let companies, products;
+  try {
+    [companies, products] = await Promise.all([fetchAllRpc('get_companies_page'), fetchAllRpc('get_products_page')]);
+  } catch (err) {
+    return new Response('Sitemap temporarily unavailable', { status: 503 });
+  }
+  const visibleIds = new Set(companies.filter(c => !c.hidden).map(c => c.id));
+  const entry = (kind, id) => {
+    const fr = escapeHtml(entityUrlAbs(kind, 'fr', id));
+    const en = escapeHtml(entityUrlAbs(kind, 'en', id));
+    return `  <url><loc>${en}</loc><xhtml:link rel="alternate" hreflang="fr" href="${fr}"/><xhtml:link rel="alternate" hreflang="en" href="${en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${fr}"/></url>`;
+  };
+  const urls = [
+    ...companies.filter(c => !c.hidden && hasEnglish(c)).map(c => entry('company', c.id)),
+    ...products.filter(p => visibleIds.has(p.company_id) && hasEnglish(p)).map(p => entry('product', p.id)),
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls.join('\n')}
+</urlset>
+`;
+  const response = new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
   ctx.waitUntil(cache.put(cacheKey, response.clone()));
   return response;
 }
@@ -448,10 +638,19 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/pages/entreprise.html') {
-      return handleEntreprisePage(request, env, ctx);
+      return handleEntityPage('company', 'fr', request, env, ctx);
     }
     if (url.pathname === '/pages/produit.html') {
-      return handleProduitPage(request, env, ctx);
+      return handleEntityPage('product', 'fr', request, env, ctx);
+    }
+    if (url.pathname === '/en/company.html') {
+      return handleEntityPage('company', 'en', request, env, ctx);
+    }
+    if (url.pathname === '/en/product.html') {
+      return handleEntityPage('product', 'en', request, env, ctx);
+    }
+    if (url.pathname === '/sitemap-en.xml') {
+      return handleSitemapEn(request, env, ctx);
     }
 
     if (url.pathname === '/api/send-email') {

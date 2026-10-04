@@ -68,7 +68,7 @@ function renderProduct(p) {
     </div>
     ${loggedIn ? '' : lockBoxHtml(hiddenSpecs ? `+${hiddenSpecs} ${t('lock_more_specs')}` : '')}
     <div class="modal-actions">
-      <a class="btn-visit" href="entreprise.html?id=${p.companyId}">${t('prod_view_maker_prefix')} ${escapeHtml(p.maker)}</a>
+      <a class="btn-visit" href="${entityUrl('company', p.companyId)}">${t('prod_view_maker_prefix')} ${escapeHtml(p.maker)}</a>
       ${p.datasheetUrl ? (loggedIn
         ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>`
         : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_datasheet')}</a>`) : ''}

@@ -76,7 +76,7 @@ function renderCompanies() {
 
     const choose = () => {
       if(dirIsDesktop()) selectRow(row, c);
-      else window.location.href = ROOT_PREFIX + 'pages/entreprise.html?id=' + encodeURIComponent(c.id);
+      else window.location.href = entityUrl('company', c.id);
     };
     row.addEventListener('click', choose);
     row.addEventListener('mouseenter', () => { if(dirIsDesktop()) selectRow(row, c); });
@@ -137,7 +137,7 @@ function renderCompanyPreview(c) {
       <div class="dp-details">${details}</div>
       ${prodsBlock}
       <div class="dp-actions">
-        <a class="btn-fiche" href="${ROOT_PREFIX}pages/entreprise.html?id=${encodeURIComponent(c.id)}">${_t('btn_view_profile')}</a>
+        <a class="btn-fiche" href="${entityUrl('company', c.id)}">${_t('btn_view_profile')}</a>
         <a class="btn-visit" href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${_t('prev_visit')}</a>
         <button class="btn-quote" id="dp-quote">${_t('prev_quote')}</button>
       </div>

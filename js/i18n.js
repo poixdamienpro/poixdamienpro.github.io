@@ -1181,8 +1181,32 @@ function getLang() {
   return localStorage.getItem('bi_lang') || 'fr';
 }
 
+// Fiches entreprise / produit : une URL par langue (pages/entreprise.html <->
+// en/company.html, pages/produit.html <-> en/product.html), pour que Google
+// indexe les deux versions (voir cloudflare/supabase-proxy-worker.js).
+const ENTITY_PAGES = {
+  company: { fr: 'pages/entreprise.html', en: 'en/company.html' },
+  product: { fr: 'pages/produit.html',    en: 'en/product.html' },
+};
+function entityUrl(kind, id) {
+  const f = ENTITY_PAGES[kind][getLang() === 'en' ? 'en' : 'fr'];
+  return (window.ROOT_PREFIX || '') + f + '?id=' + encodeURIComponent(id);
+}
+
 function setLang(lang) {
   localStorage.setItem('bi_lang', lang);
+
+  // Sur une fiche entreprise/produit, on bascule vers la même fiche dans
+  // l'autre langue (même ?id=) plutôt que de traduire sur place.
+  const here = window.location.pathname.replace(/^\//, '');
+  for (const kind in ENTITY_PAGES) {
+    const pages = ENTITY_PAGES[kind];
+    const cur = here === pages.fr ? 'fr' : here === pages.en ? 'en' : null;
+    if (cur && cur !== lang) {
+      window.location.href = '/' + pages[lang] + window.location.search;
+      return;
+    }
+  }
 
   // Si la page a une version dédiée dans la langue demandée (balise hreflang,
   // présente sur les pages statiques traduites), on y navigue au lieu de
