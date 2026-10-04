@@ -22,8 +22,9 @@
 //    a une description_en ; sinon elle reste noindex et aucune balise
 //    hreflang n'est émise, pour ne jamais présenter à Google une page
 //    « anglaise » qui serait en fait du français.
-//  - /sitemap-en.xml : sitemap dynamique des fiches anglaises traduites
-//    (déclaré dans robots.txt), régénéré à partir de la base (cache 1 h).
+//  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des fiches
+//    (toutes les fiches visibles en FR ; seulement les fiches traduites en
+//    EN), déclarés dans robots.txt, régénérés depuis la base (cache 1 h).
 //  - /pages/entreprise.html et /pages/produit.html : injecte le vrai
 //    contenu (nom, description, specs) dans le HTML AVANT de le servir,
 //    pour tout le monde (pas seulement les robots — zero risque de
@@ -52,6 +53,7 @@
 //   www.buy-inner.com/en/company.html*
 //   www.buy-inner.com/en/product.html*
 //   www.buy-inner.com/sitemap-en.xml
+//   www.buy-inner.com/sitemap-fr.xml
 //
 // Cote site : js/data.js doit avoir
 //   const SUPABASE_URL = 'https://www.buy-inner.com/api';
@@ -553,8 +555,19 @@ async function fetchAllRpc(rpcName) {
   return all;
 }
 
-// Sitemap des fiches anglaises traduites, avec leurs alternates FR.
-async function handleSitemapEn(request, env, ctx) {
+// Sitemaps dynamiques des fiches entreprise/produit, régénérés depuis la
+// base (cache 1 h) :
+//  - /sitemap-fr.xml : TOUTES les fiches visibles en français (une fiche
+//    supprimée ou masquée disparaît toute seule), avec les alternates EN
+//    pour celles qui sont traduites ;
+//  - /sitemap-en.xml : seulement les fiches anglaises traduites, avec leurs
+//    alternates FR.
+const lastmod = row => {
+  const d = row && row.updated_at ? new Date(row.updated_at) : null;
+  return d && !isNaN(d) ? `<lastmod>${d.toISOString().slice(0, 10)}</lastmod>` : '';
+};
+
+async function handleSitemap(lang, request, env, ctx) {
   const cache = caches.default;
   const cacheKey = new Request(new URL(request.url).toString(), request);
   const cached = await cache.match(cacheKey);
@@ -566,15 +579,20 @@ async function handleSitemapEn(request, env, ctx) {
   } catch (err) {
     return new Response('Sitemap temporarily unavailable', { status: 503 });
   }
-  const visibleIds = new Set(companies.filter(c => !c.hidden).map(c => c.id));
-  const entry = (kind, id) => {
-    const fr = escapeHtml(entityUrlAbs(kind, 'fr', id));
-    const en = escapeHtml(entityUrlAbs(kind, 'en', id));
-    return `  <url><loc>${en}</loc><xhtml:link rel="alternate" hreflang="fr" href="${fr}"/><xhtml:link rel="alternate" hreflang="en" href="${en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${fr}"/></url>`;
+  const visible = companies.filter(c => !c.hidden);
+  const visibleIds = new Set(visible.map(c => c.id));
+  const entry = (kind, row) => {
+    const fr = escapeHtml(entityUrlAbs(kind, 'fr', row.id));
+    const en = escapeHtml(entityUrlAbs(kind, 'en', row.id));
+    const alternates = hasEnglish(row)
+      ? `<xhtml:link rel="alternate" hreflang="fr" href="${fr}"/><xhtml:link rel="alternate" hreflang="en" href="${en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${fr}"/>`
+      : '';
+    return `  <url><loc>${lang === 'en' ? en : fr}</loc>${lastmod(row)}${alternates}</url>`;
   };
+  const keep = row => lang === 'fr' || hasEnglish(row);
   const urls = [
-    ...companies.filter(c => !c.hidden && hasEnglish(c)).map(c => entry('company', c.id)),
-    ...products.filter(p => visibleIds.has(p.company_id) && hasEnglish(p)).map(p => entry('product', p.id)),
+    ...visible.filter(keep).map(c => entry('company', c)),
+    ...products.filter(p => visibleIds.has(p.company_id) && keep(p)).map(p => entry('product', p)),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -650,7 +668,10 @@ export default {
       return handleEntityPage('product', 'en', request, env, ctx);
     }
     if (url.pathname === '/sitemap-en.xml') {
-      return handleSitemapEn(request, env, ctx);
+      return handleSitemap('en', request, env, ctx);
+    }
+    if (url.pathname === '/sitemap-fr.xml') {
+      return handleSitemap('fr', request, env, ctx);
     }
 
     if (url.pathname === '/api/send-email') {
