@@ -37,7 +37,7 @@ function updateSubmitBar() {
   const count = document.getElementById('sub-count');
   const word = document.getElementById('sub-count-word');
   if (count) count.textContent = n;
-  if (word) word.textContent = n > 1 ? 'produits' : 'produit';
+  if (word) word.textContent = n > 1 ? t('sb_product_many') : t('sb_product_one');
 }
 
 async function handleImageSelect(e, idx) {
@@ -47,13 +47,13 @@ async function handleImageSelect(e, idx) {
   if (!file) return;
 
   if (file.size > 5 * 1024 * 1024) {
-    status.textContent = 'Fichier trop lourd (max 5 Mo).';
+    status.textContent = t('sb_file_big');
     status.style.color = '#C0392B';
     e.target.value = '';
     return;
   }
 
-  status.textContent = 'Envoi en cours…';
+  status.textContent = t('sb_sending');
   status.style.color = 'var(--muted)';
   try {
     const ext = file.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') || 'jpg';
@@ -73,11 +73,11 @@ async function handleImageSelect(e, idx) {
     productImageUrls[idx] = publicUrl;
     preview.src = publicUrl;
     preview.style.display = 'block';
-    status.textContent = '✓ Photo envoyée.';
+    status.textContent = t('sb_photo_ok');
     status.style.color = 'var(--sage)';
   } catch (err) {
     console.error('Erreur upload image:', err);
-    status.textContent = "Échec de l'envoi de la photo. Le produit peut quand même être soumis sans elle.";
+    status.textContent = t('sb_photo_fail');
     status.style.color = '#C0392B';
   }
 }
@@ -90,31 +90,32 @@ function addProductBlock() {
   block.id = 'product-block-' + idx;
   block.innerHTML = `
     <div class="product-block-header">
-      <span class="product-block-title">Produit ${idx}</span>
-      <button type="button" class="btn-remove-product" onclick="removeProductBlock(${idx})">✕ Retirer</button>
+      <span class="product-block-title"><span data-i18n="sb_p_title">Produit</span> ${idx}</span>
+      <button type="button" class="btn-remove-product" onclick="removeProductBlock(${idx})" data-i18n="sb_p_remove">✕ Retirer</button>
     </div>
     <div class="submit-grid">
-      <div class="lead-field"><label>Nom du produit</label><input type="text" class="p-name" required/></div>
-      <div class="lead-field"><label>Catégorie</label><input type="text" class="p-category" required placeholder="ex: Batteries & Stockage"/></div>
-      <div class="lead-field"><label>Industrie</label><input type="text" class="p-industry" list="industry-list"/></div>
-      <div class="lead-field"><label>Prix indicatif</label><input type="text" class="p-price" placeholder="ex: ~500 € ou Sur devis"/></div>
+      <div class="lead-field"><label data-i18n="sb_p_name">Nom du produit</label><input type="text" class="p-name" required/></div>
+      <div class="lead-field"><label data-i18n="sp_category">Catégorie</label><input type="text" class="p-category" required placeholder="ex: Batteries & Stockage" data-i18n-placeholder="sb_p_cat_ph"/></div>
+      <div class="lead-field"><label data-i18n="lbl_industry">Industrie</label><input type="text" class="p-industry" list="industry-list"/></div>
+      <div class="lead-field"><label data-i18n="sb_p_price">Prix indicatif</label><input type="text" class="p-price" placeholder="ex: ~500 € ou Sur devis" data-i18n-placeholder="sb_p_price_ph"/></div>
     </div>
-    <div class="lead-field"><label>Description</label><textarea class="p-desc"></textarea></div>
-    <div class="lead-field"><label>Certifications (séparées par des virgules)</label><input type="text" class="p-certs" placeholder="CE, UN38.3, ..."/></div>
+    <div class="lead-field"><label data-i18n="lbl_description">Description</label><textarea class="p-desc"></textarea></div>
+    <div class="lead-field"><label data-i18n="sb_p_certs">Certifications (séparées par des virgules)</label><input type="text" class="p-certs" placeholder="CE, UN38.3, ..."/></div>
     <div class="lead-field">
-      <label>Photo du produit (optionnel, 5 Mo max)</label>
+      <label data-i18n="sb_p_photo">Photo du produit (optionnel, 5 Mo max)</label>
       <input type="file" class="p-image" accept="image/*" onchange="handleImageSelect(event, ${idx})"/>
       <img class="p-image-preview" id="image-preview-${idx}" style="display:none;max-width:160px;border-radius:6px;margin-top:8px;border:1px solid var(--border)"/>
       <p class="p-image-status" id="image-status-${idx}" style="font-size:11px;color:var(--muted);margin-top:4px"></p>
     </div>
     <div class="lead-field">
-      <label>Specs techniques</label>
+      <label data-i18n="sb_p_specs">Specs techniques</label>
       <div class="spec-rows" id="spec-rows-${idx}"></div>
-      <button type="button" class="btn-add-spec" onclick="addSpecRow(${idx})">+ Ajouter une spec</button>
+      <button type="button" class="btn-add-spec" onclick="addSpecRow(${idx})" data-i18n="sb_p_add_spec">+ Ajouter une spec</button>
     </div>`;
   document.getElementById('product-blocks').appendChild(block);
   addSpecRow(idx);
   updateSubmitBar();
+  if (typeof applyLang === 'function') applyLang();
 }
 
 function removeProductBlock(idx) {
@@ -130,8 +131,9 @@ function addSpecRow(blockIdx) {
   const rows = document.getElementById('spec-rows-' + blockIdx);
   const row = document.createElement('div');
   row.className = 'spec-row';
-  row.innerHTML = `<input type="text" class="spec-label" placeholder="Label (ex: Tension)"/><input type="text" class="spec-value" placeholder="Valeur (ex: 48 V)"/><button type="button" class="btn-remove-spec" onclick="this.parentElement.remove()">✕</button>`;
+  row.innerHTML = `<input type="text" class="spec-label" placeholder="Label (ex: Tension)" data-i18n-placeholder="sb_spec_label_ph"/><input type="text" class="spec-value" placeholder="Valeur (ex: 48 V)" data-i18n-placeholder="sb_spec_value_ph"/><button type="button" class="btn-remove-spec" onclick="this.parentElement.remove()">✕</button>`;
   rows.appendChild(row);
+  if (typeof applyLang === 'function') applyLang();
 }
 
 async function submitSupplierForm(e) {
@@ -148,7 +150,7 @@ async function submitSupplierForm(e) {
   const companyDesc = document.getElementById('sub-company-desc').value || null;
 
   const blocks = document.querySelectorAll('#product-blocks .product-block');
-  if (blocks.length === 0) { alert('Ajoutez au moins un produit.'); return; }
+  if (blocks.length === 0) { alert(t('sb_need_product')); return; }
 
   const rows = [];
   blocks.forEach(block => {
@@ -183,7 +185,7 @@ async function submitSupplierForm(e) {
   });
 
   const submitBtn = document.querySelector('#submit-form .btn-submit-form');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi en cours…'; }
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = t('sb_sending'); }
 
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/product_submissions`, {
@@ -207,14 +209,18 @@ async function submitSupplierForm(e) {
     document.getElementById('submit-wrap').innerHTML = `
       <div class="lead-success">
         <div class="icon">✅</div>
-        <h3>Merci !</h3>
-        <p>${rows.length} produit(s) envoyé(s) pour validation. Vous serez recontacté à <strong>${escapeHtml(submitterEmail)}</strong> une fois la fiche publiée, gratuitement, aucune carte bancaire n'a été demandée.</p>
-        <a class="btn-quote" href="${ROOT_PREFIX}index.html" style="width:100%;justify-content:center">Retour à l'accueil</a>
+        <h3>${t('sb_thanks')}</h3>
+        <p>${rows.length}${t('sb_ok_a')}<strong>${escapeHtml(submitterEmail)}</strong>${t('sb_ok_b')}</p>
+        <a class="btn-quote" href="${ROOT_PREFIX}index.html" style="width:100%;justify-content:center">${t('sb_home')}</a>
       </div>`;
   } catch (err) {
     console.error('Erreur soumission Supabase:', err);
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📩 Envoyer pour validation'; }
-    alert(`Erreur lors de l'envoi. Vérifiez votre connexion et réessayez, ou écrivez-nous directement à ${FOUNDER_EMAIL}.`);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = t('sb_submit'); }
+    alert(`${t('sb_send_err')}${FOUNDER_EMAIL}.`);
   }
 }
 
+// Au changement de langue : les libellés du formulaire sont traduits en place
+// (data-i18n, sans re-rendu pour ne pas perdre la saisie) ; seul le mot du
+// compteur de la barre d'envoi est calculé en JS.
+function onLangChange() { updateSubmitBar(); }

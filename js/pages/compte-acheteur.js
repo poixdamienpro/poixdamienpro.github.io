@@ -39,11 +39,11 @@ function openBuyerProfileForm() {
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <form onsubmit="submitBuyerProfileForm(event)">
-      <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-p-name" value="${escapeHtml(p.name)}"/></div>
-      <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-p-company" value="${escapeHtml(p.company)}"/></div>
+      <div class="lead-field"><label>${t('acc_fullname')}</label><input type="text" id="acc-p-name" value="${escapeHtml(p.name)}"/></div>
+      <div class="lead-field"><label>${t('acc_company')}</label><input type="text" id="acc-p-company" value="${escapeHtml(p.company)}"/></div>
       <div class="submit-actions">
-        <button type="submit" class="btn-submit-form">Enregistrer</button>
-        <button type="button" class="btn-remove-product" onclick="closeBuyerProfileForm()">Annuler</button>
+        <button type="submit" class="btn-submit-form">${t('acc_save')}</button>
+        <button type="button" class="btn-remove-product" onclick="closeBuyerProfileForm()">${t('acc_cancel')}</button>
       </div>
     </form>`;
 }
@@ -68,7 +68,7 @@ async function submitBuyerProfileForm(e) {
     closeBuyerProfileForm();
     renderAccountState();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -108,7 +108,7 @@ async function handleBuyerSignup(e) {
     if (next) { window.location.href = next; return; }
     renderAccountState();
   } catch (err) {
-    const confirmNeeded = err.message.includes('Vérifie ta boîte mail');
+    const confirmNeeded = err.code === 'confirm_email';
     showAccMessage(err.message, !confirmNeeded);
   }
 }
@@ -120,7 +120,7 @@ function handleBuyerLogout() {
 
 async function loadBuyerLeads() {
   const list = document.getElementById('acc-leads-list');
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     const session = buyerSession();
     const rows = await buyerFetch(`leads?buyer_user_id=eq.${session.userId}&order=created_at.desc&limit=50`);
@@ -132,11 +132,11 @@ async function loadBuyerLeads() {
 
 function renderBuyerLeads(rows) {
   const list = document.getElementById('acc-leads-list');
-  if (!rows.length) { list.innerHTML = '<p class="sup-empty">Aucune demande envoyée pour le moment.</p>'; return; }
+  if (!rows.length) { list.innerHTML = `<p class="sup-empty">${t('acc_no_requests')}</p>`; return; }
   const statusMap = {
-    sent:     { cls: 'sup-pill-pending', txt: '⏳ En attente' },
-    accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
-    rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
+    sent:     { cls: 'sup-pill-pending', txt: t('acc_st_sent') },
+    accepted: { cls: 'sup-pill-ok',      txt: t('acc_st_accepted') },
+    rejected: { cls: 'sup-pill-no',      txt: t('acc_st_rejected') },
   };
   list.innerHTML = rows.map(r => {
     const st = statusMap[r.status] || statusMap.sent;
@@ -146,8 +146,14 @@ function renderBuyerLeads(rows) {
           <span class="sup-lead-who">${escapeHtml(r.company_name)}${r.product_name ? ' · ' + escapeHtml(r.product_name) : ''}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <div class="sup-lead-meta">${new Date(r.created_at).toLocaleDateString(getLang() === 'en' ? 'en-GB' : 'fr-FR')}</div>
         <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
       </div>`;
   }).join('');
+}
+
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : l'historique
+// des demandes est construit en JS, pas via data-i18n.
+function onLangChange() {
+  if (typeof buyerSession === 'function' && buyerSession() && document.getElementById('acc-leads-list')) loadBuyerLeads();
 }

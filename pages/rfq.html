@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Dossiers RFQ / RFI / RFP · Buy-inner</title>
-<meta name="description" content="Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers et répondez directement, en tant que fournisseur référencé sur Buy-inner."/>
+<title data-i18n="rq_doc_title">Dossiers RFQ / RFI / RFP · Buy-inner</title>
+<meta name="description" data-i18n-content="rq_meta_desc" content="Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers et répondez directement, en tant que fournisseur référencé sur Buy-inner."/>
 <meta name="robots" content="noindex,follow"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
@@ -22,8 +22,8 @@
 <header class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Dossiers <span>RFQ / RFI / RFP</span></h1>
-      <p class="page-subtitle">Déposés par les systémiers référencés sur Buy-inner. Réservé aux fournisseurs connectés.</p>
+      <h1 class="page-title" data-i18n-html="rq_h1">Dossiers <span>RFQ / RFI / RFP</span></h1>
+      <p class="page-subtitle" data-i18n="rq_sub">Déposés par les systémiers référencés sur Buy-inner. Réservé aux fournisseurs connectés.</p>
     </div>
   </div>
 </header>
@@ -34,29 +34,29 @@
   <div id="sup-auth-box">
     <div class="sup-gate">
       <aside class="sup-gate-aside">
-        <span class="section-eyebrow">POURQUOI S'INSCRIRE</span>
-        <h2 class="sup-gate-title">Accédez aux <em>opportunités d'affaires.</em></h2>
+        <span class="section-eyebrow" data-i18n="sg_eyebrow">POURQUOI S'INSCRIRE</span>
+        <h2 class="sup-gate-title" data-i18n-html="rq_gate_h">Accédez aux <em>opportunités d'affaires.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span>Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers du secteur.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Répondez directement — vous ne payez <strong>que si votre réponse est acceptée</strong> (~80&nbsp;€).</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n="rq_gate_p1">Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers du secteur.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="rq_gate_p2">Répondez directement — vous ne payez <strong>que si votre réponse est acceptée</strong> (~80&nbsp;€).</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="rq_gate_p3">Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
         </ul>
-        <div class="sup-gate-foot">Pas encore sur Buy-inner ? <a href="submit.html">Référencez votre entreprise →</a></div>
+        <div class="sup-gate-foot" data-i18n-html="rq_gate_foot">Pas encore sur Buy-inner ? <a href="submit.html">Référencez votre entreprise →</a></div>
       </aside>
 
       <div class="sup-gate-card">
-        <div class="submit-section-title">Se connecter</div>
+        <div class="submit-section-title" data-i18n="acc_login">Se connecter</div>
         <form onsubmit="supplierLogin(event)">
-          <div class="lead-field"><label>Email</label><input type="email" id="sup-login-email" required/></div>
-          <div class="lead-field"><label>Mot de passe</label><input type="password" id="sup-login-password" required/></div>
-          <button type="submit" class="btn-submit-form">Se connecter</button>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="sup-login-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password">Mot de passe</label><input type="password" id="sup-login-password" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_login">Se connecter</button>
         </form>
-        <div class="sup-gate-sep"><span>nouveau&nbsp;?</span></div>
-        <div class="submit-section-title">Créer un compte</div>
+        <div class="sup-gate-sep"><span data-i18n-html="acc_new">nouveau&nbsp;?</span></div>
+        <div class="submit-section-title" data-i18n="acc_signup_title">Créer un compte</div>
         <form onsubmit="supplierSignup(event)">
-          <div class="lead-field"><label>Email</label><input type="email" id="sup-signup-email" required/></div>
-          <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
-          <button type="submit" class="btn-submit-form">Créer mon compte</button>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="sup-signup-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
         <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
       </div>
@@ -66,22 +66,22 @@
   <!-- État: connecté, pas encore d'entreprise revendiquée -->
   <div id="sup-claim-box" style="display:none">
     <div class="sup-panel">
-      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Il faut d'abord revendiquer votre entreprise pour accéder aux dossiers RFQ. Cherchez-la dans l'annuaire Buy-inner — la revendication est validée manuellement, comptez quelques jours.</p>
-      <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie"/></div>
-      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()">Chercher</button>
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sg_claim_h">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px" data-i18n="rq_claim_p">Il faut d'abord revendiquer votre entreprise pour accéder aux dossiers RFQ. Cherchez-la dans l'annuaire Buy-inner — la revendication est validée manuellement, comptez quelques jours.</p>
+      <div class="lead-field"><label data-i18n="sg_company_name">Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie" data-i18n-placeholder="sg_claim_ph"/></div>
+      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()" data-i18n="sg_search">Chercher</button>
       <div id="sup-claim-results" style="margin-top:14px"></div>
-      <p style="font-size:12px;color:var(--muted);margin-top:14px">Votre entreprise n'existe pas encore sur Buy-inner ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px" data-i18n-html="sg_claim_foot">Votre entreprise n'existe pas encore sur Buy-inner ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
     </div>
   </div>
 
   <!-- État: connecté, revendication en attente -->
   <div id="sup-pending-box" style="display:none">
     <div class="sup-panel">
-      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sg_pending_h">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button></div>
       <div class="sup-pending-note">
         <span class="sup-pending-ico">⏳</span>
-        <p style="font-size:13px;color:var(--text2);margin:0">Votre demande de revendication pour <strong id="sup-pending-company"></strong> est en attente de validation. Vous serez notifié une fois approuvée.</p>
+        <p style="font-size:13px;color:var(--text2);margin:0"><span data-i18n="sg_pending_a">Votre demande de revendication pour</span> <strong id="sup-pending-company"></strong> <span data-i18n="sg_pending_b">est en attente de validation. Vous serez notifié une fois approuvée.</span></p>
       </div>
     </div>
   </div>
@@ -91,33 +91,33 @@
     <div class="product-block-header">
       <span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Dossiers disponibles</span>
       <div style="display:flex;gap:8px">
-        <a href="supplier.html" class="btn-add-product sup-btn-sm">← Mon espace fournisseur</a>
-        <button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button>
+        <a href="supplier.html" class="btn-add-product sup-btn-sm" data-i18n="sg_back">← Mon espace fournisseur</a>
+        <button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button>
       </div>
     </div>
 
     <div id="rfq-nda-gate" style="display:none" class="sup-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Accord de confidentialité</span>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0 0 14px">
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="rq_nda_h">Accord de confidentialité</span>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0 0 14px" data-i18n="rq_nda_p">
         Les dossiers RFQ/RFI/RFP déposés par les systémiers contiennent des informations commercialement sensibles (besoins d'achat, spécifications, parfois des pièces jointes). En les consultant, vous vous engagez à :
       </p>
       <ul style="font-size:13px;color:var(--text2);line-height:1.8;margin:0 0 14px;padding-left:20px">
-        <li>ne pas divulguer leur contenu à des tiers non impliqués dans votre réponse ;</li>
-        <li>ne les utiliser que dans le cadre d'une réponse commerciale à ce dossier ;</li>
-        <li>ne pas contacter directement le systémier en dehors de la plateforme sur la base de ces informations.</li>
+        <li data-i18n="rq_nda_l1">ne pas divulguer leur contenu à des tiers non impliqués dans votre réponse ;</li>
+        <li data-i18n="rq_nda_l2">ne les utiliser que dans le cadre d'une réponse commerciale à ce dossier ;</li>
+        <li data-i18n="rq_nda_l3">ne pas contacter directement le systémier en dehors de la plateforme sur la base de ces informations.</li>
       </ul>
-      <button type="button" class="btn-submit-form" onclick="acceptRfqNda()">J'accepte l'accord de confidentialité</button>
+      <button type="button" class="btn-submit-form" onclick="acceptRfqNda()" data-i18n="rq_nda_accept">J'accepte l'accord de confidentialité</button>
     </div>
 
     <div class="sup-panel" id="rfq-list-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Dossiers publiés</span>
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="rq_published">Dossiers publiés</span>
       <div id="rfq-list"></div>
     </div>
 
     <div class="sup-panel" id="rfq-detail-panel" style="display:none"></div>
 
     <div class="sup-panel" id="rfq-my-responses-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Vos réponses envoyées</span>
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="rq_my_resp">Vos réponses envoyées</span>
       <div id="rfq-my-responses-list"></div>
     </div>
   </div>

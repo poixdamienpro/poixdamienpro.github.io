@@ -11,9 +11,8 @@ let supplierAllProducts = []; // catalogue complet (mapProduct), pour la compara
 
 // Plages du sélecteur temporel des stats de vues (même liste que
 // js/pages/admin.js ANALYTICS_RANGES, pour une expérience cohérente).
-const SUPPLIER_VIEW_RANGES = {
-  1: '1 jour', 7: '1 semaine', 30: '1 mois', 90: '3 mois', 180: '6 mois', 365: '1 an',
-};
+const supplierRangeLabel = d => (TRANSLATIONS[getLang()]['sp_rng_' + d] ? t('sp_rng_' + d) : null);
+const supLocale = () => (getLang() === 'en' ? 'en-GB' : 'fr-FR');
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
@@ -39,10 +38,10 @@ function renderSupplierStats() {
   if (!el) return;
   const fmt = v => (v === null ? '—' : v);
   el.innerHTML = `
-    <div class="sup-stat"><span class="sup-stat-n ${supStatLeadsPending ? 'sup-stat-pending' : ''}">${fmt(supStatLeadsPending)}</span><span class="sup-stat-l">Leads à traiter</span></div>
-    <div class="sup-stat"><span class="sup-stat-n">${fmt(supStatProducts)}</span><span class="sup-stat-l">Produits publiés</span></div>
-    <div class="sup-stat"><span class="sup-stat-n sup-stat-pending">${fmt(supStatPending)}</span><span class="sup-stat-l">Soumissions en attente</span></div>
-    <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">Soumissions approuvées</span></div>`;
+    <div class="sup-stat"><span class="sup-stat-n ${supStatLeadsPending ? 'sup-stat-pending' : ''}">${fmt(supStatLeadsPending)}</span><span class="sup-stat-l">${t('sp_stat_leads')}</span></div>
+    <div class="sup-stat"><span class="sup-stat-n">${fmt(supStatProducts)}</span><span class="sup-stat-l">${t('sp_stat_products')}</span></div>
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-pending">${fmt(supStatPending)}</span><span class="sup-stat-l">${t('sp_stat_pending')}</span></div>
+    <div class="sup-stat"><span class="sup-stat-n sup-stat-ok">${fmt(supStatApproved)}</span><span class="sup-stat-l">${t('sp_stat_approved')}</span></div>`;
 }
 
 // Bandeau Premium : bouton d'abonnement, ou confirmation si déjà actif.
@@ -53,12 +52,12 @@ function renderPremiumBox() {
   const el = document.getElementById('sup-premium-box');
   if (!el || !supplierCompany) return;
   if (supplierCompany.premium) {
-    el.innerHTML = `<div class="sup-premium-active">★ Votre entreprise est <strong>Premium</strong> — badge et mise en avant prioritaire actifs.</div>`;
+    el.innerHTML = `<div class="sup-premium-active">${t('sp_premium_active')}</div>`;
   } else {
     el.innerHTML = `
       <div class="sup-premium-upsell">
-        <span>Passez Premium pour le badge ★, la mise en avant prioritaire et le profil enrichi — 1 500 €/an, résiliable à tout moment.</span>
-        <button id="sup-premium-btn" class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+        <span>${t('sp_premium_upsell')}</span>
+        <button id="sup-premium-btn" class="btn-add-product" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>
       </div>`;
   }
 }
@@ -66,7 +65,7 @@ function renderPremiumBox() {
 async function startPremiumCheckout() {
   if (!supplierCompany) return;
   const btn = document.getElementById('sup-premium-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Redirection…'; }
+  if (btn) { btn.disabled = true; btn.textContent = t('sp_redirecting'); }
   try {
     const res = await fetch(`${SUPABASE_URL}/create-checkout-session`, {
       method: 'POST',
@@ -78,11 +77,11 @@ async function startPremiumCheckout() {
       }),
     });
     const data = await res.json();
-    if (!res.ok || !data.url) throw new Error(data.error || 'Erreur lors de la création du paiement.');
+    if (!res.ok || !data.url) throw new Error(data.error || t('sp_pay_err'));
     window.location.href = data.url;
   } catch (err) {
-    alert('Erreur : ' + err.message);
-    if (btn) { btn.disabled = false; btn.textContent = '★ Passer Premium — 1 500 €/an'; }
+    alert(t('acc_err_prefix') + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = t('sp_premium_btn'); }
   }
 }
 
@@ -96,7 +95,7 @@ async function handlePremiumReturn() {
   if (status === 'cancelled') return;
   if (status === 'success') {
     const banner = document.getElementById('sup-premium-box');
-    if (banner) banner.innerHTML = `<div class="sup-premium-active">Paiement reçu, activation en cours…</div>`;
+    if (banner) banner.innerHTML = `<div class="sup-premium-active">${t('sp_pay_received')}</div>`;
     try {
       const rows = await supplierFetch(`companies?id=eq.${supplierCompany.id}&select=*`);
       if (rows && rows.length) supplierCompany = rows[0];
@@ -116,18 +115,18 @@ function openCompanyEditForm() {
   wrap.style.display = 'block';
   wrap.innerHTML = `
     <div class="sup-panel">
-      <div class="submit-section-title">Modifier la fiche entreprise</div>
-      <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Comme pour les produits, la modification est soumise à validation avant d'être publiée.</p>
+      <div class="submit-section-title">${t('sp_ce_title')}</div>
+      <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">${t('sp_ce_note')}</p>
       <form onsubmit="submitCompanyEditForm(event)">
-        <div class="lead-field"><label>Description</label><textarea id="sup-c-desc" rows="3">${escapeHtml(c.desc || '')}</textarea></div>
-        <div class="lead-field"><label>Site web</label><input type="url" id="sup-c-site" value="${escapeHtml(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
-        <div class="lead-field"><label>Siège (ville)</label><input type="text" id="sup-c-hq" value="${escapeHtml(c.hq)}"/></div>
-        <div class="lead-field"><label>Pays</label><input type="text" id="sup-c-country" value="${escapeHtml(c.country)}"/></div>
-        <div class="lead-field"><label>Industrie</label><input type="text" id="sup-c-industry" value="${escapeHtml(c.industry)}"/></div>
-        <div class="lead-field"><label>Email de contact</label><input type="email" id="sup-c-contact" value="${escapeHtml(c.contact)}"/></div>
+        <div class="lead-field"><label>${t('lbl_description')}</label><textarea id="sup-c-desc" rows="3">${escapeHtml(c.desc || '')}</textarea></div>
+        <div class="lead-field"><label>${t('sp_c_site')}</label><input type="url" id="sup-c-site" value="${escapeHtml(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
+        <div class="lead-field"><label>${t('sp_c_hq')}</label><input type="text" id="sup-c-hq" value="${escapeHtml(c.hq)}"/></div>
+        <div class="lead-field"><label>${t('sp_c_country')}</label><input type="text" id="sup-c-country" value="${escapeHtml(c.country)}"/></div>
+        <div class="lead-field"><label>${t('lbl_industry')}</label><input type="text" id="sup-c-industry" value="${escapeHtml(c.industry)}"/></div>
+        <div class="lead-field"><label>${t('sp_c_contact')}</label><input type="email" id="sup-c-contact" value="${escapeHtml(c.contact)}"/></div>
         <div class="submit-actions">
-          <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
-          <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-company-form-wrap').style.display='none'">Annuler</button>
+          <button type="submit" class="btn-submit-form">${t('sp_submit_val')}</button>
+          <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-company-form-wrap').style.display='none'">${t('acc_cancel')}</button>
         </div>
       </form>`;
 }
@@ -156,10 +155,10 @@ async function submitCompanyEditForm(e) {
       }]),
     });
     document.getElementById('sup-company-form-wrap').style.display = 'none';
-    alert('Demande envoyée, en attente de validation admin.');
+    alert(t('sp_req_sent'));
     loadSupplierSubmissions();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -176,7 +175,7 @@ async function supplierFetch(path, options = {}) {
   });
   if (res.status === 401 || res.status === 403) {
     supplierLogout();
-    throw new Error('Session expirée ou accès refusé, reconnecte-toi.');
+    throw new Error(t('sp_session_exp'));
   }
   if (!res.ok) {
     // Remonte le vrai message Postgres (ex: RAISE EXCEPTION 'nda_required'
@@ -226,14 +225,14 @@ async function supplierSignup(e) {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error_description || data.msg || 'Inscription impossible.');
+    if (!res.ok) throw new Error(data.error_description || data.msg || t('acc_err_signup'));
     if (data.access_token) {
       sessionStorage.setItem('sup_access_token', data.access_token);
       sessionStorage.setItem('sup_email', email);
       sessionStorage.setItem('sup_user_id', data.user.id);
       await supplierRouteAfterAuth();
     } else {
-      showSupplierMessage('Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, puis connecte-toi.');
+      showSupplierMessage(t('acc_err_confirm'));
     }
   } catch (err) {
     showSupplierMessage(err.message, true);
@@ -251,7 +250,7 @@ async function supplierLogin(e) {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (!res.ok || !data.access_token) throw new Error(data.error_description || data.msg || 'Identifiants incorrects.');
+    if (!res.ok || !data.access_token) throw new Error(data.error_description || data.msg || t('acc_err_login'));
     sessionStorage.setItem('sup_access_token', data.access_token);
     sessionStorage.setItem('sup_email', email);
     sessionStorage.setItem('sup_user_id', data.user.id);
@@ -331,14 +330,14 @@ async function searchCompanyToClaim() {
   const q = document.getElementById('sup-claim-search').value.trim();
   const box = document.getElementById('sup-claim-results');
   if (!q) { box.innerHTML = ''; return; }
-  box.innerHTML = 'Recherche…';
+  box.innerHTML = t('sp_searching');
   try {
     const rows = await supplierFetch(`companies?name=ilike.*${encodeURIComponent(q)}*&select=id,name,country&limit=10`);
-    if (!rows || !rows.length) { box.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucun résultat.</p>'; return; }
+    if (!rows || !rows.length) { box.innerHTML = `<p style="font-size:13px;color:var(--muted)">${t('sp_no_result')}</p>`; return; }
     box.innerHTML = rows.map(c => `
       <div class="admin-field-row">
         <span>${escapeHtml(c.name)} (${escapeHtml(c.country || '—')})</span>
-        <button class="btn-add-product" onclick="requestCompanyClaim('${c.id}','${escapeJsAttr(c.name)}')" style="padding:6px 14px;font-size:12px">Revendiquer</button>
+        <button class="btn-add-product" onclick="requestCompanyClaim('${c.id}','${escapeJsAttr(c.name)}')" style="padding:6px 14px;font-size:12px">${t('ent_claim_link')}</button>
       </div>`).join('');
   } catch (err) {
     box.innerHTML = `<p style="color:#C0392B;font-size:13px">${err.message}</p>`;
@@ -360,29 +359,29 @@ async function requestCompanyClaim(companyId, companyName) {
     document.getElementById('sup-pending-box').style.display = 'block';
     setSupplierStep(2);
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
 async function loadSupplierProducts() {
   const list = document.getElementById('sup-products-list');
   if (!list) return;
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     const products = await supplierFetch(`products?company_id=eq.${supplierCompany.id}&select=*`);
     supStatProducts = (products && products.length) || 0;
     renderSupplierStats();
-    if (!products || !products.length) { list.innerHTML = '<p class="sup-empty">Aucun produit pour le moment. Ajoutez-en un, il sera publié après validation.</p>'; return; }
+    if (!products || !products.length) { list.innerHTML = `<p class="sup-empty">${t('sp_no_products')}</p>`; return; }
     list.innerHTML = products.map(p => `
       <div class="sup-prod">
         <div class="sup-prod-main">
           <span class="sup-prod-name">${escapeHtml(p.name)}</span>
           <span class="sup-prod-cat">${escapeHtml(p.category)}</span>
         </div>
-        <span class="sup-pill sup-pill-ok">● Publié</span>
+        <span class="sup-pill sup-pill-ok">${t('sp_published')}</span>
         <div class="sup-prod-actions">
-          <button class="btn-add-product sup-btn-sm" onclick="openSupplierProductForm('${p.id}')">Modifier</button>
-          <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${escapeJsAttr(p.name)}')">Supprimer</button>
+          <button class="btn-add-product sup-btn-sm" onclick="openSupplierProductForm('${p.id}')">${t('acc_edit')}</button>
+          <button class="btn-remove-product" onclick="requestDeleteProduct('${p.id}','${escapeJsAttr(p.name)}')">${t('sp_delete')}</button>
         </div>
       </div>`).join('');
   } catch (err) {
@@ -393,18 +392,18 @@ async function loadSupplierProducts() {
 async function loadSupplierSubmissions() {
   const list = document.getElementById('sup-submissions-list');
   if (!list) return;
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     const rows = await supplierFetch(`product_submissions?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=20`);
     supStatPending = (rows || []).filter(r => r.status === 'pending').length;
     supStatApproved = (rows || []).filter(r => r.status === 'approved').length;
     renderSupplierStats();
-    if (!rows || !rows.length) { list.innerHTML = '<p class="sup-empty">Aucune demande envoyée.</p>'; return; }
-    const labels = { new: 'Ajout', update: 'Modification', delete: 'Suppression' };
+    if (!rows || !rows.length) { list.innerHTML = `<p class="sup-empty">${t('sp_no_subs')}</p>`; return; }
+    const labels = { new: t('sp_sub_new'), update: t('sp_sub_update'), delete: t('sp_sub_delete') };
     const statusMap = {
-      pending:  { cls: 'sup-pill-pending', txt: '⏳ En attente' },
-      approved: { cls: 'sup-pill-ok',      txt: '✓ Approuvée' },
-      rejected: { cls: 'sup-pill-no',      txt: '✕ Rejetée' },
+      pending:  { cls: 'sup-pill-pending', txt: t('acc_st_sent') },
+      approved: { cls: 'sup-pill-ok',      txt: t('sp_st_approved') },
+      rejected: { cls: 'sup-pill-no',      txt: t('sp_st_rejected') },
     };
     list.innerHTML = `<div class="sup-timeline">` + rows.map(r => {
       const st = statusMap[r.status] || { cls: '', txt: r.status };
@@ -425,7 +424,7 @@ async function loadSupplierSubmissions() {
 async function loadSupplierLeads() {
   const list = document.getElementById('sup-leads-list');
   if (!list) return;
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     const rows = await supplierFetch(`leads?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=50`);
     supStatLeadsPending = (rows || []).filter(r => r.status === 'sent').length;
@@ -451,13 +450,13 @@ async function loadSupplierViews() {
     chart.innerHTML = '';
     list.innerHTML = `
       <div class="sup-premium-upsell">
-        <span>Les statistiques de vues détaillées par produit sont réservées aux entreprises Premium.</span>
-        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+        <span>${t('sp_views_upsell')}</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>
       </div>`;
     return;
   }
   range.style.display = '';
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     supplierViewRows = await supplierFetchAllPages(
       `entity_views?company_id=eq.${supplierCompany.id}&entity_type=eq.product&select=product_id,product_name,created_at&order=created_at.desc`
@@ -472,7 +471,7 @@ function renderSupplierViewsForRange() {
   const chart = document.getElementById('sup-views-chart');
   const list = document.getElementById('sup-views-products');
   const rangeDays = Number(document.getElementById('sup-views-range').value) || 30;
-  const rangeLabel = SUPPLIER_VIEW_RANGES[rangeDays] || `${rangeDays} j`;
+  const rangeLabel = supplierRangeLabel(rangeDays) || `${rangeDays} d`;
 
   const now = Date.now();
   const DAY = 24 * 60 * 60 * 1000;
@@ -490,8 +489,8 @@ function renderSupplierViewsForRange() {
   const rows = Object.values(byProduct).sort((a, b) => b.inRange - a.inRange);
 
   list.innerHTML = !rows.length
-    ? `<p class="sup-empty">Aucune vue enregistrée sur vos produits pour le moment.</p>`
-    : `<div class="admin-field-row" style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase"><span>Produit</span><span>${rangeLabel} · Total</span></div>` +
+    ? `<p class="sup-empty">${t('sp_views_none')}</p>`
+    : `<div class="admin-field-row" style="font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase"><span>${t('sp_product')}</span><span>${rangeLabel} · Total</span></div>` +
       rows.map(p => `<div class="admin-field-row"><span>${p.name}</span><span>${p.inRange} · ${p.total}</span></div>`).join('');
 
   renderSupplierViewsChart(chart, inRange, rangeDays);
@@ -550,11 +549,11 @@ function renderSupplierViewsChart(wrap, rows, rangeDays) {
 
 function renderSupplierLeads(rows) {
   const list = document.getElementById('sup-leads-list');
-  if (!rows.length) { list.innerHTML = '<p class="sup-empty">Aucune demande de devis pour le moment.</p>'; return; }
+  if (!rows.length) { list.innerHTML = `<p class="sup-empty">${t('sp_no_leads')}</p>`; return; }
   const statusMap = {
-    sent:     { cls: 'sup-pill-pending', txt: '⏳ À traiter' },
-    accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
-    rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
+    sent:     { cls: 'sup-pill-pending', txt: t('sp_st_todo') },
+    accepted: { cls: 'sup-pill-ok',      txt: t('acc_st_accepted') },
+    rejected: { cls: 'sup-pill-no',      txt: t('acc_st_rejected') },
   };
   list.innerHTML = rows.map(r => {
     const st = statusMap[r.status] || statusMap.sent;
@@ -564,12 +563,12 @@ function renderSupplierLeads(rows) {
           <span class="sup-lead-who">${escapeHtml(r.buyer_name)} · ${escapeHtml(r.buyer_company)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${escapeHtml(r.buyer_email)} · ${r.product_name ? escapeHtml(r.product_name) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <div class="sup-lead-meta">${escapeHtml(r.buyer_email)} · ${r.product_name ? escapeHtml(r.product_name) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString(supLocale())}</div>
         <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
         ${r.status === 'sent' ? `
         <div class="sup-lead-actions">
-          <button class="btn-add-product sup-btn-sm" onclick="respondToLead('${r.id}','accepted')">✓ Accepter</button>
-          <button class="btn-remove-product" onclick="respondToLead('${r.id}','rejected')">✕ Refuser</button>
+          <button class="btn-add-product sup-btn-sm" onclick="respondToLead('${r.id}','accepted')">${t('sp_accept')}</button>
+          <button class="btn-remove-product" onclick="respondToLead('${r.id}','rejected')">${t('sp_refuse')}</button>
         </div>` : ''}
       </div>`;
   }).join('');
@@ -584,12 +583,12 @@ async function respondToLead(id, status) {
     });
     loadSupplierLeads();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
 async function requestDeleteProduct(productId, productName) {
-  if (!confirm(`Demander la suppression de "${productName}" ? Cette action sera soumise à validation admin.`)) return;
+  if (!confirm(`${t('sp_confirm_delete_a')}${productName}${t('sp_confirm_delete_b')}`)) return;
   try {
     await supplierFetch('product_submissions', {
       method: 'POST',
@@ -606,10 +605,10 @@ async function requestDeleteProduct(productId, productName) {
         product_category: '—',
       }]),
     });
-    alert('Demande de suppression envoyée, en attente de validation admin.');
+    alert(t('sp_delete_sent'));
     loadSupplierSubmissions();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -618,15 +617,15 @@ function openSupplierProductForm(productId) {
   const wrap = document.getElementById('sup-product-form-wrap');
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">${productId ? 'Modifier le produit' : 'Nouveau produit'}</div>
+    <div class="submit-section-title">${productId ? t('sp_p_edit') : t('sp_p_new')}</div>
     <form onsubmit="submitSupplierProductForm(event)">
-      <div class="lead-field"><label>Nom du produit</label><input type="text" id="sup-p-name" required/></div>
-      <div class="lead-field"><label>Catégorie</label><input type="text" id="sup-p-category" required/></div>
-      <div class="lead-field"><label>Description</label><textarea id="sup-p-desc" rows="3"></textarea></div>
-      <div class="lead-field"><label>Prix (libellé)</label><input type="text" id="sup-p-price" placeholder="Sur devis"/></div>
+      <div class="lead-field"><label>${t('sp_p_name')}</label><input type="text" id="sup-p-name" required/></div>
+      <div class="lead-field"><label>${t('sp_category')}</label><input type="text" id="sup-p-category" required/></div>
+      <div class="lead-field"><label>${t('lbl_description')}</label><textarea id="sup-p-desc" rows="3"></textarea></div>
+      <div class="lead-field"><label>${t('sp_p_price')}</label><input type="text" id="sup-p-price" placeholder="${t('rq_price_ph')}"/></div>
       <div class="submit-actions">
-        <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
-        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-product-form-wrap').style.display='none'">Annuler</button>
+        <button type="submit" class="btn-submit-form">${t('sp_submit_val')}</button>
+        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-product-form-wrap').style.display='none'">${t('acc_cancel')}</button>
       </div>
     </form>`;
   if (productId) {
@@ -669,10 +668,10 @@ async function submitSupplierProductForm(e) {
       }]),
     });
     document.getElementById('sup-product-form-wrap').style.display = 'none';
-    alert('Demande envoyée, en attente de validation admin.');
+    alert(t('sp_req_sent'));
     loadSupplierSubmissions();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -691,19 +690,19 @@ async function loadSupplierComparison() {
     select.style.display = 'none';
     table.innerHTML = `
       <div class="sup-premium-upsell">
-        <span>La comparaison de vos produits avec la concurrence est réservée aux entreprises Premium.</span>
-        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+        <span>${t('sp_cmp_upsell')}</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>
       </div>`;
     return;
   }
-  table.innerHTML = 'Chargement du catalogue…';
+  table.innerHTML = t('sp_cmp_loading');
   try {
     const rows = await fetchAllPaged('get_products_page');
     supplierAllProducts = rows.map(mapProduct);
     const ownProducts = supplierAllProducts.filter(p => p.companyId === supplierCompany.id);
     if (!ownProducts.length) {
       select.style.display = 'none';
-      table.innerHTML = '<p class="sup-empty">Ajoutez d\'abord un produit pour le comparer à la concurrence.</p>';
+      table.innerHTML = `<p class="sup-empty">${t('sp_cmp_add_first')}</p>`;
       return;
     }
     select.style.display = '';
@@ -727,7 +726,7 @@ function renderSupplierComparison() {
     .slice(0, 4);
 
   if (!competitors.length) {
-    table.innerHTML = `<p class="sup-empty">Aucun autre produit référencé dans la catégorie « ${escapeHtml(own.cat)} » pour l'instant.</p>`;
+    table.innerHTML = `<p class="sup-empty">${t('sp_cmp_none_a')}${escapeHtml(own.cat)}${t('sp_cmp_none_b')}</p>`;
     return;
   }
 
@@ -739,7 +738,7 @@ function renderSupplierComparison() {
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
         <span style="font-size:18px">${escapeHtml(p.icon)}</span>
         <strong style="font-size:11px">${escapeHtml(p.name)}</strong>
-        <span style="font-size:10px;opacity:.8">${i === 0 ? '★ Votre produit' : escapeHtml(p.maker)}</span>
+        <span style="font-size:10px;opacity:.8">${i === 0 ? t('sp_your_product') : escapeHtml(p.maker)}</span>
       </div>
     </th>`).join('');
 
@@ -751,12 +750,12 @@ function renderSupplierComparison() {
     return `<tr><td class="row-label">${escapeHtml(label)}</td>${cells}</tr>`;
   }).join('');
 
-  const priceRow = `<tr><td class="row-label">Prix</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${escapeHtml(p.price)}</td>`).join('')}</tr>`;
+  const priceRow = `<tr><td class="row-label">${t('sp_price')}</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${escapeHtml(p.price)}</td>`).join('')}</tr>`;
 
   table.innerHTML = `
     <div style="overflow-x:auto">
       <table class="cmp-table">
-        <thead><tr><th style="min-width:120px">Caractéristique</th>${hCols}</tr></thead>
+        <thead><tr><th style="min-width:120px">${t('sp_characteristic')}</th>${hCols}</tr></thead>
         <tbody>${specRows}${priceRow}</tbody>
       </table>
     </div>`;
@@ -782,20 +781,20 @@ async function loadSupplierRfqDossiers() {
   if (!supplierCompany.premium) {
     list.innerHTML = `
       <div class="sup-premium-upsell">
-        <span>Le dépôt de dossiers RFQ/RFI/RFP auprès de tous les fournisseurs référencés est réservé aux entreprises Premium.</span>
-        <button class="btn-add-product" onclick="startPremiumCheckout()">★ Passer Premium — 1 500 €/an</button>
+        <span>${t('sp_rfq_upsell')}</span>
+        <button class="btn-add-product" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>
       </div>`;
     document.querySelector('#sup-rfq-panel .sup-add-inline').style.display = 'none';
     return;
   }
   document.querySelector('#sup-rfq-panel .sup-add-inline').style.display = '';
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     supplierRfqDossiers = await supplierFetch(`rfq_dossiers?company_id=eq.${supplierCompany.id}&select=*&order=created_at.desc`) || [];
     if (!supplierRfqDossiers.length) {
       supplierRfqResponsesByDossier = {};
       supplierRfqNdaSignaturesByDossier = {};
-      list.innerHTML = '<p class="sup-empty">Aucun dossier déposé pour le moment.</p>';
+      list.innerHTML = `<p class="sup-empty">${t('sp_rfq_none')}</p>`;
       return;
     }
     const ids = supplierRfqDossiers.map(d => d.id).join(',');
@@ -816,10 +815,10 @@ async function loadSupplierRfqDossiers() {
 function renderSupplierRfqDossiers() {
   const list = document.getElementById('sup-rfq-list');
   const statusMap = {
-    pending:   { cls: 'sup-pill-pending', txt: '⏳ En attente de validation' },
-    published: { cls: 'sup-pill-ok',      txt: '● Publié' },
-    rejected:  { cls: 'sup-pill-no',      txt: '✕ Rejeté' },
-    closed:    { cls: '',                 txt: '◼ Clôturé' },
+    pending:   { cls: 'sup-pill-pending', txt: t('sp_rfq_st_pending') },
+    published: { cls: 'sup-pill-ok',      txt: t('sp_published') },
+    rejected:  { cls: 'sup-pill-no',      txt: t('sp_rfq_st_rejected') },
+    closed:    { cls: '',                 txt: t('sp_rfq_st_closed') },
   };
   list.innerHTML = supplierRfqDossiers.map(d => {
     const st = statusMap[d.status] || { cls: '', txt: d.status };
@@ -833,12 +832,12 @@ function renderSupplierRfqDossiers() {
         </div>
         <span class="sup-pill ${st.cls}">${st.txt}</span>
         <div class="sup-prod-actions">
-          ${d.status === 'published' ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqResponses('${d.id}')">Réponses (${nResp})</button>` : ''}
-          ${d.status === 'published' && d.requires_custom_nda ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqNdaSignatures('${d.id}')">Signatures NDA (${nNdaPending})</button>` : ''}
-          ${d.status === 'published' ? `<button class="btn-remove-product" onclick="closeRfqDossier('${d.id}')">Clôturer</button>` : ''}
+          ${d.status === 'published' ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqResponses('${d.id}')">${t('sp_rfq_responses')} (${nResp})</button>` : ''}
+          ${d.status === 'published' && d.requires_custom_nda ? `<button class="btn-add-product sup-btn-sm" onclick="viewRfqNdaSignatures('${d.id}')">${t('sp_rfq_nda_sigs')} (${nNdaPending})</button>` : ''}
+          ${d.status === 'published' ? `<button class="btn-remove-product" onclick="closeRfqDossier('${d.id}')">${t('sp_rfq_close')}</button>` : ''}
         </div>
       </div>
-      ${d.status === 'rejected' && d.rejection_reason ? `<p style="font-size:12px;color:#E06A52;margin:-4px 0 10px">Motif du refus : ${escapeHtml(d.rejection_reason)}</p>` : ''}`;
+      ${d.status === 'rejected' && d.rejection_reason ? `<p style="font-size:12px;color:#E06A52;margin:-4px 0 10px">${t('sp_reject_reason')}${escapeHtml(d.rejection_reason)}</p>` : ''}`;
   }).join('');
 }
 
@@ -847,31 +846,31 @@ function openRfqDossierForm() {
   const wrap = document.getElementById('sup-rfq-form-wrap');
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">Nouveau dossier RFQ / RFI / RFP</div>
-    <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Visible par tous les fournisseurs connectés une fois validé par notre équipe. Le contenu détaillé (description, cahier des charges) n'est révélé qu'après acceptation d'un accord de confidentialité par le fournisseur.</p>
+    <div class="submit-section-title">${t('sp_rf_title')}</div>
+    <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">${t('sp_rf_note')}</p>
     <form onsubmit="submitRfqDossierForm(event)">
-      <div class="lead-field"><label>Type</label>
-        <select id="sup-rfq-type"><option value="RFQ">RFQ — Demande de devis</option><option value="RFI">RFI — Demande d'information</option><option value="RFP">RFP — Demande de proposition</option></select>
+      <div class="lead-field"><label>${t('sp_rf_type')}</label>
+        <select id="sup-rfq-type"><option value="RFQ">${t('sp_rf_opt_rfq')}</option><option value="RFI">${t('sp_rf_opt_rfi')}</option><option value="RFP">${t('sp_rf_opt_rfp')}</option></select>
       </div>
-      <div class="lead-field"><label>Titre</label><input type="text" id="sup-rfq-title" required/></div>
-      <div class="lead-field"><label>Catégorie</label><input type="text" id="sup-rfq-category" placeholder="ex: Calculateurs embarqués"/></div>
-      <div class="lead-field"><label>Domaine</label><input type="text" id="sup-rfq-industry" placeholder="ex: Spatial"/></div>
-      <div class="lead-field"><label>Description / cahier des charges (texte)</label><textarea id="sup-rfq-desc" rows="5" required></textarea></div>
-      <div class="lead-field"><label>Date limite de réponse</label><input type="date" id="sup-rfq-deadline"/></div>
-      <div class="lead-field"><label>Pièce jointe (cahier des charges, optionnel)</label><input type="file" id="sup-rfq-file"/></div>
+      <div class="lead-field"><label>${t('sp_rf_titre')}</label><input type="text" id="sup-rfq-title" required/></div>
+      <div class="lead-field"><label>${t('sp_category')}</label><input type="text" id="sup-rfq-category" placeholder="${t('sp_rf_cat_ph')}"/></div>
+      <div class="lead-field"><label>${t('sp_rf_domain')}</label><input type="text" id="sup-rfq-industry" placeholder="${t('sp_rf_domain_ph')}"/></div>
+      <div class="lead-field"><label>${t('sp_rf_desc')}</label><textarea id="sup-rfq-desc" rows="5" required></textarea></div>
+      <div class="lead-field"><label>${t('sp_rf_deadline')}</label><input type="date" id="sup-rfq-deadline"/></div>
+      <div class="lead-field"><label>${t('sp_rf_file')}</label><input type="file" id="sup-rfq-file"/></div>
       <div class="lead-field">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
           <input type="checkbox" id="sup-rfq-custom-nda" onchange="document.getElementById('sup-rfq-nda-template-wrap').style.display=this.checked?'block':'none'" style="width:auto"/>
-          NDA personnalisé requis (en plus de l'accord standard)
+          ${t('sp_rf_custom_nda')}
         </label>
       </div>
       <div id="sup-rfq-nda-template-wrap" style="display:none">
-        <div class="lead-field"><label>Gabarit NDA à faire signer (PDF)</label><input type="file" id="sup-rfq-nda-file" accept=".pdf"/></div>
-        <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">Les fournisseurs devront télécharger ce document, le signer hors plateforme, puis uploader leur copie signée — vous devrez la vérifier et l'approuver avant qu'ils n'accèdent au contenu détaillé.</p>
+        <div class="lead-field"><label>${t('sp_rf_nda_file')}</label><input type="file" id="sup-rfq-nda-file" accept=".pdf"/></div>
+        <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">${t('sp_rf_nda_note')}</p>
       </div>
       <div class="submit-actions">
-        <button type="submit" class="btn-submit-form">Envoyer pour validation</button>
-        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-rfq-form-wrap').style.display='none'">Annuler</button>
+        <button type="submit" class="btn-submit-form">${t('sp_submit_val')}</button>
+        <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-rfq-form-wrap').style.display='none'">${t('acc_cancel')}</button>
       </div>
     </form>`;
 }
@@ -924,10 +923,10 @@ async function submitRfqDossierForm(e) {
     }
 
     document.getElementById('sup-rfq-form-wrap').style.display = 'none';
-    alert('Dossier envoyé, en attente de validation admin.');
+    alert(t('sp_rf_sent'));
     loadSupplierRfqDossiers();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   } finally {
     btn.disabled = false;
   }
@@ -952,12 +951,12 @@ async function uploadRfqFile(rfqId, file, subfolder) {
     },
     body: file,
   });
-  if (!res.ok) throw new Error(`Échec de l'envoi du fichier (HTTP ${res.status})`);
+  if (!res.ok) throw new Error(`${t('rq_upload_fail')} (HTTP ${res.status})`);
   return path;
 }
 
 async function closeRfqDossier(rfqId) {
-  if (!confirm('Clôturer ce dossier ? Les fournisseurs ne pourront plus y répondre.')) return;
+  if (!confirm(t('sp_rf_confirm_close'))) return;
   try {
     await supplierFetch(`rfq_dossiers?id=eq.${rfqId}`, {
       method: 'PATCH',
@@ -966,7 +965,7 @@ async function closeRfqDossier(rfqId) {
     });
     loadSupplierRfqDossiers();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -975,15 +974,15 @@ function viewRfqResponses(rfqId) {
   const dossier = supplierRfqDossiers.find(d => d.id === rfqId);
   const responses = supplierRfqResponsesByDossier[rfqId] || [];
   const statusMap = {
-    sent:     { cls: 'sup-pill-pending', txt: '⏳ À traiter' },
-    accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
-    rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
-    invoiced: { cls: 'sup-pill-ok',      txt: '✓ Facturée' },
+    sent:     { cls: 'sup-pill-pending', txt: t('sp_st_todo') },
+    accepted: { cls: 'sup-pill-ok',      txt: t('acc_st_accepted') },
+    rejected: { cls: 'sup-pill-no',      txt: t('acc_st_rejected') },
+    invoiced: { cls: 'sup-pill-ok',      txt: t('rq_st_invoiced') },
   };
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">Réponses reçues — ${escapeHtml(dossier ? dossier.title : '')}</div>
-    ${!responses.length ? '<p class="sup-empty">Aucune réponse pour le moment.</p>' : responses.map(r => {
+    <div class="submit-section-title">${t('sp_rr_title')}${escapeHtml(dossier ? dossier.title : '')}</div>
+    ${!responses.length ? `<p class="sup-empty">${t('sp_rr_none')}</p>` : responses.map(r => {
       const st = statusMap[r.status] || statusMap.sent;
       return `
       <div class="sup-lead">
@@ -991,16 +990,16 @@ function viewRfqResponses(rfqId) {
           <span class="sup-lead-who">${escapeHtml(r.submitter_name)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${escapeHtml(r.submitter_email)} · ${r.price_label ? escapeHtml(r.price_label) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        <div class="sup-lead-meta">${escapeHtml(r.submitter_email)} · ${r.price_label ? escapeHtml(r.price_label) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString(supLocale())}</div>
         <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
         ${r.status === 'sent' ? `
         <div class="sup-lead-actions">
-          <button class="btn-add-product sup-btn-sm" onclick="respondToRfqResponse('${r.id}','accepted','${rfqId}')">✓ Accepter</button>
-          <button class="btn-remove-product" onclick="respondToRfqResponse('${r.id}','rejected','${rfqId}')">✕ Refuser</button>
+          <button class="btn-add-product sup-btn-sm" onclick="respondToRfqResponse('${r.id}','accepted','${rfqId}')">${t('sp_accept')}</button>
+          <button class="btn-remove-product" onclick="respondToRfqResponse('${r.id}','rejected','${rfqId}')">${t('sp_refuse')}</button>
         </div>` : ''}
       </div>`;
     }).join('')}
-    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-responses-wrap').style.display='none'">Fermer</button>`;
+    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-responses-wrap').style.display='none'">${t('rq_close')}</button>`;
 }
 
 async function respondToRfqResponse(id, status, rfqId) {
@@ -1013,7 +1012,7 @@ async function respondToRfqResponse(id, status, rfqId) {
     await loadSupplierRfqDossiers();
     viewRfqResponses(rfqId);
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -1027,14 +1026,14 @@ function viewRfqNdaSignatures(rfqId) {
   const dossier = supplierRfqDossiers.find(d => d.id === rfqId);
   const signatures = supplierRfqNdaSignaturesByDossier[rfqId] || [];
   const statusMap = {
-    pending:  { cls: 'sup-pill-pending', txt: '⏳ À vérifier' },
-    approved: { cls: 'sup-pill-ok',      txt: '✓ Approuvée' },
-    rejected: { cls: 'sup-pill-no',      txt: '✕ Rejetée' },
+    pending:  { cls: 'sup-pill-pending', txt: t('sp_ns_pending') },
+    approved: { cls: 'sup-pill-ok',      txt: t('sp_st_approved') },
+    rejected: { cls: 'sup-pill-no',      txt: t('sp_st_rejected') },
   };
   wrap.style.display = 'block';
   wrap.innerHTML = `
-    <div class="submit-section-title">Signatures NDA — ${escapeHtml(dossier ? dossier.title : '')}</div>
-    ${!signatures.length ? '<p class="sup-empty">Aucune demande de signature pour le moment.</p>' : signatures.map(s => {
+    <div class="submit-section-title">${t('sp_ns_title')}${escapeHtml(dossier ? dossier.title : '')}</div>
+    ${!signatures.length ? `<p class="sup-empty">${t('sp_ns_none')}</p>` : signatures.map(s => {
       const st = statusMap[s.status] || statusMap.pending;
       const filename = s.signed_document_path ? s.signed_document_path.split('/').pop() : null;
       return `
@@ -1043,20 +1042,20 @@ function viewRfqNdaSignatures(rfqId) {
           <span class="sup-lead-who">${escapeHtml(s.submitter_name)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${escapeHtml(s.submitter_email)} · ${new Date(s.created_at).toLocaleDateString('fr-FR')}</div>
-        ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:6px 0" onclick="downloadRfqFileSupplier('${escapeJsAttr(s.signed_document_path)}','${escapeJsAttr(filename)}')">📄 Télécharger la copie signée</button>` : '<p style="font-size:12px;color:var(--muted)">Aucun document uploadé.</p>'}
+        <div class="sup-lead-meta">${escapeHtml(s.submitter_email)} · ${new Date(s.created_at).toLocaleDateString(supLocale())}</div>
+        ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:6px 0" onclick="downloadRfqFileSupplier('${escapeJsAttr(s.signed_document_path)}','${escapeJsAttr(filename)}')">${t('sp_ns_dl')}</button>` : `<p style="font-size:12px;color:var(--muted)">${t('sp_ns_nodoc')}</p>`}
         ${s.status === 'pending' ? `
         <div class="sup-lead-actions">
-          <button class="btn-add-product sup-btn-sm" onclick="reviewRfqNdaSignature('${s.id}','approved','${rfqId}')">✓ Approuver</button>
-          <button class="btn-remove-product" onclick="reviewRfqNdaSignature('${s.id}','rejected','${rfqId}')">✕ Rejeter</button>
+          <button class="btn-add-product sup-btn-sm" onclick="reviewRfqNdaSignature('${s.id}','approved','${rfqId}')">${t('sp_ns_approve')}</button>
+          <button class="btn-remove-product" onclick="reviewRfqNdaSignature('${s.id}','rejected','${rfqId}')">${t('sp_ns_reject')}</button>
         </div>` : ''}
       </div>`;
     }).join('')}
-    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-nda-wrap').style.display='none'">Fermer</button>`;
+    <button type="button" class="btn-remove-product" style="margin-top:10px" onclick="document.getElementById('sup-rfq-nda-wrap').style.display='none'">${t('rq_close')}</button>`;
 }
 
 async function reviewRfqNdaSignature(id, status, rfqId) {
-  const reason = status === 'rejected' ? (prompt('Motif du refus (affiché au fournisseur) :') || null) : null;
+  const reason = status === 'rejected' ? (prompt(t('sp_ns_prompt')) || null) : null;
   try {
     await supplierFetch(`rfq_custom_nda_signatures?id=eq.${id}`, {
       method: 'PATCH',
@@ -1066,7 +1065,7 @@ async function reviewRfqNdaSignature(id, status, rfqId) {
     await loadSupplierRfqDossiers();
     viewRfqNdaSignatures(rfqId);
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -1087,7 +1086,21 @@ async function downloadRfqFileSupplier(path, filename) {
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   } catch (err) {
-    alert('Impossible de télécharger le fichier : ' + err.message);
+    alert(t('rq_dl_fail') + err.message);
   }
 }
 
+// Re-rendu au changement de langue (voir js/i18n.js applyLang()) : tout le
+// tableau de bord est construit en JS. Sans entreprise chargée, rien à faire.
+function supplierOnLangChange() {
+  if (!supplierCompany) return;
+  renderSupplierStats();
+  renderPremiumBox();
+  loadSupplierProducts();
+  loadSupplierSubmissions();
+  loadSupplierLeads();
+  loadSupplierViews();
+  loadSupplierComparison();
+  loadSupplierRfqDossiers();
+}
+function onLangChange() { supplierOnLangChange(); }

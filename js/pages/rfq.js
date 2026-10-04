@@ -1,3 +1,4 @@
+const rfqLocale = () => (getLang() === 'en' ? 'en-GB' : 'fr-FR');
 // ═══════════════════════════════
 // PAGE DOSSIERS RFQ/RFI/RFP — consultation et réponse côté fournisseur.
 // Réutilise l'authentification/session de js/pages/supplier.js (même
@@ -17,7 +18,7 @@ async function loadRfqBrowse() {
   gate.style.display = 'none';
   listPanel.style.display = 'block';
   myResponsesPanel.style.display = 'block';
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     // La liste elle-même est verrouillée par accord de confidentialité
     // (voir backend/supabase_rfq_gate_list_by_nda_2026_09.sql) : un
@@ -60,14 +61,14 @@ async function fetchAllRfqDossiers() {
 
 function renderRfqList() {
   const list = document.getElementById('rfq-list');
-  if (!rfqDossierRows.length) { list.innerHTML = '<p class="sup-empty">Aucun dossier publié pour le moment.</p>'; return; }
+  if (!rfqDossierRows.length) { list.innerHTML = `<p class="sup-empty">${t('rq_empty_list')}</p>`; return; }
   list.innerHTML = rfqDossierRows.map(d => `
     <div class="sup-prod">
       <div class="sup-prod-main">
         <span class="sup-prod-name">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)}${d.requires_custom_nda ? ' 🔒' : ''}</span>
-        <span class="sup-prod-cat">${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.deadline ? ' · avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}${d.requires_custom_nda ? ' · NDA personnalisé requis' : ''}</span>
+        <span class="sup-prod-cat">${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.deadline ? t('rq_before') + new Date(d.deadline).toLocaleDateString(rfqLocale()) : ''}${d.requires_custom_nda ? t('rq_custom_nda') : ''}</span>
       </div>
-      <button class="btn-add-product sup-btn-sm" onclick="openRfqDetail('${d.id}')">Voir le détail</button>
+      <button class="btn-add-product sup-btn-sm" onclick="openRfqDetail('${d.id}')">${t('rq_view')}</button>
     </div>`).join('');
 }
 
@@ -81,7 +82,7 @@ async function openRfqDetail(id) {
   const gate = document.getElementById('rfq-nda-gate');
   gate.style.display = 'none';
   panel.style.display = 'block';
-  panel.innerHTML = 'Chargement…';
+  panel.innerHTML = t('acc_loading');
   try {
     const rows = await supplierFetch('rpc/get_rfq_dossier_detail', {
       method: 'POST',
@@ -114,7 +115,7 @@ async function acceptRfqNda() {
     if (pendingRfqDetailId) { openRfqDetail(pendingRfqDetailId); pendingRfqDetailId = null; }
     else loadRfqBrowse();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   }
 }
 
@@ -133,18 +134,18 @@ function renderRfqDetail(d) {
   panel.innerHTML = `
     <div class="sup-panel-head">
       <span class="submit-section-title" style="margin:0;border:none;padding:0">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)}</span>
-      <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">Fermer</button>
+      <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">${t('rq_close')}</button>
     </div>
     <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">
-      ${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.industry ? ' · ' + escapeHtml(d.industry) : ''}${d.deadline ? ' · Réponse avant le ' + new Date(d.deadline).toLocaleDateString('fr-FR') : ''}
+      ${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}${d.industry ? ' · ' + escapeHtml(d.industry) : ''}${d.deadline ? t('rq_reply_before') + new Date(d.deadline).toLocaleDateString(rfqLocale()) : ''}
     </p>
     <p style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${escapeHtml(d.description)}</p>
-    ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.attachment_path)}','${escapeJsAttr(filename)}')">📄 Télécharger le cahier des charges</button>` : ''}
-    <div class="submit-section-title" style="margin-top:20px">Répondre à ce dossier</div>
+    ${filename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.attachment_path)}','${escapeJsAttr(filename)}')">${t('rq_dl_spec')}</button>` : ''}
+    <div class="submit-section-title" style="margin-top:20px">${t('rq_reply_h')}</div>
     <form onsubmit="submitRfqResponse(event,'${d.id}')">
-      <div class="lead-field"><label>Votre message / proposition</label><textarea id="rfq-resp-message" rows="4" required></textarea></div>
-      <div class="lead-field"><label>Prix indicatif (optionnel)</label><input type="text" id="rfq-resp-price" placeholder="Sur devis"/></div>
-      <button type="submit" class="btn-submit-form">Envoyer ma réponse</button>
+      <div class="lead-field"><label>${t('rq_msg')}</label><textarea id="rfq-resp-message" rows="4" required></textarea></div>
+      <div class="lead-field"><label>${t('rq_price')}</label><input type="text" id="rfq-resp-price" placeholder="${t('rq_price_ph')}"/></div>
+      <button type="submit" class="btn-submit-form">${t('rq_send')}</button>
     </form>`;
 }
 
@@ -157,24 +158,24 @@ function renderCustomNdaPanel(d) {
   const templateFilename = d.custom_nda_template_path ? d.custom_nda_template_path.split('/').pop() : null;
 
   const statusBlock = {
-    none: `<p style="font-size:13px;color:var(--text2)">Ce dossier nécessite un NDA personnalisé fourni par le systémier, en plus de l'accord standard. Téléchargez-le, signez-le hors plateforme, puis uploadez votre copie signée.</p>`,
-    pending: `<p style="font-size:13px;color:var(--text2)">Votre copie signée a été envoyée et est en attente de vérification par le systémier.</p>`,
-    rejected: `<p style="font-size:13px;color:#E06A52">Votre signature a été rejetée${d.custom_nda_rejection_reason ? ' : ' + escapeHtml(d.custom_nda_rejection_reason) : ''}. Vous pouvez renvoyer une copie corrigée ci-dessous.</p>`,
+    none: `<p style="font-size:13px;color:var(--text2)">${t('rq_nda_none')}</p>`,
+    pending: `<p style="font-size:13px;color:var(--text2)">${t('rq_nda_pending')}</p>`,
+    rejected: `<p style="font-size:13px;color:#E06A52">${t('rq_nda_rejected_a')}${d.custom_nda_rejection_reason ? ' : ' + escapeHtml(d.custom_nda_rejection_reason) : ''}${t('rq_nda_rejected_b')}</p>`,
   }[d.custom_nda_status] || '';
 
   panel.innerHTML = `
     <div class="sup-panel-head">
       <span class="submit-section-title" style="margin:0;border:none;padding:0">${escapeHtml(d.rfq_type)} — ${escapeHtml(d.title)} 🔒</span>
-      <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">Fermer</button>
+      <button type="button" class="btn-remove-product" onclick="document.getElementById('rfq-detail-panel').style.display='none'">${t('rq_close')}</button>
     </div>
     <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px">${escapeHtml(d.company_name)}${d.category ? ' · ' + escapeHtml(d.category) : ''}</p>
     ${statusBlock}
-    ${templateFilename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.custom_nda_template_path)}','${escapeJsAttr(templateFilename)}')">📄 Télécharger le gabarit NDA</button>` : ''}
+    ${templateFilename ? `<button type="button" class="btn-add-product sup-btn-sm" style="margin:10px 0" onclick="downloadRfqAttachment('${escapeJsAttr(d.custom_nda_template_path)}','${escapeJsAttr(templateFilename)}')">${t('rq_dl_nda')}</button>` : ''}
     ${d.custom_nda_status !== 'pending' ? `
-    <div class="submit-section-title" style="margin-top:20px">Envoyer ma copie signée</div>
+    <div class="submit-section-title" style="margin-top:20px">${t('rq_nda_send_h')}</div>
     <form onsubmit="submitSignedNda(event,'${d.id}')">
-      <div class="lead-field"><label>Copie signée (PDF)</label><input type="file" id="rfq-nda-signed-file" accept=".pdf" required/></div>
-      <button type="submit" class="btn-submit-form">Envoyer pour vérification</button>
+      <div class="lead-field"><label>${t('rq_nda_file')}</label><input type="file" id="rfq-nda-signed-file" accept=".pdf" required/></div>
+      <button type="submit" class="btn-submit-form">${t('rq_nda_send_btn')}</button>
     </form>` : ''}`;
 }
 
@@ -193,7 +194,7 @@ async function submitSignedNda(e, rfqId) {
       headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + token, 'Content-Type': file.type || 'application/octet-stream', 'x-upsert': 'true' },
       body: file,
     });
-    if (!res.ok) throw new Error(`Échec de l'envoi du fichier (HTTP ${res.status})`);
+    if (!res.ok) throw new Error(`${t('rq_upload_fail')} (HTTP ${res.status})`);
 
     // Existe-t-il déjà une demande (rejetée) pour ce dossier ? Sinon on en
     // crée une nouvelle -- la contrainte unique (rfq_id, company_id) impose
@@ -220,10 +221,10 @@ async function submitSignedNda(e, rfqId) {
       });
     }
 
-    alert('Copie signée envoyée, en attente de vérification par le systémier.');
+    alert(t('rq_nda_sent'));
     openRfqDetail(rfqId);
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   } finally {
     btn.disabled = false;
   }
@@ -247,11 +248,11 @@ async function submitRfqResponse(e, rfqId) {
         price_label: document.getElementById('rfq-resp-price').value || null,
       }]),
     });
-    alert('Réponse envoyée.');
+    alert(t('rq_resp_sent'));
     document.getElementById('rfq-detail-panel').style.display = 'none';
     loadRfqMyResponses();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    alert(t('acc_err_prefix') + err.message);
   } finally {
     btn.disabled = false;
   }
@@ -275,23 +276,23 @@ async function downloadRfqAttachment(path, filename) {
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   } catch (err) {
-    alert('Impossible de télécharger le fichier : ' + err.message);
+    alert(t('rq_dl_fail') + err.message);
   }
 }
 
 async function loadRfqMyResponses() {
   const list = document.getElementById('rfq-my-responses-list');
   if (!list) return;
-  list.innerHTML = 'Chargement…';
+  list.innerHTML = t('acc_loading');
   try {
     const uid = sessionStorage.getItem('sup_user_id');
     const rows = await supplierFetch(`rfq_responses?submitter_user_id=eq.${uid}&select=*&order=created_at.desc`) || [];
-    if (!rows.length) { list.innerHTML = '<p class="sup-empty">Vous n\'avez pas encore répondu à un dossier RFQ.</p>'; return; }
+    if (!rows.length) { list.innerHTML = `<p class="sup-empty">${t('rq_no_resp')}</p>`; return; }
     const statusMap = {
-      sent:     { cls: 'sup-pill-pending', txt: '⏳ Envoyée' },
-      accepted: { cls: 'sup-pill-ok',      txt: '✓ Acceptée' },
-      rejected: { cls: 'sup-pill-no',      txt: '✕ Refusée' },
-      invoiced: { cls: 'sup-pill-ok',      txt: '✓ Facturée' },
+      sent:     { cls: 'sup-pill-pending', txt: t('rq_st_sent') },
+      accepted: { cls: 'sup-pill-ok',      txt: t('acc_st_accepted') },
+      rejected: { cls: 'sup-pill-no',      txt: t('acc_st_rejected') },
+      invoiced: { cls: 'sup-pill-ok',      txt: t('rq_st_invoiced') },
     };
     list.innerHTML = rows.map(r => {
       const st = statusMap[r.status] || statusMap.sent;
@@ -301,4 +302,12 @@ async function loadRfqMyResponses() {
   } catch (err) {
     list.innerHTML = `<p style="color:#E06A52;font-size:13px">${err.message}</p>`;
   }
+}
+
+// Re-rendu au changement de langue : surcharge celle de supplier.js (chargé
+// avant) -- on enchaîne donc les deux.
+function onLangChange() {
+  if (typeof supplierOnLangChange === 'function') supplierOnLangChange();
+  if (typeof rfqDossierRows !== 'undefined' && rfqDossierRows.length && document.getElementById('rfq-list')) renderRfqList();
+  if (typeof supplierCompany !== 'undefined' && supplierCompany && typeof loadRfqMyResponses === 'function') loadRfqMyResponses();
 }

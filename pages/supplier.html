@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Espace fournisseur · Buy-inner</title>
-<meta name="description" content="Espace fournisseur Buy-inner : gérez vos produits et vos leads. Chaque ajout est validé avant publication."/>
+<title data-i18n="sp_doc_title">Espace fournisseur · Buy-inner</title>
+<meta name="description" data-i18n-content="sp_meta_desc" content="Espace fournisseur Buy-inner : gérez vos produits et vos leads. Chaque ajout est validé avant publication."/>
 <meta name="robots" content="noindex,follow"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
@@ -22,19 +22,19 @@
 <header class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Espace <span>fournisseur</span></h1>
-      <p class="page-subtitle">Gérez vos produits. Chaque ajout/modification reste soumis à validation avant publication.</p>
+      <h1 class="page-title" data-i18n-html="sp_h1">Espace <span>fournisseur</span></h1>
+      <p class="page-subtitle" data-i18n="sp_sub">Gérez vos produits. Chaque ajout/modification reste soumis à validation avant publication.</p>
     </div>
   </div>
 </header>
 
 <!-- Stepper du parcours fournisseur -->
-<nav class="sup-steps" id="sup-steps" data-step="1" aria-label="Étapes du parcours fournisseur">
-  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label">Compte</span></div>
+<nav class="sup-steps" id="sup-steps" data-step="1" aria-label="Étapes du parcours fournisseur" data-i18n-aria="sp_steps_aria">
+  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label" data-i18n="sp_step1">Compte</span></div>
   <span class="sup-step-bar"></span>
-  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label">Revendiquer</span></div>
+  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label" data-i18n="sp_step2">Revendiquer</span></div>
   <span class="sup-step-bar"></span>
-  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label">Publier</span></div>
+  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label" data-i18n="sp_step3">Publier</span></div>
 </nav>
 
 <div class="submit-wrap">
@@ -43,29 +43,29 @@
   <div id="sup-auth-box">
     <div class="sup-gate">
       <aside class="sup-gate-aside">
-        <span class="section-eyebrow">POURQUOI S'INSCRIRE</span>
-        <h2 class="sup-gate-title">Vos produits, devant les <em>bons acheteurs.</em></h2>
+        <span class="section-eyebrow" data-i18n="sg_eyebrow">POURQUOI S'INSCRIRE</span>
+        <h2 class="sup-gate-title" data-i18n-html="sp_gate_h">Vos produits, devant les <em>bons acheteurs.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span>Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Vous ne payez <strong>qu'un lead que vous avez accepté</strong> (~80&nbsp;€), jamais d'abonnement.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Vous gardez la main : chaque modification passe par vous, puis validation.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sp_gate_p1">Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sp_gate_p2">Vous ne payez <strong>qu'un lead que vous avez accepté</strong> (~80&nbsp;€), jamais d'abonnement.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n="sp_gate_p3">Vous gardez la main : chaque modification passe par vous, puis validation.</span></li>
         </ul>
-        <div class="sup-gate-foot">Pas encore sur Buy-inner ? <a href="submit.html">Référencez votre entreprise →</a></div>
+        <div class="sup-gate-foot" data-i18n-html="rq_gate_foot">Pas encore sur Buy-inner ? <a href="submit.html">Référencez votre entreprise →</a></div>
       </aside>
 
       <div class="sup-gate-card">
-        <div class="submit-section-title">Se connecter</div>
+        <div class="submit-section-title" data-i18n="acc_login">Se connecter</div>
         <form onsubmit="supplierLogin(event)">
-          <div class="lead-field"><label>Email</label><input type="email" id="sup-login-email" required/></div>
-          <div class="lead-field"><label>Mot de passe</label><input type="password" id="sup-login-password" required/></div>
-          <button type="submit" class="btn-submit-form">Se connecter</button>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="sup-login-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password">Mot de passe</label><input type="password" id="sup-login-password" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_login">Se connecter</button>
         </form>
-        <div class="sup-gate-sep"><span>nouveau&nbsp;?</span></div>
-        <div class="submit-section-title">Créer un compte</div>
+        <div class="sup-gate-sep"><span data-i18n-html="acc_new">nouveau&nbsp;?</span></div>
+        <div class="submit-section-title" data-i18n="acc_signup_title">Créer un compte</div>
         <form onsubmit="supplierSignup(event)">
-          <div class="lead-field"><label>Email</label><input type="email" id="sup-signup-email" required/></div>
-          <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
-          <button type="submit" class="btn-submit-form">Créer mon compte</button>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="sup-signup-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
         <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
       </div>
@@ -75,22 +75,22 @@
   <!-- État: connecté, pas encore d'entreprise revendiquée -->
   <div id="sup-claim-box" style="display:none">
     <div class="sup-panel">
-      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px">Cherchez votre entreprise dans l'annuaire Buy-inner. La revendication est validée manuellement, comptez quelques jours.</p>
-      <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie"/></div>
-      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()">Chercher</button>
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sg_claim_h">Revendiquer mon entreprise</span><button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px" data-i18n="sp_claim_p">Cherchez votre entreprise dans l'annuaire Buy-inner. La revendication est validée manuellement, comptez quelques jours.</p>
+      <div class="lead-field"><label data-i18n="sg_company_name">Nom de l'entreprise</label><input type="text" id="sup-claim-search" placeholder="ex: TYVA Energie" data-i18n-placeholder="sg_claim_ph"/></div>
+      <button type="button" class="btn-add-product" onclick="searchCompanyToClaim()" data-i18n="sg_search">Chercher</button>
       <div id="sup-claim-results" style="margin-top:14px"></div>
-      <p style="font-size:12px;color:var(--muted);margin-top:14px">Votre entreprise n'existe pas encore sur Buy-inner ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px" data-i18n-html="sg_claim_foot">Votre entreprise n'existe pas encore sur Buy-inner ? <a href="submit.html" style="color:var(--steel);font-weight:600">Référencez-la ici</a> à la place.</p>
     </div>
   </div>
 
   <!-- État: connecté, revendication en attente -->
   <div id="sup-pending-box" style="display:none">
     <div class="sup-panel">
-      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button></div>
+      <div class="product-block-header"><span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sg_pending_h">Revendication en cours</span><button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button></div>
       <div class="sup-pending-note">
         <span class="sup-pending-ico">⏳</span>
-        <p style="font-size:13px;color:var(--text2);margin:0">Votre demande de revendication pour <strong id="sup-pending-company"></strong> est en attente de validation. Vous serez notifié une fois approuvée.</p>
+        <p style="font-size:13px;color:var(--text2);margin:0"><span data-i18n="sg_pending_a">Votre demande de revendication pour</span> <strong id="sup-pending-company"></strong> <span data-i18n="sg_pending_b">est en attente de validation. Vous serez notifié une fois approuvée.</span></p>
       </div>
     </div>
   </div>
@@ -100,9 +100,9 @@
     <div class="product-block-header">
       <span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span>
       <div style="display:flex;gap:8px">
-        <a href="rfq.html" class="btn-add-product sup-btn-sm">📋 Dossiers RFQ disponibles</a>
-        <button type="button" class="btn-add-product sup-btn-sm" onclick="openCompanyEditForm()">Modifier la fiche</button>
-        <button class="btn-remove-product" onclick="supplierLogout()">Se déconnecter</button>
+        <a href="rfq.html" class="btn-add-product sup-btn-sm" data-i18n="sp_rfq_avail">📋 Dossiers RFQ disponibles</a>
+        <button type="button" class="btn-add-product sup-btn-sm" onclick="openCompanyEditForm()" data-i18n="sp_edit_company">Modifier la fiche</button>
+        <button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button>
       </div>
     </div>
 
@@ -111,14 +111,14 @@
     <div class="sup-stats" id="sup-stats"></div>
 
     <div class="sup-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Demandes de devis reçues</span>
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="sp_h_leads">Demandes de devis reçues</span>
       <div id="sup-leads-list"></div>
     </div>
 
     <div class="sup-panel">
       <div class="sup-panel-head">
-        <span class="submit-section-title" style="margin:0;border:none;padding:0">Vos produits</span>
-        <button type="button" class="btn-add-product sup-add-inline" onclick="openSupplierProductForm()">+ Ajouter un produit</button>
+        <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sp_h_products">Vos produits</span>
+        <button type="button" class="btn-add-product sup-add-inline" onclick="openSupplierProductForm()" data-i18n="sp_add_product">+ Ajouter un produit</button>
       </div>
       <div id="sup-products-list"></div>
       <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
@@ -128,8 +128,8 @@
     est systémier ET premium (voir renderSupplierRfqSection, js/pages/supplier.js) -->
     <div class="sup-panel" id="sup-rfq-panel" style="display:none">
       <div class="sup-panel-head">
-        <span class="submit-section-title" style="margin:0;border:none;padding:0">Vos dossiers RFQ / RFI / RFP</span>
-        <button type="button" class="btn-add-product sup-add-inline" onclick="openRfqDossierForm()">+ Déposer un dossier</button>
+        <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sp_h_rfq">Vos dossiers RFQ / RFI / RFP</span>
+        <button type="button" class="btn-add-product sup-add-inline" onclick="openRfqDossierForm()" data-i18n="sp_add_rfq">+ Déposer un dossier</button>
       </div>
       <div id="sup-rfq-list"></div>
       <div id="sup-rfq-form-wrap" style="display:none;margin-top:20px"></div>
@@ -139,14 +139,14 @@
 
     <div class="sup-panel">
       <div class="sup-panel-head">
-        <span class="submit-section-title" style="margin:0;border:none;padding:0">Statistiques de vues</span>
+        <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sp_h_views">Statistiques de vues</span>
         <select id="sup-views-range" onchange="renderSupplierViewsForRange()" style="display:none;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
-          <option value="1">1 jour</option>
-          <option value="7">1 semaine</option>
-          <option value="30" selected>1 mois</option>
-          <option value="90">3 mois</option>
-          <option value="180">6 mois</option>
-          <option value="365">1 an</option>
+          <option value="1" data-i18n="sp_rng_1">1 jour</option>
+          <option value="7" data-i18n="sp_rng_7">1 semaine</option>
+          <option value="30" selected data-i18n="sp_rng_30">1 mois</option>
+          <option value="90" data-i18n="sp_rng_90">3 mois</option>
+          <option value="180" data-i18n="sp_rng_180">6 mois</option>
+          <option value="365" data-i18n="sp_rng_365">1 an</option>
         </select>
       </div>
       <div id="sup-views-chart"></div>
@@ -155,14 +155,14 @@
 
     <div class="sup-panel">
       <div class="sup-panel-head">
-        <span class="submit-section-title" style="margin:0;border:none;padding:0">Comparaison avec la concurrence</span>
+        <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sp_h_compare">Comparaison avec la concurrence</span>
         <select id="sup-compare-product" onchange="renderSupplierComparison()" style="display:none;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)"></select>
       </div>
       <div id="sup-compare-table"></div>
     </div>
 
     <div class="sup-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Vos soumissions</span>
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="sp_h_subs">Vos soumissions</span>
       <div id="sup-submissions-list"></div>
     </div>
 

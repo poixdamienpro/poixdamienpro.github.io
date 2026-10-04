@@ -12,9 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderPlans() {
   const grid = document.getElementById('plans-grid');
   if(!grid) return;
-  grid.innerHTML = PLANS.map((plan, i) => `
+  const plans = getLang() === 'en' ? PLANS_EN : PLANS;
+  grid.innerHTML = plans.map((plan, i) => `
     <div class="plan-card ${plan.highlight ? 'highlight' : ''}" style="--i:${i}">
-      ${plan.highlight ? '<div class="plan-popular">LE PLUS POPULAIRE</div>' : ''}
+      ${plan.highlight ? `<div class="plan-popular">${t('pr_popular')}</div>` : ''}
       <div class="plan-name">${plan.name}</div>
       <div class="plan-price">${plan.price}</div>
       <div class="plan-period">${plan.period}</div>
@@ -30,7 +31,8 @@ function renderPlans() {
 function renderFAQ() {
   const el = document.getElementById('faq-list');
   if(!el) return;
-  el.innerHTML = FAQ.map((f, i) => `
+  const faq = getLang() === 'en' ? FAQ_EN : FAQ;
+  el.innerHTML = faq.map((f, i) => `
     <div class="faq-item${i === 0 ? ' open' : ''}">
       <button class="faq-q" type="button" aria-expanded="${i === 0}">
         <span>${f.q}</span><span class="faq-toggle" aria-hidden="true">+</span>
@@ -45,6 +47,12 @@ function renderFAQ() {
       btn.setAttribute('aria-expanded', isOpen);
     });
   });
+}
+
+// Re-rendu des blocs construits en JS au changement de langue (voir js/i18n.js applyLang()).
+function onLangChange() {
+  renderPlans();
+  renderFAQ();
 }
 
 // Révèle le rail (nœuds + câbles) quand il entre dans le viewport.

@@ -71,6 +71,40 @@ const PLANS = [
   ]},
 ];
 
+const PLANS_EN = [
+  {name:"Buyer",price:"€0",period:"forever",highlight:false,target:"annuaire",desc:"For engineers and buyers sourcing equipment.",cta:"Explore for free",ctaClass:"secondary",features:[
+    {ok:true, text:"Full directory"},
+    {ok:true, text:"Product pages, full technical specs"},
+    {ok:true, text:"Filters by industry and category"},
+    {ok:true, text:"Unlimited comparison (4 products)"},
+    {ok:true, text:"Unlimited quote requests"},
+    {ok:true, text:"No credit card required"}
+  ]},
+  {name:"Supplier · Listing",price:"€0",period:"forever",highlight:true,target:"submit",desc:"Your company listed for free. You only pay on results.",cta:"List my company",ctaClass:"primary",features:[
+    {ok:true, text:"Company and product pages in the directory"},
+    {ok:true, text:"No payment to be listed or visible"},
+    {ok:true, text:"You choose to accept or decline each contact request"},
+    {ok:true, text:"Pay only for accepted leads (~€80 per qualified lead)"},
+    {ok:false,text:"Verified Premium badge"},
+    {ok:false,text:"Priority in search results"}
+  ]},
+  {name:"Supplier Premium",price:"€1,500",period:"/year",highlight:false,target:"supplier",desc:"For manufacturers who want to maximize their visibility and leads. Available once your company has been claimed.",cta:"Go Premium",ctaClass:"secondary",features:[
+    {ok:true, text:"Everything in the Listing plan"},
+    {ok:true, text:"★ PREMIUM badge and priority placement"},
+    {ok:true, text:"Enriched profile: video, datasheets, certifications"},
+    {ok:true, text:"Analytics dashboard: views, clicks, requests"},
+    {ok:true, text:"Unlimited product pages"},
+    {ok:true, text:"Dedicated onboarding support"}
+  ]},
+];
+const FAQ_EN = [
+  {q:"Do I have to pay to have my company listed?",a:"No. Basic listing is, and will always be, free. You never pay to be listed or visible in the directory."},
+  {q:"How does pay-per-lead work?",a:"When an engineer requests a quote on your page, we offer you the contact. You choose to accept it (~€80 per qualified lead) or decline it at no cost. No invoice is ever sent without your explicit agreement."},
+  {q:"Do buyers have to pay to see specs or contact a supplier?",a:"No. Buyer access is entirely free: directory, full technical sheets and unlimited quote requests, with no credit card."},
+  {q:"How does the supplier Premium badge work?",a:"Your company appears at the top of relevant results, with a gold frame and the ★ PREMIUM badge, for €1,500/year."},
+  {q:"What if my company is listed without my knowledge?",a:"Unclaimed profiles are built from public data (websites, datasheets). You can claim them for free at any time, or ask for their removal."},
+  {q:"Is the site indexed on Google?",a:"Yes. Every company and product page is optimized for organic search (SEO)."},
+];
 const FAQ = [
   {q:"Dois-je payer pour que mon entreprise soit référencée ?",a:"Non. Le référencement de base est et restera toujours gratuit. Vous ne payez jamais pour être listé ou visible dans l'annuaire."},
   {q:"Comment fonctionne le paiement par lead ?",a:"Quand un ingénieur demande un devis sur votre fiche, nous vous proposons le contact. Vous choisissez de l'accepter (paiement ~80 € par lead qualifié) ou de le refuser, sans frais. Aucune facture n'est jamais envoyée sans votre accord explicite."},

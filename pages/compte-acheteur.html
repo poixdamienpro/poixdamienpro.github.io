@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Mon compte · Buy-inner</title>
-<meta name="description" content="Créez un compte acheteur gratuit pour préremplir vos demandes de devis et retrouver leur historique sur Buy-inner."/>
+<title data-i18n="acc_doc_title">Mon compte · Buy-inner</title>
+<meta name="description" data-i18n-content="acc_meta_desc" content="Créez un compte acheteur gratuit pour préremplir vos demandes de devis et retrouver leur historique sur Buy-inner."/>
 <meta name="robots" content="noindex,follow"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/styles.css"/>
@@ -22,8 +22,8 @@
 <header class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Mon <span>compte</span></h1>
-      <p class="page-subtitle">Optionnel et gratuit — préremplissez vos demandes de devis et retrouvez leur historique. Aucun compte n'est nécessaire pour utiliser Buy-inner.</p>
+      <h1 class="page-title" data-i18n-html="acc_h1">Mon <span>compte</span></h1>
+      <p class="page-subtitle" data-i18n="acc_sub">Gratuit — accédez aux fiches complètes, à la carte et aux datasheets, et retrouvez l'historique de vos demandes de devis.</p>
     </div>
   </div>
 </header>
@@ -34,30 +34,30 @@
   <div id="acc-auth-box">
     <div class="sup-gate">
       <aside class="sup-gate-aside">
-        <span class="section-eyebrow">POURQUOI SE CONNECTER</span>
-        <h2 class="sup-gate-title">Vos demandes, <em>retrouvées en un clic.</em></h2>
+        <span class="section-eyebrow" data-i18n="acc_eyebrow">POURQUOI SE CONNECTER</span>
+        <h2 class="sup-gate-title" data-i18n-html="acc_h2">Vos demandes, <em>retrouvées en un clic.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span>Nom, email et entreprise <strong>préremplis</strong> à chaque demande de devis.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>L'historique de toutes vos demandes envoyées, avec leur statut.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Toujours <strong>100&nbsp;% gratuit</strong>, jamais obligatoire pour utiliser l'annuaire.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="acc_p1">Accès aux <strong>informations complètes</strong> : specs détaillées, datasheets, carte des fournisseurs.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="acc_p2">Nom, email et entreprise <strong>préremplis</strong> à chaque demande de devis.</span></li>
+                    <li><span class="sup-gate-ico">✓</span><span data-i18n-html="acc_p3">Toujours <strong>100&nbsp;% gratuit</strong> : l'annuaire reste consultable sans compte.</span></li>
         </ul>
       </aside>
 
       <div class="sup-gate-card">
-        <div class="submit-section-title">Se connecter</div>
+        <div class="submit-section-title" data-i18n="acc_login">Se connecter</div>
         <form onsubmit="handleBuyerLogin(event)">
-          <div class="lead-field"><label>Email</label><input type="email" id="acc-login-email" required/></div>
-          <div class="lead-field"><label>Mot de passe</label><input type="password" id="acc-login-password" required/></div>
-          <button type="submit" class="btn-submit-form">Se connecter</button>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="acc-login-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password">Mot de passe</label><input type="password" id="acc-login-password" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_login">Se connecter</button>
         </form>
-        <div class="sup-gate-sep"><span>nouveau&nbsp;?</span></div>
-        <div class="submit-section-title">Créer un compte</div>
+        <div class="sup-gate-sep"><span data-i18n-html="acc_new">nouveau&nbsp;?</span></div>
+        <div class="submit-section-title" data-i18n="acc_signup_title">Créer un compte</div>
         <form onsubmit="handleBuyerSignup(event)">
-          <div class="lead-field"><label>Nom complet</label><input type="text" id="acc-signup-name" required/></div>
-          <div class="lead-field"><label>Entreprise</label><input type="text" id="acc-signup-company" required/></div>
-          <div class="lead-field"><label>Email</label><input type="email" id="acc-signup-email" required/></div>
-          <div class="lead-field"><label>Mot de passe (8 caractères min.)</label><input type="password" id="acc-signup-password" minlength="8" required/></div>
-          <button type="submit" class="btn-submit-form">Créer mon compte</button>
+          <div class="lead-field"><label data-i18n="acc_fullname">Nom complet</label><input type="text" id="acc-signup-name" required/></div>
+          <div class="lead-field"><label data-i18n="acc_company">Entreprise</label><input type="text" id="acc-signup-company" required/></div>
+          <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="acc-signup-email" required/></div>
+          <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="acc-signup-password" minlength="8" required/></div>
+          <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
         <p id="acc-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
       </div>
@@ -67,23 +67,23 @@
   <!-- État : connecté -->
   <div id="acc-dashboard" style="display:none">
     <div class="product-block-header">
-      <span class="submit-section-title" style="margin:0;border:none;padding:0">Mon profil</span>
+      <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="acc_profile">Mon profil</span>
       <div style="display:flex;gap:8px">
-        <button type="button" class="btn-add-product sup-btn-sm" onclick="openBuyerProfileForm()">Modifier</button>
-        <button class="btn-remove-product" onclick="handleBuyerLogout()">Se déconnecter</button>
+        <button type="button" class="btn-add-product sup-btn-sm" onclick="openBuyerProfileForm()" data-i18n="acc_edit">Modifier</button>
+        <button class="btn-remove-product" onclick="handleBuyerLogout()" data-i18n="acc_logout">Se déconnecter</button>
       </div>
     </div>
     <div class="sup-panel">
       <div class="detail-grid" id="acc-profile-view">
-        <div class="detail-item"><div class="detail-label">Nom</div><div class="detail-value" id="acc-name">—</div></div>
-        <div class="detail-item"><div class="detail-label">Email</div><div class="detail-value" id="acc-email">—</div></div>
-        <div class="detail-item"><div class="detail-label">Entreprise</div><div class="detail-value" id="acc-company">—</div></div>
+        <div class="detail-item"><div class="detail-label" data-i18n="acc_name">Nom</div><div class="detail-value" id="acc-name">—</div></div>
+        <div class="detail-item"><div class="detail-label" data-i18n="acc_email">Email</div><div class="detail-value" id="acc-email">—</div></div>
+        <div class="detail-item"><div class="detail-label" data-i18n="acc_company">Entreprise</div><div class="detail-value" id="acc-company">—</div></div>
       </div>
       <div id="acc-profile-form-wrap" style="display:none"></div>
     </div>
 
     <div class="sup-panel">
-      <span class="submit-section-title" style="border:none;padding:0">Historique de mes demandes</span>
+      <span class="submit-section-title" style="border:none;padding:0" data-i18n="acc_history">Historique de mes demandes</span>
       <div id="acc-leads-list"></div>
     </div>
   </div>

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Référencer mon entreprise · Buy-inner</title>
-<meta name="description" content="Référencez gratuitement votre entreprise et vos produits sur Buy-inner, l'annuaire des équipementiers industriels. Publication après validation."/>
+<title data-i18n="sb_doc_title">Référencer mon entreprise · Buy-inner</title>
+<meta name="description" data-i18n-content="sb_meta_desc" content="Référencez gratuitement votre entreprise et vos produits sur Buy-inner, l'annuaire des équipementiers industriels. Publication après validation."/>
 <meta name="robots" content="index,follow"/>
 <link rel="canonical" href="https://www.buy-inner.com/pages/submit.html"/>
 <meta property="og:type" content="website"/>
@@ -34,19 +34,19 @@
 <header class="page-header">
   <div class="page-header-inner">
     <div>
-      <h1 class="page-title">Référencer <span>mon entreprise</span></h1>
-      <p class="page-subtitle">Gratuit. Vos produits sont relus avant publication, comptez quelques jours.</p>
+      <h1 class="page-title" data-i18n-html="sb_h1">Référencer <span>mon entreprise</span></h1>
+      <p class="page-subtitle" data-i18n="sb_sub">Gratuit. Vos produits sont relus avant publication, comptez quelques jours.</p>
     </div>
   </div>
 </header>
 
 <!-- Stepper (suit le scroll) -->
-<nav class="sup-steps" id="sub-steps" data-step="1" aria-label="Sections du formulaire">
-  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label">Coordonnées</span></div>
+<nav class="sup-steps" id="sub-steps" data-step="1" aria-label="Sections du formulaire" data-i18n-aria="sb_steps_aria">
+  <div class="sup-step" data-n="1"><span class="sup-step-dot">1</span><span class="sup-step-label" data-i18n="sb_step1">Coordonnées</span></div>
   <span class="sup-step-bar"></span>
-  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label">Entreprise</span></div>
+  <div class="sup-step" data-n="2"><span class="sup-step-dot">2</span><span class="sup-step-label" data-i18n="sb_step2">Entreprise</span></div>
   <span class="sup-step-bar"></span>
-  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label">Produits</span></div>
+  <div class="sup-step" data-n="3"><span class="sup-step-dot">3</span><span class="sup-step-label" data-i18n="sb_step3">Produits</span></div>
 </nav>
 
 <datalist id="industry-list"></datalist>
@@ -56,48 +56,48 @@
     <form id="submit-form" onsubmit="submitSupplierForm(event)">
 
       <section class="sub-card" data-step="1" style="--i:0">
-        <div class="sub-card-head"><span class="sub-card-num">1</span><div><div class="sub-card-title">Vos coordonnées</div><div class="sub-card-sub">Pour vous recontacter une fois la fiche publiée.</div></div></div>
+        <div class="sub-card-head"><span class="sub-card-num">1</span><div><div class="sub-card-title" data-i18n="sb_c1_t">Vos coordonnées</div><div class="sub-card-sub" data-i18n="sb_c1_s">Pour vous recontacter une fois la fiche publiée.</div></div></div>
         <div class="submit-grid">
-          <div class="lead-field"><label>Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
-          <div class="lead-field"><label>Votre email</label><input type="email" id="sub-submitter-email" required/></div>
+          <div class="lead-field"><label data-i18n="sb_your_name">Votre nom</label><input type="text" id="sub-submitter-name" required/></div>
+          <div class="lead-field"><label data-i18n="sb_your_email">Votre email</label><input type="email" id="sub-submitter-email" required/></div>
         </div>
       </section>
 
       <section class="sub-card" data-step="2" style="--i:1">
-        <div class="sub-card-head"><span class="sub-card-num">2</span><div><div class="sub-card-title">Votre entreprise</div><div class="sub-card-sub">Les informations publiques de votre fiche annuaire.</div></div></div>
+        <div class="sub-card-head"><span class="sub-card-num">2</span><div><div class="sub-card-title" data-i18n="sb_c2_t">Votre entreprise</div><div class="sub-card-sub" data-i18n="sb_c2_s">Les informations publiques de votre fiche annuaire.</div></div></div>
         <div class="submit-grid">
-          <div class="lead-field"><label>Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
-          <div class="lead-field"><label>Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France"/></div>
-          <div class="lead-field"><label>Siège</label><input type="text" id="sub-company-hq"/></div>
-          <div class="lead-field"><label>Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense"/></div>
-          <div class="lead-field"><label>Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
-          <div class="lead-field"><label>Email de contact public</label><input type="email" id="sub-company-contact"/></div>
+          <div class="lead-field"><label data-i18n="sb_co_name">Nom de l'entreprise</label><input type="text" id="sub-company-name" required/></div>
+          <div class="lead-field"><label data-i18n="sb_co_country">Pays</label><input type="text" id="sub-company-country" placeholder="ex: 🇫🇷 France" data-i18n-placeholder="sb_co_country_ph"/></div>
+          <div class="lead-field"><label data-i18n="sb_co_hq">Siège</label><input type="text" id="sub-company-hq"/></div>
+          <div class="lead-field"><label data-i18n="sb_co_sector">Secteur principal</label><input type="text" id="sub-company-industry" list="industry-list" placeholder="ex: Aéronautique & Défense" data-i18n-placeholder="sb_co_sector_ph"/></div>
+          <div class="lead-field"><label data-i18n="sb_co_site">Site web</label><input type="url" id="sub-company-site" placeholder="https://"/></div>
+          <div class="lead-field"><label data-i18n="sb_co_contact">Email de contact public</label><input type="email" id="sub-company-contact"/></div>
         </div>
-        <div class="lead-field"><label>Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
+        <div class="lead-field"><label data-i18n="sb_co_desc">Description de l'entreprise</label><textarea id="sub-company-desc"></textarea></div>
       </section>
 
       <section class="sub-card" data-step="3" style="--i:2">
-        <div class="sub-card-head"><span class="sub-card-num">3</span><div><div class="sub-card-title">Vos produits</div><div class="sub-card-sub">Ajoutez-en autant que nécessaire. Specs et photo optionnelles.</div></div></div>
+        <div class="sub-card-head"><span class="sub-card-num">3</span><div><div class="sub-card-title" data-i18n="sb_c3_t">Vos produits</div><div class="sub-card-sub" data-i18n="sb_c3_s">Ajoutez-en autant que nécessaire. Specs et photo optionnelles.</div></div></div>
         <div id="product-blocks"></div>
-        <button type="button" class="btn-add-product" onclick="addProductBlock()">+ Ajouter un produit</button>
+        <button type="button" class="btn-add-product" onclick="addProductBlock()" data-i18n="sb_add_product">+ Ajouter un produit</button>
       </section>
 
       <div class="sub-submitbar">
-        <span class="sub-bar-count"><strong id="sub-count">0</strong> <span id="sub-count-word">produit</span> prêt(s) à envoyer</span>
-        <button type="submit" class="btn-submit-form sub-bar-btn">📩 Envoyer pour validation</button>
+        <span class="sub-bar-count"><strong id="sub-count">0</strong> <span id="sub-count-word">produit</span> <span data-i18n="sb_ready">prêt(s) à envoyer</span></span>
+        <button type="submit" class="btn-submit-form sub-bar-btn" data-i18n="sb_submit">📩 Envoyer pour validation</button>
       </div>
     </form>
 
     <aside class="sub-aside">
       <div class="sub-aside-card">
-        <span class="section-eyebrow">C'EST GRATUIT</span>
-        <h2 class="sup-gate-title">Référencé en quelques jours, <em>sans payer.</em></h2>
+        <span class="section-eyebrow" data-i18n="sb_eyebrow">C'EST GRATUIT</span>
+        <h2 class="sup-gate-title" data-i18n-html="sb_aside_h">Référencé en quelques jours, <em>sans payer.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span>Référencement et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Chaque fiche est <strong>relue par un humain</strong> avant publication.</span></li>
-          <li><span class="sup-gate-ico">✓</span><span>Vous ne payez <strong>qu'un lead accepté</strong> (~80&nbsp;€). Aucune carte bancaire ici.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sb_aside_p1">Référencement et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sb_aside_p2">Chaque fiche est <strong>relue par un humain</strong> avant publication.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sb_aside_p3">Vous ne payez <strong>qu'un lead accepté</strong> (~80&nbsp;€). Aucune carte bancaire ici.</span></li>
         </ul>
-        <div class="sup-gate-foot">Déjà référencé ? <a href="supplier.html">Accéder à mon espace →</a></div>
+        <div class="sup-gate-foot" data-i18n-html="sb_aside_foot">Déjà référencé ? <a href="supplier.html">Accéder à mon espace →</a></div>
       </div>
     </aside>
 

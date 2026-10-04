@@ -93,8 +93,8 @@ async function buyerSignup(email, password, name, company) {
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error_description || data.msg || 'Inscription impossible.');
-  if (!data.access_token) throw new Error('Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, puis connecte-toi.');
+  if (!res.ok) throw new Error(data.error_description || data.msg || t('acc_err_signup'));
+  if (!data.access_token) { const e = new Error(t('acc_err_confirm')); e.code = 'confirm_email'; throw e; }
 
   localStorage.setItem('buyer_access_token', data.access_token);
   localStorage.setItem('buyer_refresh_token', data.refresh_token);
@@ -121,7 +121,7 @@ async function buyerLogin(email, password) {
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
-  if (!res.ok || !data.access_token) throw new Error(data.error_description || data.msg || 'Identifiants incorrects.');
+  if (!res.ok || !data.access_token) throw new Error(data.error_description || data.msg || t('acc_err_login'));
   localStorage.setItem('buyer_access_token', data.access_token);
   localStorage.setItem('buyer_refresh_token', data.refresh_token);
   localStorage.setItem('buyer_user_id', data.user.id);
