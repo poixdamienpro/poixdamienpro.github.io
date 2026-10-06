@@ -36,11 +36,11 @@ const TRANSLATIONS = {
 
     // Index HUD
     hud_tagline:         'SOURCER EN MINUTES, PAS EN SEMAINES',
-    hud_submit:          'Référencer mon entreprise',
+    hud_submit:          'Rejoindre l\'essaim',
     hud_explore:         'Explorer l\'annuaire',
 
     // Index hero
-    hero_eyebrow:        'Référentiel équipementiers · Le Circuit',
+    hero_eyebrow:        'Notre essaim d\'équipementiers',
     hero_l1:             'Suivez le courant',
     hero_l2:             'au cœur des',
     hero_l3:             '<em>systèmes industriels.</em>',
@@ -86,9 +86,8 @@ const TRANSLATIONS = {
     st5_guide:           'Comment choisir une vanne ?',
 
     // Outro
-    outro_eyebrow:       'Fin du circuit',
-    outro_h2:            'Le système complet vous <em>attend</em>.',
-    outro_p:             'Vous avez suivi le courant. Maintenant, parcourez les fabricants et fiches produits : filtrez, comparez, contactez. Gratuit pour les acheteurs.',
+    outro_eyebrow:       'Début de l\'exploration',
+    outro_p:             'Vous avez suivi le courant. Maintenant, parcourez la ruche : des fabricants et des fiches produits à filtrer, comparer, contacter. Gratuit pour les acheteurs.',
     outro_btn1:          'Explorer l\'annuaire complet',
     outro_btn2:          'Parcourir le catalogue',
 
@@ -626,11 +625,11 @@ const TRANSLATIONS = {
 
     // Index HUD
     hud_tagline:         'SOURCE IN MINUTES, NOT WEEKS',
-    hud_submit:          'List my company',
+    hud_submit:          'Join the swarm',
     hud_explore:         'Explore directory',
 
     // Index hero
-    hero_eyebrow:        'OEM Reference · The Circuit',
+    hero_eyebrow:        'Our swarm of equipment makers',
     hero_l1:             'Follow the current',
     hero_l2:             'through the heart of',
     hero_l3:             '<em>industrial systems.</em>',
@@ -676,9 +675,8 @@ const TRANSLATIONS = {
     st5_guide:           'How to choose a valve?',
 
     // Outro
-    outro_eyebrow:       'End of circuit',
-    outro_h2:            'The complete system <em>awaits</em>.',
-    outro_p:             'You\'ve followed the current. Now browse manufacturers and product datasheets: filter, compare, contact. Free for buyers.',
+    outro_eyebrow:       'Start of exploration',
+    outro_p:             'You\'ve followed the current. Now browse the hive: manufacturers and product datasheets to filter, compare, and contact. Free for buyers.',
     outro_btn1:          'Explore the full directory',
     outro_btn2:          'Browse catalogue',
 
