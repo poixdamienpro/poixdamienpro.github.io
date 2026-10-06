@@ -272,13 +272,17 @@ async function startMfaEnrollment() {
 
     const factor = await authFetch('factors', token, {
       method: 'POST',
-      body: JSON.stringify({ factor_type: 'totp', friendly_name: `Authenticator-${Date.now()}` }),
+      // issuer : nom affiché dans l'appli d'authentification (sinon, l'adresse du projet Supabase)
+      body: JSON.stringify({ factor_type: 'totp', issuer: 'Buy-inner admin', friendly_name: `Authenticator-${Date.now()}` }),
     });
     adminEnrollFactorId = factor.id;
     const qrSrc = qrCodeDataUrl(factor.totp.qr_code);
+    const otpUri = factor.totp.uri && factor.totp.uri.startsWith('otpauth://') ? factor.totp.uri : '';
     box.innerHTML = `
       <p style="font-size:12px;color:var(--text2);line-height:1.6">1. Scanne ce QR code avec ton application d'authentification (Google Authenticator, 1Password, Authy...) — ou si ça ne marche pas, choisis "Saisir une clé manuellement" dans l'appli et colle la clé ci-dessous.</p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.6"><strong>iPhone :</strong> l'appareil photo ouvre l'app <em>Mots de passe</em> (trousseau iCloud), qui sait aussi générer ces codes : choisis « Configurer le code de vérification » (ou « Ajouter à un identifiant »), puis recopie le code affiché. Si tu préfères une appli dédiée, ouvre Google Authenticator / Authy et scanne depuis l'appli. Le code est alors synchronisé avec le compte iCloud, qui doit donc être protégé.</p>
       ${qrSrc ? `<img src="${escapeHtml(qrSrc)}" alt="QR code MFA" style="width:180px;height:180px;border:1px solid var(--border);border-radius:8px;margin:10px 0"/>` : '<p style="font-size:12px;color:#C0392B">QR code indisponible, utilise la clé manuelle ci-dessous.</p>'}
+      ${otpUri ? `<p style="font-size:12px;margin:0 0 8px"><a href="${escapeHtml(otpUri)}">📱 Déjà sur ton téléphone ? Ouvre directement dans ton appli d'authentification</a></p>` : ''}
       <p style="font-size:11px;color:var(--muted);word-break:break-all">Clé manuelle (si le QR code ne scanne pas) : <strong>${escapeHtml(factor.totp.secret)}</strong></p>
       <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-top:10px">2. Une fois le compte ajouté dans l'appli, elle affiche un <strong>code à 6 chiffres qui change toutes les 30 secondes</strong> — recopie CE code ci-dessous (pas la clé manuelle).</p>
       <form onsubmit="confirmMfaEnrollment(event)">
