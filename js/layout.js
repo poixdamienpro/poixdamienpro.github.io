@@ -49,9 +49,22 @@ function loadBuyerScript() {
   });
 }
 
+// Robots d'indexation et outils automatisés (Applebot, Googlebot...) : ils
+// exécutent le JS du site, donc déclenchaient les logs de vue comme de vrais
+// visiteurs et gonflaient les compteurs de l'admin. Utilisé aussi par
+// js/pages/admin.js pour écarter les anciennes lignes déjà enregistrées.
+function isBotUserAgent(ua) {
+  return /bot|crawl|spider|slurp|headless|lighthouse|facebookexternalhit|python-requests|curl\/|wget/i.test(ua || '');
+}
+function shouldSkipTracking() {
+  return navigator.webdriver === true || isBotUserAgent(navigator.userAgent);
+}
+
 // Log anonyme d'une vue de page (compté côté admin) — fire-and-forget,
 // pas de cookie, pas d'IP stockée. Voir backend/supabase_add_page_views.sql.
+// Ni les robots ni la page d'admin elle-même ne sont comptés.
 function logPageView() {
+  if (shouldSkipTracking() || /\/admin\.html$/.test(window.location.pathname)) return;
   fetch(`${SUPABASE_URL}/rest/v1/site_page_views`, {
     method: 'POST',
     headers: {
@@ -78,6 +91,7 @@ function logPageView() {
 // chargée, PAS depuis loadLayout() (l'id n'est pas encore connu à ce
 // moment-là contrairement à logPageView()).
 function logEntityView({ type, productId, productName, category, companyId, companyName, industry }) {
+  if (shouldSkipTracking()) return;
   fetch(`${SUPABASE_URL}/rest/v1/entity_views`, {
     method: 'POST',
     headers: {

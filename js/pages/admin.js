@@ -336,7 +336,9 @@ async function loadAnalytics() {
   top.innerHTML = '';
   try {
     [adminAnalyticsRows, adminEntityViewRows] = await Promise.all([
-      adminFetchAllPages('site_page_views?select=page,created_at&order=created_at.desc'),
+      // user_agent sert uniquement à écarter les robots déjà enregistrés (voir isBotUserAgent, js/layout.js)
+      adminFetchAllPages('site_page_views?select=page,user_agent,created_at&order=created_at.desc')
+        .then(rows => rows.filter(r => !isBotUserAgent(r.user_agent) && !r.page.endsWith('/admin.html'))),
       adminFetchAllPages('entity_views?select=entity_type,product_id,product_name,category,company_id,company_name,industry,created_at&order=created_at.desc'),
     ]);
 
