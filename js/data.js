@@ -22,13 +22,20 @@ const LOGO_DEV_TOKEN  = 'pk_auyA2g6JQ6aVtkiqtPU2xg';
 // cloudflare/supabase-proxy-worker.js). Best-effort à chaque site
 // d'appel : un échec ne doit jamais bloquer le flux principal (soumission,
 // approbation...), on logue juste l'erreur en console.
+//
+// Le Worker contrôle QUI peut envoyer QUOI (route publique) :
+//   * submission_confirmation : exige extra.submissionId (id de la soumission
+//     qui vient d'être créée) ; le contenu de l'email vient de la base.
+//   * submission_approved / claim_approved : exige extra.token (session admin).
 // ═══════════════════════════════
-async function sendTransactionalEmail(type, to, params) {
+async function sendTransactionalEmail(type, to, params, extra = {}) {
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (extra.token) headers['Authorization'] = 'Bearer ' + extra.token;
     const res = await fetch(`${SUPABASE_URL}/send-email`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, to, params }),
+      headers,
+      body: JSON.stringify({ type, to, params, submissionId: extra.submissionId }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
   } catch (err) {

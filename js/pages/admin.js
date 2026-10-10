@@ -704,7 +704,7 @@ async function approveSubmission(id) {
         submitterName: sub.submitter_name || sub.submitter_email,
         companyName: sub.company_name,
         link: `https://www.buy-inner.com/pages/entreprise.html?id=${companyId}`,
-      });
+      }, { token: sessionStorage.getItem('admin_access_token') });
     }
 
     card.remove();
@@ -1024,7 +1024,7 @@ async function approveClaim(id) {
       sendTransactionalEmail('claim_approved', claim.user_email, {
         companyName: (claim.companies && claim.companies.name) || 'votre entreprise',
         link: `https://www.buy-inner.com/pages/supplier.html`,
-      });
+      }, { token: sessionStorage.getItem('admin_access_token') });
     }
 
     card.remove();

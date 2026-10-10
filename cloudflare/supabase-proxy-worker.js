@@ -147,20 +147,164 @@ function json(obj, status = 200) {
 }
 
 // ── Emails transactionnels (Resend) ──────────────────────────────────
-async function handleSendEmail(request, env) {
-  let body;
-  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-  const { type, to, params } = body || {};
+// Qui peut déclencher quel email via POST /api/send-email (route PUBLIQUE).
+//   - submission_confirmation : visiteur anonyme qui vient de remplir le
+//     formulaire de référencement -> vérifié contre la base (claimSubmissionConfirmation).
+//   - submission_approved / claim_approved : réservés aux administrateurs.
+//   - tout le reste (ex. premium_activated, envoyé par le webhook Stripe) n'est
+//     PAS joignable par cette route : le Worker l'appelle en interne via sendTemplateEmail.
+const ADMIN_EMAIL_TYPES = new Set(['submission_approved', 'claim_approved']);
+
+// Envoi interne, SANS contrôle d'accès : ne jamais l'exposer tel quel à une route.
+async function sendTemplateEmail(env, type, to, params) {
   const template = EMAIL_TEMPLATES[type];
   if (!template) return json({ error: 'type de template inconnu' }, 400);
-  if (!to || typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+  if (!to || typeof to !== 'string' || !EMAIL_RE.test(to)) {
     return json({ error: 'destinataire invalide' }, 400);
   }
   if (!env.RESEND_API_KEY) return json({ error: 'RESEND_API_KEY non configurée sur le Worker' }, 500);
 
   const { subject, html } = template(params || {});
   return sendViaResend(env, to, subject, html);
+}
+
+async function handleSendEmail(request, env) {
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+
+  const { type, to, params, submissionId } = body || {};
+  if (!EMAIL_TEMPLATES[type]) return json({ error: 'type de template inconnu' }, 400);
+  if (!to || typeof to !== 'string' || !EMAIL_RE.test(to)) {
+    return json({ error: 'destinataire invalide' }, 400);
+  }
+
+  if (ADMIN_EMAIL_TYPES.has(type)) {
+    const denied = await requireAdmin(request, env);
+    if (denied) return denied;
+    // Défense en profondeur : le lien doit pointer vers le site.
+    const link = params && params.link;
+    if (typeof link !== 'string' || !link.startsWith(SITE_URL + '/')) {
+      return json({ error: 'lien invalide' }, 400);
+    }
+    return sendTemplateEmail(env, type, to, params);
+  }
+
+  if (type === 'submission_confirmation') {
+    // Le contenu vient de la base, jamais du client.
+    const claim = await claimSubmissionConfirmation(env, submissionId, to);
+    if (claim.error) return claim.error;
+    const res = await sendTemplateEmail(env, type, to, {
+      submitterName: claim.row.submitter_name,
+      companyName: claim.row.company_name,
+    });
+    if (!res.ok) await releaseSubmissionConfirmation(env, submissionId);
+    return res;
+  }
+
+  return json({ error: 'type de template non autorisé' }, 403);
+}
+
+// ── Accès service_role (lecture/écriture des soumissions) ──
+function serviceFetch(env, path, options = {}) {
+  return fetch(`${SUPABASE_ORIGIN}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+}
+
+// L'appelant doit être administrateur (table admins, lue avec la clé
+// service_role — le token seul ne suffit pas). Renvoie une Response d'erreur,
+// ou null si l'appelant est bien admin.
+async function requireAdmin(request, env) {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    return json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500);
+  }
+
+  const authHeader = request.headers.get('Authorization') || '';
+  const callerToken = authHeader.replace(/^Bearer\s+/i, '');
+  if (!callerToken) return json({ error: 'Non authentifié' }, 401);
+
+  // 1. Résout l'identité de l'appelant à partir de son propre token.
+  const whoRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/user`, {
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${callerToken}` },
+  });
+  if (!whoRes.ok) return json({ error: 'Session invalide' }, 401);
+  const caller = await whoRes.json();
+
+  // 2. Vérifie que l'appelant est bien dans la table admins.
+  const checkRes = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(caller.id)}&select=user_id`);
+  if (!checkRes.ok) {
+    const detail = await checkRes.text();
+    return json({ error: 'Échec de la vérification admin', detail }, 502);
+  }
+  const checkRows = await checkRes.json();
+  if (!checkRows.length) return json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403);
+  return null;
+}
+
+// Confirmation de soumission : une seule fois par soumission, pour l'adresse
+// réellement saisie dans le formulaire, dans les 15 minutes, et au plus 3 par
+// adresse et par jour. Le « claim » est atomique (PATCH conditionnel) : deux
+// appels simultanés ne peuvent pas envoyer deux emails.
+const CONFIRMATION_WINDOW_MS = 15 * 60 * 1000;
+const CONFIRMATION_MAX_PER_DAY = 3;
+async function claimSubmissionConfirmation(env, submissionId, to) {
+  if (typeof submissionId !== 'string' || !UUID_RE.test(submissionId)) {
+    return { error: json({ error: 'submissionId invalide' }, 400) };
+  }
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { error: json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500) };
+  }
+
+  const rowRes = await serviceFetch(env,
+    `product_submissions?id=eq.${submissionId}&select=submitter_name,submitter_email,company_name,created_at,confirmation_sent_at`);
+  if (!rowRes.ok) return { error: json({ error: 'Vérification impossible' }, 502) };
+  const rows = await rowRes.json();
+  const row = rows && rows[0];
+  if (!row || String(row.submitter_email || '').toLowerCase() !== to.toLowerCase()) {
+    return { error: json({ error: 'soumission introuvable pour cette adresse' }, 403) };
+  }
+  if (Date.now() - new Date(row.created_at).getTime() > CONFIRMATION_WINDOW_MS) {
+    return { error: json({ error: 'soumission trop ancienne' }, 403) };
+  }
+  if (row.confirmation_sent_at) return { error: json({ error: 'confirmation déjà envoyée' }, 409) };
+
+  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+  const recentRes = await serviceFetch(env,
+    `product_submissions?submitter_email=ilike.${encodeURIComponent(to)}&confirmation_sent_at=gte.${encodeURIComponent(since)}&select=id`);
+  if (recentRes.ok) {
+    const recent = await recentRes.json();
+    if (recent.length >= CONFIRMATION_MAX_PER_DAY) return { error: json({ error: 'trop de confirmations pour cette adresse' }, 429) };
+  }
+
+  const claimRes = await serviceFetch(env, `product_submissions?id=eq.${submissionId}&confirmation_sent_at=is.null`, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=representation' },
+    body: JSON.stringify({ confirmation_sent_at: new Date().toISOString() }),
+  });
+  if (!claimRes.ok) return { error: json({ error: 'Vérification impossible' }, 502) };
+  const claimed = await claimRes.json();
+  if (!claimed || !claimed.length) return { error: json({ error: 'confirmation déjà envoyée' }, 409) };
+  return { row };
+}
+
+// Si l'envoi Resend échoue, on libère la place pour qu'un nouvel essai soit possible.
+async function releaseSubmissionConfirmation(env, submissionId) {
+  try {
+    await serviceFetch(env, `product_submissions?id=eq.${submissionId}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ confirmation_sent_at: null }),
+    });
+  } catch { /* best-effort */ }
 }
 
 async function sendViaResend(env, to, subject, html) {
@@ -269,33 +413,9 @@ function generateTempPassword() {
 // vérifie donc nous-mêmes, ici, que l'appelant est déjà un admin
 // authentifié AVANT de faire quoi que ce soit avec cette clé.
 async function handleAdminCreateUser(request, env) {
-  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-    return json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500);
-  }
-
-  const authHeader = request.headers.get('Authorization') || '';
-  const callerToken = authHeader.replace(/^Bearer\s+/i, '');
-  if (!callerToken) return json({ error: 'Non authentifié' }, 401);
-
-  // 1. Résout l'identité de l'appelant à partir de son propre token.
-  const whoRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/user`, {
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${callerToken}` },
-  });
-  if (!whoRes.ok) return json({ error: 'Session invalide' }, 401);
-  const caller = await whoRes.json();
-
-  // 2. Vérifie que l'appelant est bien dans la table admins (lecture
-  //    avec la clé service_role, qui ignore la RLS — c'est la seule
-  //    source de vérité ici, pas confiance dans le token seul).
-  const checkRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins?user_id=eq.${caller.id}&select=user_id`, {
-    headers: { 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` },
-  });
-  if (!checkRes.ok) {
-    const detail = await checkRes.text();
-    return json({ error: 'Échec de la vérification admin', detail }, 502);
-  }
-  const checkRows = await checkRes.json();
-  if (!checkRows.length) return json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403);
+  // 1-2. Appelant authentifié ET présent dans la table admins (voir requireAdmin).
+  const denied = await requireAdmin(request, env);
+  if (denied) return denied;
 
   // 3. Crée le compte Supabase Auth.
   let body;
@@ -700,14 +820,8 @@ async function handleStripeWebhook(request, env) {
       const companyName = (session.metadata && session.metadata.company_name) || 'votre entreprise';
       if (session.customer_details && session.customer_details.email) {
         // best-effort, ne bloque jamais le traitement du webhook
-        handleSendEmail(new Request('https://x/', {
-          method: 'POST',
-          body: JSON.stringify({
-            type: 'premium_activated',
-            to: session.customer_details.email,
-            params: { companyName, link: `${SITE_URL}/pages/supplier.html` },
-          }),
-        }), env).catch(() => {});
+        sendTemplateEmail(env, 'premium_activated', session.customer_details.email,
+          { companyName, link: `${SITE_URL}/pages/supplier.html` }).catch(() => {});
       }
     }
   } else if (event.type === 'customer.subscription.deleted') {

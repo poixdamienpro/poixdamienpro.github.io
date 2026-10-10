@@ -136,6 +136,16 @@ function addSpecRow(blockIdx) {
   if (typeof applyLang === 'function') applyLang();
 }
 
+// Identifiant généré côté client : permet au Worker de relier l'email de
+// confirmation à CETTE soumission (l'anonyme ne peut pas relire sa ligne).
+function newSubmissionId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 async function submitSupplierForm(e) {
   e.preventDefault();
 
@@ -163,6 +173,7 @@ async function submitSupplierForm(e) {
     const certs = block.querySelector('.p-certs').value.split(',').map(c => c.trim()).filter(Boolean);
     const blockIdx = block.id.replace('product-block-', '');
     rows.push({
+      id: newSubmissionId(),
       product_image_url: productImageUrls[blockIdx] || null,
       status: 'pending',
       submitter_name: submitterName,
@@ -200,9 +211,9 @@ async function submitSupplierForm(e) {
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
-    sendTransactionalEmail('submission_confirmation', submitterEmail, {
-      submitterName, companyName,
-    });
+    // L'id de la 1re ligne prouve au Worker qu'une soumission vient d'être créée
+    // pour cette adresse : le contenu de l'email est relu en base, pas envoyé d'ici.
+    sendTransactionalEmail('submission_confirmation', submitterEmail, {}, { submissionId: rows[0].id });
 
     const stepper = document.getElementById('sub-steps');
     if (stepper) stepper.style.display = 'none';
