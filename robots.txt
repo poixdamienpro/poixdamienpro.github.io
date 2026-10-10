@@ -5,16 +5,37 @@ User-agent: *
 Allow: /
 Disallow: /pages/admin.html
 
-# Crawlers IA connus (entraînement de modèles / agents de navigation) —
-# bloqués explicitement. Note : ceci est une déclaration respectée
-# uniquement par les bots "bien élevés" (OpenAI, Anthropic, Google
-# annoncent officiellement la respecter) — un scraper malveillant conçu
-# pour contourner la détection l'ignorera. Voir aussi la protection
-# Cloudflare côté réseau pour un vrai blocage.
-User-agent: GPTBot
-Disallow: /
+# Bots IA de RECHERCHE / CITATION — autorisés. Ils lisent le site pour
+# répondre à une question et renvoyer l'utilisateur vers Buy-inner.
+# (Un groupe nommé n'hérite pas de "*" : on répète donc le Disallow admin.)
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /pages/admin.html
 
 User-agent: ChatGPT-User
+Allow: /
+Disallow: /pages/admin.html
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /pages/admin.html
+
+User-agent: Claude-User
+Allow: /
+Disallow: /pages/admin.html
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /pages/admin.html
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /pages/admin.html
+
+# Crawlers IA d'ENTRAÎNEMENT et scrapers de données — bloqués.
+# Déclaration respectée uniquement par les bots "bien élevés" ; un
+# scraper malveillant l'ignorera (voir protection Cloudflare côté réseau).
+User-agent: GPTBot
 Disallow: /
 
 User-agent: ClaudeBot
@@ -29,13 +50,13 @@ Disallow: /
 User-agent: Google-Extended
 Disallow: /
 
+User-agent: Applebot-Extended
+Disallow: /
+
 User-agent: CCBot
 Disallow: /
 
 User-agent: Bytespider
-Disallow: /
-
-User-agent: PerplexityBot
 Disallow: /
 
 User-agent: Amazonbot
@@ -51,5 +72,3 @@ User-agent: FacebookBot
 Disallow: /
 
 Sitemap: https://www.buy-inner.com/sitemap.xml
-Sitemap: https://www.buy-inner.com/sitemap-fr.xml
-Sitemap: https://www.buy-inner.com/sitemap-en.xml
