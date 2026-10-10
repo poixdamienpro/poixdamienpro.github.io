@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initChips('presta-industry-chips', industries, () => prestaIndustry, v => { prestaIndustry = v; renderCompanies(); });
     initChips('presta-cat-chips', catsPresent, () => prestaCat, v => { prestaCat = v; renderCompanies(); });
     document.getElementById('kpi-c').textContent = serviceCompanies.length;
+    document.getElementById('kpi-t').textContent = catsPresent.length; // types de prestation réellement présents (était écrit en dur : 8)
 
     const params = new URLSearchParams(window.location.search);
     const q = params.get('q');
