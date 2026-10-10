@@ -23,7 +23,7 @@
   <div class="page-header-inner">
     <div>
       <h1 class="page-title" data-i18n-html="rq_h1">Dossiers <span>RFQ / RFI / RFP</span></h1>
-      <p class="page-subtitle" data-i18n="rq_sub">Déposés par les systémiers référencés sur Buy-inner. Réservé aux fournisseurs connectés.</p>
+      <p class="page-subtitle" data-i18n="rq_sub">Déposés par les systémiers référencés sur Buy-inner. Réservé aux fournisseurs Premium connectés.</p>
     </div>
   </div>
 </header>
@@ -37,9 +37,9 @@
         <span class="section-eyebrow" data-i18n="sg_eyebrow">POURQUOI S'INSCRIRE</span>
         <h2 class="sup-gate-title" data-i18n-html="rq_gate_h">Accédez aux <em>opportunités d'affaires.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span data-i18n="rq_gate_p1">Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers du secteur.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n="rq_gate_p1">Consultez les dossiers RFQ/RFI/RFP déposés par les systémiers du secteur — accès réservé aux fournisseurs Premium.</span></li>
           <li><span class="sup-gate-ico">✓</span><span data-i18n-html="rq_gate_p2">Répondez directement — vous ne payez <strong>que si votre réponse est acceptée</strong> (~80&nbsp;€).</span></li>
-          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="rq_gate_p3">Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="rq_gate_p3">Accès aux RFQ inclus dans l'abonnement <strong>Premium</strong> (1&nbsp;500&nbsp;€/an).</span></li>
         </ul>
         <div class="sup-gate-foot" data-i18n-html="rq_gate_foot">Pas encore sur Buy-inner ? <a href="submit.html">Référencez votre entreprise →</a></div>
       </aside>
@@ -94,6 +94,12 @@
         <a href="supplier.html" class="btn-add-product sup-btn-sm" data-i18n="sg_back">← Mon espace fournisseur</a>
         <button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button>
       </div>
+    </div>
+
+    <div id="rfq-premium-gate" style="display:none" class="sup-panel">
+      <span class="submit-section-title" style="border:none;padding:0" id="rfq-premium-h"></span>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0 0 14px" id="rfq-premium-p"></p>
+      <button type="button" class="btn-submit-form" id="rfq-premium-btn" onclick="startPremiumCheckout()" style="width:auto;padding:12px 22px"></button>
     </div>
 
     <div id="rfq-nda-gate" style="display:none" class="sup-panel">

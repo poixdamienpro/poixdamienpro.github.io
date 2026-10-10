@@ -6,6 +6,13 @@
 let supplierCompany = null; // entreprise revendiquée (si déjà approuvée)
 let supplierEditingProductId = null; // null = ajout, sinon id du produit en cours d'édition
 let supStatProducts = null, supStatPending = null, supStatApproved = null, supStatLeadsPending = null; // compteurs du bandeau
+// Plan gratuit : 2 produits (publiés + demandes d'ajout en attente). Règle appliquée en base
+// (backend/supabase_plan_limits_2026_10.sql, erreur PRODUCT_LIMIT) ; ici on l'explique à l'écran.
+const FREE_PRODUCT_LIMIT = 2;
+let supStatPendingNew = null;
+// Texte traduit avec repli intégré : i18n.js peut rester en cache plusieurs heures chez un
+// visiteur de retour, sans les clés récentes -- jamais de clé technique à l'écran.
+const tf = (key, fr, en) => ((TRANSLATIONS[getLang()] || {})[key]) || (getLang() === 'en' ? en : fr);
 let supplierViewRows = []; // vues produit (entity_views), stats premium -- voir loadSupplierViews()
 let supplierAllProducts = []; // catalogue complet (mapProduct), pour la comparaison concurrentielle premium
 
@@ -265,7 +272,7 @@ function supplierLogout() {
   sessionStorage.removeItem('sup_email');
   sessionStorage.removeItem('sup_user_id');
   supplierCompany = null;
-  supStatProducts = supStatPending = supStatApproved = null;
+  supStatProducts = supStatPending = supStatApproved = supStatPendingNew = null;
   supplierViewRows = [];
   supplierAllProducts = [];
   supplierRfqDossiers = [];
@@ -316,6 +323,9 @@ async function supplierRouteAfterAuth() {
       setSupplierStep(3);
       renderSupplierStats();
       renderPremiumBox();
+      // RFQ réservés aux fournisseurs Premium : pas de lien d'accès pour les autres.
+      const rfqLink = document.getElementById('sup-rfq-link');
+      if (rfqLink) rfqLink.style.display = supplierCompany.premium ? '' : 'none';
       loadSupplierProducts();
       loadSupplierSubmissions();
       if (typeof loadSupplierTeam === 'function') loadSupplierTeam();
@@ -391,6 +401,7 @@ async function loadSupplierProducts() {
     const products = await supplierFetch(`products?company_id=eq.${supplierCompany.id}&select=*`);
     supStatProducts = (products && products.length) || 0;
     renderSupplierStats();
+    renderProductLimit();
     if (!products || !products.length) { list.innerHTML = `<p class="sup-empty">${t('sp_no_products')}</p>`; return; }
     list.innerHTML = products.map(p => `
       <div class="sup-prod">
@@ -417,7 +428,9 @@ async function loadSupplierSubmissions() {
     const rows = await supplierFetch(`product_submissions?company_id=eq.${supplierCompany.id}&order=created_at.desc&limit=20`);
     supStatPending = (rows || []).filter(r => r.status === 'pending').length;
     supStatApproved = (rows || []).filter(r => r.status === 'approved').length;
+    supStatPendingNew = (rows || []).filter(r => r.status === 'pending' && r.submission_type === 'new').length;
     renderSupplierStats();
+    renderProductLimit();
     if (!rows || !rows.length) { list.innerHTML = `<p class="sup-empty">${t('sp_no_subs')}</p>`; return; }
     const labels = { new: t('sp_sub_new'), update: t('sp_sub_update'), delete: t('sp_sub_delete') };
     const statusMap = {
@@ -632,7 +645,36 @@ async function requestDeleteProduct(productId, productName) {
   }
 }
 
+// Plan gratuit : avertit et bloque l'ajout au-delà de FREE_PRODUCT_LIMIT. Le blocage réel est en base.
+function productLimitState() {
+  if (!supplierCompany || supplierCompany.premium || supStatProducts === null || supStatPendingNew === null) return { limited: false };
+  const used = supStatProducts + supStatPendingNew;
+  return { limited: true, used, atLimit: used >= FREE_PRODUCT_LIMIT };
+}
+
+function renderProductLimit() {
+  const note = document.getElementById('sup-product-limit');
+  const btn = document.getElementById('sup-add-product-btn');
+  if (!note || !btn) return;
+  const s = productLimitState();
+  if (!s.limited) { note.style.display = 'none'; btn.disabled = false; return; }
+  const msg = s.used > FREE_PRODUCT_LIMIT
+    ? tf('sp_product_limit_over', 'Plan gratuit : {limit} produits maximum. Vos {used} produits actuels sont conservés ; passez en Premium pour en ajouter.', 'Free plan: {limit} products maximum. Your {used} current products are kept; go Premium to add more.')
+    : tf('sp_product_limit_note', 'Plan gratuit : {used} / {limit} produits. Passez en Premium pour en publier davantage.', 'Free plan: {used} / {limit} products. Go Premium to publish more.');
+  note.innerHTML = `${escapeHtml(msg.replace('{used}', s.used).replace('{limit}', FREE_PRODUCT_LIMIT))}` +
+    (s.atLimit ? ` <button type="button" class="btn-add-product sup-btn-sm" style="margin-left:8px" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>` : '');
+  note.style.display = 'block';
+  btn.disabled = s.atLimit;
+}
+
 function openSupplierProductForm(productId) {
+  if (!productId) {
+    const s = productLimitState();
+    if (s.limited && s.atLimit) {
+      alert(tf('sp_err_product_limit', 'Limite du plan gratuit atteinte (2 produits). Passez en Premium pour publier davantage de produits.', 'Free plan limit reached (2 products). Go Premium to publish more products.'));
+      return;
+    }
+  }
   supplierEditingProductId = productId || null;
   const wrap = document.getElementById('sup-product-form-wrap');
   wrap.style.display = 'block';
@@ -691,6 +733,11 @@ async function submitSupplierProductForm(e) {
     alert(t('sp_req_sent'));
     loadSupplierSubmissions();
   } catch (err) {
+    if (/PRODUCT_LIMIT/.test(err.message)) {
+      alert(tf('sp_err_product_limit', 'Limite du plan gratuit atteinte (2 produits). Passez en Premium pour publier davantage de produits.', 'Free plan limit reached (2 products). Go Premium to publish more products.'));
+      loadSupplierSubmissions();
+      return;
+    }
     alert(t('acc_err_prefix') + err.message);
   }
 }

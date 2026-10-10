@@ -48,7 +48,7 @@
         <span class="section-eyebrow" data-i18n="sg_eyebrow">POURQUOI S'INSCRIRE</span>
         <h2 class="sup-gate-title" data-i18n-html="sp_gate_h">Vos produits, devant les <em>bons acheteurs.</em></h2>
         <ul class="sup-gate-points">
-          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sp_gate_p1">Référencement, fiche entreprise et fiches produits <strong>100&nbsp;% gratuits</strong>.</span></li>
+          <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sp_gate_p1">Référencement, fiche entreprise et <strong>2 fiches produits gratuits</strong> (illimitées avec Premium).</span></li>
           <li><span class="sup-gate-ico">✓</span><span data-i18n-html="sp_gate_p2">Vous ne payez <strong>qu'un lead que vous avez accepté</strong> (~80&nbsp;€), jamais d'abonnement.</span></li>
           <li><span class="sup-gate-ico">✓</span><span data-i18n="sp_gate_p3">Vous gardez la main : chaque modification passe par vous, puis validation.</span></li>
         </ul>
@@ -102,7 +102,7 @@
     <div class="product-block-header">
       <span class="submit-section-title" style="margin:0;border:none;padding:0" id="sup-dash-title">Mon entreprise</span>
       <div style="display:flex;gap:8px">
-        <a href="rfq.html" class="btn-add-product sup-btn-sm" data-i18n="sp_rfq_avail">📋 Dossiers RFQ disponibles</a>
+        <a href="rfq.html" id="sup-rfq-link" class="btn-add-product sup-btn-sm" data-i18n="sp_rfq_avail">📋 Dossiers RFQ disponibles</a>
         <button type="button" class="btn-add-product sup-btn-sm" onclick="openCompanyEditForm()" data-i18n="sp_edit_company">Modifier la fiche</button>
         <button class="btn-remove-product" onclick="supplierLogout()" data-i18n="acc_logout">Se déconnecter</button>
       </div>
@@ -128,8 +128,9 @@
     <div class="sup-panel">
       <div class="sup-panel-head">
         <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="sp_h_products">Vos produits</span>
-        <button type="button" class="btn-add-product sup-add-inline" onclick="openSupplierProductForm()" data-i18n="sp_add_product">+ Ajouter un produit</button>
+        <button type="button" id="sup-add-product-btn" class="btn-add-product sup-add-inline" onclick="openSupplierProductForm()" data-i18n="sp_add_product">+ Ajouter un produit</button>
       </div>
+      <div id="sup-product-limit" class="sup-team-note" style="display:none;margin:0 0 12px"></div>
       <div id="sup-products-list"></div>
       <div id="sup-product-form-wrap" style="display:none;margin-top:20px"></div>
     </div>

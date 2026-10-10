@@ -8,7 +8,23 @@ const rfqLocale = () => (getLang() === 'en' ? 'en-GB' : 'fr-FR');
 let rfqDossierRows = [];
 let pendingRfqDetailId = null; // id du dossier à ré-ouvrir après acceptation de l'accord de confidentialité
 
+// RFQ / RFI / RFP : réservés aux fournisseurs Premium (consulter ET répondre). Règle appliquée en
+// base (exception 'premium_required', backend/supabase_plan_limits_2026_10.sql) ; ici on explique.
+function showRfqPremiumGate() {
+  ['rfq-list-panel', 'rfq-detail-panel', 'rfq-my-responses-panel', 'rfq-nda-gate'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  document.getElementById('rfq-premium-h').textContent = tf('rq_premium_h', 'Réservé aux fournisseurs Premium', 'Reserved for Premium suppliers');
+  document.getElementById('rfq-premium-p').textContent = tf('rq_premium_p',
+    'Les dossiers RFQ / RFI / RFP déposés par les systémiers sont accessibles aux entreprises ayant l\'abonnement Premium : consultation, accord de confidentialité et réponse.',
+    'The RFQ / RFI / RFP files posted by systems integrators are available to companies on the Premium plan: browsing, confidentiality agreement and responses.');
+  document.getElementById('rfq-premium-btn').textContent = t('sp_premium_btn');
+  document.getElementById('rfq-premium-gate').style.display = 'block';
+}
+
 async function loadRfqBrowse() {
+  if (typeof supplierCompany !== 'undefined' && supplierCompany && !supplierCompany.premium) { showRfqPremiumGate(); return; }
+  document.getElementById('rfq-premium-gate').style.display = 'none';
   const listPanel = document.getElementById('rfq-list-panel');
   const list = document.getElementById('rfq-list');
   const gate = document.getElementById('rfq-nda-gate');
@@ -29,6 +45,7 @@ async function loadRfqBrowse() {
     renderRfqList();
     loadRfqMyResponses();
   } catch (err) {
+    if (err.message === 'premium_required') { showRfqPremiumGate(); return; }
     if (err.message === 'nda_required') {
       listPanel.style.display = 'none';
       myResponsesPanel.style.display = 'none';
@@ -92,6 +109,7 @@ async function openRfqDetail(id) {
     if (!d) { panel.innerHTML = '<p class="sup-empty">Ce dossier n\'est plus disponible.</p>'; return; }
     renderRfqDetail(d);
   } catch (err) {
+    if (err.message === 'premium_required') { showRfqPremiumGate(); return; }
     if (err.message === 'nda_required') {
       panel.style.display = 'none';
       gate.style.display = 'block';
