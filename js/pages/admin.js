@@ -190,6 +190,7 @@ function adminMfaCancel() {
 // (voir completeAdminLogin/tryRestoreAdminSession) : seul l'affichage
 // est découpé, pas le chargement des données.
 function adminShowTab(name) {
+  if (name === 'admins') name = 'users'; // l'ancien onglet « Comptes admin » est fondu dans « Utilisateurs"
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   sessionStorage.setItem('admin_active_tab', name);
@@ -765,49 +766,6 @@ async function adminChangePassword(event) {
   }
 }
 
-// Création d'un nouveau compte admin — voir
-// cloudflare/supabase-proxy-worker.js /api/admin-create-user : le Worker
-// vérifie lui-même que l'appelant est admin avant de toucher à la clé
-// service_role, donc pas besoin de dupliquer cette vérification ici.
-async function adminCreateUser(event) {
-  event.preventDefault();
-  const emailInput = document.getElementById('admin-new-email');
-  const makeAdminInput = document.getElementById('admin-new-is-admin');
-  const errorEl = document.getElementById('admin-create-user-error');
-  const resultEl = document.getElementById('admin-create-user-result');
-  const btn = event.target.querySelector('button[type="submit"]');
-  errorEl.style.display = 'none';
-  resultEl.style.display = 'none';
-  btn.disabled = true;
-
-  try {
-    const token = sessionStorage.getItem('admin_access_token');
-    const res = await fetch(`${SUPABASE_URL}/admin-create-user`, {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        newEmail: emailInput.value.trim(),
-        makeAdmin: makeAdminInput.checked,
-      }),
-    });
-    const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
-
-    resultEl.style.display = 'block';
-    resultEl.innerHTML = `
-      <p style="margin:0 0 6px"><strong>Compte créé${data.isAdmin ? ' (administrateur)' : ''} :</strong> ${escapeHtml(data.email)}</p>
-      <p style="margin:0">Mot de passe temporaire (à transmettre toi-même — il ne sera plus jamais affiché) :</p>
-      <code style="display:block;margin-top:6px;padding:8px;background:var(--white);border:1px solid var(--border);border-radius:4px;font-size:13px;word-break:break-all">${escapeHtml(data.tempPassword)}</code>`;
-    emailInput.value = '';
-    makeAdminInput.checked = false;
-  } catch (err) {
-    errorEl.textContent = err.message;
-    errorEl.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-  }
-}
-
 // ── Utilisateurs : création, mot de passe, désactivation, suppression ──
 // Tout passe par le Worker (/api/admin-users, réservé aux admins) : la clé
 // service_role n'est jamais côté navigateur, et AUCUN mot de passe ne transite
@@ -848,7 +806,7 @@ async function loadAdminAuditLog() {
   if (!box) return;
   try {
     const rows = await adminFetch('admin_audit_log?select=created_at,admin_email,action,target_email,details&order=created_at.desc&limit=15');
-    const labels = { create_user: 'a créé le compte', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise' };
+    const labels = { create_user: 'a créé le compte', create_admin: 'a créé le compte administrateur', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise' };
     box.innerHTML = !rows || !rows.length
       ? '<div class="admin-empty">Aucune action enregistrée.</div>'
       : rows.map(r => `<div class="admin-field-row" style="font-size:12px"><span>${escapeHtml(new Date(r.created_at).toLocaleString('fr-FR'))} · <strong>${escapeHtml(r.admin_email)}</strong> ${escapeHtml(labels[r.action] || r.action)} ${escapeHtml(r.target_email || '')}</span></div>`).join('');
@@ -907,6 +865,12 @@ function adminUserLinkBox(data, intro) {
   </div>`;
 }
 
+// Compte administrateur : pas d'entreprise ni de rôle d'équipe (accès à toute la plateforme).
+function adminUserToggleAdminMode() {
+  const isAdmin = document.getElementById('admin-user-is-admin').checked;
+  document.getElementById('admin-user-company-block').style.display = isAdmin ? 'none' : 'block';
+}
+
 function adminUserSearchCompanyDebounced() {
   clearTimeout(adminCompanySearchTimer);
   adminCompanySearchTimer = setTimeout(adminUserSearchCompany, 250);
@@ -932,7 +896,9 @@ async function adminUserCreate(event) {
   const btn = event.target.querySelector('button[type="submit"]');
   errEl.style.display = 'none'; resEl.style.display = 'none';
   const sel = document.getElementById('admin-user-company');
-  const companyId = sel.style.display !== 'none' ? sel.value : '';
+  const isAdmin = document.getElementById('admin-user-is-admin').checked;
+  const companyId = !isAdmin && sel.style.display !== 'none' ? sel.value : '';
+  if (isAdmin && !confirm(`Créer un compte ADMINISTRATEUR pour ${document.getElementById('admin-user-email').value.trim()} ?\n\nCette personne aura un accès complet à cette page : validation des fiches, gestion des comptes, statistiques.`)) return;
   btn.disabled = true;
   try {
     const data = await adminUsersCall({
@@ -942,9 +908,11 @@ async function adminUserCreate(event) {
       role: document.getElementById('admin-user-role').value,
       lang: document.getElementById('admin-user-lang').value,
       sendEmail: document.getElementById('admin-user-send').checked,
+      makeAdmin: isAdmin,
     });
     resEl.style.display = 'block';
-    resEl.innerHTML = adminUserLinkBox(data, `Compte créé : ${data.email}`);
+    resEl.innerHTML = adminUserLinkBox(data, data.isAdmin ? `Compte administrateur créé : ${data.email}` : `Compte créé : ${data.email}`) +
+      (data.isAdmin ? '<p style="font-size:12px;color:var(--muted);margin:8px 0 0">Demande-lui d\'activer la double authentification dans l\'onglet « Sécurité » dès sa première connexion.</p>' : '');
     document.getElementById('admin-user-email').value = '';
     await loadAdminUsers();
   } catch (err) {

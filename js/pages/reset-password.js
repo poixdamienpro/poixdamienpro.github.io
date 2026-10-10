@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if ((lang === 'fr' || lang === 'en') && typeof setLang === 'function') setLang(lang);
 
   const tokenHash = params.get('token_hash');
-  // next=buyer : demande faite depuis le compte acheteur -> on renvoie vers sa connexion.
-  if (params.get('next') === 'buyer') {
-    try { sessionStorage.setItem('pw_reset_next', 'buyer'); } catch (e) { /* ignore */ }
+  // next=buyer / next=admin : on renvoie vers la bonne page de connexion après l'enregistrement.
+  if (params.get('next') === 'buyer' || params.get('next') === 'admin') {
+    try { sessionStorage.setItem('pw_reset_next', params.get('next')); } catch (e) { /* ignore */ }
   }
   const type = PW_ALLOWED_TYPES.includes(params.get('type')) ? params.get('type') : 'recovery';
   // Le jeton ne doit pas rester dans la barre d'adresse (historique, captures d'écran).
@@ -89,8 +89,8 @@ async function submitNewPassword(e) {
     const loginLink = document.getElementById('pw-login');
     let next = null;
     try { next = sessionStorage.getItem('pw_reset_next'); sessionStorage.removeItem('pw_reset_next'); } catch (err) { /* ignore */ }
-    if (next === 'buyer') {
-      loginLink.href = 'compte-acheteur.html';
+    if (next === 'buyer' || next === 'admin') {
+      loginLink.href = next === 'admin' ? 'admin.html' : 'compte-acheteur.html';
       loginLink.removeAttribute('data-i18n');
       loginLink.textContent = t('acc_login');
     }

@@ -11,10 +11,10 @@
 //    (abonnement Premium 1500€/an) pour une entreprise deja revendiquee.
 //  - /api/stripe-webhook : recoit les evenements Stripe (paiement reussi,
 //    abonnement annule/impaye) et met a jour companies.premium en base.
-//  - /api/admin-create-user : cree un compte Supabase Auth (et
-//    eventuellement l'ajoute a la table admins), appele depuis
-//    pages/admin.html. Verifie d'abord que l'appelant est lui-meme
-//    admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
+//  - /api/admin-users : gestion des comptes depuis pages/admin.html (liste,
+//    creation de comptes fournisseur OU administrateur, lien de nouveau mot de
+//    passe, desactivation, suppression). Verifie d'abord que l'appelant est
+//    lui-meme admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
 //  - /en/company.html et /en/product.html : versions anglaises des deux
 //    pages ci-dessous (mêmes données, description_en, catégories/pays
 //    traduits). Une fiche anglaise n'est indexable (robots index,follow +
@@ -274,7 +274,16 @@ const BAN_FOREVER = '876000h';
 
 const ACCOUNT_TEMPLATES = {
   fr: {
-    created: ({ email, link, companyName }) => ({
+    created: ({ email, link, companyName, isAdmin }) => isAdmin ? ({
+      subject: 'Buy-inner — Votre compte administrateur est prêt',
+      html: `<p>Bonjour,</p>
+      <p>Un compte <strong>administrateur</strong> Buy-inner vient d'être créé pour vous (<strong>${escapeHtml(email)}</strong>).</p>
+      <p>Choisissez votre mot de passe pour y accéder :</p>
+      <p><a href="${escapeHtml(link)}">Définir mon mot de passe →</a></p>
+      <p>Vous pourrez ensuite vous connecter sur <a href="${SITE_URL}/pages/admin.html">${SITE_URL}/pages/admin.html</a>. Pensez à activer la double authentification dans l'onglet « Sécurité ».</p>
+      <p style="color:#666;font-size:13px">Ce lien est personnel et expire rapidement. S'il a expiré, demandez-en un nouveau à un autre administrateur.</p>
+      <p>— L'équipe Buy-inner</p>`,
+    }) : ({
       subject: 'Buy-inner — Votre compte est prêt',
       html: `<p>Bonjour,</p>
       <p>Un compte Buy-inner vient d'être créé pour vous (<strong>${escapeHtml(email)}</strong>)${companyName ? ` pour l'entreprise <strong>${escapeHtml(companyName)}</strong>` : ''}.</p>
@@ -302,7 +311,16 @@ const ACCOUNT_TEMPLATES = {
     }),
   },
   en: {
-    created: ({ email, link, companyName }) => ({
+    created: ({ email, link, companyName, isAdmin }) => isAdmin ? ({
+      subject: 'Buy-inner — Your administrator account is ready',
+      html: `<p>Hello,</p>
+      <p>A Buy-inner <strong>administrator</strong> account has just been created for you (<strong>${escapeHtml(email)}</strong>).</p>
+      <p>Choose your password to access it:</p>
+      <p><a href="${escapeHtml(link)}">Set my password →</a></p>
+      <p>You can then sign in at <a href="${SITE_URL}/pages/admin.html">${SITE_URL}/pages/admin.html</a>. Remember to enable two-factor authentication in the “Security” tab.</p>
+      <p style="color:#666;font-size:13px">This link is personal and expires quickly. If it has expired, ask another administrator for a new one.</p>
+      <p>— The Buy-inner team</p>`,
+    }) : ({
       subject: 'Buy-inner — Your account is ready',
       html: `<p>Hello,</p>
       <p>A Buy-inner account has just been created for you (<strong>${escapeHtml(email)}</strong>)${companyName ? ` for the company <strong>${escapeHtml(companyName)}</strong>` : ''}.</p>
@@ -423,12 +441,12 @@ async function generateRecoveryData(env, email) {
 }
 
 function passwordLinkFromToken(hashedToken, lang, next) {
-  return `${PASSWORD_PAGE}?token_hash=${encodeURIComponent(hashedToken)}&type=recovery&lang=${lang}${next === 'buyer' ? '&next=buyer' : ''}`;
+  return `${PASSWORD_PAGE}?token_hash=${encodeURIComponent(hashedToken)}&type=recovery&lang=${lang}${next === 'buyer' || next === 'admin' ? '&next=' + next : ''}`;
 }
 
-async function generatePasswordLink(env, email, lang) {
+async function generatePasswordLink(env, email, lang, next) {
   const data = await generateRecoveryData(env, email);
-  return passwordLinkFromToken(data.hashed_token, lang);
+  return passwordLinkFromToken(data.hashed_token, lang, next);
 }
 
 // ── « Mot de passe oublié » en libre-service (route PUBLIQUE) ─────────
@@ -492,8 +510,8 @@ async function processPasswordResetRequest(env, email, lang, scope) {
   } catch { /* best-effort : jamais d'erreur visible côté appelant */ }
 }
 
-async function emailAccountLink(env, kind, lang, email, link, companyName) {
-  const { subject, html } = ACCOUNT_TEMPLATES[lang][kind]({ email, link, companyName });
+async function emailAccountLink(env, kind, lang, email, link, companyName, isAdmin) {
+  const { subject, html } = ACCOUNT_TEMPLATES[lang][kind]({ email, link, companyName, isAdmin });
   if (!env.RESEND_API_KEY) return { sent: false, error: 'RESEND_API_KEY non configurée sur le Worker' };
   const res = await sendViaResend(env, email, subject, html);
   return res.ok ? { sent: true } : { sent: false, error: 'Échec de l\'envoi de l\'email' };
@@ -517,6 +535,9 @@ async function handleAdminUsers(request, env) {
     if (action === 'create') {
       const email = String(body.email || '').trim().toLowerCase();
       if (!EMAIL_RE.test(email)) return json({ error: 'Email invalide' }, 400);
+      // Compte administrateur de la plateforme : sans entreprise (accès complet à l'admin).
+      const makeAdmin = body.makeAdmin === true;
+      if (makeAdmin && body.companyId) return json({ error: 'Un compte administrateur ne se rattache pas à une entreprise.' }, 400);
       let company = null;
       if (body.companyId) {
         if (!UUID_RE.test(String(body.companyId))) return json({ error: 'companyId invalide' }, 400);
@@ -540,16 +561,26 @@ async function handleAdminUsers(request, env) {
         return json({ error: msg || 'Échec de la création du compte' }, 502);
       }
 
+      if (makeAdmin) {
+        const addRes = await serviceFetch(env, 'admins', {
+          method: 'POST', headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify([{ user_id: created.id, email }]),
+        });
+        if (!addRes.ok) {
+          return json({ error: 'Compte créé mais l\'ajout comme administrateur a échoué : ne lui donne pas accès, supprime-le dans la liste puis recommence.', userId: created.id, email }, 502);
+        }
+      }
+
       if (company) {
         const role = !company.claimed_by_user_id ? 'owner' : (body.role === 'owner' ? 'owner' : 'member');
         const attach = await attachUserToCompany(env, created.id, company, role);
         if (!attach.ok) return json({ error: 'Compte créé mais rattachement à l\'entreprise impossible', userId: created.id, email }, 502);
       }
 
-      const link = await generatePasswordLink(env, email, lang);
-      const mail = body.sendEmail ? await emailAccountLink(env, 'created', lang, email, link, company && company.name) : { sent: false };
-      await auditAdminAction(env, caller, 'create_user', email, { company: company && company.name, emailSent: mail.sent });
-      return json({ success: true, userId: created.id, email, setupLink: link, emailSent: mail.sent, emailError: mail.error || null });
+      const link = await generatePasswordLink(env, email, lang, makeAdmin ? 'admin' : undefined);
+      const mail = body.sendEmail ? await emailAccountLink(env, 'created', lang, email, link, company && company.name, makeAdmin) : { sent: false };
+      await auditAdminAction(env, caller, makeAdmin ? 'create_admin' : 'create_user', email, { company: company && company.name, emailSent: mail.sent });
+      return json({ success: true, userId: created.id, email, isAdmin: makeAdmin, setupLink: link, emailSent: mail.sent, emailError: mail.error || null });
     }
 
     if (action === 'attach_company') {
@@ -797,56 +828,6 @@ function generateTempPassword() {
 // Nécessite SUPABASE_SERVICE_ROLE_KEY (contourne toute la RLS) : on
 // vérifie donc nous-mêmes, ici, que l'appelant est déjà un admin
 // authentifié AVANT de faire quoi que ce soit avec cette clé.
-async function handleAdminCreateUser(request, env) {
-  // 1-2. Appelant authentifié ET présent dans la table admins (voir requireAdmin).
-  const denied = await requireAdmin(request, env);
-  if (denied) return denied;
-
-  // 3. Crée le compte Supabase Auth.
-  let body;
-  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
-  const newEmail = (body && body.newEmail || '').trim().toLowerCase();
-  const makeAdmin = !!(body && body.makeAdmin);
-  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-    return json({ error: 'Email invalide' }, 400);
-  }
-
-  const tempPassword = generateTempPassword();
-  const createRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/admin/users`, {
-    method: 'POST',
-    headers: {
-      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
-      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email: newEmail, password: tempPassword, email_confirm: true }),
-  });
-  const created = await createRes.json();
-  if (!createRes.ok) {
-    return json({ error: created.msg || created.message || 'Échec de la création du compte' }, 502);
-  }
-
-  // 4. Si demandé, ajoute le nouveau compte à la table admins.
-  if (makeAdmin) {
-    const addRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/admins`, {
-      method: 'POST',
-      headers: {
-        'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify({ user_id: created.id, email: newEmail }),
-    });
-    if (!addRes.ok) {
-      const detail = await addRes.text();
-      return json({ error: 'Compte créé mais échec de l\'ajout comme admin', detail }, 502);
-    }
-  }
-
-  return json({ success: true, email: newEmail, tempPassword, isAdmin: makeAdmin });
-}
-
 // Vérifie la signature Stripe (HMAC-SHA256 sur "timestamp.rawBody"),
 // voir https://docs.stripe.com/webhooks#verify-manually
 async function verifyStripeSignature(rawBody, sigHeader, secret) {
@@ -1272,12 +1253,6 @@ export default {
     if (url.pathname === '/api/create-checkout-session') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
       if (request.method === 'POST') return handleCreateCheckoutSession(request, env);
-      return json({ error: 'Method not allowed' }, 405);
-    }
-
-    if (url.pathname === '/api/admin-create-user') {
-      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
-      if (request.method === 'POST') return handleAdminCreateUser(request, env);
       return json({ error: 'Method not allowed' }, 405);
     }
 
