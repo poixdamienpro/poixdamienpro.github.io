@@ -158,10 +158,21 @@ function companyDomain(site) {
 // site et une clé sont disponibles, avec repli automatique sur l'emoji
 // (onerror) si le logo n'existe pas chez logo.dev ou si la clé n'est pas
 // configurée — jamais de case vide.
+// Logos fournis par la plateforme (fichiers locaux), prioritaires sur logo.dev : entreprises
+// partenaires dont on a le logo officiel (le même que sur « Qui sommes-nous »).
+// Clé = domaine sans www.
+const LOCAL_COMPANY_LOGOS = {
+  'aifinity.fr': 'assets/partners/aifinity.png',
+};
+
 function companyLogoHtml(c, sizePx) {
   sizePx = sizePx || 40;
   const domain = companyDomain(c.site);
   const fallback = (c.logo || '🏭').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  if (domain && LOCAL_COMPANY_LOGOS[domain]) {
+    const base = (typeof ROOT_PREFIX === 'string') ? ROOT_PREFIX : '/';
+    return `<img src="${base}${LOCAL_COMPANY_LOGOS[domain]}" alt="" loading="lazy" style="max-width:86%;max-height:86%;object-fit:contain" onerror="this.outerHTML='${fallback}'"/>`;
+  }
   if (!domain || !LOGO_DEV_TOKEN || LOGO_DEV_TOKEN.includes('XXXX')) return fallback;
   const url = `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=${sizePx * 2}&format=png`;
   return `<img src="${url}" alt="" loading="lazy" style="max-width:78%;max-height:78%;object-fit:contain" onerror="this.outerHTML='${fallback}'"/>`;

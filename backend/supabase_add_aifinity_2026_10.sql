@@ -1,29 +1,36 @@
 -- ============================================================
 -- BUY-INNER -- AiFinity : prestataire IA & data, PREMIUM — 2026-10
 --
--- Ajoute l'entreprise (société AIFINITY SOLUTIONS, Saint-Cloud) comme
+-- Ajoute l'entreprise (société AIFINITY SOLUTIONS, Villeurbanne) comme
 -- prestataire de services, catégorie « Prestation IA & data », avec une
 -- prestation et leurs traductions anglaises. L'entreprise est mise en
 -- Premium (partenariat croisé : pas de paiement Stripe).
 --
--- Informations issues des registres publics (activité : développement de
--- solutions technologiques d'IA et de big data pour la gestion de ressources
--- stratégiques). verified = FALSE tant que le Kbis et le contact n'ont pas été
--- confirmés ; employees et contact_email laissés vides (inconnus).
+-- Activité issue des registres publics (développement de solutions
+-- technologiques d'IA et de big data pour la gestion de ressources
+-- stratégiques) ; localisation : Villeurbanne (69100), confirmée par le dirigeant
+-- de Buy-inner (les registres indiquaient auparavant Saint-Cloud).
+-- verified = FALSE tant que le Kbis et le contact n'ont pas été confirmés ; employees et contact_email laissés vides (inconnus).
 --
 -- Prérequis : supabase_add_geo_columns.sql, descriptions_en et name_en en place.
 -- Idempotent : peut être relancé sans créer de doublon (et remet Premium si besoin).
 -- ============================================================
 
 INSERT INTO companies (name, country, hq, industry, site, logo, description, description_en, verified, premium, founded, city, department, region, lat, lng)
-SELECT 'AiFinity', '🇫🇷 France', 'Saint-Cloud', 'Industrie & Manufacturing', 'https://www.aifinity.fr', '🤖',
-  'Société française spécialisée dans le développement de solutions technologiques d''intelligence artificielle et de traitement de données massives (big data) pour la gestion de ressources stratégiques. Basée à Saint-Cloud (Hauts-de-Seine).',
-  'French company specialising in the development of artificial intelligence and big-data technology solutions for the management of strategic resources. Based in Saint-Cloud (Hauts-de-Seine).',
-  FALSE, TRUE, '2025', 'Saint-Cloud', 'Hauts-de-Seine', 'Île-de-France', 48.8449, 2.2178
+SELECT 'AiFinity', '🇫🇷 France', 'Villeurbanne', 'Industrie & Manufacturing', 'https://www.aifinity.fr', '🤖',
+  'Société française spécialisée dans le développement de solutions technologiques d''intelligence artificielle et de traitement de données massives (big data) pour la gestion de ressources stratégiques. Basée à Villeurbanne (Rhône).',
+  'French company specialising in the development of artificial intelligence and big-data technology solutions for the management of strategic resources. Based in Villeurbanne (Rhône).',
+  FALSE, TRUE, '2025', 'Villeurbanne', 'Rhône', 'Auvergne-Rhône-Alpes', 45.7719, 4.8902
 WHERE NOT EXISTS (SELECT 1 FROM companies WHERE name = 'AiFinity');
 
--- Premium, même si la fiche existait déjà.
-UPDATE companies SET premium = TRUE WHERE name = 'AiFinity';
+-- Premium et localisation, même si la fiche existait déjà (corrige une fiche créée avec l'ancienne adresse).
+UPDATE companies SET
+  premium = TRUE,
+  hq = 'Villeurbanne', city = 'Villeurbanne', department = 'Rhône', region = 'Auvergne-Rhône-Alpes',
+  lat = 45.7719, lng = 4.8902,
+  description = 'Société française spécialisée dans le développement de solutions technologiques d''intelligence artificielle et de traitement de données massives (big data) pour la gestion de ressources stratégiques. Basée à Villeurbanne (Rhône).',
+  description_en = 'French company specialising in the development of artificial intelligence and big-data technology solutions for the management of strategic resources. Based in Villeurbanne (Rhône).'
+WHERE name = 'AiFinity';
 
 -- ============ PRESTATION ============
 DO $$
@@ -43,8 +50,20 @@ BEGIN
   FROM companies c WHERE c.name = 'AiFinity' LIMIT 1;
 END $$;
 
--- Contrôle (doit renvoyer 1 ligne : premium = true, 1 prestation) :
-SELECT c.name, c.premium, c.verified, count(p.id) AS prestations
-FROM companies c LEFT JOIN products p ON p.company_id = c.id
-WHERE c.name = 'AiFinity'
-GROUP BY c.name, c.premium, c.verified;
+-- Catégorie de service de l'entreprise : le site lit les catégories d'une entreprise dans
+-- company_product_categories (sans cette ligne, elle n'apparaît pas dans « Prestataires »).
+-- AiFinity n'a qu'une prestation : on retire toute autre catégorie (ex. rattachement manuel antérieur).
+DELETE FROM company_product_categories
+WHERE company_id = (SELECT id FROM companies WHERE name = 'AiFinity' LIMIT 1)
+  AND category <> 'Prestation IA & data';
+
+INSERT INTO company_product_categories (company_id, category)
+SELECT id, 'Prestation IA & data' FROM companies WHERE name = 'AiFinity' LIMIT 1
+ON CONFLICT DO NOTHING;
+
+-- Contrôle (doit renvoyer 1 ligne : premium = true, 1 prestation, 1 catégorie) :
+SELECT c.name, c.premium, c.verified, c.city,
+       (SELECT count(*) FROM products p WHERE p.company_id = c.id) AS prestations,
+       (SELECT count(*) FROM company_product_categories cc WHERE cc.company_id = c.id) AS categories
+FROM companies c
+WHERE c.name = 'AiFinity';
