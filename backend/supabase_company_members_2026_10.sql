@@ -68,6 +68,11 @@ $$;
 GRANT EXECUTE ON FUNCTION public.is_company_member(uuid) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.is_company_owner(uuid) TO anon, authenticated;
 
+-- Ce projet révoque les droits par défaut sur les nouvelles tables
+-- (supabase_lock_base_tables.sql) : il faut un GRANT explicite. Le vrai
+-- contrôle d'accès reste les policies RLS ci-dessous.
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.company_members TO authenticated;
+
 -- Un membre voit l'équipe de son entreprise ; l'admin plateforme voit tout.
 -- Aucune écriture directe pour les utilisateurs : tout passe par les RPC
 -- ci-dessous (sauf l'admin plateforme, qui rattache un compte à la main).

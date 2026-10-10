@@ -293,7 +293,13 @@ async function supplierRouteAfterAuth() {
     // backend/supabase_company_members_2026_10.sql n'est pas exécutée.
     let companies = [];
     try {
-      const memberships = await supplierFetch(`company_members?user_id=eq.${userId}&select=company_id,role&order=created_at.asc`);
+      // fetch direct (pas supplierFetch) : un refus d'accès sur cette table ne doit
+      // jamais déclencher la déconnexion automatique, juste le repli ci-dessous.
+      const mres = await fetch(`${SUPABASE_URL}/rest/v1/company_members?user_id=eq.${userId}&select=company_id,role&order=created_at.asc`, {
+        headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + sessionStorage.getItem('sup_access_token') },
+      });
+      if (!mres.ok) throw new Error('HTTP ' + mres.status);
+      const memberships = await mres.json();
       if (memberships && memberships.length) {
         companies = await supplierFetch(`companies?id=eq.${memberships[0].company_id}&select=*`);
       }
