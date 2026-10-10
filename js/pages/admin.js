@@ -771,6 +771,7 @@ async function adminChangePassword(event) {
 // service_role n'est jamais côté navigateur, et AUCUN mot de passe ne transite
 // par l'admin — la personne le choisit via pages/nouveau-mot-de-passe.html.
 let adminUsersCache = [];
+let adminUsersMe = null; // { id, isSuper } de l'admin connecté (renvoyé par le Worker)
 let adminUsersLoaded = false;
 let adminCompanySearchTimer = null;
 
@@ -793,7 +794,13 @@ async function loadAdminUsers() {
   try {
     const data = await adminUsersCall({ action: 'list' });
     adminUsersCache = (data.users || []).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    adminUsersMe = data.me || null;
     adminUsersLoaded = true;
+    // Créer un compte administrateur : réservé aux super-admins.
+    const adminOpt = document.getElementById('admin-user-admin-option');
+    const isSuper = !!(adminUsersMe && adminUsersMe.isSuper);
+    if (adminOpt) adminOpt.style.display = isSuper ? 'block' : 'none';
+    if (!isSuper) { const cb = document.getElementById('admin-user-is-admin'); if (cb) { cb.checked = false; adminUserToggleAdminMode(); } }
     renderAdminUsers();
   } catch (err) {
     list.innerHTML = `<div class="admin-empty" style="color:#C0392B">${escapeHtml(err.message)}</div>`;
@@ -806,7 +813,7 @@ async function loadAdminAuditLog() {
   if (!box) return;
   try {
     const rows = await adminFetch('admin_audit_log?select=created_at,admin_email,action,target_email,details&order=created_at.desc&limit=15');
-    const labels = { create_user: 'a créé le compte', create_admin: 'a créé le compte administrateur', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise' };
+    const labels = { create_user: 'a créé le compte', create_admin: 'a créé le compte administrateur', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise', detach_company: 'a retiré d\'une entreprise', set_super: 'a donné le statut super-admin à', unset_super: 'a retiré le statut super-admin à', revoke_admin: 'a retiré les droits admin de', delete_admin: 'a supprimé le compte administrateur' };
     box.innerHTML = !rows || !rows.length
       ? '<div class="admin-empty">Aucune action enregistrée.</div>'
       : rows.map(r => `<div class="admin-field-row" style="font-size:12px"><span>${escapeHtml(new Date(r.created_at).toLocaleString('fr-FR'))} · <strong>${escapeHtml(r.admin_email)}</strong> ${escapeHtml(labels[r.action] || r.action)} ${escapeHtml(r.target_email || '')}</span></div>`).join('');
@@ -817,7 +824,8 @@ async function loadAdminAuditLog() {
 
 function adminUserPills(u) {
   const pills = [];
-  if (u.is_admin) pills.push('<span class="sup-pill sup-pill-ok" style="font-size:10px">Admin</span>');
+  if (u.is_super) pills.push('<span class="sup-pill sup-pill-ok" style="font-size:10px">Super-admin</span>');
+  else if (u.is_admin) pills.push('<span class="sup-pill sup-pill-ok" style="font-size:10px">Admin</span>');
   if (u.disabled) pills.push('<span class="sup-pill sup-pill-no" style="font-size:10px">Désactivé</span>');
   if (!u.confirmed) pills.push('<span class="sup-pill sup-pill-pending" style="font-size:10px">Email non confirmé</span>');
   return pills.join(' ');
@@ -826,6 +834,7 @@ function adminUserPills(u) {
 function renderAdminUsers() {
   const list = document.getElementById('admin-users-list');
   if (!list) return;
+  const me = adminUsersMe || {};
   const q = ((document.getElementById('admin-users-search') || {}).value || '').trim().toLowerCase();
   const rows = adminUsersCache.filter(u => !q || (u.email || '').toLowerCase().includes(q) ||
     u.companies.some(c => (c.name || '').toLowerCase().includes(q)));
@@ -834,24 +843,37 @@ function renderAdminUsers() {
   list.innerHTML = `<p style="font-size:11px;color:var(--muted);margin:0 0 8px">${rows.length} compte${rows.length > 1 ? 's' : ''}${rows.length > 100 ? ' (100 premiers affichés, affine la recherche)' : ''}</p>` +
     rows.slice(0, 100).map(u => {
       const co = u.companies.map(c => `${escapeHtml(c.name)} <em style="color:var(--muted)">(${c.role === 'owner' ? 'admin' : 'collaborateur'})</em>`).join(', ');
-      const locked = u.is_admin;
       const e = escapeJsAttr(u.email);
+      const isMe = u.id === me.id;
+      const btn = (label, fn, cls) => `<button class="${cls || 'btn-remove-product'}" onclick="${fn}">${label}</button>`;
+      let actions;
+      if (isMe) {
+        actions = '<span style="font-size:11px;color:var(--muted)">C\'est ton compte — mot de passe et accès : onglet « Sécurité »</span>';
+      } else {
+        const adminBtns = (u.is_admin && me.isSuper)
+          ? btn(u.is_super ? 'Retirer super-admin' : 'Rendre super-admin', `adminUserSetSuper('${u.id}','${e}',${u.is_super ? 'false' : 'true'})`, 'btn-add-product sup-btn-sm') +
+            btn('Retirer admin', `adminUserRevokeAdmin('${u.id}','${e}')`)
+          : '';
+        const lockedAdmin = u.is_admin && !me.isSuper;
+        actions = adminBtns +
+          (lockedAdmin ? '<span style="font-size:11px;color:var(--muted)">Compte admin : seul un super-admin peut agir dessus.</span>'
+            : btn('Mot de passe', `adminUserShowPasswordPanel('${u.id}','${e}')`, 'btn-add-product sup-btn-sm')) +
+          btn('Entreprises', `adminUserShowCompanyPanel('${u.id}')`, 'btn-add-product sup-btn-sm') +
+          (lockedAdmin ? '' : btn(u.disabled ? 'Réactiver' : 'Désactiver', `adminUserToggleDisabled('${u.id}','${e}',${u.disabled ? 'false' : 'true'})`) +
+                              btn('Supprimer', `adminUserDelete('${u.id}','${e}')`));
+      }
       return `
       <div id="admin-user-${u.id}" style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1 1 280px;min-width:0">
           <div style="font-size:13px;font-weight:600;word-break:break-all;margin-bottom:3px">${escapeHtml(u.email)} ${adminUserPills(u)}</div>
           <div style="font-size:12px;color:var(--muted)">${co || 'Aucune entreprise'} · créé le ${fmt(u.created_at)} · dernière connexion ${fmt(u.last_sign_in_at)}</div>
           <div id="admin-user-panel-${u.id}" style="display:none;margin-top:10px"></div>
+          <div id="admin-user-co-${u.id}" style="display:none;margin-top:10px"></div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-          ${locked ? '<span style="font-size:11px;color:var(--muted)">Compte admin protégé</span>' : `
-          <button class="btn-add-product sup-btn-sm" onclick="adminUserShowPasswordPanel('${u.id}','${e}')">Mot de passe</button>
-          <button class="btn-add-product sup-btn-sm" onclick="adminUserAttachPrompt('${u.id}','${e}')">Entreprise</button>
-          <button class="btn-remove-product" onclick="adminUserToggleDisabled('${u.id}','${e}',${u.disabled ? 'false' : 'true'})">${u.disabled ? 'Réactiver' : 'Désactiver'}</button>
-          <button class="btn-remove-product" onclick="adminUserDelete('${u.id}','${e}')">Supprimer</button>`}
-        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${actions}</div>
       </div>`;
     }).join('');
+  if (adminOpenCompanyPanel) renderAdminCompanyPanel(adminOpenCompanyPanel);
 }
 
 // Lien affiché à l'admin : à copier pour transmettre toi-même, ou déjà envoyé par email.
@@ -960,7 +982,12 @@ async function adminUserToggleDisabled(id, email, disabled) {
 }
 
 async function adminUserDelete(id, email) {
-  const typed = prompt(`Supprimer définitivement le compte ${email} ?\n\nLa personne perd son accès, et l'entreprise redevient sans administrateur. Pour confirmer, retape l'adresse email du compte :`);
+  const u = adminUsersCache.find(x => x.id === id);
+  const kind = u && u.is_admin ? 'ADMINISTRATEUR ' : '';
+  const consequence = u && u.is_admin
+    ? 'Cette personne perd tout accès, y compris à cette page.'
+    : 'La personne perd son accès, et l\'entreprise redevient sans administrateur.';
+  const typed = prompt(`Supprimer définitivement le compte ${kind}${email} ?\n\n${consequence} Pour confirmer, retape l'adresse email du compte :`);
   if (typed === null) return;
   try {
     await adminUsersCall({ action: 'delete', userId: id, confirmEmail: typed });
@@ -970,22 +997,119 @@ async function adminUserDelete(id, email) {
   }
 }
 
-async function adminUserAttachPrompt(id, email) {
-  const q = prompt(`Rattacher ${email} à quelle entreprise ?\nTape le début de son nom :`);
-  if (!q || q.trim().length < 2) return;
+// ── Administrateurs : statut super-admin, retrait des droits (super-admin uniquement) ──
+async function adminUserSetSuper(id, email, makeSuper) {
+  const msg = makeSuper
+    ? `Donner le statut SUPER-ADMIN à ${email} ?\n\nIl pourra créer des administrateurs, donner ou retirer le statut super-admin, retirer les droits admin et supprimer d'autres administrateurs.`
+    : `Retirer le statut super-admin à ${email} ?\n\nIl restera administrateur, sans pouvoir gérer les autres administrateurs.`;
+  if (!confirm(msg)) return;
   try {
-    const rows = await adminFetch(`companies?name=ilike.*${encodeURIComponent(q.trim())}*&select=id,name&order=name&limit=9`);
-    if (!rows || !rows.length) { alert('Aucune entreprise trouvée.'); return; }
-    let company = rows[0];
-    if (rows.length > 1) {
-      const pick = prompt('Plusieurs entreprises trouvées, tape le numéro :\n' + rows.map((c, i) => `${i + 1}. ${c.name}`).join('\n'));
-      company = rows[Number(pick) - 1];
-      if (!company) return;
-    }
-    const asOwner = confirm(`Rattacher ${email} à « ${company.name} ».\n\nOK = administrateur de l'entreprise (gère l'équipe)\nAnnuler = collaborateur`);
-    await adminUsersCall({ action: 'attach_company', userId: id, companyId: company.id, role: asOwner ? 'owner' : 'member' });
+    await adminUsersCall({ action: 'set_super', userId: id, isSuper: makeSuper });
     await loadAdminUsers();
   } catch (err) { alert('Erreur : ' + err.message); }
+}
+
+async function adminUserRevokeAdmin(id, email) {
+  if (!confirm(`Retirer les droits administrateur de ${email} ?\n\nSon compte reste actif (il peut toujours se connecter comme utilisateur) mais il n'aura plus accès à cette page.`)) return;
+  try {
+    await adminUsersCall({ action: 'revoke_admin', userId: id });
+    await loadAdminUsers();
+  } catch (err) { alert('Erreur : ' + err.message); }
+}
+
+// ── Entreprises rattachées à un compte (admins et super-admins, jamais sur son propre compte) ──
+let adminOpenCompanyPanel = null;
+let adminCoSearchTimer = null;
+
+function adminUserShowCompanyPanel(id) {
+  const panel = document.getElementById(`admin-user-co-${id}`);
+  if (!panel) return;
+  if (adminOpenCompanyPanel === id) { adminOpenCompanyPanel = null; panel.style.display = 'none'; return; }
+  const prev = adminOpenCompanyPanel && document.getElementById(`admin-user-co-${adminOpenCompanyPanel}`);
+  if (prev) prev.style.display = 'none';
+  adminOpenCompanyPanel = id;
+  renderAdminCompanyPanel(id);
+}
+
+function renderAdminCompanyPanel(id) {
+  const panel = document.getElementById(`admin-user-co-${id}`);
+  const u = adminUsersCache.find(x => x.id === id);
+  if (!panel || !u) return;
+  const e = escapeJsAttr(u.email);
+  const rowsHtml = u.companies.length
+    ? u.companies.map(c => `
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+        <span style="flex:1 1 160px;font-weight:600">${escapeHtml(c.name)}</span>
+        <select onchange="adminUserSetCompanyRole('${id}','${c.id}',this.value)" aria-label="Rôle dans l'entreprise" style="font-size:12px;padding:5px 8px">
+          <option value="owner"${c.role === 'owner' ? ' selected' : ''}>Administrateur</option>
+          <option value="member"${c.role === 'member' ? ' selected' : ''}>Collaborateur</option>
+        </select>
+        <button class="btn-remove-product" onclick="adminUserDetachCompany('${id}','${c.id}','${escapeJsAttr(c.name)}','${e}','${c.role}')">Retirer</button>
+      </div>`).join('')
+    : '<p style="margin:0 0 8px;color:var(--muted)">Aucune entreprise rattachée.</p>';
+  panel.style.display = 'block';
+  panel.innerHTML = `<div style="padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:12px">
+    <p style="margin:0 0 8px">Entreprises de <strong>${escapeHtml(u.email)}</strong> :</p>
+    ${rowsHtml}
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+      <p style="margin:0 0 6px;color:var(--muted)">Rattacher à une entreprise :</p>
+      <input type="text" id="admin-user-co-q-${id}" placeholder="Début du nom…" oninput="adminUserCompanySearchDebounced('${id}')" autocomplete="off" style="width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;margin-bottom:6px"/>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select id="admin-user-co-sel-${id}" style="display:none;flex:1 1 200px;font-size:12px;padding:5px 8px"></select>
+        <select id="admin-user-co-role-${id}" style="font-size:12px;padding:5px 8px"><option value="member">Collaborateur</option><option value="owner">Administrateur</option></select>
+        <button class="btn-approve sup-btn-sm" onclick="adminUserAttachCompany('${id}')">Rattacher</button>
+      </div>
+    </div>
+    <p id="admin-user-co-msg-${id}" style="margin:8px 0 0;color:#C0392B;display:none"></p>
+  </div>`;
+}
+
+function adminUserCompanySearchDebounced(id) {
+  clearTimeout(adminCoSearchTimer);
+  adminCoSearchTimer = setTimeout(() => adminUserCompanySearch(id), 250);
+}
+
+async function adminUserCompanySearch(id) {
+  const q = (document.getElementById(`admin-user-co-q-${id}`) || {}).value || '';
+  const sel = document.getElementById(`admin-user-co-sel-${id}`);
+  if (!sel) return;
+  if (q.trim().length < 2) { sel.style.display = 'none'; sel.innerHTML = ''; return; }
+  try {
+    const rows = await adminFetch(`companies?name=ilike.*${encodeURIComponent(q.trim())}*&select=id,name&order=name&limit=15`);
+    sel.innerHTML = (rows || []).map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('') || '<option value="">Aucune entreprise trouvée</option>';
+    sel.style.display = 'block';
+  } catch (err) { sel.style.display = 'none'; }
+}
+
+function adminUserCompanyError(id, err) {
+  const el = document.getElementById(`admin-user-co-msg-${id}`);
+  if (el) { el.textContent = err.message; el.style.display = 'block'; } else alert('Erreur : ' + err.message);
+}
+
+async function adminUserAttachCompany(id) {
+  const sel = document.getElementById(`admin-user-co-sel-${id}`);
+  const companyId = sel && sel.style.display !== 'none' ? sel.value : '';
+  if (!companyId) { adminUserCompanyError(id, new Error('Choisis une entreprise dans la liste (tape son nom d\'abord).')); return; }
+  try {
+    await adminUsersCall({ action: 'attach_company', userId: id, companyId, role: document.getElementById(`admin-user-co-role-${id}`).value });
+    await loadAdminUsers();
+  } catch (err) { adminUserCompanyError(id, err); }
+}
+
+async function adminUserSetCompanyRole(id, companyId, role) {
+  try {
+    await adminUsersCall({ action: 'attach_company', userId: id, companyId, role });
+    await loadAdminUsers();
+  } catch (err) { adminUserCompanyError(id, err); }
+}
+
+async function adminUserDetachCompany(id, companyId, companyName, email, role) {
+  const warn = role === 'owner' ? '\n\nSi c\'est le seul administrateur de cette entreprise, elle n\'en aura plus.' : '';
+  if (!confirm(`Retirer ${email} de « ${companyName} » ?${warn}`)) return;
+  try {
+    await adminUsersCall({ action: 'detach_company', userId: id, companyId });
+    await loadAdminUsers();
+  } catch (err) { adminUserCompanyError(id, err); }
 }
 
 async function applyDeleteSubmission(sub) {

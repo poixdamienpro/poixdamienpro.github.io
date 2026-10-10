@@ -148,7 +148,9 @@
       <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 14px;max-width:640px">Compte fournisseur ou administrateur : la personne choisit elle-même son mot de passe, tu ne le vois jamais. Tu peux lui envoyer le lien par email, ou le copier pour le lui transmettre toi-même.</p>
       <form id="admin-user-create-form" onsubmit="adminUserCreate(event)" style="max-width:520px">
         <div class="lead-field"><label>Email de la personne</label><input type="email" id="admin-user-email" required/></div>
-        <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin:0 0 14px;line-height:1.5"><input type="checkbox" id="admin-user-is-admin" onchange="adminUserToggleAdminMode()" style="margin:3px 0 0"/> <span><strong>Administrateur de la plateforme</strong> — accès complet à cette page (validation, comptes, statistiques). À réserver aux personnes de confiance.</span></label>
+        <div id="admin-user-admin-option" style="display:none">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;margin:0 0 14px;line-height:1.5"><input type="checkbox" id="admin-user-is-admin" onchange="adminUserToggleAdminMode()" style="margin:3px 0 0"/> <span><strong>Administrateur de la plateforme</strong> — accès à cette page (validation, comptes, statistiques). Réservé aux super-admins ; le nouvel admin n'est pas super-admin par défaut.</span></label>
+        </div>
         <div id="admin-user-company-block">
           <div class="lead-field"><label>Entreprise (optionnel)</label>
             <input type="text" id="admin-user-company-q" placeholder="Tape le début du nom…" oninput="adminUserSearchCompanyDebounced()" autocomplete="off"/>

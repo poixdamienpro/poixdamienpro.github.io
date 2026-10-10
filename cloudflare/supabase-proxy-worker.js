@@ -240,15 +240,18 @@ async function authenticateAdmin(request, env) {
   if (!whoRes.ok) return { error: json({ error: 'Session invalide' }, 401) };
   const caller = await whoRes.json();
 
-  // 2. Vérifie que l'appelant est bien dans la table admins.
-  const checkRes = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(caller.id)}&select=user_id`);
+  // 2. Vérifie que l'appelant est bien dans la table admins, et s'il est super-admin.
+  //    Repli sans la colonne is_super tant que backend/supabase_admin_roles_2026_10.sql
+  //    n'est pas exécuté : tout le monde est alors simple admin (rien ne casse).
+  let checkRes = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(caller.id)}&select=user_id,is_super`);
+  if (!checkRes.ok) checkRes = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(caller.id)}&select=user_id`);
   if (!checkRes.ok) {
     const detail = await checkRes.text();
     return { error: json({ error: 'Échec de la vérification admin', detail }, 502) };
   }
   const checkRows = await checkRes.json();
   if (!checkRows.length) return { error: json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403) };
-  return { caller };
+  return { caller: { ...caller, isSuper: checkRows[0].is_super === true } };
 }
 
 async function requireAdmin(request, env) {
@@ -397,9 +400,10 @@ async function listAdminUsers(env) {
   }
   const [members, admins] = await Promise.all([
     serviceFetchAll(env, 'company_members?select=user_id,role,company_id,companies(name)'),
-    serviceFetchAll(env, 'admins?select=user_id'),
+    serviceFetchAll(env, 'admins?select=user_id,is_super').catch(() => serviceFetchAll(env, 'admins?select=user_id')),
   ]);
   const adminIds = new Set(admins.map(a => a.user_id));
+  const superIds = new Set(admins.filter(a => a.is_super === true).map(a => a.user_id));
   const byUser = {};
   for (const m of members) {
     (byUser[m.user_id] = byUser[m.user_id] || []).push({ id: m.company_id, name: (m.companies && m.companies.name) || '', role: m.role });
@@ -413,8 +417,17 @@ async function listAdminUsers(env) {
     confirmed: !!u.email_confirmed_at,
     disabled: !!(u.banned_until && new Date(u.banned_until).getTime() > now),
     is_admin: adminIds.has(u.id),
+    is_super: superIds.has(u.id),
     companies: byUser[u.id] || [],
   }));
+}
+
+// Échec d'une écriture sur les comptes : le garde-fou « dernier super-admin » (base) a un message dédié.
+async function adminWriteFailure(res, fallback) {
+  const text = await res.text();
+  return /LAST_SUPER/.test(text)
+    ? json({ error: 'Il doit rester au moins un super-admin.', code: 'LAST_SUPER' }, 409)
+    : json({ error: fallback }, 502);
 }
 
 async function getAuthUser(env, userId) {
@@ -529,7 +542,7 @@ async function handleAdminUsers(request, env) {
 
   try {
     if (action === 'list') {
-      return json({ users: await listAdminUsers(env) });
+      return json({ users: await listAdminUsers(env), me: { id: caller.id, isSuper: caller.isSuper } });
     }
 
     if (action === 'create') {
@@ -537,6 +550,7 @@ async function handleAdminUsers(request, env) {
       if (!EMAIL_RE.test(email)) return json({ error: 'Email invalide' }, 400);
       // Compte administrateur de la plateforme : sans entreprise (accès complet à l'admin).
       const makeAdmin = body.makeAdmin === true;
+      if (makeAdmin && !caller.isSuper) return json({ error: 'Seul un super-admin peut créer un compte administrateur.', code: 'SUPER_REQUIRED' }, 403);
       if (makeAdmin && body.companyId) return json({ error: 'Un compte administrateur ne se rattache pas à une entreprise.' }, 400);
       let company = null;
       if (body.companyId) {
@@ -590,10 +604,61 @@ async function handleAdminUsers(request, env) {
       if (!cRows.length) return json({ error: 'Entreprise introuvable' }, 404);
       const target = await getAuthUser(env, body.userId);
       if (!target) return json({ error: 'Compte introuvable' }, 404);
+      if (target.id === caller.id) return json({ error: 'Tu ne peux pas modifier ton propre rattachement ici.', code: 'SELF' }, 400);
       const role = body.role === 'owner' ? 'owner' : 'member';
       const attach = await attachUserToCompany(env, target.id, cRows[0], role);
       if (!attach.ok) return json({ error: 'Rattachement impossible' }, 502);
       await auditAdminAction(env, caller, 'attach_company', target.email, { company: cRows[0].name, role });
+      return json({ success: true });
+    }
+
+    if (action === 'detach_company') {
+      if (!UUID_RE.test(String(body.userId || '')) || !UUID_RE.test(String(body.companyId || ''))) return json({ error: 'Paramètres invalides' }, 400);
+      const target = await getAuthUser(env, body.userId);
+      if (!target) return json({ error: 'Compte introuvable' }, 404);
+      if (target.id === caller.id) return json({ error: 'Tu ne peux pas modifier ton propre rattachement ici.', code: 'SELF' }, 400);
+      const cRes = await serviceFetch(env, `companies?id=eq.${body.companyId}&select=id,name,claimed_by_user_id`);
+      const cRows = cRes.ok ? await cRes.json() : [];
+      if (!cRows.length) return json({ error: 'Entreprise introuvable' }, 404);
+      const delRes = await serviceFetch(env, `company_members?company_id=eq.${body.companyId}&user_id=eq.${encodeURIComponent(target.id)}`, {
+        method: 'DELETE', headers: { 'Prefer': 'return=representation' },
+      });
+      if (!delRes.ok) return json({ error: 'Retrait impossible' }, 502);
+      if (!(await delRes.json()).length) return json({ error: 'Ce compte n\'est pas rattaché à cette entreprise.' }, 404);
+      // L'ancien champ « propriétaire » (encore lu par le repli de supplier.js) ne doit pas rester sur un compte retiré.
+      if (cRows[0].claimed_by_user_id === target.id) {
+        const ownerRes = await serviceFetch(env, `company_members?company_id=eq.${body.companyId}&role=eq.owner&select=user_id&limit=1`);
+        const owners = ownerRes.ok ? await ownerRes.json() : [];
+        await serviceFetch(env, `companies?id=eq.${body.companyId}`, {
+          method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ claimed_by_user_id: owners.length ? owners[0].user_id : null }),
+        });
+      }
+      await auditAdminAction(env, caller, 'detach_company', target.email, { company: cRows[0].name });
+      return json({ success: true });
+    }
+
+    // Gestion des administrateurs : réservée aux super-admins, jamais sur soi-même.
+    if (action === 'set_super' || action === 'revoke_admin') {
+      if (!caller.isSuper) return json({ error: 'Réservé aux super-admins.', code: 'SUPER_REQUIRED' }, 403);
+      if (!UUID_RE.test(String(body.userId || ''))) return json({ error: 'userId invalide' }, 400);
+      if (body.userId === caller.id) return json({ error: 'Tu ne peux pas modifier ton propre statut.', code: 'SELF' }, 400);
+      const target = await getAuthUser(env, body.userId);
+      if (!target) return json({ error: 'Compte introuvable' }, 404);
+      if (!(await isAdminUser(env, target.id))) return json({ error: 'Ce compte n\'est pas administrateur.', code: 'NOT_ADMIN' }, 400);
+
+      if (action === 'set_super') {
+        const isSuper = body.isSuper === true;
+        const res = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(target.id)}`, {
+          method: 'PATCH', headers: { 'Prefer': 'return=representation' }, body: JSON.stringify({ is_super: isSuper }),
+        });
+        if (!res.ok) return adminWriteFailure(res, 'Modification impossible');
+        await auditAdminAction(env, caller, isSuper ? 'set_super' : 'unset_super', target.email, null);
+        return json({ success: true, isSuper });
+      }
+
+      const res = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(target.id)}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+      if (!res.ok) return adminWriteFailure(res, 'Retrait impossible');
+      await auditAdminAction(env, caller, 'revoke_admin', target.email, null);
       return json({ success: true });
     }
 
@@ -602,8 +667,9 @@ async function handleAdminUsers(request, env) {
       const target = await getAuthUser(env, body.userId);
       if (!target) return json({ error: 'Compte introuvable' }, 404);
       if (target.id === caller.id) return json({ error: 'Utilise l\'onglet Sécurité pour ton propre compte.' }, 400);
-      if (await isAdminUser(env, target.id)) {
-        return json({ error: 'Compte administrateur : il gère lui-même son mot de passe et son accès.', code: 'IS_ADMIN' }, 403);
+      const targetIsAdmin = await isAdminUser(env, target.id);
+      if (targetIsAdmin && !caller.isSuper) {
+        return json({ error: 'Compte administrateur : seul un super-admin peut agir dessus.', code: 'SUPER_REQUIRED' }, 403);
       }
 
       if (action === 'reset_link') {
@@ -627,7 +693,7 @@ async function handleAdminUsers(request, env) {
       if (String(body.confirmEmail || '').trim().toLowerCase() !== String(target.email || '').toLowerCase()) {
         return json({ error: 'Adresse de confirmation incorrecte' }, 400);
       }
-      const prep = await serviceFetch(env, 'rpc/admin_prepare_user_deletion', { method: 'POST', body: JSON.stringify({ p_user: target.id }) });
+      const prep = await serviceFetch(env, 'rpc/admin_prepare_user_deletion', { method: 'POST', body: JSON.stringify({ p_user: target.id, p_allow_admin: targetIsAdmin }) });
       if (!prep.ok) {
         const detail = await prep.text();
         if (/HAS_RFQ_DATA/.test(detail)) {
@@ -637,8 +703,8 @@ async function handleAdminUsers(request, env) {
         return json({ error: 'Préparation de la suppression impossible', detail }, 502);
       }
       const del = await authAdminFetch(env, `users/${encodeURIComponent(target.id)}`, { method: 'DELETE' });
-      if (!del.ok) return json({ error: 'Suppression impossible' }, 502);
-      await auditAdminAction(env, caller, 'delete_user', target.email, null);
+      if (!del.ok) return adminWriteFailure(del, 'Suppression impossible'); // le dernier super-admin ne peut pas disparaître (garde-fou en base)
+      await auditAdminAction(env, caller, targetIsAdmin ? 'delete_admin' : 'delete_user', target.email, null);
       return json({ success: true });
     }
 
