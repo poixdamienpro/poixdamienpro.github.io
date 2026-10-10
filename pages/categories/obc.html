@@ -23,6 +23,85 @@
   "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com" }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/pages/categories/obc.html",
+  "inLanguage": "fr",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce qu'un OBC ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un OBC (On-Board Computer, calculateur embarqué) est une unité de traitement : elle reçoit des données, exécute un programme et envoie des commandes. C'est le cerveau du système embarqué, qu'il s'agisse d'un satellite, d'un aéronef, d'un véhicule ou d'une machine industrielle."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "CPU, FPGA, GPU ou SoC hybride : comment choisir ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Partez du besoin le plus contraignant. Un timing garanti à la nanoseconde élimine le CPU seul et le GPU. Un besoin d'inférence IA élimine le FPGA seul, sauf accélérateurs dédiés. Le SoC hybride CPU + FPGA n'a de sens que si les deux contraintes coexistent, sinon c'est un surcoût de développement inutile."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels bus de communication un OBC doit-il gérer ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Chaque domaine a ses standards : SpaceWire pour le spatial, MIL-STD-1553 pour la défense et l'aéronautique, ARINC 429 pour l'avionique civile, CAN FD pour l'automobile et l'industrie, Ethernet TSN pour l'industrie et la mobilité. Le bus choisi verrouille l'écosystème, car les équipements ne parlent souvent qu'un seul protocole."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment trouver un fournisseur d'OBC et demander un devis ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Types de calculateur embarqué",
+  "url": "https://www.buy-inner.com/pages/categories/obc.html",
+  "inLanguage": "fr",
+  "numberOfItems": 4,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "CPU / MCU",
+      "description": "Le généraliste : exécute un logiciel séquentiel, gère les interruptions et pilote les périphériques. Choix par défaut quand le traitement est logiciel et les flux de données modérés."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "FPGA",
+      "description": "Logique reconfigurable qui exécute des opérations en parallèle avec une latence fixe et prévisible. Choisi pour le radar, le traitement d'image, le contrôle moteur haute fréquence."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "GPU / NPU",
+      "description": "Calcul massivement parallèle optimisé pour les réseaux de neurones et la fusion de capteurs. Indispensable pour la perception autonome et le traitement vidéo embarqué."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "SoC hybride CPU + FPGA",
+      "description": "Un CPU gère l'OS et le logiciel applicatif, le FPGA traite les flux temps réel en parallèle : flexibilité logicielle et déterminisme matériel sur une seule puce."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -118,6 +197,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -674,6 +761,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 200 € – 30 000 € selon puissance et niveau ASIL</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Questions fréquentes</div>
+    <h2>Questions fréquentes <em>sur les OBC</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Qu'est-ce qu'un OBC ?</summary><p>Un OBC (On-Board Computer, calculateur embarqué) est une unité de traitement : elle reçoit des données, exécute un programme et envoie des commandes. C'est le cerveau du système embarqué, qu'il s'agisse d'un satellite, d'un aéronef, d'un véhicule ou d'une machine industrielle.</p></details>
+      <details class="faq-item"><summary>CPU, FPGA, GPU ou SoC hybride : comment choisir ?</summary><p>Partez du besoin le plus contraignant. Un timing garanti à la nanoseconde élimine le CPU seul et le GPU. Un besoin d'inférence IA élimine le FPGA seul, sauf accélérateurs dédiés. Le SoC hybride CPU + FPGA n'a de sens que si les deux contraintes coexistent, sinon c'est un surcoût de développement inutile.</p></details>
+      <details class="faq-item"><summary>Quels bus de communication un OBC doit-il gérer ?</summary><p>Chaque domaine a ses standards : SpaceWire pour le spatial, MIL-STD-1553 pour la défense et l'aéronautique, ARINC 429 pour l'avionique civile, CAN FD pour l'automobile et l'industrie, Ethernet TSN pour l'industrie et la mobilité. Le bus choisi verrouille l'écosystème, car les équipements ne parlent souvent qu'un seul protocole.</p></details>
+      <details class="faq-item"><summary>Comment trouver un fournisseur d'OBC et demander un devis ?</summary><p>Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription.</p></details>
     </div>
   </div>
 

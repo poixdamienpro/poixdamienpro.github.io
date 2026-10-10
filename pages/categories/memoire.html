@@ -23,6 +23,103 @@
   "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com" }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/pages/categories/memoire.html",
+  "inLanguage": "fr",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Mémoire volatile ou non-volatile : laquelle choisir ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le premier critère est simple : la donnée doit-elle survivre à une coupure de courant ? Si oui, il faut une mémoire non-volatile (NOR Flash, NAND Flash, MRAM, EEPROM). Sinon, la SRAM et la DRAM offrent la vitesse. Chaque technologie répond ensuite à un compromis entre vitesse, capacité, endurance et coût."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle mémoire choisir pour une application spatiale critique ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La MRAM est la technologie de référence pour les mémoires spatiales critiques, comme la mémoire de configuration et les tables de bord : elle combine la vitesse de la SRAM et la non-volatilité de la Flash, et résiste naturellement aux radiations. Son coût au bit reste le facteur limitant."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À quoi servent l'EDAC et le scrubbing ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "L'EDAC (Error Detection And Correction) ajoute un code correcteur d'erreurs aux données stockées : il détecte une erreur sur 2 bits et en corrige une sur 1 bit à la volée. Le scrubbing relit périodiquement toute la mémoire et réécrit les données corrigées, pour éviter que des erreurs accumulées dépassent la capacité de correction."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment trouver un fournisseur de mémoires et demander un devis ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Technologies de mémoire embarquée",
+  "url": "https://www.buy-inner.com/pages/categories/memoire.html",
+  "inLanguage": "fr",
+  "numberOfItems": 7,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "SRAM",
+      "description": "Volatile et la plus rapide, robuste aux radiations. Utilisée comme cache CPU et mémoire de travail temps réel. Chère et de faible densité."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "DRAM / SDRAM / LPDDR",
+      "description": "Volatile, haute densité et bonne bande passante, mais nécessite un rafraîchissement périodique et un contrôleur EDAC en environnement radiatif."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "NOR Flash",
+      "description": "Non-volatile, lecture aléatoire rapide avec exécution du code en place (XIP). Stocke le bootloader, le firmware et les paramètres."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "NAND Flash",
+      "description": "Non-volatile, haute densité et faible coût, pour le stockage de masse. Nécessite un contrôleur FTL."
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "MRAM",
+      "description": "Non-volatile, combine la vitesse de la SRAM et la non-volatilité de la Flash, naturellement résistante aux radiations."
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "EEPROM",
+      "description": "Non-volatile, faible capacité, écriture octet par octet et très haute endurance. Stocke numéros de série, clés de calibration et configuration."
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "eMMC / UFS / SSD NVMe",
+      "description": "Stockage de masse intégré ou déporté, avec contrôleur FTL pour le wear-leveling et la correction d'erreurs."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -114,6 +211,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -517,6 +622,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Qualification AEC-Q100 : tests de durée de vie accélérés (HTOL)</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Questions fréquentes</div>
+    <h2>Questions fréquentes <em>sur les mémoires embarquées</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Mémoire volatile ou non-volatile : laquelle choisir ?</summary><p>Le premier critère est simple : la donnée doit-elle survivre à une coupure de courant ? Si oui, il faut une mémoire non-volatile (NOR Flash, NAND Flash, MRAM, EEPROM). Sinon, la SRAM et la DRAM offrent la vitesse. Chaque technologie répond ensuite à un compromis entre vitesse, capacité, endurance et coût.</p></details>
+      <details class="faq-item"><summary>Quelle mémoire choisir pour une application spatiale critique ?</summary><p>La MRAM est la technologie de référence pour les mémoires spatiales critiques, comme la mémoire de configuration et les tables de bord : elle combine la vitesse de la SRAM et la non-volatilité de la Flash, et résiste naturellement aux radiations. Son coût au bit reste le facteur limitant.</p></details>
+      <details class="faq-item"><summary>À quoi servent l'EDAC et le scrubbing ?</summary><p>L'EDAC (Error Detection And Correction) ajoute un code correcteur d'erreurs aux données stockées : il détecte une erreur sur 2 bits et en corrige une sur 1 bit à la volée. Le scrubbing relit périodiquement toute la mémoire et réécrit les données corrigées, pour éviter que des erreurs accumulées dépassent la capacité de correction.</p></details>
+      <details class="faq-item"><summary>Comment trouver un fournisseur de mémoires et demander un devis ?</summary><p>Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription.</p></details>
     </div>
   </div>
 

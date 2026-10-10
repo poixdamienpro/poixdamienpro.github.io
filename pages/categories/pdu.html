@@ -23,6 +23,103 @@
   "publisher": { "@type": "Organization", "name": "Buy-inner", "url": "https://www.buy-inner.com" }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/pages/categories/pdu.html",
+  "inLanguage": "fr",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce qu'un PDU ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un PDU (Power Distribution Unit) est un nœud de distribution d'énergie : une entrée, plusieurs sorties. Il répartit le courant d'une source (batterie, panneau solaire, réseau secteur, génératrice) vers plusieurs charges. Selon le fabricant, il intègre en option la protection de surintensité, la commutation et le séquencement, le monitoring, le filtrage EMI, la redondance, la conversion de tension et le durcissement environnemental."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Fusible, disjoncteur ou SSPC : lequel choisir ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le fusible reste pertinent pour une protection de dernier recours peu coûteuse et rarement sollicitée. Le disjoncteur convient dès qu'un réarmement manuel est acceptable. Le SSPC s'impose quand le système doit se reconfigurer seul après un défaut, par exemple en spatial, en défense ou dans les architectures redondantes, au prix d'un coût plus élevé."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle différence entre un PDU standard et une PCDU spatiale ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La fonction de base est la même. Ce sont les options sélectionnées par le fabricant, et les niveaux de qualification exigés, qui font la différence entre un PDU de rack standard et une PCDU spatiale : redondance, durcissement aux radiations, composants qualifiés espace, monitoring complet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment trouver un fournisseur de PDU et demander un devis ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner référence des fabricants de PDU industriels, embarqués et spatiaux. Vous pouvez filtrer le catalogue par catégorie, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Options d'un PDU",
+  "url": "https://www.buy-inner.com/pages/categories/pdu.html",
+  "inLanguage": "fr",
+  "numberOfItems": 7,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Protection de surintensité",
+      "description": "Fusibles passifs, disjoncteurs magnéto-thermiques ou SSPC actifs : en cas de défaut, seule la sortie concernée est coupée."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Commutation et séquencement",
+      "description": "Relais ou MOSFETs pour piloter chaque sortie par commande logique et éviter les pics de courant au démarrage."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Monitoring et télémétrie",
+      "description": "Mesure de tension, courant et température par sortie, remontée sur un bus (CAN, Modbus, SNMP, 1553, SpaceWire)."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Filtrage EMI / CEM",
+      "description": "Filtrage des perturbations conduites et rayonnées pour satisfaire les normes (MIL-STD-461, CISPR, DO-160)."
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Redondance",
+      "description": "Double entrée, bus primaire/secondaire, bypass automatique ou cross-strapping, pour les applications critiques."
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Conversion et adaptation de tension",
+      "description": "Convertisseurs DC/DC ou redresseurs AC/DC pour alimenter plusieurs bus à des tensions différentes depuis une source unique."
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "Durcissement environnemental",
+      "description": "Tenue aux vibrations, chocs, températures extrêmes, humidité et radiations."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -125,6 +222,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -592,6 +697,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Prix typique : 500 € – 15 000 € selon puissance et niveau ASIL</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">Questions fréquentes</div>
+    <h2>Questions fréquentes <em>sur les PDU</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Qu'est-ce qu'un PDU ?</summary><p>Un PDU (Power Distribution Unit) est un nœud de distribution d'énergie : une entrée, plusieurs sorties. Il répartit le courant d'une source (batterie, panneau solaire, réseau secteur, génératrice) vers plusieurs charges. Selon le fabricant, il intègre en option la protection de surintensité, la commutation et le séquencement, le monitoring, le filtrage EMI, la redondance, la conversion de tension et le durcissement environnemental.</p></details>
+      <details class="faq-item"><summary>Fusible, disjoncteur ou SSPC : lequel choisir ?</summary><p>Le fusible reste pertinent pour une protection de dernier recours peu coûteuse et rarement sollicitée. Le disjoncteur convient dès qu'un réarmement manuel est acceptable. Le SSPC s'impose quand le système doit se reconfigurer seul après un défaut, par exemple en spatial, en défense ou dans les architectures redondantes, au prix d'un coût plus élevé.</p></details>
+      <details class="faq-item"><summary>Quelle différence entre un PDU standard et une PCDU spatiale ?</summary><p>La fonction de base est la même. Ce sont les options sélectionnées par le fabricant, et les niveaux de qualification exigés, qui font la différence entre un PDU de rack standard et une PCDU spatiale : redondance, durcissement aux radiations, composants qualifiés espace, monitoring complet.</p></details>
+      <details class="faq-item"><summary>Comment trouver un fournisseur de PDU et demander un devis ?</summary><p>Buy-inner référence des fabricants de PDU industriels, embarqués et spatiaux. Vous pouvez filtrer le catalogue par catégorie, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription.</p></details>
     </div>
   </div>
 

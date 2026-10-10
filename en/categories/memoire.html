@@ -26,6 +26,103 @@
   "inLanguage": "en"
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/en/categories/memoire.html",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Volatile or non-volatile memory: which should I choose?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The first criterion is simple: must the data survive a power cut? If so, you need non-volatile memory (NOR Flash, NAND Flash, MRAM, EEPROM). If not, SRAM and DRAM provide the speed. Each technology then addresses a trade-off between speed, capacity, endurance and cost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which memory should I use for a critical space application?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MRAM is the reference technology for critical space memories such as configuration memory and housekeeping tables: it combines the speed of SRAM with the non-volatility of Flash and is naturally radiation-resistant. It is still costly, though density is increasing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What are EDAC and scrubbing for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "EDAC (Error Detection And Correction) adds an error-correcting code to stored data: it detects 2-bit errors and corrects 1-bit errors on the fly. Scrubbing periodically reads all memory and rewrites corrected data, so that accumulated errors cannot exceed the correction capacity."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I find a memory supplier and request a quote?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Embedded memory technologies",
+  "url": "https://www.buy-inner.com/en/categories/memoire.html",
+  "inLanguage": "en",
+  "numberOfItems": 7,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "SRAM",
+      "description": "Volatile and the fastest, robust to radiation. Used as CPU cache and real-time working memory. Expensive and low density."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "DRAM / SDRAM / LPDDR",
+      "description": "Volatile, high density and good bandwidth, but requires periodic refresh and an EDAC controller in radiation environments."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "NOR Flash",
+      "description": "Non-volatile with fast random read and direct code execution in place (XIP). Stores bootloader, firmware and configuration parameters."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "NAND Flash",
+      "description": "Non-volatile, high density and low cost, for mass storage. Requires an FTL controller."
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "MRAM",
+      "description": "Non-volatile, combines SRAM speed with Flash non-volatility and is naturally radiation-resistant."
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "EEPROM",
+      "description": "Non-volatile, low capacity, byte-by-byte write and very high endurance. Stores serial numbers, calibration keys and configuration."
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "eMMC / UFS / NVMe SSD",
+      "description": "Integrated or off-board mass storage, with an FTL controller handling wear-leveling and error correction."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -104,6 +201,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -390,6 +495,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>AEC-Q100 qualification: accelerated lifetime tests (HTOL)</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">FAQ</div>
+    <h2>Embedded memory <em>frequently asked questions</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Volatile or non-volatile memory: which should I choose?</summary><p>The first criterion is simple: must the data survive a power cut? If so, you need non-volatile memory (NOR Flash, NAND Flash, MRAM, EEPROM). If not, SRAM and DRAM provide the speed. Each technology then addresses a trade-off between speed, capacity, endurance and cost.</p></details>
+      <details class="faq-item"><summary>Which memory should I use for a critical space application?</summary><p>MRAM is the reference technology for critical space memories such as configuration memory and housekeeping tables: it combines the speed of SRAM with the non-volatility of Flash and is naturally radiation-resistant. It is still costly, though density is increasing.</p></details>
+      <details class="faq-item"><summary>What are EDAC and scrubbing for?</summary><p>EDAC (Error Detection And Correction) adds an error-correcting code to stored data: it detects 2-bit errors and corrects 1-bit errors on the fly. Scrubbing periodically reads all memory and rewrites corrected data, so that accumulated errors cannot exceed the correction capacity.</p></details>
+      <details class="faq-item"><summary>How do I find a memory supplier and request a quote?</summary><p>Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
     </div>
   </div>
 

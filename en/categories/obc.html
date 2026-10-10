@@ -26,6 +26,85 @@
   "inLanguage": "en"
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/en/categories/obc.html",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is an OBC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An OBC (On-Board Computer) is a processing unit: it receives data, executes a program and sends commands. It is the brain of an embedded system, whether a satellite, an aircraft, a vehicle or an industrial machine."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I choose an OBC?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Answer three questions: what processor type is needed, which interfaces it must expose to talk to the subsystems, and which software (OS, certification) must run on it. Everything else, such as housing, radiation hardening and redundancy, is a domain constraint that comes on top."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which communication buses does an OBC need to support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each domain has its standards: SpaceWire for space, MIL-STD-1553 for defense and aero, ARINC 429 for civil avionics, CAN FD for automotive and industry, and Ethernet TSN for industry and mobility. The chosen bus locks in the ecosystem, as equipment often speaks only one protocol."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I find an OBC supplier and request a quote?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Types of on-board computer",
+  "url": "https://www.buy-inner.com/en/categories/obc.html",
+  "inLanguage": "en",
+  "numberOfItems": 4,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "CPU / MCU",
+      "description": "The generalist: executes sequential software, handles interrupts and drives peripherals. The default choice when processing is software-based and data throughput is moderate."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "FPGA",
+      "description": "Reconfigurable logic that executes operations in parallel with fixed, predictable latency. Chosen for radar, image processing and high-frequency motor control."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "GPU / NPU",
+      "description": "Massively parallel computation optimized for neural networks and sensor fusion. Essential for autonomous perception and embedded video processing."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Hybrid SoC CPU + FPGA",
+      "description": "A CPU manages the OS and application software while the FPGA handles real-time data streams in parallel: software flexibility and hardware determinism on one chip."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -104,6 +183,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -457,6 +544,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Typical price: €200 – €30,000 depending on power and ASIL level</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">FAQ</div>
+    <h2>OBC <em>frequently asked questions</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>What is an OBC?</summary><p>An OBC (On-Board Computer) is a processing unit: it receives data, executes a program and sends commands. It is the brain of an embedded system, whether a satellite, an aircraft, a vehicle or an industrial machine.</p></details>
+      <details class="faq-item"><summary>How do I choose an OBC?</summary><p>Answer three questions: what processor type is needed, which interfaces it must expose to talk to the subsystems, and which software (OS, certification) must run on it. Everything else, such as housing, radiation hardening and redundancy, is a domain constraint that comes on top.</p></details>
+      <details class="faq-item"><summary>Which communication buses does an OBC need to support?</summary><p>Each domain has its standards: SpaceWire for space, MIL-STD-1553 for defense and aero, ARINC 429 for civil avionics, CAN FD for automotive and industry, and Ethernet TSN for industry and mobility. The chosen bus locks in the ecosystem, as equipment often speaks only one protocol.</p></details>
+      <details class="faq-item"><summary>How do I find an OBC supplier and request a quote?</summary><p>Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
     </div>
   </div>
 

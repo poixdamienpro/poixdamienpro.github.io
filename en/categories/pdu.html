@@ -26,6 +26,103 @@
   "inLanguage": "en"
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "url": "https://www.buy-inner.com/en/categories/pdu.html",
+  "inLanguage": "en",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a PDU?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A PDU (Power Distribution Unit) is a power distribution node: one input, multiple outputs. It spreads current from a source (battery, solar panel, mains, generator) to several loads. Depending on the manufacturer, it adds options such as overcurrent protection, switching and sequencing, monitoring, EMI filtering, redundancy, voltage conversion and environmental hardening."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What options do PDU manufacturers add?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Overcurrent protection (fuses, circuit breakers or SSPC), switching and sequencing, monitoring and telemetry, EMI/EMC filtering, redundancy, voltage conversion and environmental hardening. A space manufacturer will enable all of them, while a standard datacenter rack PDU may integrate only a couple. That choice of options, and their quality level, differentiates products and sets the price."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When is redundancy needed in a PDU?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Redundancy means dual input, a primary/secondary bus, automatic bypass or cross-strapping, so that if one path fails the other takes over without interruption. It is reserved for critical applications such as space, defense and medical."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I find a PDU supplier and request a quote?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "PDU options",
+  "url": "https://www.buy-inner.com/en/categories/pdu.html",
+  "inLanguage": "en",
+  "numberOfItems": 7,
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Overcurrent protection",
+      "description": "Passive fuses, thermal-magnetic circuit breakers or active SSPC: on a fault, only the affected output is cut."
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Switching & sequencing",
+      "description": "Relays or MOSFETs switch each output on or off by logic command, and sequencing prevents inrush current at startup."
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Monitoring & telemetry",
+      "description": "Voltage, current and temperature sensing per output, reported over a bus (CAN, Modbus, SNMP, 1553, SpaceWire)."
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "EMI / EMC filtering",
+      "description": "Filters conducted and radiated interference to meet standards such as MIL-STD-461, CISPR and DO-160."
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Redundancy",
+      "description": "Dual input, primary/secondary bus, automatic bypass or cross-strapping for critical applications."
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Voltage conversion & adaptation",
+      "description": "DC/DC converters or AC/DC rectifiers to supply several buses at different voltages from a single source."
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "Environmental hardening",
+      "description": "Resistance to vibration, shock, extreme temperatures, humidity and radiation."
+    }
+  ]
+}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../../css/styles.css"/>
 <link rel="icon" href="../../assets/favicon.ico" sizes="any"/>
@@ -118,6 +215,14 @@ body { background: var(--ink-3); color: var(--t-hi); }
 .cat-cta h2 em{color:var(--rust);font-style:italic}
 .cat-cta p{color:var(--t-mid);font-size:16px;margin-bottom:28px}
 .cat-cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* ── FAQ (visible, reprise dans le JSON-LD FAQPage) ─────────────── */
+.faq-list{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.faq-item{border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.03)}
+.faq-item summary{cursor:pointer;padding:16px 20px;font-weight:600;font-size:16px;color:var(--t-hi);list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::before{content:'+';font-family:var(--mono);color:var(--steel);margin-right:12px}
+.faq-item[open] summary::before{content:'\2212'}
+.faq-item p{padding:0 20px 18px;color:var(--t-mid);font-size:15px;line-height:1.7}
 </style>
 </head>
 <body class="theme-dark">
@@ -444,6 +549,18 @@ body { background: var(--ink-3); color: var(--t-hi); }
           <li style="font-size:14px;color:var(--t-mid);display:flex;gap:10px"><span style="color:var(--rust);font-family:var(--mono)">→</span>Typical price: €500 – €15,000 depending on power and ASIL level</li>
         </ul>
       </div>
+    </div>
+  </div>
+
+  <!-- ── FAQ ────────────────────────────────────────────────────── -->
+  <div class="cat-section">
+    <div class="cat-section-label">FAQ</div>
+    <h2>PDU <em>frequently asked questions</em></h2>
+    <div class="faq-list">
+      <details class="faq-item"><summary>What is a PDU?</summary><p>A PDU (Power Distribution Unit) is a power distribution node: one input, multiple outputs. It spreads current from a source (battery, solar panel, mains, generator) to several loads. Depending on the manufacturer, it adds options such as overcurrent protection, switching and sequencing, monitoring, EMI filtering, redundancy, voltage conversion and environmental hardening.</p></details>
+      <details class="faq-item"><summary>What options do PDU manufacturers add?</summary><p>Overcurrent protection (fuses, circuit breakers or SSPC), switching and sequencing, monitoring and telemetry, EMI/EMC filtering, redundancy, voltage conversion and environmental hardening. A space manufacturer will enable all of them, while a standard datacenter rack PDU may integrate only a couple. That choice of options, and their quality level, differentiates products and sets the price.</p></details>
+      <details class="faq-item"><summary>When is redundancy needed in a PDU?</summary><p>Redundancy means dual input, a primary/secondary bus, automatic bypass or cross-strapping, so that if one path fails the other takes over without interruption. It is reserved for critical applications such as space, defense and medical.</p></details>
+      <details class="faq-item"><summary>How do I find a PDU supplier and request a quote?</summary><p>Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
     </div>
   </div>
 
