@@ -193,6 +193,7 @@ function adminShowTab(name) {
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   sessionStorage.setItem('admin_active_tab', name);
+  if (name === 'users' && !adminUsersLoaded && typeof loadAdminUsers === 'function') loadAdminUsers();
 }
 
 function completeAdminLogin(accessToken, email) {
@@ -805,6 +806,218 @@ async function adminCreateUser(event) {
   } finally {
     btn.disabled = false;
   }
+}
+
+// ── Utilisateurs : création, mot de passe, désactivation, suppression ──
+// Tout passe par le Worker (/api/admin-users, réservé aux admins) : la clé
+// service_role n'est jamais côté navigateur, et AUCUN mot de passe ne transite
+// par l'admin — la personne le choisit via pages/nouveau-mot-de-passe.html.
+let adminUsersCache = [];
+let adminUsersLoaded = false;
+let adminCompanySearchTimer = null;
+
+async function adminUsersCall(body) {
+  const token = sessionStorage.getItem('admin_access_token');
+  const res = await fetch(`${SUPABASE_URL}/admin-users`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) { const e = new Error((data && data.error) || `HTTP ${res.status}`); e.code = data && data.code; throw e; }
+  return data;
+}
+
+async function loadAdminUsers() {
+  const list = document.getElementById('admin-users-list');
+  if (!list) return;
+  list.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  try {
+    const data = await adminUsersCall({ action: 'list' });
+    adminUsersCache = (data.users || []).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    adminUsersLoaded = true;
+    renderAdminUsers();
+  } catch (err) {
+    list.innerHTML = `<div class="admin-empty" style="color:#C0392B">${escapeHtml(err.message)}</div>`;
+  }
+  loadAdminAuditLog();
+}
+
+async function loadAdminAuditLog() {
+  const box = document.getElementById('admin-users-audit');
+  if (!box) return;
+  try {
+    const rows = await adminFetch('admin_audit_log?select=created_at,admin_email,action,target_email,details&order=created_at.desc&limit=15');
+    const labels = { create_user: 'a créé le compte', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise' };
+    box.innerHTML = !rows || !rows.length
+      ? '<div class="admin-empty">Aucune action enregistrée.</div>'
+      : rows.map(r => `<div class="admin-field-row" style="font-size:12px"><span>${escapeHtml(new Date(r.created_at).toLocaleString('fr-FR'))} · <strong>${escapeHtml(r.admin_email)}</strong> ${escapeHtml(labels[r.action] || r.action)} ${escapeHtml(r.target_email || '')}</span></div>`).join('');
+  } catch (err) {
+    box.innerHTML = '<div class="admin-empty">Journal indisponible (exécute backend/supabase_admin_user_management_2026_10.sql).</div>';
+  }
+}
+
+function adminUserPills(u) {
+  const pills = [];
+  if (u.is_admin) pills.push('<span class="sup-pill sup-pill-ok" style="font-size:10px">Admin</span>');
+  if (u.disabled) pills.push('<span class="sup-pill sup-pill-no" style="font-size:10px">Désactivé</span>');
+  if (!u.confirmed) pills.push('<span class="sup-pill sup-pill-pending" style="font-size:10px">Email non confirmé</span>');
+  return pills.join(' ');
+}
+
+function renderAdminUsers() {
+  const list = document.getElementById('admin-users-list');
+  if (!list) return;
+  const q = ((document.getElementById('admin-users-search') || {}).value || '').trim().toLowerCase();
+  const rows = adminUsersCache.filter(u => !q || (u.email || '').toLowerCase().includes(q) ||
+    u.companies.some(c => (c.name || '').toLowerCase().includes(q)));
+  if (!rows.length) { list.innerHTML = '<div class="admin-empty">Aucun compte.</div>'; return; }
+  const fmt = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
+  list.innerHTML = `<p style="font-size:11px;color:var(--muted);margin:0 0 8px">${rows.length} compte${rows.length > 1 ? 's' : ''}${rows.length > 100 ? ' (100 premiers affichés, affine la recherche)' : ''}</p>` +
+    rows.slice(0, 100).map(u => {
+      const co = u.companies.map(c => `${escapeHtml(c.name)} <em style="color:var(--muted)">(${c.role === 'owner' ? 'admin' : 'collaborateur'})</em>`).join(', ');
+      const locked = u.is_admin;
+      const e = escapeJsAttr(u.email);
+      return `
+      <div id="admin-user-${u.id}" style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1 1 280px;min-width:0">
+          <div style="font-size:13px;font-weight:600;word-break:break-all;margin-bottom:3px">${escapeHtml(u.email)} ${adminUserPills(u)}</div>
+          <div style="font-size:12px;color:var(--muted)">${co || 'Aucune entreprise'} · créé le ${fmt(u.created_at)} · dernière connexion ${fmt(u.last_sign_in_at)}</div>
+          <div id="admin-user-panel-${u.id}" style="display:none;margin-top:10px"></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${locked ? '<span style="font-size:11px;color:var(--muted)">Compte admin protégé</span>' : `
+          <button class="btn-add-product sup-btn-sm" onclick="adminUserShowPasswordPanel('${u.id}','${e}')">Mot de passe</button>
+          <button class="btn-add-product sup-btn-sm" onclick="adminUserAttachPrompt('${u.id}','${e}')">Entreprise</button>
+          <button class="btn-remove-product" onclick="adminUserToggleDisabled('${u.id}','${e}',${u.disabled ? 'false' : 'true'})">${u.disabled ? 'Réactiver' : 'Désactiver'}</button>
+          <button class="btn-remove-product" onclick="adminUserDelete('${u.id}','${e}')">Supprimer</button>`}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+// Lien affiché à l'admin : à copier pour transmettre toi-même, ou déjà envoyé par email.
+function adminUserLinkBox(data, intro) {
+  const sent = data.emailSent ? `<p style="margin:0 0 8px;color:#2D6A4F">✓ Email envoyé à ${escapeHtml(data.email)}.</p>` : (data.emailError ? `<p style="margin:0 0 8px;color:#C0392B">Email non envoyé : ${escapeHtml(data.emailError)}. Utilise le lien ci-dessous.</p>` : '');
+  return `<div style="padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:12px">
+    <p style="margin:0 0 8px"><strong>${escapeHtml(intro)}</strong></p>${sent}
+    <p style="margin:0 0 6px;color:var(--muted)">Lien pour définir le mot de passe (personnel, valable peu de temps — à ne partager qu'avec la personne concernée) :</p>
+    <input type="text" readonly value="${escapeHtml(data.setupLink)}" onclick="this.select()" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:4px;font-family:var(--mono)"/>
+    <button type="button" class="btn-add-product sup-btn-sm" style="margin-top:8px" onclick="navigator.clipboard.writeText('${escapeJsAttr(data.setupLink)}').then(() => { this.textContent = 'Copié ✓'; })">Copier le lien</button>
+  </div>`;
+}
+
+function adminUserSearchCompanyDebounced() {
+  clearTimeout(adminCompanySearchTimer);
+  adminCompanySearchTimer = setTimeout(adminUserSearchCompany, 250);
+}
+
+async function adminUserSearchCompany() {
+  const q = document.getElementById('admin-user-company-q').value.trim();
+  const sel = document.getElementById('admin-user-company');
+  if (q.length < 2) { sel.style.display = 'none'; sel.innerHTML = ''; return; }
+  try {
+    const rows = await adminFetch(`companies?name=ilike.*${encodeURIComponent(q)}*&select=id,name&order=name&limit=15`);
+    sel.innerHTML = (rows || []).map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('') || '<option value="">Aucune entreprise trouvée</option>';
+    sel.style.display = 'block';
+  } catch (err) {
+    sel.style.display = 'none';
+  }
+}
+
+async function adminUserCreate(event) {
+  event.preventDefault();
+  const errEl = document.getElementById('admin-user-create-error');
+  const resEl = document.getElementById('admin-user-create-result');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errEl.style.display = 'none'; resEl.style.display = 'none';
+  const sel = document.getElementById('admin-user-company');
+  const companyId = sel.style.display !== 'none' ? sel.value : '';
+  btn.disabled = true;
+  try {
+    const data = await adminUsersCall({
+      action: 'create',
+      email: document.getElementById('admin-user-email').value.trim(),
+      companyId: companyId || undefined,
+      role: document.getElementById('admin-user-role').value,
+      lang: document.getElementById('admin-user-lang').value,
+      sendEmail: document.getElementById('admin-user-send').checked,
+    });
+    resEl.style.display = 'block';
+    resEl.innerHTML = adminUserLinkBox(data, `Compte créé : ${data.email}`);
+    document.getElementById('admin-user-email').value = '';
+    await loadAdminUsers();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function adminUserShowPasswordPanel(id, email) {
+  const panel = document.getElementById(`admin-user-panel-${id}`);
+  if (!panel) return;
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  panel.innerHTML = `<div style="padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:12px">
+    <p style="margin:0 0 8px">Nouveau mot de passe pour <strong>${escapeHtml(email)}</strong> : un lien est généré, la personne choisit elle-même son mot de passe.</p>
+    <button type="button" class="btn-approve sup-btn-sm" onclick="adminUserResetLink('${id}', true)">Envoyer par email</button>
+    <button type="button" class="btn-add-product sup-btn-sm" onclick="adminUserResetLink('${id}', false)">Afficher le lien</button>
+    <div id="admin-user-link-${id}" style="margin-top:10px"></div>
+  </div>`;
+}
+
+async function adminUserResetLink(id, sendEmail) {
+  const out = document.getElementById(`admin-user-link-${id}`);
+  out.innerHTML = '<span style="color:var(--muted)">Génération…</span>';
+  try {
+    const data = await adminUsersCall({ action: 'reset_link', userId: id, sendEmail, lang: 'fr' });
+    out.innerHTML = adminUserLinkBox(data, 'Lien généré');
+    loadAdminAuditLog();
+  } catch (err) {
+    out.innerHTML = `<span style="color:#C0392B">${escapeHtml(err.message)}</span>`;
+  }
+}
+
+async function adminUserToggleDisabled(id, email, disabled) {
+  const msg = disabled
+    ? `Désactiver ${email} ? La personne ne pourra plus se connecter (ses données sont conservées, tu peux réactiver à tout moment).`
+    : `Réactiver ${email} ?`;
+  if (!confirm(msg)) return;
+  try {
+    await adminUsersCall({ action: 'set_disabled', userId: id, disabled });
+    await loadAdminUsers();
+  } catch (err) { alert('Erreur : ' + err.message); }
+}
+
+async function adminUserDelete(id, email) {
+  const typed = prompt(`Supprimer définitivement le compte ${email} ?\n\nLa personne perd son accès, et l'entreprise redevient sans administrateur. Pour confirmer, retape l'adresse email du compte :`);
+  if (typed === null) return;
+  try {
+    await adminUsersCall({ action: 'delete', userId: id, confirmEmail: typed });
+    await loadAdminUsers();
+  } catch (err) {
+    alert(err.code === 'HAS_RFQ_DATA' ? err.message + '\n\nUtilise « Désactiver » à la place.' : 'Erreur : ' + err.message);
+  }
+}
+
+async function adminUserAttachPrompt(id, email) {
+  const q = prompt(`Rattacher ${email} à quelle entreprise ?\nTape le début de son nom :`);
+  if (!q || q.trim().length < 2) return;
+  try {
+    const rows = await adminFetch(`companies?name=ilike.*${encodeURIComponent(q.trim())}*&select=id,name&order=name&limit=9`);
+    if (!rows || !rows.length) { alert('Aucune entreprise trouvée.'); return; }
+    let company = rows[0];
+    if (rows.length > 1) {
+      const pick = prompt('Plusieurs entreprises trouvées, tape le numéro :\n' + rows.map((c, i) => `${i + 1}. ${c.name}`).join('\n'));
+      company = rows[Number(pick) - 1];
+      if (!company) return;
+    }
+    const asOwner = confirm(`Rattacher ${email} à « ${company.name} ».\n\nOK = administrateur de l'entreprise (gère l'équipe)\nAnnuler = collaborateur`);
+    await adminUsersCall({ action: 'attach_company', userId: id, companyId: company.id, role: asOwner ? 'owner' : 'member' });
+    await loadAdminUsers();
+  } catch (err) { alert('Erreur : ' + err.message); }
 }
 
 async function applyDeleteSubmission(sub) {

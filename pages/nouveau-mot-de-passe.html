@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title data-i18n="pw_doc_title">Nouveau mot de passe · Buy-inner</title>
+<meta name="robots" content="noindex,nofollow"/>
+<meta name="referrer" content="no-referrer"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png"/>
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'password';</script>
+</head>
+<body class="theme-dark">
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <h1 class="page-title" data-i18n-html="pw_h1">Votre <span>mot de passe</span></h1>
+      <p class="page-subtitle" data-i18n="pw_sub">Choisissez un mot de passe d'au moins 8 caractères pour accéder à votre espace.</p>
+    </div>
+  </div>
+</header>
+
+<div class="submit-wrap">
+  <div class="sup-panel" style="max-width:460px;margin:0 auto">
+    <p id="pw-checking" style="font-size:13px;color:var(--muted);margin:0" data-i18n="pw_checking">Vérification du lien…</p>
+
+    <form id="pw-form" onsubmit="submitNewPassword(event)" style="display:none">
+      <div class="lead-field"><label data-i18n="pw_label1">Nouveau mot de passe</label><input type="password" id="pw-1" minlength="8" autocomplete="new-password" required/></div>
+      <div class="lead-field"><label data-i18n="pw_label2">Confirmer le mot de passe</label><input type="password" id="pw-2" minlength="8" autocomplete="new-password" required/></div>
+      <button type="submit" class="btn-submit-form" id="pw-btn" data-i18n="pw_btn">Enregistrer le mot de passe</button>
+    </form>
+
+    <p id="pw-message" style="font-size:13px;margin:14px 0 0;display:none"></p>
+    <a id="pw-login" class="btn-add-product" href="supplier.html" style="display:none;margin-top:16px;text-align:center" data-i18n="pw_login">Se connecter à l'espace fournisseur</a>
+  </div>
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/pages/reset-password.js"></script>
+</body>
+</html>

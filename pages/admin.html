@@ -63,6 +63,7 @@
         <button type="button" class="admin-tab-btn" data-tab="rfq" onclick="adminShowTab('rfq')">RFQ/RFI/RFP</button>
         <button type="button" class="admin-tab-btn" data-tab="analytics" onclick="adminShowTab('analytics')">Analytics</button>
         <button type="button" class="admin-tab-btn" data-tab="signups" onclick="adminShowTab('signups')">Inscrits</button>
+        <button type="button" class="admin-tab-btn" data-tab="users" onclick="adminShowTab('users')">Utilisateurs</button>
         <button type="button" class="admin-tab-btn" data-tab="admins" onclick="adminShowTab('admins')">Comptes admin</button>
         <button type="button" class="admin-tab-btn" data-tab="security" onclick="adminShowTab('security')">Sécurité</button>
       </div>
@@ -139,6 +140,42 @@
       <div class="submit-section-title" style="margin:0 0 10px;border:none;padding:0;font-size:13px">Nouvelles inscriptions par jour</div>
       <div id="admin-signups-daily-chart" style="margin-bottom:14px"></div>
       <p style="font-size:11px;color:var(--muted);line-height:1.6;margin:0">Comptes créés sur le site (acheteurs et fournisseurs), administrateurs exclus. « Confirmés » = adresse e-mail validée.</p>
+    </div>
+
+    <div class="admin-tab-panel" data-tab="users">
+      <div class="product-block-header" style="margin-bottom:10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Créer un compte fournisseur</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 14px;max-width:640px">La personne choisit elle-même son mot de passe : tu ne le vois jamais. Tu peux lui envoyer le lien par email, ou le copier pour le lui transmettre toi-même.</p>
+      <form id="admin-user-create-form" onsubmit="adminUserCreate(event)" style="max-width:520px">
+        <div class="lead-field"><label>Email de la personne</label><input type="email" id="admin-user-email" required/></div>
+        <div class="lead-field"><label>Entreprise (optionnel)</label>
+          <input type="text" id="admin-user-company-q" placeholder="Tape le début du nom…" oninput="adminUserSearchCompanyDebounced()" autocomplete="off"/>
+          <select id="admin-user-company" style="margin-top:6px;width:100%;display:none"></select>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="lead-field" style="flex:1;min-width:180px"><label>Rôle dans l'entreprise</label>
+            <select id="admin-user-role"><option value="owner">Administrateur (gère l'équipe)</option><option value="member">Collaborateur</option></select></div>
+          <div class="lead-field" style="flex:1;min-width:140px"><label>Langue de l'email</label>
+            <select id="admin-user-lang"><option value="fr">Français</option><option value="en">English</option></select></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0 14px"><input type="checkbox" id="admin-user-send" checked style="margin:0"/> Envoyer l'email d'accès à la personne</label>
+        <button type="submit" class="btn-submit-form">Créer le compte</button>
+        <p id="admin-user-create-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+        <div id="admin-user-create-result" style="display:none;margin-top:14px"></div>
+      </form>
+
+      <div class="product-block-header" style="margin:34px 0 10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Comptes inscrits</span>
+        <button type="button" class="btn-remove-product" onclick="loadAdminUsers()">Actualiser</button>
+      </div>
+      <input type="search" id="admin-users-search" placeholder="Rechercher par email ou entreprise…" oninput="renderAdminUsers()" style="width:100%;max-width:420px;font-size:13px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:12px"/>
+      <div id="admin-users-list"><div class="admin-empty">Ouvre l'onglet pour charger les comptes.</div></div>
+
+      <div class="product-block-header" style="margin:34px 0 10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Journal des actions</span>
+      </div>
+      <div id="admin-users-audit"></div>
     </div>
 
     <div class="admin-tab-panel" data-tab="admins">

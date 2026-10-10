@@ -221,33 +221,332 @@ function serviceFetch(env, path, options = {}) {
 }
 
 // L'appelant doit être administrateur (table admins, lue avec la clé
-// service_role — le token seul ne suffit pas). Renvoie une Response d'erreur,
-// ou null si l'appelant est bien admin.
-async function requireAdmin(request, env) {
+// service_role — le token seul ne suffit pas). authenticateAdmin renvoie
+// { caller } (id + email) ou { error: Response } ; requireAdmin renvoie
+// seulement la Response d'erreur éventuelle (null si l'appelant est admin).
+async function authenticateAdmin(request, env) {
   if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-    return json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500);
+    return { error: json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500) };
   }
 
   const authHeader = request.headers.get('Authorization') || '';
   const callerToken = authHeader.replace(/^Bearer\s+/i, '');
-  if (!callerToken) return json({ error: 'Non authentifié' }, 401);
+  if (!callerToken) return { error: json({ error: 'Non authentifié' }, 401) };
 
   // 1. Résout l'identité de l'appelant à partir de son propre token.
   const whoRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/user`, {
     headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${callerToken}` },
   });
-  if (!whoRes.ok) return json({ error: 'Session invalide' }, 401);
+  if (!whoRes.ok) return { error: json({ error: 'Session invalide' }, 401) };
   const caller = await whoRes.json();
 
   // 2. Vérifie que l'appelant est bien dans la table admins.
   const checkRes = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(caller.id)}&select=user_id`);
   if (!checkRes.ok) {
     const detail = await checkRes.text();
-    return json({ error: 'Échec de la vérification admin', detail }, 502);
+    return { error: json({ error: 'Échec de la vérification admin', detail }, 502) };
   }
   const checkRows = await checkRes.json();
-  if (!checkRows.length) return json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403);
-  return null;
+  if (!checkRows.length) return { error: json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403) };
+  return { caller };
+}
+
+async function requireAdmin(request, env) {
+  const a = await authenticateAdmin(request, env);
+  return a.error || null;
+}
+
+// ── Gestion des comptes depuis la page admin ─────────────────────────
+// Un seul point d'entrée, réservé aux administrateurs (authenticateAdmin) :
+//   list         : tous les comptes (+ entreprises, rôle, admin, désactivé)
+//   create       : crée un compte SANS mot de passe connu de personne, le
+//                  rattache à une entreprise, renvoie un lien « définir mon mot de
+//                  passe » (et l'envoie par email si demandé)
+//   reset_link   : nouveau lien de mot de passe pour un compte existant
+//   set_disabled : désactive / réactive la connexion
+//   delete       : supprime le compte (après nettoyage atomique, voir
+//                  backend/supabase_admin_user_management_2026_10.sql)
+// Les mots de passe ne transitent JAMAIS par l'admin : la personne choisit le
+// sien sur la page pages/nouveau-mot-de-passe.html. Les comptes administrateurs
+// sont protégés (pas de réinitialisation / désactivation / suppression ici).
+const PASSWORD_PAGE = `${SITE_URL}/pages/nouveau-mot-de-passe.html`;
+const BAN_FOREVER = '876000h';
+
+const ACCOUNT_TEMPLATES = {
+  fr: {
+    created: ({ email, link, companyName }) => ({
+      subject: 'Buy-inner — Votre compte est prêt',
+      html: `<p>Bonjour,</p>
+      <p>Un compte Buy-inner vient d'être créé pour vous (<strong>${escapeHtml(email)}</strong>)${companyName ? ` pour l'entreprise <strong>${escapeHtml(companyName)}</strong>` : ''}.</p>
+      <p>Choisissez votre mot de passe pour y accéder :</p>
+      <p><a href="${escapeHtml(link)}">Définir mon mot de passe →</a></p>
+      <p>Vous pourrez ensuite vous connecter sur <a href="${SITE_URL}/pages/supplier.html">${SITE_URL}/pages/supplier.html</a>.</p>
+      <p style="color:#666;font-size:13px">Ce lien est personnel et expire rapidement. S'il a expiré, demandez-en un nouveau à l'équipe Buy-inner.</p>
+      <p>— L'équipe Buy-inner</p>`,
+    }),
+    reset: ({ email, link }) => ({
+      subject: 'Buy-inner — Définissez un nouveau mot de passe',
+      html: `<p>Bonjour,</p>
+      <p>Un nouveau mot de passe peut être défini pour votre compte Buy-inner (<strong>${escapeHtml(email)}</strong>).</p>
+      <p><a href="${escapeHtml(link)}">Définir un nouveau mot de passe →</a></p>
+      <p style="color:#666;font-size:13px">Ce lien est personnel et expire rapidement. Si vous n'êtes pas à l'origine de cette demande, contactez l'équipe Buy-inner.</p>
+      <p>— L'équipe Buy-inner</p>`,
+    }),
+  },
+  en: {
+    created: ({ email, link, companyName }) => ({
+      subject: 'Buy-inner — Your account is ready',
+      html: `<p>Hello,</p>
+      <p>A Buy-inner account has just been created for you (<strong>${escapeHtml(email)}</strong>)${companyName ? ` for the company <strong>${escapeHtml(companyName)}</strong>` : ''}.</p>
+      <p>Choose your password to access it:</p>
+      <p><a href="${escapeHtml(link)}">Set my password →</a></p>
+      <p>You can then sign in at <a href="${SITE_URL}/pages/supplier.html">${SITE_URL}/pages/supplier.html</a>.</p>
+      <p style="color:#666;font-size:13px">This link is personal and expires quickly. If it has expired, ask the Buy-inner team for a new one.</p>
+      <p>— The Buy-inner team</p>`,
+    }),
+    reset: ({ email, link }) => ({
+      subject: 'Buy-inner — Set a new password',
+      html: `<p>Hello,</p>
+      <p>A new password can be set for your Buy-inner account (<strong>${escapeHtml(email)}</strong>).</p>
+      <p><a href="${escapeHtml(link)}">Set a new password →</a></p>
+      <p style="color:#666;font-size:13px">This link is personal and expires quickly. If you did not request this, contact the Buy-inner team.</p>
+      <p>— The Buy-inner team</p>`,
+    }),
+  },
+};
+
+function authAdminFetch(env, path, options = {}) {
+  return fetch(`${SUPABASE_ORIGIN}/auth/v1/admin/${path}`, {
+    ...options,
+    headers: {
+      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+}
+
+// PostgREST plafonne les lectures à 50 lignes : on pagine.
+async function serviceFetchAll(env, path) {
+  const sep = path.includes('?') ? '&' : '?';
+  const all = [];
+  for (let offset = 0; offset < 5000; offset += 50) {
+    const res = await serviceFetch(env, `${path}${sep}limit=50&offset=${offset}`);
+    if (!res.ok) throw new Error('lecture impossible : ' + path.split('?')[0]);
+    const rows = await res.json();
+    all.push(...rows);
+    if (rows.length < 50) break;
+  }
+  return all;
+}
+
+async function auditAdminAction(env, caller, action, targetEmail, details) {
+  try {
+    await serviceFetch(env, 'admin_audit_log', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify([{ admin_email: caller.email || caller.id, action, target_email: targetEmail || null, details: details || null }]),
+    });
+  } catch { /* le journal ne doit jamais bloquer l'action */ }
+}
+
+async function listAdminUsers(env) {
+  const users = [];
+  for (let page = 1; page <= 10; page++) {
+    const res = await authAdminFetch(env, `users?page=${page}&per_page=200`);
+    if (!res.ok) throw new Error('liste des comptes impossible');
+    const data = await res.json();
+    const batch = (data && data.users) || [];
+    users.push(...batch);
+    if (batch.length < 200) break;
+  }
+  const [members, admins] = await Promise.all([
+    serviceFetchAll(env, 'company_members?select=user_id,role,company_id,companies(name)'),
+    serviceFetchAll(env, 'admins?select=user_id'),
+  ]);
+  const adminIds = new Set(admins.map(a => a.user_id));
+  const byUser = {};
+  for (const m of members) {
+    (byUser[m.user_id] = byUser[m.user_id] || []).push({ id: m.company_id, name: (m.companies && m.companies.name) || '', role: m.role });
+  }
+  const now = Date.now();
+  return users.map(u => ({
+    id: u.id,
+    email: u.email,
+    created_at: u.created_at,
+    last_sign_in_at: u.last_sign_in_at || null,
+    confirmed: !!u.email_confirmed_at,
+    disabled: !!(u.banned_until && new Date(u.banned_until).getTime() > now),
+    is_admin: adminIds.has(u.id),
+    companies: byUser[u.id] || [],
+  }));
+}
+
+async function getAuthUser(env, userId) {
+  const res = await authAdminFetch(env, `users/${encodeURIComponent(userId)}`);
+  if (!res.ok) return null;
+  const u = await res.json();
+  return u && u.id ? u : null;
+}
+
+async function isAdminUser(env, userId) {
+  const res = await serviceFetch(env, `admins?user_id=eq.${encodeURIComponent(userId)}&select=user_id`);
+  if (!res.ok) throw new Error('vérification admin impossible');
+  return (await res.json()).length > 0;
+}
+
+// Jeton de récupération -> notre propre page (pas l'action_link de Supabase :
+// il dépend des URL de redirection autorisées et peut être consommé par un
+// scanner d'emails ; ici la page appelle /verify elle-même, en JavaScript).
+async function generatePasswordLink(env, email, lang) {
+  const res = await authAdminFetch(env, 'generate_link', { method: 'POST', body: JSON.stringify({ type: 'recovery', email }) });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || !data.hashed_token) throw new Error((data && (data.msg || data.message)) || 'génération du lien impossible');
+  return `${PASSWORD_PAGE}?token_hash=${encodeURIComponent(data.hashed_token)}&type=recovery&lang=${lang}`;
+}
+
+async function emailAccountLink(env, kind, lang, email, link, companyName) {
+  const { subject, html } = ACCOUNT_TEMPLATES[lang][kind]({ email, link, companyName });
+  if (!env.RESEND_API_KEY) return { sent: false, error: 'RESEND_API_KEY non configurée sur le Worker' };
+  const res = await sendViaResend(env, email, subject, html);
+  return res.ok ? { sent: true } : { sent: false, error: 'Échec de l\'envoi de l\'email' };
+}
+
+async function handleAdminUsers(request, env) {
+  const auth = await authenticateAdmin(request, env);
+  if (auth.error) return auth.error;
+  const caller = auth.caller;
+
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+  const action = body && body.action;
+  const lang = body && body.lang === 'en' ? 'en' : 'fr';
+
+  try {
+    if (action === 'list') {
+      return json({ users: await listAdminUsers(env) });
+    }
+
+    if (action === 'create') {
+      const email = String(body.email || '').trim().toLowerCase();
+      if (!EMAIL_RE.test(email)) return json({ error: 'Email invalide' }, 400);
+      let company = null;
+      if (body.companyId) {
+        if (!UUID_RE.test(String(body.companyId))) return json({ error: 'companyId invalide' }, 400);
+        const cRes = await serviceFetch(env, `companies?id=eq.${body.companyId}&select=id,name,claimed_by_user_id`);
+        const cRows = cRes.ok ? await cRes.json() : [];
+        if (!cRows.length) return json({ error: 'Entreprise introuvable' }, 404);
+        company = cRows[0];
+      }
+
+      // Mot de passe aléatoire que PERSONNE ne connaît : la personne choisira le sien.
+      const createRes = await authAdminFetch(env, 'users', {
+        method: 'POST',
+        body: JSON.stringify({ email, password: generateTempPassword() + generateTempPassword(), email_confirm: true }),
+      });
+      const created = await createRes.json().catch(() => ({}));
+      if (!createRes.ok) {
+        const msg = created.msg || created.message || '';
+        if (createRes.status === 422 || /already|exist/i.test(msg)) {
+          return json({ error: 'Un compte existe déjà avec cette adresse. Retrouve-le dans la liste pour le rattacher à une entreprise.', code: 'EMAIL_EXISTS' }, 409);
+        }
+        return json({ error: msg || 'Échec de la création du compte' }, 502);
+      }
+
+      if (company) {
+        const role = !company.claimed_by_user_id ? 'owner' : (body.role === 'owner' ? 'owner' : 'member');
+        const attach = await attachUserToCompany(env, created.id, company, role);
+        if (!attach.ok) return json({ error: 'Compte créé mais rattachement à l\'entreprise impossible', userId: created.id, email }, 502);
+      }
+
+      const link = await generatePasswordLink(env, email, lang);
+      const mail = body.sendEmail ? await emailAccountLink(env, 'created', lang, email, link, company && company.name) : { sent: false };
+      await auditAdminAction(env, caller, 'create_user', email, { company: company && company.name, emailSent: mail.sent });
+      return json({ success: true, userId: created.id, email, setupLink: link, emailSent: mail.sent, emailError: mail.error || null });
+    }
+
+    if (action === 'attach_company') {
+      if (!UUID_RE.test(String(body.userId || '')) || !UUID_RE.test(String(body.companyId || ''))) return json({ error: 'Paramètres invalides' }, 400);
+      const cRes = await serviceFetch(env, `companies?id=eq.${body.companyId}&select=id,name,claimed_by_user_id`);
+      const cRows = cRes.ok ? await cRes.json() : [];
+      if (!cRows.length) return json({ error: 'Entreprise introuvable' }, 404);
+      const target = await getAuthUser(env, body.userId);
+      if (!target) return json({ error: 'Compte introuvable' }, 404);
+      const role = body.role === 'owner' ? 'owner' : 'member';
+      const attach = await attachUserToCompany(env, target.id, cRows[0], role);
+      if (!attach.ok) return json({ error: 'Rattachement impossible' }, 502);
+      await auditAdminAction(env, caller, 'attach_company', target.email, { company: cRows[0].name, role });
+      return json({ success: true });
+    }
+
+    if (action === 'reset_link' || action === 'set_disabled' || action === 'delete') {
+      if (!UUID_RE.test(String(body.userId || ''))) return json({ error: 'userId invalide' }, 400);
+      const target = await getAuthUser(env, body.userId);
+      if (!target) return json({ error: 'Compte introuvable' }, 404);
+      if (target.id === caller.id) return json({ error: 'Utilise l\'onglet Sécurité pour ton propre compte.' }, 400);
+      if (await isAdminUser(env, target.id)) {
+        return json({ error: 'Compte administrateur : il gère lui-même son mot de passe et son accès.', code: 'IS_ADMIN' }, 403);
+      }
+
+      if (action === 'reset_link') {
+        const link = await generatePasswordLink(env, target.email, lang);
+        const mail = body.sendEmail ? await emailAccountLink(env, 'reset', lang, target.email, link) : { sent: false };
+        await auditAdminAction(env, caller, 'reset_password_link', target.email, { emailSent: mail.sent });
+        return json({ success: true, email: target.email, setupLink: link, emailSent: mail.sent, emailError: mail.error || null });
+      }
+
+      if (action === 'set_disabled') {
+        const disabled = !!body.disabled;
+        const res = await authAdminFetch(env, `users/${encodeURIComponent(target.id)}`, {
+          method: 'PUT', body: JSON.stringify({ ban_duration: disabled ? BAN_FOREVER : 'none' }),
+        });
+        if (!res.ok) return json({ error: 'Modification impossible' }, 502);
+        await auditAdminAction(env, caller, disabled ? 'disable_user' : 'enable_user', target.email, null);
+        return json({ success: true, disabled });
+      }
+
+      // delete : la personne qui supprime retape l'adresse du compte pour confirmer.
+      if (String(body.confirmEmail || '').trim().toLowerCase() !== String(target.email || '').toLowerCase()) {
+        return json({ error: 'Adresse de confirmation incorrecte' }, 400);
+      }
+      const prep = await serviceFetch(env, 'rpc/admin_prepare_user_deletion', { method: 'POST', body: JSON.stringify({ p_user: target.id }) });
+      if (!prep.ok) {
+        const detail = await prep.text();
+        if (/HAS_RFQ_DATA/.test(detail)) {
+          return json({ error: 'Ce compte a des dossiers ou réponses RFQ : désactive-le plutôt que de le supprimer.', code: 'HAS_RFQ_DATA' }, 409);
+        }
+        if (/IS_ADMIN/.test(detail)) return json({ error: 'Compte administrateur', code: 'IS_ADMIN' }, 403);
+        return json({ error: 'Préparation de la suppression impossible', detail }, 502);
+      }
+      const del = await authAdminFetch(env, `users/${encodeURIComponent(target.id)}`, { method: 'DELETE' });
+      if (!del.ok) return json({ error: 'Suppression impossible' }, 502);
+      await auditAdminAction(env, caller, 'delete_user', target.email, null);
+      return json({ success: true });
+    }
+
+    return json({ error: 'action inconnue' }, 400);
+  } catch (err) {
+    return json({ error: 'Erreur : ' + (err && err.message ? err.message : 'inconnue') }, 502);
+  }
+}
+
+// Rattache un compte à une entreprise (équipe). Premier compte d'une entreprise
+// non revendiquée => administrateur, et on renseigne aussi claimed_by_user_id
+// (l'ancien champ « propriétaire », encore lu par le repli de supplier.js).
+async function attachUserToCompany(env, userId, company, role) {
+  const res = await serviceFetch(env, 'company_members?on_conflict=company_id,user_id', {
+    method: 'POST',
+    headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify([{ company_id: company.id, user_id: userId, role }]),
+  });
+  if (!res.ok) return { ok: false };
+  if (role === 'owner' && !company.claimed_by_user_id) {
+    await serviceFetch(env, `companies?id=eq.${company.id}`, {
+      method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ claimed_by_user_id: userId }),
+    });
+  }
+  return { ok: true };
 }
 
 // Confirmation de soumission : une seule fois par soumission, pour l'adresse
@@ -863,6 +1162,12 @@ export default {
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
       if (request.method === 'POST') return handleSendEmail(request, env);
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
+    if (url.pathname === '/api/admin-users') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (request.method === 'POST') return handleAdminUsers(request, env);
       return json({ error: 'Method not allowed' }, 405);
     }
 
