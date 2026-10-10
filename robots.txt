@@ -72,3 +72,5 @@ User-agent: FacebookBot
 Disallow: /
 
 Sitemap: https://www.buy-inner.com/sitemap.xml
+Sitemap: https://www.buy-inner.com/sitemap-fr.xml
+Sitemap: https://www.buy-inner.com/sitemap-en.xml
