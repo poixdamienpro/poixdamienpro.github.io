@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if ((lang === 'fr' || lang === 'en') && typeof setLang === 'function') setLang(lang);
 
   const tokenHash = params.get('token_hash');
+  // next=buyer : demande faite depuis le compte acheteur -> on renvoie vers sa connexion.
+  if (params.get('next') === 'buyer') {
+    try { sessionStorage.setItem('pw_reset_next', 'buyer'); } catch (e) { /* ignore */ }
+  }
   const type = PW_ALLOWED_TYPES.includes(params.get('type')) ? params.get('type') : 'recovery';
   // Le jeton ne doit pas rester dans la barre d'adresse (historique, captures d'écran).
   history.replaceState(null, '', window.location.pathname);
@@ -82,7 +86,15 @@ async function submitNewPassword(e) {
     try { sessionStorage.removeItem(PW_TOKEN_KEY); } catch (err) { /* ignore */ }
     document.getElementById('pw-form').style.display = 'none';
     pwShowMessage(t('pw_done'), false);
-    document.getElementById('pw-login').style.display = 'block';
+    const loginLink = document.getElementById('pw-login');
+    let next = null;
+    try { next = sessionStorage.getItem('pw_reset_next'); sessionStorage.removeItem('pw_reset_next'); } catch (err) { /* ignore */ }
+    if (next === 'buyer') {
+      loginLink.href = 'compte-acheteur.html';
+      loginLink.removeAttribute('data-i18n');
+      loginLink.textContent = t('acc_login');
+    }
+    loginLink.style.display = 'block';
   } catch (err) {
     pwShowMessage(t('pw_err_generic') + err.message, true);
     btn.disabled = false;

@@ -284,6 +284,14 @@ const ACCOUNT_TEMPLATES = {
       <p style="color:#666;font-size:13px">Ce lien est personnel et expire rapidement. S'il a expiré, demandez-en un nouveau à l'équipe Buy-inner.</p>
       <p>— L'équipe Buy-inner</p>`,
     }),
+    forgot: ({ email, link }) => ({
+      subject: 'Buy-inner — Réinitialisation de votre mot de passe',
+      html: `<p>Bonjour,</p>
+      <p>Vous avez demandé à réinitialiser le mot de passe de votre compte Buy-inner (<strong>${escapeHtml(email)}</strong>).</p>
+      <p><a href="${escapeHtml(link)}">Choisir un nouveau mot de passe →</a></p>
+      <p style="color:#666;font-size:13px">Ce lien est personnel, expire rapidement et ne peut servir qu'une fois. Si vous n'êtes pas à l'origine de cette demande, ignorez simplement ce message : votre mot de passe actuel reste inchangé.</p>
+      <p>— L'équipe Buy-inner</p>`,
+    }),
     reset: ({ email, link }) => ({
       subject: 'Buy-inner — Définissez un nouveau mot de passe',
       html: `<p>Bonjour,</p>
@@ -302,6 +310,14 @@ const ACCOUNT_TEMPLATES = {
       <p><a href="${escapeHtml(link)}">Set my password →</a></p>
       <p>You can then sign in at <a href="${SITE_URL}/pages/supplier.html">${SITE_URL}/pages/supplier.html</a>.</p>
       <p style="color:#666;font-size:13px">This link is personal and expires quickly. If it has expired, ask the Buy-inner team for a new one.</p>
+      <p>— The Buy-inner team</p>`,
+    }),
+    forgot: ({ email, link }) => ({
+      subject: 'Buy-inner — Reset your password',
+      html: `<p>Hello,</p>
+      <p>You asked to reset the password of your Buy-inner account (<strong>${escapeHtml(email)}</strong>).</p>
+      <p><a href="${escapeHtml(link)}">Choose a new password →</a></p>
+      <p style="color:#666;font-size:13px">This link is personal, expires quickly and can only be used once. If you did not make this request, simply ignore this message: your current password stays unchanged.</p>
       <p>— The Buy-inner team</p>`,
     }),
     reset: ({ email, link }) => ({
@@ -399,11 +415,81 @@ async function isAdminUser(env, userId) {
 // Jeton de récupération -> notre propre page (pas l'action_link de Supabase :
 // il dépend des URL de redirection autorisées et peut être consommé par un
 // scanner d'emails ; ici la page appelle /verify elle-même, en JavaScript).
-async function generatePasswordLink(env, email, lang) {
+async function generateRecoveryData(env, email) {
   const res = await authAdminFetch(env, 'generate_link', { method: 'POST', body: JSON.stringify({ type: 'recovery', email }) });
   const data = await res.json().catch(() => null);
   if (!res.ok || !data || !data.hashed_token) throw new Error((data && (data.msg || data.message)) || 'génération du lien impossible');
-  return `${PASSWORD_PAGE}?token_hash=${encodeURIComponent(data.hashed_token)}&type=recovery&lang=${lang}`;
+  return data;
+}
+
+function passwordLinkFromToken(hashedToken, lang, next) {
+  return `${PASSWORD_PAGE}?token_hash=${encodeURIComponent(hashedToken)}&type=recovery&lang=${lang}${next === 'buyer' ? '&next=buyer' : ''}`;
+}
+
+async function generatePasswordLink(env, email, lang) {
+  const data = await generateRecoveryData(env, email);
+  return passwordLinkFromToken(data.hashed_token, lang);
+}
+
+// ── « Mot de passe oublié » en libre-service (route PUBLIQUE) ─────────
+// Principes :
+//   * la réponse est IDENTIQUE que le compte existe ou non (pas d'énumération
+//     de comptes), et le travail réel se fait après la réponse (ctx.waitUntil)
+//     pour que le temps de réponse ne trahisse rien non plus ;
+//   * 3 demandes par adresse et 10 par IP et par heure (table
+//     password_reset_requests, backend/supabase_password_reset_requests_2026_10.sql) ;
+//     si la table est absente on refuse (503) plutôt que de rester sans limite ;
+//   * les comptes administrateurs et les comptes désactivés ne reçoivent rien ;
+//   * seul un lien « personnel » est envoyé, vers notre page (jamais d'URL fournie par le client).
+const FORGOT_MAX_PER_EMAIL = 3;
+const FORGOT_MAX_PER_IP = 10;
+async function handleRequestPasswordReset(request, env, ctx) {
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+  const email = String((body && body.email) || '').trim().toLowerCase();
+  if (email.length > 254 || !EMAIL_RE.test(email)) return json({ error: 'Email invalide' }, 400);
+  if (!env.SUPABASE_SERVICE_ROLE_KEY || !env.RESEND_API_KEY) return json({ error: 'Service temporairement indisponible' }, 503);
+
+  const lang = body.lang === 'en' ? 'en' : 'fr';
+  const scope = body.scope === 'buyer' ? 'buyer' : 'supplier';
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const since = encodeURIComponent(new Date(Date.now() - 3600 * 1000).toISOString());
+
+  try {
+    const [byEmail, byIp] = await Promise.all([
+      serviceFetch(env, `password_reset_requests?email=eq.${encodeURIComponent(email)}&created_at=gte.${since}&select=id&limit=${FORGOT_MAX_PER_EMAIL}`),
+      serviceFetch(env, `password_reset_requests?ip=eq.${encodeURIComponent(ip)}&created_at=gte.${since}&select=id&limit=${FORGOT_MAX_PER_IP}`),
+    ]);
+    if (!byEmail.ok || !byIp.ok) return json({ error: 'Service temporairement indisponible' }, 503);
+    if ((await byEmail.json()).length >= FORGOT_MAX_PER_EMAIL || (await byIp.json()).length >= FORGOT_MAX_PER_IP) {
+      return json({ error: 'Trop de demandes. Réessayez dans une heure.' }, 429);
+    }
+    const ins = await serviceFetch(env, 'password_reset_requests', {
+      method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify([{ email, ip }]),
+    });
+    if (!ins.ok) return json({ error: 'Service temporairement indisponible' }, 503);
+  } catch {
+    return json({ error: 'Service temporairement indisponible' }, 503);
+  }
+
+  ctx.waitUntil(processPasswordResetRequest(env, email, lang, scope));
+  return json({ success: true });
+}
+
+async function processPasswordResetRequest(env, email, lang, scope) {
+  try {
+    // Purge des demandes de plus de 24 h (adresse + IP : durée de conservation annoncée
+    // dans la politique de confidentialité). Exécutée à chaque demande : requête indexée, peu coûteuse.
+    const old = encodeURIComponent(new Date(Date.now() - 24 * 3600 * 1000).toISOString());
+    await serviceFetch(env, `password_reset_requests?created_at=lt.${old}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+    let data;
+    try { data = await generateRecoveryData(env, email); } catch { return; } // compte inconnu : on ne dit rien
+    const uid = data.id || (data.user && data.user.id);
+    const banned = data.banned_until || (data.user && data.user.banned_until);
+    if (banned && new Date(banned).getTime() > Date.now()) return;
+    if (uid && await isAdminUser(env, uid)) return;
+    await emailAccountLink(env, 'forgot', lang, email, passwordLinkFromToken(data.hashed_token, lang, scope));
+  } catch { /* best-effort : jamais d'erreur visible côté appelant */ }
 }
 
 async function emailAccountLink(env, kind, lang, email, link, companyName) {
@@ -1162,6 +1248,12 @@ export default {
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
       if (request.method === 'POST') return handleSendEmail(request, env);
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
+    if (url.pathname === '/api/request-password-reset') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (request.method === 'POST') return handleRequestPasswordReset(request, env, ctx);
       return json({ error: 'Method not allowed' }, 405);
     }
 
