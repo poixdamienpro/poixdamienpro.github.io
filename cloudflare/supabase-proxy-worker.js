@@ -925,6 +925,7 @@ const TAXONOMY_EN = {
   'Photonique & Optique': 'Photonics & Optics',
   'Pièces & MRO': 'Parts & MRO',
   'Plateformes satellites': 'Satellite platforms',
+  'Prestation IA & data': 'AI & data services',
   'Prestation de talents': 'Contract talent',
   'Recyclage & Économie circulaire': 'Recycling & Circular economy',
   'Robotique & Automatisation': 'Robotics & Automation',

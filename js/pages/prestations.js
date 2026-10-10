@@ -25,6 +25,9 @@ const SERVICE_CATS = [
   // Electronics) -- pas des fabricants avec une gamme "maison", donc
   // hors catalogue produit comme les autres categories de service.
   'Distribution de composants',
+  // Prestataires d'intelligence artificielle et de traitement de données (ex: AiFinity) :
+  // une prestation sur mesure, pas un composant à intégrer -- hors catalogue produit.
+  'Prestation IA & data',
 ];
 
 let dirCurrentId = null;

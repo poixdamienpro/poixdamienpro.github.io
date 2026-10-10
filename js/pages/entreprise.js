@@ -14,6 +14,7 @@ const SERVICE_CATS = [
   'Intégration & assemblage système',
   'Segment sol & opérations',
   'Sous-traitance électronique (EMS)',
+  'Prestation IA & data',
 ];
 
 document.addEventListener('DOMContentLoaded', async () => {
