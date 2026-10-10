@@ -22,7 +22,6 @@ const TRANSLATIONS = {
     nav_referencer:      'Référencer mon entreprise',
     footer_cgv:          'CGV',
     nav_pill:            '✓ Annuaire & specs 100% gratuits',
-    ticker_label:        'NOUVEAU',
 
     // Footer
     footer_about:        'Qui sommes-nous',
@@ -670,7 +669,6 @@ const TRANSLATIONS = {
     nav_referencer:      'List my company',
     footer_cgv:          'Terms of sale',
     nav_pill:            '✓ Directory & specs 100% free',
-    ticker_label:        'NEW',
 
     // Footer
     footer_about:        'About us',
@@ -1585,7 +1583,6 @@ function applyLang() {
   // Re-rendu du contenu dynamique (liste entreprises / produits) — chaque
   // page définit la fonction qui la concerne, les autres restent undefined.
   if (typeof relabelChips === 'function') relabelChips();
-  if (typeof initTicker === 'function') initTicker();
   if (typeof renderCompanies === 'function') renderCompanies();
   if (typeof renderProducts === 'function') renderProducts();
   if (typeof renderSystemiers === 'function') renderSystemiers();

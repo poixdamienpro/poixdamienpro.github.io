@@ -17,15 +17,9 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 a{text-decoration:none;color:inherit}
 button{font-family:var(--sans);cursor:pointer}
 
-/* TICKER */
-.ticker{background:var(--ink);height:30px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.07)}
-.ticker-label{font-family:var(--sans);font-size:10px;font-weight:700;color:var(--rust);padding:0 14px;flex-shrink:0;letter-spacing:.08em;text-transform:uppercase}
-.ticker-track{flex:1;overflow:hidden;position:relative}
-.ticker-inner{display:inline-block;white-space:nowrap;animation:ticker 55s linear infinite;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55)}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* NAV */
-nav.main{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.10);position:sticky;top:30px;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.28)}
+nav.main{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.10);position:sticky;top:0;z-index:100;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;box-shadow:0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.28)}
 .logo{display:flex;align-items:center;gap:10px;background:none;border:none;padding:0}
 .logo-full{height:34px;width:auto;object-fit:contain;display:block}
 .nav-links{display:flex;height:100%;align-items:stretch;gap:0}
@@ -78,7 +72,7 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 
 /* LAYOUT */
 .layout{display:flex;max-width:1280px;margin:0 auto}
-.sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);padding:18px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto;background:var(--white)}
+.sidebar{width:240px;flex-shrink:0;border-right:1px solid var(--border);padding:18px 12px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;background:var(--white)}
 .sidebar-section{margin-bottom:16px}
 .sidebar-label{font-family:var(--sans);font-weight:600;font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .sidebar-label::before{content:'';display:block;width:2px;height:10px;background:var(--rust);border-radius:1px}
@@ -616,7 +610,7 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .btn-submit-form.sub-bar-btn:hover{background:#E85F1A;transform:translateY(-1px)}
 
 /* panneau réassurance sticky */
-.sub-aside{position:sticky;top:88px}
+.sub-aside{position:sticky;top:58px}
 .sub-aside-card{background:linear-gradient(160deg,rgba(212,80,10,.12),rgba(91,139,181,.06) 55%,transparent);
   border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:26px 24px;position:relative;overflow:hidden;
   opacity:0;animation:subCardIn .6s ease forwards;animation-delay:.2s}
@@ -755,7 +749,7 @@ body.theme-dark::after{
    ════════════════════════════════════════════════════════════════ */
 .dir{display:grid;grid-template-columns:225px minmax(320px,400px) 1fr;gap:22px;
   max-width:1440px;margin:0 auto;padding:16px 24px 64px;align-items:start}
-.dir .sidebar{position:sticky;top:86px}
+.dir .sidebar{position:sticky;top:56px}
 .dir-list-col{min-width:0}
 .dir-hint{font-size:11px;color:rgba(243,241,236,.4);font-style:italic}
 .dir-list{display:flex;flex-direction:column;gap:4px}
@@ -791,10 +785,10 @@ body.theme-dark::after{
   border:1px dashed rgba(255,255,255,.15);border-radius:10px}
 
 /* panneau d'aperçu */
-.dir-preview{position:sticky;top:86px;align-self:start;min-width:0}
+.dir-preview{position:sticky;top:56px;align-self:start;min-width:0}
 .dir-preview-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.12);
   border-top:2px solid var(--rust);border-radius:12px;padding:24px;
-  max-height:calc(100vh - 104px);overflow-y:auto;
+  max-height:calc(100vh - 74px);overflow-y:auto;
   animation:previewIn .4s cubic-bezier(.2,.7,.2,1)}
 @keyframes previewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .dp-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:8px}

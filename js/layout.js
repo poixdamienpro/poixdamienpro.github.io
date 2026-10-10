@@ -23,7 +23,6 @@ async function loadLayout() {
     if (ckEl && typeof window.biCookieSettings === 'function') ckEl.hidden = false;
   }
   markActiveNavLink();
-  initTicker();
   initMobileNav();
   if (typeof applyLang === 'function') applyLang();
   document.querySelectorAll('.overlay').forEach(o => {
@@ -170,9 +169,3 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
-function initTicker() {
-  const items = (typeof getLang === 'function' && getLang() === 'en') ? TICKER_ITEMS_EN : TICKER_ITEMS;
-  const text = items.join('   ·   ');
-  const el = document.getElementById('tickerText');
-  if (el) el.textContent = text + '     ' + text;
-}
