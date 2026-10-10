@@ -343,23 +343,92 @@ body { background: var(--ink-3); color: var(--t-hi); }
   </div>
 
   <div class="cat-section">
-    <div class="cat-section-label">Selection</div>
-    <h2>The criteria <em>that make the difference</em></h2>
-    <p>Beyond technology type, several parameters distinguish a standard embedded memory from one qualified for a critical environment.</p>
-    <table class="specs-table">
-      <thead><tr><th>Criterion</th><th>Typical range</th><th>Notes</th></tr></thead>
+    <div class="cat-section-label">Comparison · Trade-offs</div>
+    <h2>The 6 technologies <em>side by side</em></h2>
+    <p>To weigh technologies without rereading each description, here is the speed / density / endurance / cost trade-off of each one.</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:720px">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          <th style="text-align:center">SRAM</th>
+          <th style="text-align:center">DRAM</th>
+          <th style="text-align:center">NOR Flash</th>
+          <th style="text-align:center">NAND Flash</th>
+          <th style="text-align:center">MRAM</th>
+          <th style="text-align:center">EEPROM</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr><td>Capacity</td><td>1 KB — 2 TB</td><td>EEPROM: KB to MB; DRAM: MB to GB; NAND/SSD: GB to TB</td></tr>
-        <tr><td>Read throughput</td><td>1 MB/s — 7 GB/s</td><td>SPI Flash: ~50 MB/s; LPDDR5: ~6.4 GB/s per channel</td></tr>
-        <tr><td>Write throughput</td><td>0.1 MB/s — 5 GB/s</td><td>NAND Flash: 10–300 MB/s; NVMe PCIe Gen4: &gt; 5 GB/s</td></tr>
-        <tr><td>Access latency</td><td>&lt; 1 ns — a few ms</td><td>SRAM: &lt; 10 ns; NAND: ~100 µs per page; SSD: ~100 µs</td></tr>
-        <tr><td>Endurance (write cycles)</td><td>1k — infinite</td><td>QLC NAND: ~1k; SLC: ~100k; MRAM: &gt; 10¹⁴ cycles</td></tr>
-        <tr><td>Data retention</td><td>10 years — 20 years</td><td>Flash: 10 years at 25 °C; MRAM / EEPROM: &gt; 20 years</td></tr>
-        <tr><td>Operating temperature</td><td>−55 °C — +125 °C</td><td>Commercial: 0/70 °C; industrial: −40/85 °C; MIL: −55/125 °C</td></tr>
-        <tr><td>Radiation tolerance (TID)</td><td>0 — 300 krad</td><td>Unqualified COTS: &lt; 1 krad; rad-hard MRAM: 100–300 krad</td></tr>
-        <tr><td>Interface</td><td>I²C, SPI, QSPI, DDR, PCIe, ONFI, Toggle</td><td>Chosen by the OBC — the memory must be compatible</td></tr>
+        <tr>
+          <td>Volatile?</td>
+          <td style="text-align:center;color:#D4500A">Yes</td>
+          <td style="text-align:center;color:#D4500A">Yes</td>
+          <td style="text-align:center;color:#3F9A72">No</td>
+          <td style="text-align:center;color:#3F9A72">No</td>
+          <td style="text-align:center;color:#3F9A72">No</td>
+          <td style="text-align:center;color:#3F9A72">No</td>
+        </tr>
+        <tr>
+          <td>Access speed</td>
+          <td style="text-align:center;color:#3F9A72">Very fast</td>
+          <td style="text-align:center">Fast</td>
+          <td style="text-align:center">Fast read (XIP)</td>
+          <td style="text-align:center;color:#D4500A">Slow, sequential</td>
+          <td style="text-align:center;color:#3F9A72">Very fast</td>
+          <td style="text-align:center">Moderate</td>
+        </tr>
+        <tr>
+          <td>Density / cost per bit</td>
+          <td style="text-align:center;color:#D4500A">Low density, expensive</td>
+          <td style="text-align:center;color:#3F9A72">High density</td>
+          <td style="text-align:center">Moderate</td>
+          <td style="text-align:center;color:#3F9A72">Very high density</td>
+          <td style="text-align:center;color:#D4500A">Density increasing, expensive</td>
+          <td style="text-align:center;color:#D4500A">Low density</td>
+        </tr>
+        <tr>
+          <td>Write endurance</td>
+          <td style="text-align:center;color:#3F9A72">Unlimited</td>
+          <td style="text-align:center;color:#3F9A72">Unlimited</td>
+          <td style="text-align:center">Moderate</td>
+          <td style="text-align:center;color:#D4500A">Low to moderate (depends on type)</td>
+          <td style="text-align:center;color:#3F9A72">Near unlimited</td>
+          <td style="text-align:center;color:#3F9A72">Very high</td>
+        </tr>
+        <tr>
+          <td>Direct random access</td>
+          <td style="text-align:center;color:#3F9A72">Yes</td>
+          <td style="text-align:center;color:#3F9A72">Yes</td>
+          <td style="text-align:center;color:#3F9A72">Yes</td>
+          <td style="text-align:center;color:#D4500A">No (via FTL)</td>
+          <td style="text-align:center;color:#3F9A72">Yes</td>
+          <td style="text-align:center;color:#3F9A72">Yes (byte)</td>
+        </tr>
+        <tr>
+          <td>Radiation sensitivity</td>
+          <td style="text-align:center;color:#3F9A72">Low (no trapped charge)</td>
+          <td style="text-align:center;color:#D4500A">SEU-sensitive (needs EDAC)</td>
+          <td style="text-align:center">Moderate</td>
+          <td style="text-align:center">Moderate</td>
+          <td style="text-align:center;color:#3F9A72">Low (native)</td>
+          <td style="text-align:center">Moderate</td>
+        </tr>
+        <tr>
+          <td>Typical use case</td>
+          <td style="text-align:center">CPU cache, scratchpad</td>
+          <td style="text-align:center">Main memory</td>
+          <td style="text-align:center">Bootloader, firmware</td>
+          <td style="text-align:center">Mass storage</td>
+          <td style="text-align:center">Critical space configuration</td>
+          <td style="text-align:center">Parameters, calibration</td>
+        </tr>
       </tbody>
     </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">In practice</strong>: the first question is volatile or not. Then random access (SRAM/DRAM/NOR/MRAM/EEPROM) rules out NAND whenever code must execute directly in place. MRAM is the only compromise that ticks almost every box, but its cost per bit remains the limiting factor in 2026.
+    </p>
   </div>
 
   <div class="cat-section">

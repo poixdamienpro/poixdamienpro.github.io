@@ -366,6 +366,65 @@ body { background: var(--ink-3); color: var(--t-hi); }
   </div>
 
   <div class="cat-section">
+    <div class="cat-section-label">Comparison · Trade-offs</div>
+    <h2>Fuse, circuit breaker or SSPC: <em>how to choose</em></h2>
+    <p>Overcurrent protection is the one option almost every PDU has, but three technologies compete for each output, with very different trade-offs. Here is the direct comparison to settle it.</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:640px">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          <th style="text-align:center">Fuse</th>
+          <th style="text-align:center">Circuit breaker</th>
+          <th style="text-align:center">SSPC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fault clearing time</td>
+          <td style="text-align:center">Fast, not adjustable</td>
+          <td style="text-align:center">Moderate, not adjustable</td>
+          <td style="text-align:center;color:#3F9A72">Very fast, adjustable</td>
+        </tr>
+        <tr>
+          <td>Reset after a fault</td>
+          <td style="text-align:center;color:#D4500A">Replacement (single use)</td>
+          <td style="text-align:center">Manual or remote-controlled</td>
+          <td style="text-align:center;color:#3F9A72">Automatic, remote</td>
+        </tr>
+        <tr>
+          <td>Cycling capability</td>
+          <td style="text-align:center;color:#D4500A">None (destructive)</td>
+          <td style="text-align:center">A few thousand cycles</td>
+          <td style="text-align:center;color:#3F9A72">Unlimited (contactless)</td>
+        </tr>
+        <tr>
+          <td>Diagnostics / telemetry</td>
+          <td style="text-align:center;color:#D4500A">None</td>
+          <td style="text-align:center">Limited (auxiliary contact)</td>
+          <td style="text-align:center;color:#3F9A72">Full (I, V, history)</td>
+        </tr>
+        <tr>
+          <td>Unit cost</td>
+          <td style="text-align:center;color:#3F9A72">Low</td>
+          <td style="text-align:center">Moderate</td>
+          <td style="text-align:center;color:#D4500A">High</td>
+        </tr>
+        <tr>
+          <td>Inductive load handling</td>
+          <td style="text-align:center">Good</td>
+          <td style="text-align:center">Good to very good</td>
+          <td style="text-align:center;color:#3F9A72">Excellent (arc-free)</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">In practice</strong>: the fuse remains relevant as a low-cost last-resort protection that is rarely triggered. The circuit breaker fits whenever a manual reset is acceptable. The SSPC is the right choice when the system must reconfigure itself after a fault, as in space, defense and redundant architectures.
+    </p>
+  </div>
+
+  <div class="cat-section">
     <div class="cat-section-label">Summary</div>
     <h2>Which options <em>for which domain</em></h2>
     <p>It's the same base PDU. The options selected by the manufacturer — and the qualification levels required — are what make the difference between a €300 rack PDU and a €200,000 space PCDU.</p>
@@ -393,25 +452,6 @@ body { background: var(--ink-3); color: var(--t-hi); }
     </table>
     </div>
     <p style="font-size:13px;color:var(--t-low);margin-top:12px;font-family:var(--mono)">🟢 Systematic &nbsp;·&nbsp; 🟡 Model-dependent &nbsp;·&nbsp; ⚫ Rare or absent</p>
-  </div>
-
-  <div class="cat-section">
-    <div class="cat-section-label">Specifications</div>
-    <h2>Typical <em>specification ranges</em></h2>
-    <p>These ranges cover the full market of PDUs. Exact values depend on the application domain and chosen variant.</p>
-    <table class="specs-table">
-      <thead><tr><th>Parameter</th><th>Typical range</th><th>Notes</th></tr></thead>
-      <tbody>
-        <tr><td>Input voltage</td><td>12 V — 600 V DC / 110–480 V AC</td><td>28 V (aero/defense), 28–100 V (space), 48 V (telecom), 400–800 V (EV)</td></tr>
-        <tr><td>Max input current</td><td>10 A — 3,000 A</td><td>Depends on total power to distribute</td></tr>
-        <tr><td>Number of outputs</td><td>2 — 64+</td><td>Simple PDUs: 4–8 outputs; datacenter PDUs: up to 64</td></tr>
-        <tr><td>Current per output</td><td>1 A — 400 A</td><td>SSPC typically 1–30 A; high-power contactors &gt; 100 A</td></tr>
-        <tr><td>Efficiency</td><td>85 % — 99 %</td><td>Losses mainly from protection and filtering</td></tr>
-        <tr><td>Operating temperature</td><td>−55 °C — +125 °C</td><td>Space/defense: extended ranges; industrial: −20/+70 °C</td></tr>
-        <tr><td>Communication bus</td><td>CAN, Modbus, SNMP, 1553, SpaceWire, CAN FD, LIN</td><td>Domain-dependent</td></tr>
-        <tr><td>Switching time</td><td>&lt; 1 µs (SSPC) — 10 ms (relay)</td><td>SSPCs allow ultra-fast interruption without arcing</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <div class="cat-section">

@@ -341,6 +341,70 @@ body { background: var(--ink-3); color: var(--t-hi); }
       </div>
     </div>
 
+    <div class="cat-section-label" style="margin-top:36px">Comparison · Trade-offs</div>
+    <h3 style="font-family:var(--serif);font-weight:400;font-size:22px;margin-bottom:12px">CPU, FPGA, GPU or hybrid SoC: <em style="color:var(--steel)">the right trade-off</em></h3>
+    <p>The four computer types are not interchangeable: each optimizes a different dimension at the expense of the others. A direct comparison to decide:</p>
+    <div style="overflow-x:auto;margin-top:8px">
+    <table class="specs-table" style="min-width:680px">
+      <thead>
+        <tr>
+          <th>Criterion</th>
+          <th style="text-align:center">CPU / MCU</th>
+          <th style="text-align:center">FPGA</th>
+          <th style="text-align:center">GPU / NPU</th>
+          <th style="text-align:center">Hybrid SoC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Real-time determinism</td>
+          <td style="text-align:center">Good (RTOS)</td>
+          <td style="text-align:center;color:#3F9A72">Excellent (fixed latency)</td>
+          <td style="text-align:center;color:#D4500A">Low to moderate</td>
+          <td style="text-align:center;color:#3F9A72">Excellent (FPGA part)</td>
+        </tr>
+        <tr>
+          <td>Software flexibility</td>
+          <td style="text-align:center;color:#3F9A72">High</td>
+          <td style="text-align:center;color:#D4500A">Low (hardware reconfig.)</td>
+          <td style="text-align:center">Moderate (AI frameworks)</td>
+          <td style="text-align:center;color:#3F9A72">High (CPU part)</td>
+        </tr>
+        <tr>
+          <td>Massive parallel compute</td>
+          <td style="text-align:center;color:#D4500A">Low</td>
+          <td style="text-align:center;color:#3F9A72">High, deterministic</td>
+          <td style="text-align:center;color:#3F9A72">Very high (SIMD/tensors)</td>
+          <td style="text-align:center">High (depends on partitioning)</td>
+        </tr>
+        <tr>
+          <td>Typical power consumption</td>
+          <td style="text-align:center;color:#3F9A72">Low (mW–W)</td>
+          <td style="text-align:center">Moderate (W)</td>
+          <td style="text-align:center;color:#D4500A">High (W–tens of W)</td>
+          <td style="text-align:center">Moderate to high</td>
+        </tr>
+        <tr>
+          <td>Development time / cost</td>
+          <td style="text-align:center;color:#3F9A72">Low</td>
+          <td style="text-align:center;color:#D4500A">High (VHDL/Verilog)</td>
+          <td style="text-align:center">Moderate (mature frameworks)</td>
+          <td style="text-align:center;color:#D4500A">High (dual skill set)</td>
+        </tr>
+        <tr>
+          <td>Typical use case</td>
+          <td style="text-align:center">Sequential, moderate I/O</td>
+          <td style="text-align:center">Radar, high-frequency motor control</td>
+          <td style="text-align:center">Vision, sensor fusion, AI</td>
+          <td style="text-align:center">Mixed critical systems</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="color:var(--t-mid);font-size:15px;line-height:1.7;margin-top:16px">
+      <strong style="color:var(--t-hi)">In practice</strong>: start from the most constraining requirement. Timing guaranteed to the nanosecond rules out a CPU alone and a GPU. A need for AI inference rules out an FPGA alone (unless dedicated accelerators are used). The hybrid SoC only makes sense if both constraints coexist; otherwise it is unnecessary development overhead.
+    </p>
+
     <div class="cat-section-label" style="margin-top:36px">Interfaces</div>
     <div class="functions-grid">
       <div class="func-card">
