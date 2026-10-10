@@ -286,7 +286,20 @@ async function supplierRouteAfterAuth() {
   document.getElementById('sup-auth-box').style.display = 'none';
   try {
     const userId = sessionStorage.getItem('sup_user_id');
-    const companies = await supplierFetch(`companies?claimed_by_user_id=eq.${userId}&select=*`);
+    // Invitation reçue par email : on la valide d'abord (js/pages/supplier-team.js).
+    if (typeof acceptPendingInvite === 'function') await acceptPendingInvite();
+    // L'entreprise = celle dont on est membre (company_members). Repli sur
+    // l'ancien propriétaire unique tant que la migration
+    // backend/supabase_company_members_2026_10.sql n'est pas exécutée.
+    let companies = [];
+    try {
+      const memberships = await supplierFetch(`company_members?user_id=eq.${userId}&select=company_id,role&order=created_at.asc`);
+      if (memberships && memberships.length) {
+        companies = await supplierFetch(`companies?id=eq.${memberships[0].company_id}&select=*`);
+      }
+    } catch (memberErr) {
+      companies = await supplierFetch(`companies?claimed_by_user_id=eq.${userId}&select=*`);
+    }
     if (companies && companies.length) {
       supplierCompany = companies[0];
       document.getElementById('sup-claim-box').style.display = 'none';
@@ -299,6 +312,7 @@ async function supplierRouteAfterAuth() {
       renderPremiumBox();
       loadSupplierProducts();
       loadSupplierSubmissions();
+      if (typeof loadSupplierTeam === 'function') loadSupplierTeam();
       loadSupplierLeads();
       loadSupplierViews();
       loadSupplierComparison();

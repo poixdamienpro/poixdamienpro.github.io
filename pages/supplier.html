@@ -40,6 +40,8 @@
 <div class="submit-wrap">
 
   <!-- État: non connecté → panneau valeur + carte d'accès -->
+  <div id="sup-notice" class="sup-notice" role="status" style="display:none"></div>
+
   <div id="sup-auth-box">
     <div class="sup-gate">
       <aside class="sup-gate-aside">
@@ -110,6 +112,14 @@
 
     <div class="sup-stats" id="sup-stats"></div>
 
+    <div class="sup-panel" id="sup-team-panel">
+      <div class="sup-panel-head">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0" data-i18n="team_h">Équipe</span>
+        <span class="sup-pill sup-pill-pending" id="sup-team-seats"></span>
+      </div>
+      <div id="sup-team-list"></div>
+    </div>
+
     <div class="sup-panel">
       <span class="submit-section-title" style="border:none;padding:0" data-i18n="sp_h_leads">Demandes de devis reçues</span>
       <div id="sup-leads-list"></div>
@@ -179,5 +189,6 @@
 <script src="../js/api.js"></script>
 <script src="../js/layout.js"></script>
 <script src="../js/pages/supplier.js"></script>
+<script src="../js/pages/supplier-team.js"></script>
 </body>
 </html>

@@ -104,10 +104,39 @@ const EMAIL_TEMPLATES = {
   }),
 };
 
+// Invitation à rejoindre l'équipe d'une entreprise. Volontairement HORS de
+// EMAIL_TEMPLATES : /api/send-email est public, alors que ce message contient
+// un jeton d'accès. Il n'est envoyé que par /api/send-invite-email, qui relit
+// l'invitation en base avec le jeton de l'inviteur (voir handleSendInviteEmail).
+const INVITE_TEMPLATES = {
+  fr: ({ inviterEmail, companyName, roleLabel, email, link, expires }) => ({
+    subject: `Buy-inner — Invitation à rejoindre ${companyName}`,
+    html: `<p>Bonjour,</p>
+      <p><strong>${escapeHtml(inviterEmail)}</strong> vous invite à rejoindre l'espace fournisseur de <strong>${escapeHtml(companyName)}</strong> sur Buy-inner, en tant que <strong>${escapeHtml(roleLabel)}</strong>.</p>
+      <p>Créez un compte (ou connectez-vous) avec cette adresse email : <strong>${escapeHtml(email)}</strong>, puis acceptez l'invitation :</p>
+      <p><a href="${escapeHtml(link)}">Accepter l'invitation →</a></p>
+      <p style="color:#666;font-size:13px">Ce lien est personnel et valable jusqu'au ${escapeHtml(expires)}. Si vous ne connaissez pas cette personne, ignorez simplement ce message.</p>
+      <p>— L'équipe Buy-inner</p>`,
+  }),
+  en: ({ inviterEmail, companyName, roleLabel, email, link, expires }) => ({
+    subject: `Buy-inner — Invitation to join ${companyName}`,
+    html: `<p>Hello,</p>
+      <p><strong>${escapeHtml(inviterEmail)}</strong> has invited you to join the supplier workspace of <strong>${escapeHtml(companyName)}</strong> on Buy-inner, as <strong>${escapeHtml(roleLabel)}</strong>.</p>
+      <p>Create an account (or sign in) with this email address: <strong>${escapeHtml(email)}</strong>, then accept the invitation:</p>
+      <p><a href="${escapeHtml(link)}">Accept the invitation →</a></p>
+      <p style="color:#666;font-size:13px">This link is personal and valid until ${escapeHtml(expires)}. If you don't know this person, just ignore this message.</p>
+      <p>— The Buy-inner team</p>`,
+  }),
+};
+const INVITE_ROLE_LABELS = {
+  fr: { owner: 'administrateur', member: 'collaborateur' },
+  en: { owner: 'administrator', member: 'team member' },
+};
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature',
+  'Access-Control-Allow-Headers': 'Content-Type, Stripe-Signature, Authorization',
 };
 
 function json(obj, status = 200) {
@@ -131,7 +160,10 @@ async function handleSendEmail(request, env) {
   if (!env.RESEND_API_KEY) return json({ error: 'RESEND_API_KEY non configurée sur le Worker' }, 500);
 
   const { subject, html } = template(params || {});
+  return sendViaResend(env, to, subject, html);
+}
 
+async function sendViaResend(env, to, subject, html) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -146,6 +178,45 @@ async function handleSendEmail(request, env) {
     return json({ error: 'Échec envoi Resend', detail }, 502);
   }
   return json({ success: true });
+}
+
+// ── Invitation d'équipe : l'email est construit ICI à partir de la base ──
+// Le client n'envoie que l'id d'invitation et son propre jeton de session ;
+// le destinataire, le lien et le nom d'entreprise viennent de la RPC
+// get_invite_email_payload (qui vérifie que l'appelant est administrateur de
+// l'entreprise). Impossible donc d'utiliser ce point d'entrée pour écrire à
+// une adresse arbitraire.
+async function handleSendInviteEmail(request, env) {
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+
+  const { inviteId, lang } = body || {};
+  const authorization = request.headers.get('Authorization') || '';
+  if (!/^Bearer\s+\S+$/.test(authorization)) return json({ error: 'authentification requise' }, 401);
+  if (typeof inviteId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(inviteId)) {
+    return json({ error: 'inviteId invalide' }, 400);
+  }
+  if (!env.RESEND_API_KEY) return json({ error: 'RESEND_API_KEY non configurée sur le Worker' }, 500);
+
+  const rpc = await fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/get_invite_email_payload`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': authorization, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_invite: inviteId }),
+  });
+  if (!rpc.ok) return json({ error: 'invitation introuvable ou accès refusé' }, 403);
+  const p = await rpc.json().catch(() => null);
+  if (!p || !p.email || !p.token) return json({ error: 'invitation invalide' }, 403);
+
+  const l = lang === 'en' ? 'en' : 'fr';
+  const { subject, html } = INVITE_TEMPLATES[l]({
+    inviterEmail: p.inviter_email || 'Buy-inner',
+    companyName: p.company_name || '',
+    roleLabel: INVITE_ROLE_LABELS[l][p.role] || INVITE_ROLE_LABELS[l].member,
+    email: p.email,
+    link: `${SITE_URL}/pages/supplier.html?invite=${encodeURIComponent(p.token)}`,
+    expires: String(p.expires_at || '').slice(0, 10),
+  });
+  return sendViaResend(env, p.email, subject, html);
 }
 
 // ── Stripe : création de la session de paiement Premium ─────────────
@@ -678,6 +749,12 @@ export default {
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
       if (request.method === 'POST') return handleSendEmail(request, env);
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
+    if (url.pathname === '/api/send-invite-email') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (request.method === 'POST') return handleSendInviteEmail(request, env);
       return json({ error: 'Method not allowed' }, 405);
     }
 

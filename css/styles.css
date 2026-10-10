@@ -526,6 +526,21 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .sup-prod-actions{display:flex;align-items:center;gap:8px}
 .sup-btn-sm{width:auto;padding:6px 13px;font-size:12px;margin:0}
 
+/* Équipe de l'entreprise (comptes multiples, voir js/pages/supplier-team.js) */
+.sup-team-sub{font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(243,241,236,.5);margin:18px 0 10px}
+.sup-team-me{font-weight:400;color:rgba(243,241,236,.5)}
+.sup-team-role{font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#F3F1EC}
+.sup-team-role option{color:#1b1b1b}
+.sup-team-form{display:flex;gap:8px;flex-wrap:wrap}
+.sup-team-form input[type=email]{flex:1 1 220px;min-width:0;font-size:13px;padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#F3F1EC}
+.sup-team-form select{font-size:13px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#F3F1EC}
+.sup-team-form select option{color:#1b1b1b}
+.sup-team-form button{width:auto;margin:0;padding:9px 18px}
+.sup-team-note{font-size:12px;line-height:1.6;color:rgba(243,241,236,.6);margin:10px 0 0}
+.sup-notice{border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;line-height:1.5}
+.sup-notice-ok{background:rgba(134,214,172,.10);border:1px solid rgba(134,214,172,.4);color:#86D6AC}
+.sup-notice-err{background:rgba(224,106,82,.10);border:1px solid rgba(224,106,82,.45);color:#F0A08F}
+
 .sup-lead{padding:14px 16px;border:1px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(255,255,255,.02);margin-bottom:10px}
 .sup-lead-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .sup-lead-who{font-size:14px;font-weight:600;color:#F3F1EC}

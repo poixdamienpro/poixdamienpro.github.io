@@ -999,10 +999,22 @@ async function approveClaim(id) {
   const card = document.getElementById(`admin-claim-${id}`);
   card.querySelectorAll('button').forEach(b => b.disabled = true);
   try {
-    await adminFetch(`companies?id=eq.${claim.company_id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ claimed_by_user_id: claim.user_id }),
-    });
+    // Entreprise déjà revendiquée : on rattache ce compte comme membre de
+    // l'équipe (company_members) au lieu d'écraser le propriétaire existant.
+    // Sinon (première revendication), le trigger de la base crée le 'owner'.
+    const current = await adminFetch(`companies?id=eq.${claim.company_id}&select=claimed_by_user_id`);
+    if (current && current[0] && current[0].claimed_by_user_id && current[0].claimed_by_user_id !== claim.user_id) {
+      await adminFetch('company_members?on_conflict=company_id,user_id', {
+        method: 'POST',
+        headers: { 'Prefer': 'resolution=ignore-duplicates,return=minimal' },
+        body: JSON.stringify([{ company_id: claim.company_id, user_id: claim.user_id, role: 'member' }]),
+      });
+    } else {
+      await adminFetch(`companies?id=eq.${claim.company_id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ claimed_by_user_id: claim.user_id }),
+      });
+    }
     await adminFetch(`company_claims?id=eq.${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ status: 'approved' }),
