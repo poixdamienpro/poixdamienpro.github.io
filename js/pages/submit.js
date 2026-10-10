@@ -31,9 +31,23 @@ function initSubmitStepper() {
   cards.forEach(c => io.observe(c));
 }
 
+// Inscription gratuite : 2 produits maximum (même règle que l'espace fournisseur ; appliquée en base,
+// backend/supabase_plan_limits_2026_10.sql). Texte avec repli intégré : i18n.js peut rester en cache
+// plusieurs heures chez un visiteur de retour, sans les clés récentes.
+const SUBMIT_FREE_LIMIT = 2;
+const ts = (key, fr, en) => ((TRANSLATIONS[getLang()] || {})[key]) || (getLang() === 'en' ? en : fr);
+const visibleProductBlocks = () => document.querySelectorAll('#product-blocks .product-block:not(.removing)').length;
+
 // Compteur de la barre d'envoi.
 function updateSubmitBar() {
   const n = document.querySelectorAll('#product-blocks .product-block:not(.removing)').length;
+  const addBtn = document.getElementById('sub-add-btn');
+  const note = document.getElementById('sub-limit-note');
+  if (addBtn && note) {
+    addBtn.disabled = n >= SUBMIT_FREE_LIMIT;
+    note.style.display = n >= SUBMIT_FREE_LIMIT ? 'block' : 'none';
+    note.textContent = ts('sb_limit_note', 'Inscription gratuite : 2 produits maximum. Vous pourrez en publier davantage avec l\'offre Premium, depuis votre espace fournisseur.', 'Free listing: 2 products maximum. You can publish more with the Premium plan, from your supplier area.');
+  }
   const count = document.getElementById('sub-count');
   const word = document.getElementById('sub-count-word');
   if (count) count.textContent = n;
@@ -83,6 +97,7 @@ async function handleImageSelect(e, idx) {
 }
 
 function addProductBlock() {
+  if (visibleProductBlocks() >= SUBMIT_FREE_LIMIT) { updateSubmitBar(); return; }
   productBlockCount++;
   const idx = productBlockCount;
   const block = document.createElement('div');
@@ -209,7 +224,10 @@ async function submitSupplierForm(e) {
       },
       body: JSON.stringify(rows),
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => null);
+      throw new Error((errBody && errBody.message) || ('HTTP ' + res.status));
+    }
 
     // L'id de la 1re ligne prouve au Worker qu'une soumission vient d'être créée
     // pour cette adresse : le contenu de l'email est relu en base, pas envoyé d'ici.
@@ -227,6 +245,10 @@ async function submitSupplierForm(e) {
   } catch (err) {
     console.error('Erreur soumission Supabase:', err);
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = t('sb_submit'); }
+    if (/PRODUCT_LIMIT/.test(err.message)) {
+      alert(ts('sb_err_limit', 'Limite du plan gratuit atteinte : 2 produits maximum pour cette entreprise. Pour en publier davantage, passez en Premium depuis votre espace fournisseur.', 'Free plan limit reached: 2 products maximum for this company. To publish more, go Premium from your supplier area.'));
+      return;
+    }
     alert(`${t('sb_send_err')}${FOUNDER_EMAIL}.`);
   }
 }

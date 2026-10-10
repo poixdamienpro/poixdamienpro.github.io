@@ -1,8 +1,12 @@
 -- ============================================================
 -- Limites du plan gratuit — 2026-10
 --
--- 1. Produits : un fournisseur NON Premium ne peut pas avoir plus de 2
+-- 1. Produits : une entreprise NON Premium ne peut pas avoir plus de 2
 --    produits (publiés + demandes d'ajout en attente). Premium : illimité.
+--    S'applique à l'espace fournisseur ET au formulaire public d'inscription
+--    (là, l'entreprise est reconnue par son nom + l'email du dépôt ; une
+--    entreprise déjà Premium n'est pas limitée). Un dépôt qui dépasse est
+--    refusé EN ENTIER.
 --    Les entreprises qui ont déjà plus de 2 produits les gardent (on ne
 --    retire rien) ; elles ne peuvent simplement plus en ajouter.
 --    Appliqué par un trigger sur product_submissions (message : PRODUCT_LIMIT).
@@ -52,19 +56,40 @@ RETURNS int LANGUAGE sql IMMUTABLE AS $$ SELECT 2 $$;
 CREATE OR REPLACE FUNCTION public._enforce_free_product_limit()
 RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  used int;
 BEGIN
-  -- Seules les demandes d'AJOUT faites depuis un espace fournisseur sont limitées
-  -- (le formulaire public de référencement n'a pas de company_id).
-  IF NEW.submission_type IS DISTINCT FROM 'new' OR NEW.company_id IS NULL THEN
+  -- Seules les demandes d'AJOUT de produit sont limitées.
+  IF NEW.submission_type IS DISTINCT FROM 'new' THEN
     RETURN NEW;
   END IF;
-  IF COALESCE((SELECT premium FROM public.companies WHERE id = NEW.company_id), false) THEN
-    RETURN NEW;
+
+  IF NEW.company_id IS NOT NULL THEN
+    -- Espace fournisseur : l'entreprise est connue.
+    IF COALESCE((SELECT premium FROM public.companies WHERE id = NEW.company_id), false) THEN
+      RETURN NEW;
+    END IF;
+    used := (SELECT count(*) FROM public.products WHERE company_id = NEW.company_id)
+          + (SELECT count(*) FROM public.product_submissions
+             WHERE company_id = NEW.company_id AND submission_type = 'new' AND status = 'pending');
+  ELSE
+    -- Formulaire public d'inscription : pas encore de company_id. On reconnaît l'entreprise
+    -- par son nom (insensible à la casse) : déjà Premium => pas de limite ; sinon on compte
+    -- ses produits publiés et les produits en attente déposés avec la même adresse email.
+    -- (Fonction VOLATILE : dans un dépôt de plusieurs lignes, chaque ligne voit les précédentes.)
+    IF NEW.company_name IS NULL THEN RETURN NEW; END IF;
+    IF EXISTS (SELECT 1 FROM public.companies WHERE lower(name) = lower(NEW.company_name) AND premium = true) THEN
+      RETURN NEW;
+    END IF;
+    used := (SELECT count(*) FROM public.products p JOIN public.companies c ON c.id = p.company_id
+             WHERE lower(c.name) = lower(NEW.company_name))
+          + (SELECT count(*) FROM public.product_submissions
+             WHERE company_id IS NULL AND submission_type = 'new' AND status = 'pending'
+               AND lower(company_name) = lower(NEW.company_name)
+               AND lower(submitter_email) = lower(NEW.submitter_email));
   END IF;
-  IF (SELECT count(*) FROM public.products WHERE company_id = NEW.company_id)
-     + (SELECT count(*) FROM public.product_submissions
-        WHERE company_id = NEW.company_id AND submission_type = 'new' AND status = 'pending')
-     >= public._free_product_limit() THEN
+
+  IF used >= public._free_product_limit() THEN
     RAISE EXCEPTION 'PRODUCT_LIMIT';
   END IF;
   RETURN NEW;

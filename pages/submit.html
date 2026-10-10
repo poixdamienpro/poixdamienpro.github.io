@@ -79,7 +79,8 @@
       <section class="sub-card" data-step="3" style="--i:2">
         <div class="sub-card-head"><span class="sub-card-num">3</span><div><div class="sub-card-title" data-i18n="sb_c3_t">Vos produits</div><div class="sub-card-sub" data-i18n="sb_c3_s">Ajoutez-en autant que nécessaire. Specs et photo optionnelles.</div></div></div>
         <div id="product-blocks"></div>
-        <button type="button" class="btn-add-product" onclick="addProductBlock()" data-i18n="sb_add_product">+ Ajouter un produit</button>
+        <button type="button" class="btn-add-product" id="sub-add-btn" onclick="addProductBlock()" data-i18n="sb_add_product">+ Ajouter un produit</button>
+        <p id="sub-limit-note" style="display:none;font-size:12px;line-height:1.6;margin:10px 0 0;opacity:.8"></p>
       </section>
 
       <div class="sub-submitbar">
