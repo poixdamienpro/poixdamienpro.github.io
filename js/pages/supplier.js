@@ -226,7 +226,7 @@ async function supplierSignup(e) {
   const email = document.getElementById('sup-signup-email').value;
   const password = document.getElementById('sup-signup-password').value;
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup?redirect_to=${encodeURIComponent(new URL(ROOT_PREFIX + 'pages/supplier.html', window.location.href).href)}`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

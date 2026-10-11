@@ -67,7 +67,26 @@ async function buyerRefreshSession() {
   }
 }
 
+// Atterrissage après le clic sur le lien « Confirmer mon adresse » de l'email Supabase :
+// Supabase renvoie vers le site avec la session dans le fragment d'URL (#access_token=…&type=signup).
+// On ne s'en sert pas pour connecter (le visiteur se connecte avec son mot de passe) : on retire
+// le jeton de la barre d'adresse et on affiche une confirmation, sur n'importe quelle page.
+function handleSignupConfirmationLanding() {
+  const h = window.location.hash || '';
+  if (!/[#&]type=signup(&|$)/.test(h) || !/access_token=/.test(h)) return;
+  try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
+  const en = typeof getLang === 'function' && getLang() === 'en';
+  const bar = document.createElement('div');
+  bar.setAttribute('role', 'status');
+  bar.style.cssText = 'position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:300;max-width:calc(100vw - 32px);background:#1F5D44;color:#fff;padding:12px 18px;border-radius:8px;font:600 13px/1.4 "Public Sans",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);display:flex;gap:12px;align-items:center';
+  bar.innerHTML = '<span>' + (en ? '✓ Email address confirmed. You can now log in with your password.' : '✓ Adresse email confirmée. Vous pouvez maintenant vous connecter avec votre mot de passe.') + '</span><button type="button" aria-label="Close" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer">✕</button>';
+  bar.querySelector('button').onclick = () => bar.remove();
+  document.body.appendChild(bar);
+  setTimeout(() => bar.remove(), 15000);
+}
+
 async function initBuyerSession() {
+  handleSignupConfirmationLanding();
   if (localStorage.getItem('buyer_refresh_token')) {
     const ok = await buyerRefreshSession();
     if (ok) await loadBuyerProfile();
@@ -87,7 +106,7 @@ function updateBuyerNavUI() {
 }
 
 async function buyerSignup(email, password, name, company) {
-  const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/signup?redirect_to=${encodeURIComponent(new URL(ROOT_PREFIX + 'pages/compte-acheteur.html', window.location.href).href)}`, {
     method: 'POST',
     headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
