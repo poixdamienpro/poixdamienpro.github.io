@@ -195,6 +195,7 @@ function adminShowTab(name) {
   document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   sessionStorage.setItem('admin_active_tab', name);
   if (name === 'users' && !adminUsersLoaded && typeof loadAdminUsers === 'function') loadAdminUsers();
+  if (name === 'service' && typeof loadServiceRequests === 'function') loadServiceRequests();
 }
 
 function completeAdminLogin(accessToken, email) {
@@ -210,6 +211,7 @@ function completeAdminLogin(accessToken, email) {
   loadPendingSubmissions();
   loadPendingClaims();
   loadPendingRfqDossiers();
+  loadServiceRequests();
 }
 
 function adminLogout() {
@@ -230,6 +232,7 @@ function tryRestoreAdminSession() {
   loadPendingSubmissions();
   loadPendingClaims();
   loadPendingRfqDossiers();
+  loadServiceRequests();
 }
 
 // ── Statut + enrôlement MFA, affiché en haut du panneau une fois connecté ──
@@ -1468,3 +1471,102 @@ async function rejectRfqDossier(id) {
   }
 }
 
+// ── Demandes d'accompagnement équipements (voir backend/supabase_service_requests_2026_10.sql
+// et js/pages/service-request.js) : formulaire public -> table service_requests. L'onglet
+// affiche un badge avec le nombre de demandes « nouvelles » ; chaque demande a un statut
+// (nouvelle / en cours / devis envoyé / clôturée) et une note interne.
+let adminSvcRows = [];
+const SVC_STATUS_LABELS = { new: 'Nouvelle', in_progress: 'En cours', quoted: 'Devis envoyé', closed: 'Clôturée' };
+const SVC_OBJECTIVE_LABELS = { qualification: 'Qualification', transformation: 'Transformation', both: 'Qualification + transformation', unsure: 'À préciser' };
+
+async function loadServiceRequests() {
+  const list = document.getElementById('admin-svc-list');
+  if (!list) return;
+  if (!adminSvcRows.length) list.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  try {
+    adminSvcRows = await adminFetchAllPages('service_requests?select=*&order=created_at.desc,id.asc');
+    renderServiceRequests();
+  } catch (err) {
+    list.innerHTML = `<div class="admin-empty">${escapeHtml(err.message)}${/42P01|does not exist|schema cache/i.test(err.message) ? '<br>La table n\'existe pas encore : exécute backend/supabase_service_requests_2026_10.sql dans Supabase.' : ''}</div>`;
+  }
+}
+
+function updateServiceBadge() {
+  const badge = document.getElementById('admin-svc-badge');
+  if (!badge) return;
+  const n = adminSvcRows.filter(r => r.status === 'new').length;
+  badge.textContent = n;
+  badge.hidden = n === 0;
+}
+
+function renderServiceRequests() {
+  updateServiceBadge();
+  const list = document.getElementById('admin-svc-list');
+  if (!list) return;
+  const f = document.getElementById('admin-svc-filter').value;
+  const rows = adminSvcRows.filter(r => f === 'all' ? true : f === 'open' ? (r.status === 'new' || r.status === 'in_progress') : r.status === f);
+  if (!rows.length) {
+    list.innerHTML = '<div class="admin-empty">' + (adminSvcRows.length ? 'Aucune demande dans ce filtre.' : 'Aucune demande pour le moment.') + '</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r => {
+    const when = new Date(r.created_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+    const subject = encodeURIComponent('Votre demande d\'accompagnement — ' + r.equipment);
+    const domains = [r.source_domain, r.target_domain].filter(Boolean).map(escapeHtml).join(' → ');
+    return `
+    <div class="admin-card" id="admin-svc-${r.id}"${r.status === 'new' ? ' style="border-left:3px solid var(--rust)"' : ''}>
+      <div class="admin-card-head">
+        <div>
+          <div class="admin-card-title">${escapeHtml(r.equipment)}</div>
+          <div class="admin-card-meta">${escapeHtml(r.company)} · ${escapeHtml(r.contact_name)} · <a href="mailto:${escapeHtml(r.contact_email)}?subject=${subject}">${escapeHtml(r.contact_email)}</a>${r.contact_phone ? ' · ' + escapeHtml(r.contact_phone) : ''}</div>
+          <div class="admin-card-meta">Reçue le ${when} · ${r.lang === 'en' ? 'anglais' : 'français'}${domains ? ' · ' + domains : ''}${r.objective ? ' · ' + escapeHtml(SVC_OBJECTIVE_LABELS[r.objective] || r.objective) : ''}</div>
+        </div>
+        <span class="tag" style="white-space:nowrap">${escapeHtml(SVC_STATUS_LABELS[r.status] || r.status)}</span>
+      </div>
+      <p style="font-size:12px;color:var(--text2);white-space:pre-wrap;margin:8px 0">${escapeHtml(r.message)}</p>
+      <div class="lead-field" style="max-width:240px"><label>Statut</label>
+        <select id="admin-svc-status-${r.id}">${Object.keys(SVC_STATUS_LABELS).map(k => `<option value="${k}"${k === r.status ? ' selected' : ''}>${SVC_STATUS_LABELS[k]}</option>`).join('')}</select></div>
+      <div class="lead-field"><label>Note interne (jamais visible du demandeur)</label>
+        <textarea id="admin-svc-note-${r.id}" rows="2" maxlength="5000">${escapeHtml(r.admin_note || '')}</textarea></div>
+      <div class="admin-actions">
+        <button class="btn-approve" onclick="saveServiceRequest('${r.id}')">Enregistrer</button>
+        <a class="btn-approve" style="text-align:center;text-decoration:none;background:var(--steel)" href="mailto:${escapeHtml(r.contact_email)}?subject=${subject}">✉ Répondre</a>
+        <button class="btn-reject" onclick="deleteServiceRequest('${r.id}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function saveServiceRequest(id) {
+  const card = document.getElementById('admin-svc-' + id);
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    const status = document.getElementById('admin-svc-status-' + id).value;
+    const note = document.getElementById('admin-svc-note-' + id).value.trim();
+    await adminFetch(`service_requests?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status, admin_note: note || null }),
+    });
+    const row = adminSvcRows.find(r => r.id === id);
+    if (row) { row.status = status; row.admin_note = note || null; }
+    renderServiceRequests();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    card.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+async function deleteServiceRequest(id) {
+  if (!confirm('Supprimer définitivement cette demande ?')) return;
+  const card = document.getElementById('admin-svc-' + id);
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    await adminFetch(`service_requests?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
+    adminSvcRows = adminSvcRows.filter(r => r.id !== id);
+    renderServiceRequests();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    card.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}

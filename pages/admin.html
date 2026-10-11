@@ -19,6 +19,8 @@
 .admin-tab-btn{padding:10px 10px;border:none;background:none;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-5px;white-space:nowrap;transition:color .15s,border-color .15s}
 .admin-tab-btn:hover{color:var(--ink)}
 .admin-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust)}
+.admin-tab-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:9px;background:var(--rust);color:#fff;font-size:11px;font-weight:700;line-height:16px;text-align:center}
+.admin-tab-badge[hidden]{display:none}
 .admin-tab-panel{display:none}
 .admin-tab-panel.active{display:block}
 </style>
@@ -61,6 +63,7 @@
         <button type="button" class="admin-tab-btn" data-tab="submissions" onclick="adminShowTab('submissions')">Soumissions</button>
         <button type="button" class="admin-tab-btn" data-tab="claims" onclick="adminShowTab('claims')">Revendications</button>
         <button type="button" class="admin-tab-btn" data-tab="rfq" onclick="adminShowTab('rfq')">RFQ/RFI/RFP</button>
+        <button type="button" class="admin-tab-btn" data-tab="service" onclick="adminShowTab('service')">Accompagnement <span id="admin-svc-badge" class="admin-tab-badge" hidden>0</span></button>
         <button type="button" class="admin-tab-btn" data-tab="analytics" onclick="adminShowTab('analytics')">Analytics</button>
         <button type="button" class="admin-tab-btn" data-tab="signups" onclick="adminShowTab('signups')">Inscrits</button>
         <button type="button" class="admin-tab-btn" data-tab="users" onclick="adminShowTab('users')">Utilisateurs</button>
@@ -88,6 +91,21 @@
         <span class="submit-section-title" style="margin:0;border:none;padding:0">Dossiers RFQ/RFI/RFP en attente</span>
       </div>
       <div id="admin-rfq-list"></div>
+    </div>
+
+    <div class="admin-tab-panel" data-tab="service">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Demandes d'accompagnement équipements</span>
+        <select id="admin-svc-filter" onchange="renderServiceRequests()" style="font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--white)">
+          <option value="open" selected>À traiter (nouvelles + en cours)</option>
+          <option value="new">Nouvelles</option>
+          <option value="in_progress">En cours</option>
+          <option value="quoted">Devis envoyé</option>
+          <option value="closed">Clôturées</option>
+          <option value="all">Toutes</option>
+        </select>
+      </div>
+      <div id="admin-svc-list"></div>
     </div>
 
     <div class="admin-tab-panel" data-tab="analytics">

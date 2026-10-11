@@ -1008,3 +1008,20 @@ body.theme-dark::after{
 .partner-logo{display:flex;align-items:center;justify-content:center;height:96px;min-width:170px;padding:14px 26px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.02);transition:border-color .15s,background .15s}
 .partner-logo:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.05)}
 .partner-logo img{display:block;max-height:68px;max-width:160px;width:auto;height:auto;object-fit:contain}
+
+/* Service « Accompagnement à la transformation des équipements » : formulaire de demande + bandeau (voir js/pages/service-request.js) */
+.svc-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:26px}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.lead-field select{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;font-family:var(--sans);color:var(--ink);background:var(--paper);outline:none}
+.lead-field select:focus{border-color:var(--steel)}
+.theme-dark .lead-field select{color:#F3F1EC}
+.theme-dark .lead-field select option{color:#1B1B1B;background:#fff}
+.svc-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.svc-consent{font-size:12px;line-height:1.55;color:var(--muted);margin:2px 0 14px}
+.svc-consent a{color:var(--text2);text-decoration:underline}
+.svc-error{color:#E5604D;font-size:13px;margin:10px 0 0}
+.svc-error[hidden]{display:none}
+.svc-banner{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;margin:0 24px 16px;padding:14px 18px;background:var(--white);border:1px solid var(--border);border-left:3px solid var(--rust);border-radius:8px}
+.svc-banner-t{font-size:14px;font-weight:700;color:#F3F1EC}
+.svc-banner-s{font-size:12.5px;color:var(--text2);margin-top:2px}
+@media(max-width:640px){.svc-grid{grid-template-columns:1fr}.svc-card{padding:18px}}
