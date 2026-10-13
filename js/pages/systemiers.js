@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderSystemiers();
   } catch (err) {
     console.error('Erreur Supabase:', err);
-    showLoadError(['companies-list']);
+    showLoadError(['companies-list'], err);
   }
 });
 

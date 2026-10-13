@@ -305,15 +305,22 @@ function showLoading(ids) {
   });
 }
 
-function showLoadError(ids) {
+// Les textes sont ici (et non dans i18n.js) : ce message doit s'afficher correctement même si
+// le fichier de traductions est encore en cache dans une ancienne version.
+function showLoadError(ids, err) {
+  const en = typeof getLang === 'function' && getLang() === 'en';
+  const detail = err && err.message ? escapeHtml(String(err.message).slice(0, 160)) : '';
   const msg = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;background:var(--white);border:1px solid var(--border);border-radius:8px">' +
     '<div style="font-size:28px;margin-bottom:10px">⚠️</div>' +
-    '<p style="color:var(--rust);font-weight:700;font-size:14px;margin-bottom:6px">Impossible de se connecter à Supabase</p>' +
-    '<p style="color:var(--muted);font-size:12px;line-height:1.7">' +
-    'Vérifie que <code>SUPABASE_URL</code> et <code>SUPABASE_ANON</code> sont correctement renseignés dans le code.<br><br>' +
-    'Dans Supabase : <strong>Settings → API</strong> → copie le <em>Project URL</em> et la clé <em>anon public</em>.<br><br>' +
-    'Vérifie aussi que les politiques RLS autorisent la lecture publique (policy <em>companies_read_all</em>).' +
-    '</p></div>';
+    '<p style="color:var(--rust);font-weight:700;font-size:14px;margin-bottom:6px">' + (en ? 'Unable to load the data' : 'Impossible de charger les données') + '</p>' +
+    '<p style="color:var(--muted);font-size:12px;line-height:1.7;max-width:520px;margin:0 auto">' +
+    (en
+      ? 'The connection to Buy-inner was interrupted. Please try again. If the problem persists, a corporate firewall or proxy may be blocking the requests: try another network, or ask your IT team to allow <strong>www.buy-inner.com</strong>.'
+      : 'La connexion à Buy-inner a été interrompue. Réessayez. Si le problème persiste, un pare-feu ou un proxy d\'entreprise bloque peut-être les requêtes : essayez depuis un autre réseau, ou demandez à votre service informatique d\'autoriser <strong>www.buy-inner.com</strong>.') +
+    (detail ? '<br><span style="font-size:11px;opacity:.8">' + (en ? 'Technical detail: ' : 'Détail technique : ') + detail + '</span>' : '') +
+    '</p>' +
+    '<button type="button" onclick="window.location.reload()" style="margin-top:14px;padding:9px 18px;border:none;border-radius:6px;background:var(--rust);color:#fff;font-weight:700;font-size:13px;cursor:pointer">' + (en ? 'Try again' : 'Réessayer') + '</button>' +
+    '</div>';
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = msg;

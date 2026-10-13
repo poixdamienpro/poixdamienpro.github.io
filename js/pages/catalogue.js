@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCompareBanner();
   } catch (err) {
     console.error('Erreur Supabase:', err);
-    showLoadError(['products-list']);
+    showLoadError(['products-list'], err);
   }
 });
 

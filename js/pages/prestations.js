@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCompanies();
   } catch (err) {
     console.error('Erreur Supabase:', err);
-    showLoadError(['companies-list']);
+    showLoadError(['companies-list'], err);
   }
 });
 

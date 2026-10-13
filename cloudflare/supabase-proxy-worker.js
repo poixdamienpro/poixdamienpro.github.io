@@ -1335,9 +1335,19 @@ export default {
     // /api/rest/v1/... -> https://xxx.supabase.co/rest/v1/...
     const target = SUPABASE_ORIGIN + url.pathname.slice('/api'.length) + url.search;
 
+    // Le site n'utilise jamais d'en-tête Range (la pagination passe par limit/offset). Certains
+    // proxys d'entreprise en ajoutent un d'office ; PostgREST répond alors « 416 Range Not
+    // Satisfiable » et tout le site affiche « Impossible de se connecter ». On l'écarte pour
+    // les données et l'authentification (pas pour le stockage de fichiers).
+    const headers = new Headers(request.headers);
+    if (url.pathname.startsWith('/api/rest/') || url.pathname.startsWith('/api/auth/')) {
+      headers.delete('Range');
+      headers.delete('If-Range');
+    }
+
     const proxied = new Request(target, {
       method: request.method,
-      headers: request.headers,
+      headers,
       body: (request.method === 'GET' || request.method === 'HEAD') ? undefined : request.body,
     });
 
