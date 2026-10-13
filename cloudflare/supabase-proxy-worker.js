@@ -1363,6 +1363,13 @@ export default {
       headers.delete('Range');
       headers.delete('If-Range');
     }
+    // Lecture anonyme sans clé dans les en-têtes : certains proxys d'entreprise bloquent les requêtes
+    // qui portent la clé (jeton « eyJ… » dans apikey/Authorization). Le navigateur peut donc l'omettre
+    // et c'est le Worker qui ajoute la clé publique (anon), la même que celle déjà publiée dans le site.
+    if (url.pathname.startsWith('/api/rest/') && !headers.has('apikey') && !headers.has('Authorization')) {
+      headers.set('apikey', SUPABASE_ANON);
+      headers.set('Authorization', 'Bearer ' + SUPABASE_ANON);
+    }
 
     const proxied = new Request(target, {
       method: request.method,

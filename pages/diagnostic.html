@@ -44,7 +44,13 @@
     ['4. Données, avec clé et autorisation', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { headers: H })],
     ['5. Idem, sans cache', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { headers: H, cache: 'no-store' })],
     ['6. Données par POST (comme l\'annuaire)', () => fetch(API + '/rest/v1/rpc/get_companies_page', { method: 'POST', headers: H, body: JSON.stringify({ p_limit: 1, p_offset: 0 }) })],
+    // Tests 7 à 10 : isolent ce que le proxy bloque (la clé dans l'en-tête, le chemin, ou la forme de l'URL).
+    ['7. Point de contrôle + en-tête apikey', () => fetch(API + '/_diag', { headers: { apikey: SUPABASE_ANON }, cache: 'no-store' })],
+    ['8. Point de contrôle + en-tête Authorization', () => fetch(API + '/_diag', { headers: { Authorization: 'Bearer ' + SUPABASE_ANON }, cache: 'no-store' })],
+    ['9. Chemin /rest/v1/ sans aucun en-tête', () => fetch(API + '/rest/v1/', { cache: 'no-store' })],
+    ['10. Point de contrôle + paramètres d\'URL des données', () => fetch(API + '/_diag?select=company_id,tag&limit=50&offset=0', { cache: 'no-store' })],
   ];
+  const results = [];
   let report = '';
 
   function cell(tr, text, cls) { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td); }
@@ -77,10 +83,12 @@
         const cf = r.headers.get('cf-ray') ? 'oui' : 'NON';
         const via = r.headers.get('via') || r.headers.get('x-cache') || r.headers.get('x-forwarded-server') || '-';
         const start = txt.slice(0, 90).replace(/\s+/g, ' ');
+        results.push({ n: parseInt(name, 10), status: r.status, cf: cf === 'oui' });
         cell(tr, r.status + ' (' + ms + ' ms)', r.ok ? 'dg-ok' : 'dg-ko'); cell(tr, server); cell(tr, cf, cf === 'NON' ? 'dg-ko' : ''); cell(tr, via); cell(tr, start);
         lines.push(name + ' => ' + r.status + ' ' + r.statusText + ' | serveur: ' + server + ' | cf-ray: ' + (r.headers.get('cf-ray') || 'AUCUN') + ' | via: ' + via + ' | ' + start);
         if (name.startsWith('2.') && r.ok) { try { const j = JSON.parse(txt); if (j && j.headers) diagBody = j; } catch (e) {} }
       } catch (e) {
+        results.push({ n: parseInt(name, 10), status: 0, cf: false });
         cell(tr, 'ERREUR', 'dg-ko'); cell(tr, e.message); cell(tr, ''); cell(tr, ''); cell(tr, '');
         lines.push(name + ' => ERREUR ' + e.message);
       }
@@ -98,6 +106,18 @@
       if (h['x-forwarded-for'] || h.forwarded) lines.push('>>> Un proxy a ajouté X-Forwarded-For / Forwarded.');
     } else {
       lines.push('Le point de contrôle (test 2) n\'a pas répondu : il est peut-être bloqué, ou le Worker n\'est pas à jour.');
+    }
+    // Verdict automatique : un test est « bloqué » s'il échoue sans que la réponse vienne de Cloudflare.
+    const blocked = n => { const r = results.find(x => x.n === n); return !!r && !r.cf && r.status !== 200; };
+    lines.push('');
+    lines.push('Verdict :');
+    const dataBlocked = [3, 4, 5, 6].some(blocked);
+    if (!dataBlocked) lines.push('  Les appels de données passent : le problème n\'apparaît pas sur ce réseau.');
+    else {
+      if (blocked(7) || blocked(8)) lines.push('  -> Le proxy bloque les requêtes qui portent la clé dans un en-tête (apikey / Authorization).');
+      if (blocked(9)) lines.push('  -> Le proxy bloque le chemin /api/rest/.');
+      if (blocked(10)) lines.push('  -> Le proxy bloque la forme des paramètres d\'URL (select=, limit=, offset=).');
+      if (!blocked(7) && !blocked(8) && !blocked(9) && !blocked(10)) lines.push('  -> Cause non isolée par ces tests (voir le détail ci-dessus).');
     }
     report = lines.join('\n');
     const ta = document.createElement('textarea'); ta.className = 'dg-report'; ta.readOnly = true; ta.value = report;
