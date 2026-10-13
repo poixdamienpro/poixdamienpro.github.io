@@ -55,6 +55,7 @@
     // Tests 13 et 14 : chemin neutre /data/ (le Worker le traduit en /rest/v1/), sans clé.
     ['13. Chemin neutre /data/, GET (nouveau repli)', () => fetch(API + '/data/company_tags?select=tag&limit=1', { cache: 'no-store' })],
     ['14. Chemin neutre /data/, POST (nouveau repli)', () => fetch(API + '/data/rpc/get_companies_page', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_limit: 1, p_offset: 0 }), cache: 'no-store' })],
+    ['15. Réponse avec en-tête Content-Range (test de l\'hypothèse)', () => fetch(API + '/_diag?cr=1', { cache: 'no-store' })],
   ];
   const results = [];
   let report = '';
@@ -119,6 +120,8 @@
     lines.push('Verdict :');
     const dataBlocked = [3, 4, 5, 6].some(blocked);
     const passed = n => { const r = results.find(x => x.n === n); return !!r && r.status === 200 && r.cf; };
+    if (blocked(15) && passed(2)) lines.push('  >>> CAUSE PROBABLE : le proxy bloque les réponses qui portent l\'en-tête Content-Range (ajouté par la base de données à chaque réponse de données). Le Worker doit le retirer (déjà prévu : redéployer le Worker).');
+    else if (passed(15) && dataBlocked) lines.push('  >>> Le proxy laisse passer un Content-Range : l\'hypothèse est écartée.');
     if (!dataBlocked) lines.push('  Les appels de données passent : le problème n\'apparaît pas sur ce réseau.');
     else {
       if (blocked(7) || blocked(8)) lines.push('  -> Le proxy bloque toute requête qui porte la clé dans un en-tête (apikey / Authorization).');

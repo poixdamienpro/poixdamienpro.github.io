@@ -177,6 +177,7 @@ async function sendTemplateEmail(env, type, to, params) {
 // réponse ne va qu'à celui qui a fait la requête.
 const DIAG_REDACTED = new Set(['authorization', 'cookie', 'apikey', 'x-api-key', 'cf-connecting-ip', 'x-real-ip']);
 function handleDiag(request) {
+  const extra = new URL(request.url).searchParams.get('cr') === '1' ? { 'Content-Range': '0-0/*' } : {};
   const headers = {};
   for (const [k, v] of request.headers) headers[k] = DIAG_REDACTED.has(k.toLowerCase()) ? '(masqué)' : v.slice(0, 200);
   const cf = request.cf || {};
@@ -185,7 +186,7 @@ function handleDiag(request) {
     method: request.method,
     headers,
     cf: { colo: cf.colo || null, country: cf.country || null, httpProtocol: cf.httpProtocol || null, tlsVersion: cf.tlsVersion || null },
-  }, null, 1), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...CORS_HEADERS } });
+  }, null, 1), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...extra, ...CORS_HEADERS } });
 }
 
 async function handleSendEmail(request, env) {
@@ -1381,6 +1382,18 @@ export default {
       body: (request.method === 'GET' || request.method === 'HEAD') ? undefined : request.body,
     });
 
-    return fetch(proxied);
+    const upstream = await fetch(proxied);
+
+    // PostgREST ajoute « Content-Range: 0-49/* » à chaque réponse de données, même quand aucun Range
+    // n'a été demandé. Certains proxys d'entreprise jugent alors la réponse incohérente et fabriquent
+    // eux-mêmes une page « 416 Requested range not satisfiable » : le site n'affiche plus rien.
+    // Le site ne lit jamais cet en-tête (pagination par limit/offset) : on le retire.
+    if (apiPath.startsWith('/rest/')) {
+      const res = new Response(upstream.body, upstream);
+      res.headers.delete('Content-Range');
+      res.headers.delete('Accept-Ranges');
+      return res;
+    }
+    return upstream;
   },
 };
