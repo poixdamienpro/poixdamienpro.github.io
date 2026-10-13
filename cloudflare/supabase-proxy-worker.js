@@ -22,6 +22,9 @@
 //    a une description_en ; sinon elle reste noindex et aucune balise
 //    hreflang n'est émise, pour ne jamais présenter à Google une page
 //    « anglaise » qui serait en fait du français.
+//  - /pages/annuaire.html, catalogue.html, prestations.html, systemiers.html : ajoute en bas de page la liste
+//    texte des entreprises / produits (liens vers les fiches), masquée, pour les robots qui n'exécutent pas
+//    JavaScript. Retirée par js/api.js dès que la page prend la main ; affichée si le chargement échoue.
 //  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des fiches
 //    (toutes les fiches visibles en FR ; seulement les fiches traduites en
 //    EN), déclarés dans robots.txt, régénérés depuis la base (cache 1 h).
@@ -52,6 +55,10 @@
 //   www.buy-inner.com/pages/produit.html*
 //   www.buy-inner.com/en/company.html*
 //   www.buy-inner.com/en/product.html*
+//   www.buy-inner.com/pages/annuaire.html*
+//   www.buy-inner.com/pages/catalogue.html*
+//   www.buy-inner.com/pages/prestations.html*
+//   www.buy-inner.com/pages/systemiers.html*
 //   www.buy-inner.com/sitemap-en.xml
 //   www.buy-inner.com/sitemap-fr.xml
 //
@@ -1336,6 +1343,107 @@ ${urls.join('\n')}
   return response;
 }
 
+// ── Pages de listes (annuaire, catalogue, prestations, systémiers) ──────────────────────────
+// Ces pages se remplissent par JavaScript : un robot qui n'exécute pas de script n'y voit qu'une coquille vide.
+// On ajoute donc en bas de page une liste texte (liens vers les fiches), visuellement masquée. Dès que le
+// script de la page démarre il la retire (js/api.js showLoading) ; si le chargement des données échoue, il
+// l'affiche à la place de l'erreur (showLoadError). Contenu identique à ce que la page affiche ensuite.
+//
+// À tenir à jour avec js/pages/prestations.js (SERVICE_CATS), js/pages/catalogue.js (CATALOGUE_EXCLUDED_CATS)
+// et js/pages/systemiers.js (SYSTEMIER_CATS).
+const SERVICE_CATS = [
+  'Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques',
+  'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système',
+  'Segment sol & opérations', 'Sous-traitance électronique (EMS)', 'Distribution de composants', 'Prestation IA & data',
+];
+const CATALOGUE_EXCLUDED_CATS = [...SERVICE_CATS, 'Lanceurs', 'Plateformes satellites', 'Véhicules'];
+const LIST_PAGES = { '/pages/annuaire.html': 'annuaire', '/pages/catalogue.html': 'catalogue', '/pages/prestations.html': 'prestations', '/pages/systemiers.html': 'systemiers' };
+
+const shortText = (s, n = 110) => {
+  const t = String(s || '').replace(/\s+/g, ' ').trim();
+  return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : t;
+};
+const groupBy = (rows, keyFn) => {
+  const m = new Map();
+  for (const r of rows) { const k = keyFn(r) || 'Autres'; if (!m.has(k)) m.set(k, []); m.get(k).push(r); }
+  return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0], 'fr'));
+};
+const byName = (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'fr');
+const companyLi = c => `<li><a href="/pages/entreprise.html?id=${escapeHtml(c.id)}">${escapeHtml(c.name)}</a> — ${escapeHtml(stripEmoji(c.country))}${c.hq ? ', ' + escapeHtml(c.hq) : ''}${c.description ? ' : ' + escapeHtml(shortText(c.description)) : ''}</li>`;
+const productLi = p => `<li><a href="/pages/produit.html?id=${escapeHtml(p.id)}">${escapeHtml(p.name)}</a> — ${escapeHtml(p.company_name || '')}</li>`;
+const sectionHtml = (heading, items) => `<h3>${escapeHtml(heading)} (${items.length})</h3><ul>${items.join('')}</ul>`;
+
+// Lignes d'une table REST paginées (plafond serveur de 50 lignes par requête).
+async function fetchAllRest(path) {
+  const headers = { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON };
+  let all = [];
+  for (let offset = 0; ; offset += 50) {
+    const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/${path}${path.includes('?') ? '&' : '?'}limit=50&offset=${offset}`, { headers });
+    if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+    const page = await res.json();
+    all = all.concat(page);
+    if (page.length < 50) break;
+  }
+  return all;
+}
+
+async function buildListBlock(kind) {
+  const companies = (await fetchAllRpc('get_companies_page')).filter(c => !c.hidden);
+  let title, intro, sections;
+  if (kind === 'annuaire' || kind === 'systemiers') {
+    const rows = (kind === 'systemiers' ? companies.filter(c => c.is_systemier) : companies).sort(byName);
+    sections = groupBy(rows, c => c.industry).map(([k, v]) => sectionHtml(k, v.map(companyLi)));
+    if (kind === 'annuaire') {
+      title = 'Annuaire des fabricants industriels';
+      intro = `${rows.length} fabricants et équipementiers industriels référencés sur Buy-inner, classés par secteur. Chaque fiche présente l'entreprise et ses produits, et permet de demander un devis.`;
+    } else {
+      title = 'Systémiers : entreprises qui livrent un système complet';
+      intro = `${rows.length} systémiers (plateformes satellites, lanceurs, véhicules…) référencés sur Buy-inner, classés par secteur.`;
+    }
+  } else if (kind === 'catalogue') {
+    const visible = new Set(companies.map(c => c.id));
+    const products = (await fetchAllRpc('get_products_page')).filter(p => visible.has(p.company_id) && !CATALOGUE_EXCLUDED_CATS.includes(p.category)).sort(byName);
+    sections = groupBy(products, p => p.category).map(([k, v]) => sectionHtml(k, v.map(productLi)));
+    title = 'Catalogue de produits et spécifications';
+    intro = `${products.length} produits industriels référencés sur Buy-inner par ${new Set(products.map(p => p.company_id)).size} fabricants, classés par catégorie. Chaque fiche détaille les caractéristiques techniques.`;
+  } else if (kind === 'prestations') {
+    const inList = SERVICE_CATS.map(c => '"' + c.replace(/"/g, '') + '"').join(',');
+    const rows = await fetchAllRest(`company_product_categories?select=company_id,category&category=in.(${encodeURIComponent(inList)})&order=company_id,category`);
+    const byId = new Map(companies.map(c => [c.id, c]));
+    const perCat = new Map();
+    for (const r of rows) { const c = byId.get(r.company_id); if (!c) continue; if (!perCat.has(r.category)) perCat.set(r.category, []); perCat.get(r.category).push(c); }
+    sections = SERVICE_CATS.filter(k => perCat.has(k)).map(k => sectionHtml(k, perCat.get(k).sort(byName).map(companyLi)));
+    const n = new Set(rows.filter(r => byId.has(r.company_id)).map(r => r.company_id)).size;
+    title = 'Prestataires de services industriels';
+    intro = `${n} prestataires de services industriels référencés sur Buy-inner : ${SERVICE_CATS.join(', ')}.`;
+  } else return '';
+  if (!sections.length) return '';
+  // Masquage EN LIGNE (et non seulement via la classe de styles.css) : le bloc ne doit jamais apparaître à l'écran,
+  // même si la feuille de styles ou js/api.js sont encore en cache dans une ancienne version.
+  return `<section id="ssr-directory" class="ssr-only" style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(intro)}</p>${sections.join('')}</section>`;
+}
+
+// Le bloc est reconstruit au plus une fois par heure (cache), la page elle-même n'est jamais mise en cache ici.
+async function getListBlock(kind, ctx) {
+  const cache = caches.default;
+  const key = new Request(`${SITE_URL}/__ssr-list/${kind}`);
+  const hit = await cache.match(key);
+  if (hit) return hit.text();
+  const html = await buildListBlock(kind);
+  if (html) ctx.waitUntil(cache.put(key, new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } })));
+  return html;
+}
+
+async function handleListPage(kind, request, env, ctx) {
+  const url = new URL(request.url);
+  const originRes = await fetch(GITHUB_PAGES_ORIGIN + url.pathname + url.search);
+  if (request.method !== 'GET' || !originRes.ok) return originRes;
+  let block = '';
+  try { block = await getListBlock(kind, ctx); } catch (e) { return originRes; }   // échec : la page d'origine, inchangée
+  if (!block) return originRes;
+  return new HTMLRewriter().on('body', new AppendHtml(block)).transform(originRes);
+}
+
 async function handleStripeWebhook(request, env) {
   if (!env.STRIPE_WEBHOOK_SECRET || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: 'Webhook Stripe non configuré sur le Worker' }, 500);
@@ -1392,6 +1500,9 @@ export default {
     }
     if (url.pathname === '/en/product.html') {
       return handleEntityPage('product', 'en', request, env, ctx);
+    }
+    if (LIST_PAGES[url.pathname]) {
+      return handleListPage(LIST_PAGES[url.pathname], request, env, ctx);
     }
     if (url.pathname === '/sitemap-en.xml') {
       return handleSitemap('en', request, env, ctx);

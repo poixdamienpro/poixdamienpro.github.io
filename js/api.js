@@ -296,6 +296,10 @@ async function loadTaxonomy() {
 }
 
 function showLoading(ids) {
+  // Liste texte ajoutée par le Worker pour les robots sans JavaScript : retirée dès que la page prend la main,
+  // mais gardée en mémoire pour être affichée si le chargement des données échoue (voir showLoadError).
+  const ssr = document.getElementById('ssr-directory');
+  if (ssr) { window._ssrDirectory = ssr.innerHTML; ssr.remove(); }
   const msg = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px">' +
     '<div style="font-size:30px;display:inline-block;animation:spin 1s linear infinite">⚙️</div>' +
     '<p style="color:var(--muted);margin-top:12px;font-size:13px">' + (typeof t === 'function' ? t('loading') : 'Chargement des données…') + '</p></div>';
@@ -320,6 +324,8 @@ function showLoadError(ids, err) {
     (detail ? '<br><span style="font-size:11px;opacity:.8">' + (en ? 'Technical detail: ' : 'Détail technique : ') + detail + '</span>' : '') +
     '</p>' +
     '<button type="button" onclick="window.location.reload()" style="margin-top:14px;padding:9px 18px;border:none;border-radius:6px;background:var(--rust);color:#fff;font-weight:700;font-size:13px;cursor:pointer">' + (en ? 'Try again' : 'Réessayer') + '</button>' +
+    // Liste fournie par le serveur : le visiteur peut quand même parcourir et ouvrir les fiches.
+    (window._ssrDirectory ? '<div class="ssr-fallback">' + window._ssrDirectory + '</div>' : '') +
     '</div>';
   ids.forEach(id => {
     const el = document.getElementById(id);
