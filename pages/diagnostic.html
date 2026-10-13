@@ -49,6 +49,9 @@
     ['8. Point de contrôle + en-tête Authorization', () => fetch(API + '/_diag', { headers: { Authorization: 'Bearer ' + SUPABASE_ANON }, cache: 'no-store' })],
     ['9. Chemin /rest/v1/ sans aucun en-tête', () => fetch(API + '/rest/v1/', { cache: 'no-store' })],
     ['10. Point de contrôle + paramètres d\'URL des données', () => fetch(API + '/_diag?select=company_id,tag&limit=50&offset=0', { cache: 'no-store' })],
+    // Tests 11 et 12 : exactement ce que fait le repli du site (données SANS clé dans les en-têtes ; le Worker l'ajoute).
+    ['11. Données SANS clé (repli du site), GET', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { cache: 'no-store' })],
+    ['12. Données SANS clé (repli du site), POST', () => fetch(API + '/rest/v1/rpc/get_companies_page', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_limit: 1, p_offset: 0 }), cache: 'no-store' })],
   ];
   const results = [];
   let report = '';
@@ -112,12 +115,15 @@
     lines.push('');
     lines.push('Verdict :');
     const dataBlocked = [3, 4, 5, 6].some(blocked);
+    const passed = n => { const r = results.find(x => x.n === n); return !!r && r.status === 200 && r.cf; };
     if (!dataBlocked) lines.push('  Les appels de données passent : le problème n\'apparaît pas sur ce réseau.');
     else {
-      if (blocked(7) || blocked(8)) lines.push('  -> Le proxy bloque les requêtes qui portent la clé dans un en-tête (apikey / Authorization).');
-      if (blocked(9)) lines.push('  -> Le proxy bloque le chemin /api/rest/.');
-      if (blocked(10)) lines.push('  -> Le proxy bloque la forme des paramètres d\'URL (select=, limit=, offset=).');
-      if (!blocked(7) && !blocked(8) && !blocked(9) && !blocked(10)) lines.push('  -> Cause non isolée par ces tests (voir le détail ci-dessus).');
+      if (blocked(7) || blocked(8)) lines.push('  -> Le proxy bloque toute requête qui porte la clé dans un en-tête (apikey / Authorization).');
+      else if (blocked(9)) lines.push('  -> Le proxy bloque le chemin /api/rest/.');
+      else if (blocked(10)) lines.push('  -> Le proxy bloque la forme des paramètres d\'URL (select=, limit=, offset=).');
+      else lines.push('  -> Le proxy bloque l\'association « chemin /rest/v1/ + clé dans l\'en-tête » (signature des requêtes Supabase) : la clé seule, le chemin seul et les paramètres seuls passent.');
+      if (passed(11) && passed(12)) lines.push('  => Les données SANS clé passent (tests 11 et 12) : le repli du site fonctionne, le site doit se charger (Ctrl+F5).');
+      else if (results.some(x => x.n === 11 || x.n === 12)) lines.push('  => Même sans clé, les données sont bloquées (tests 11/12) : une exception côté service informatique est nécessaire pour www.buy-inner.com.');
     }
     report = lines.join('\n');
     const ta = document.createElement('textarea'); ta.className = 'dg-report'; ta.readOnly = true; ta.value = report;
