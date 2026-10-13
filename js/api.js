@@ -29,39 +29,9 @@ function escapeJsAttr(str) {
   return escapeHtml(jsSafe);
 }
 
-// Réseaux d'entreprise : certains proxys bloquent (réponse « 416 » ou coupure) toute requête qui porte
-// la clé publique dans un en-tête. Pour une lecture anonyme, on tente d'abord normalement ; si cela
-// échoue, on réessaie SANS clé (le Worker ajoute la clé publique côté serveur) et on s'en souvient
-// pour la session, afin de ne pas doubler chaque requête. Aucun effet pour un visiteur dont le réseau
-// laisse passer la requête normale.
-function biIsAnonymous(options) {
-  const a = options && options.headers && options.headers['Authorization'];
-  return !a || a === 'Bearer ' + SUPABASE_ANON;
-}
-function biStripKeys(options) {
-  const h = { ...(options.headers || {}) };
-  delete h['apikey']; delete h['Authorization'];
-  return { ...options, headers: h };
-}
-// Chemin neutre : /rest/v1/ devient /data/ (le Worker fait la traduction). Certains pare-feu
-// reconnaissent la signature « /rest/v1/ » des API Supabase et coupent la requête.
-function biNeutralUrl(url) { return String(url).replace('/rest/v1/', '/data/'); }
-async function biFetch(url, options = {}) {
-  const anon = biIsAnonymous(options);
-  let noKey = false;
-  try { noKey = anon && sessionStorage.getItem('bi_nokey') === '1'; } catch (e) {}
-  if (noKey) return fetch(biNeutralUrl(url), biStripKeys(options));
-  let res = null, failed = false;
-  try { res = await fetch(url, options); failed = res.status === 416; } catch (e) { failed = true; if (!anon) throw e; }
-  if (!failed || !anon) return res;
-  const retry = await fetch(biNeutralUrl(url), biStripKeys(options));
-  if (retry.ok) { try { sessionStorage.setItem('bi_nokey', '1'); } catch (e) {} }
-  return retry;
-}
-
 async function supabase(table, params = '') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${params ? '?' + params : ''}`;
-  const res = await biFetch(url, {
+  const res = await fetch(url, {
     headers: {
       'apikey': SUPABASE_ANON,
       'Authorization': 'Bearer ' + SUPABASE_ANON,
@@ -80,7 +50,7 @@ async function fetchAllPaged(rpcName, pageSize = 50) {
   let all = [];
   let offset = 0;
   while (true) {
-    const res = await biFetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_ANON,
@@ -121,7 +91,7 @@ async function fetchAllPagedTable(table, selectParams, pageSize = 50) {
 // Appelle une RPC Supabase et retourne ses lignes — voir
 // backend/supabase_add_detail_page_rpcs.sql.
 async function fetchRpc(rpcName, params) {
-  const res = await biFetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
     method: 'POST',
     headers: {
       'apikey': SUPABASE_ANON,
