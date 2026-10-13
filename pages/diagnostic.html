@@ -52,6 +52,9 @@
     // Tests 11 et 12 : exactement ce que fait le repli du site (données SANS clé dans les en-têtes ; le Worker l'ajoute).
     ['11. Données SANS clé (repli du site), GET', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { cache: 'no-store' })],
     ['12. Données SANS clé (repli du site), POST', () => fetch(API + '/rest/v1/rpc/get_companies_page', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_limit: 1, p_offset: 0 }), cache: 'no-store' })],
+    // Tests 13 et 14 : chemin neutre /data/ (le Worker le traduit en /rest/v1/), sans clé.
+    ['13. Chemin neutre /data/, GET (nouveau repli)', () => fetch(API + '/data/company_tags?select=tag&limit=1', { cache: 'no-store' })],
+    ['14. Chemin neutre /data/, POST (nouveau repli)', () => fetch(API + '/data/rpc/get_companies_page', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ p_limit: 1, p_offset: 0 }), cache: 'no-store' })],
   ];
   const results = [];
   let report = '';
@@ -122,6 +125,8 @@
       else if (blocked(9)) lines.push('  -> Le proxy bloque le chemin /api/rest/.');
       else if (blocked(10)) lines.push('  -> Le proxy bloque la forme des paramètres d\'URL (select=, limit=, offset=).');
       else lines.push('  -> Le proxy bloque l\'association « chemin /rest/v1/ + clé dans l\'en-tête » (signature des requêtes Supabase) : la clé seule, le chemin seul et les paramètres seuls passent.');
+      if (passed(13) && passed(14)) lines.push('  => Le chemin neutre /data/ passe (tests 13 et 14) : le repli du site l\'utilise, le site doit se charger (Ctrl+F5).');
+      else if (results.some(x => x.n === 13 || x.n === 14)) lines.push('  => Même le chemin neutre /data/ est bloqué (tests 13/14) : le proxy reconnaît autre chose (forme des paramètres ou de la réponse).');
       if (passed(11) && passed(12)) lines.push('  => Les données SANS clé passent (tests 11 et 12) : le repli du site fonctionne, le site doit se charger (Ctrl+F5).');
       else if (results.some(x => x.n === 11 || x.n === 12)) lines.push('  => Même sans clé, les données sont bloquées (tests 11/12) : une exception côté service informatique est nécessaire pour www.buy-inner.com.');
     }

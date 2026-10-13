@@ -1352,21 +1352,25 @@ export default {
     }
 
     // /api/rest/v1/... -> https://xxx.supabase.co/rest/v1/...
-    const target = SUPABASE_ORIGIN + url.pathname.slice('/api'.length) + url.search;
+    // Chemin neutre : /api/data/... -> /rest/v1/... Certains pare-feu d'entreprise reconnaissent la
+    // signature « /rest/v1/ » (API Supabase) et coupent la requête ; /api/data/ n'évoque rien.
+    let apiPath = url.pathname.slice('/api'.length);
+    if (apiPath.startsWith('/data/')) apiPath = '/rest/v1/' + apiPath.slice('/data/'.length);
+    const target = SUPABASE_ORIGIN + apiPath + url.search;
 
     // Le site n'utilise jamais d'en-tête Range (la pagination passe par limit/offset). Certains
     // proxys d'entreprise en ajoutent un d'office ; PostgREST répond alors « 416 Range Not
     // Satisfiable » et tout le site affiche « Impossible de se connecter ». On l'écarte pour
     // les données et l'authentification (pas pour le stockage de fichiers).
     const headers = new Headers(request.headers);
-    if (url.pathname.startsWith('/api/rest/') || url.pathname.startsWith('/api/auth/')) {
+    if (apiPath.startsWith('/rest/') || apiPath.startsWith('/auth/')) {
       headers.delete('Range');
       headers.delete('If-Range');
     }
     // Lecture anonyme sans clé dans les en-têtes : certains proxys d'entreprise bloquent les requêtes
     // qui portent la clé (jeton « eyJ… » dans apikey/Authorization). Le navigateur peut donc l'omettre
     // et c'est le Worker qui ajoute la clé publique (anon), la même que celle déjà publiée dans le site.
-    if (url.pathname.startsWith('/api/rest/') && !headers.has('apikey') && !headers.has('Authorization')) {
+    if (apiPath.startsWith('/rest/') && !headers.has('apikey') && !headers.has('Authorization')) {
       headers.set('apikey', SUPABASE_ANON);
       headers.set('Authorization', 'Bearer ' + SUPABASE_ANON);
     }

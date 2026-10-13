@@ -43,15 +43,18 @@ function biStripKeys(options) {
   delete h['apikey']; delete h['Authorization'];
   return { ...options, headers: h };
 }
+// Chemin neutre : /rest/v1/ devient /data/ (le Worker fait la traduction). Certains pare-feu
+// reconnaissent la signature « /rest/v1/ » des API Supabase et coupent la requête.
+function biNeutralUrl(url) { return String(url).replace('/rest/v1/', '/data/'); }
 async function biFetch(url, options = {}) {
   const anon = biIsAnonymous(options);
   let noKey = false;
   try { noKey = anon && sessionStorage.getItem('bi_nokey') === '1'; } catch (e) {}
-  if (noKey) return fetch(url, biStripKeys(options));
+  if (noKey) return fetch(biNeutralUrl(url), biStripKeys(options));
   let res = null, failed = false;
   try { res = await fetch(url, options); failed = res.status === 416; } catch (e) { failed = true; if (!anon) throw e; }
   if (!failed || !anon) return res;
-  const retry = await fetch(url, biStripKeys(options));
+  const retry = await fetch(biNeutralUrl(url), biStripKeys(options));
   if (retry.ok) { try { sessionStorage.setItem('bi_nokey', '1'); } catch (e) {} }
   return retry;
 }
