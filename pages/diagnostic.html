@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Diagnostic de connexion · Buy-inner</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<style>
+.dg-wrap{max-width:860px;margin:0 auto;padding:32px 24px 64px}
+.dg-btn{padding:12px 22px;border:none;border-radius:6px;background:var(--rust);color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.dg-btn[disabled]{opacity:.6;cursor:wait}
+.dg-btn-alt{background:transparent;border:1px solid var(--border2);color:#F3F1EC;margin-left:8px}
+.dg-table{width:100%;border-collapse:collapse;margin:22px 0;font-size:12px}
+.dg-table th,.dg-table td{border:1px solid var(--border);padding:7px 9px;text-align:left;vertical-align:top;color:var(--text2)}
+.dg-table th{color:#F3F1EC;background:rgba(255,255,255,.04)}
+.dg-ok{color:#86D6AC;font-weight:700}.dg-ko{color:#E5604D;font-weight:700}
+.dg-report{width:100%;min-height:220px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--paper);color:#F3F1EC;border:1px solid var(--border);border-radius:6px;padding:10px}
+</style>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = '';</script>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+<main class="dg-wrap">
+  <h1 class="page-title" style="margin-bottom:8px">Diagnostic de connexion</h1>
+  <p class="cat-intro" style="margin-bottom:18px">Cette page teste, étape par étape, la connexion entre votre réseau et Buy-inner, pour comprendre pourquoi le site ne charge pas ses données. Elle n'envoie aucune information personnelle. Cliquez sur le bouton, puis envoyez-nous le rapport affiché.</p>
+  <button class="dg-btn" id="dg-run" type="button">Lancer le test</button>
+  <button class="dg-btn dg-btn-alt" id="dg-copy" type="button" hidden>Copier le rapport</button>
+  <div id="dg-out"></div>
+</main>
+<div id="footer-slot"></div>
+
+<script src="../js/data.js"></script>
+<script>
+(function () {
+  const H = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
+  const API = SUPABASE_URL;
+  const tests = [
+    ['1. Page du site (fichier statique)', () => fetch('faq.html', { cache: 'no-store' })],
+    ['2. Point de contrôle du Worker (ce qu\'il reçoit)', () => fetch(API + '/_diag', { cache: 'no-store' })],
+    ['3. Données, requête simple avec clé', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { headers: { apikey: SUPABASE_ANON } })],
+    ['4. Données, avec clé et autorisation', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { headers: H })],
+    ['5. Idem, sans cache', () => fetch(API + '/rest/v1/company_tags?select=tag&limit=1', { headers: H, cache: 'no-store' })],
+    ['6. Données par POST (comme l\'annuaire)', () => fetch(API + '/rest/v1/rpc/get_companies_page', { method: 'POST', headers: H, body: JSON.stringify({ p_limit: 1, p_offset: 0 }) })],
+  ];
+  let report = '';
+
+  function cell(tr, text, cls) { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td); }
+
+  async function run() {
+    const btn = document.getElementById('dg-run'); btn.disabled = true; btn.textContent = 'Test en cours…';
+    const out = document.getElementById('dg-out'); out.innerHTML = '';
+    const lines = [
+      'Buy-inner — rapport de diagnostic',
+      'Date : ' + new Date().toISOString(),
+      'Adresse : ' + location.href,
+      'Navigateur : ' + navigator.userAgent,
+      'En ligne : ' + navigator.onLine,
+      '',
+    ];
+    const table = document.createElement('table'); table.className = 'dg-table';
+    table.innerHTML = '<thead><tr><th>Test</th><th>Résultat</th><th>Serveur</th><th>Cloudflare</th><th>Via / proxy</th><th>Début de la réponse</th></tr></thead>';
+    const body = document.createElement('tbody'); table.appendChild(body); out.appendChild(table);
+    let diagBody = null;
+
+    for (const [name, fn] of tests) {
+      const tr = document.createElement('tr'); body.appendChild(tr);
+      cell(tr, name);
+      const t0 = performance.now();
+      try {
+        const r = await fn();
+        const txt = (await r.text());
+        const ms = Math.round(performance.now() - t0);
+        const server = r.headers.get('server') || '-';
+        const cf = r.headers.get('cf-ray') ? 'oui' : 'NON';
+        const via = r.headers.get('via') || r.headers.get('x-cache') || r.headers.get('x-forwarded-server') || '-';
+        const start = txt.slice(0, 90).replace(/\s+/g, ' ');
+        cell(tr, r.status + ' (' + ms + ' ms)', r.ok ? 'dg-ok' : 'dg-ko'); cell(tr, server); cell(tr, cf, cf === 'NON' ? 'dg-ko' : ''); cell(tr, via); cell(tr, start);
+        lines.push(name + ' => ' + r.status + ' ' + r.statusText + ' | serveur: ' + server + ' | cf-ray: ' + (r.headers.get('cf-ray') || 'AUCUN') + ' | via: ' + via + ' | ' + start);
+        if (name.startsWith('2.') && r.ok) { try { const j = JSON.parse(txt); if (j && j.headers) diagBody = j; } catch (e) {} }
+      } catch (e) {
+        cell(tr, 'ERREUR', 'dg-ko'); cell(tr, e.message); cell(tr, ''); cell(tr, ''); cell(tr, '');
+        lines.push(name + ' => ERREUR ' + e.message);
+      }
+    }
+
+    lines.push('');
+    if (diagBody) {
+      lines.push('En-têtes reçus par le Worker (test 2) :');
+      Object.keys(diagBody.headers).sort().forEach(k => lines.push('  ' + k + ': ' + diagBody.headers[k]));
+      lines.push('  cf: ' + JSON.stringify(diagBody.cf));
+      const h = diagBody.headers;
+      lines.push('');
+      lines.push(h.range ? '>>> ATTENTION : un en-tête Range a été ajouté en chemin : ' + h.range : 'Aucun en-tête Range reçu sur ce test.');
+      if (h.via) lines.push('>>> En-tête Via (proxy intermédiaire) : ' + h.via);
+      if (h['x-forwarded-for'] || h.forwarded) lines.push('>>> Un proxy a ajouté X-Forwarded-For / Forwarded.');
+    } else {
+      lines.push('Le point de contrôle (test 2) n\'a pas répondu : il est peut-être bloqué, ou le Worker n\'est pas à jour.');
+    }
+    report = lines.join('\n');
+    const ta = document.createElement('textarea'); ta.className = 'dg-report'; ta.readOnly = true; ta.value = report;
+    out.appendChild(ta);
+    document.getElementById('dg-copy').hidden = false;
+    btn.disabled = false; btn.textContent = 'Relancer le test';
+  }
+
+  document.getElementById('dg-run').addEventListener('click', run);
+  document.getElementById('dg-copy').addEventListener('click', async function () {
+    try { await navigator.clipboard.writeText(report); this.textContent = 'Copié ✓'; } catch (e) { document.querySelector('.dg-report').select(); }
+  });
+})();
+</script>
+<script src="../js/i18n.js"></script>
+<script src="../js/layout.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => loadLayout());</script>
+</body>
+</html>

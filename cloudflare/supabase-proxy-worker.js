@@ -171,6 +171,23 @@ async function sendTemplateEmail(env, type, to, params) {
   return sendViaResend(env, to, subject, html);
 }
 
+// Diagnostic réseau (pages/diagnostic.html) : renvoie à l'appelant les en-têtes que le Worker a
+// réellement reçus, pour voir ce qu'un proxy d'entreprise a ajouté ou modifié en chemin (Range, Via,
+// X-Forwarded-For…). Aucune donnée sensible : les en-têtes d'identification sont masqués, et la
+// réponse ne va qu'à celui qui a fait la requête.
+const DIAG_REDACTED = new Set(['authorization', 'cookie', 'apikey', 'x-api-key', 'cf-connecting-ip', 'x-real-ip']);
+function handleDiag(request) {
+  const headers = {};
+  for (const [k, v] of request.headers) headers[k] = DIAG_REDACTED.has(k.toLowerCase()) ? '(masqué)' : v.slice(0, 200);
+  const cf = request.cf || {};
+  return new Response(JSON.stringify({
+    ok: true,
+    method: request.method,
+    headers,
+    cf: { colo: cf.colo || null, country: cf.country || null, httpProtocol: cf.httpProtocol || null, tlsVersion: cf.tlsVersion || null },
+  }, null, 1), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...CORS_HEADERS } });
+}
+
 async function handleSendEmail(request, env) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
@@ -1292,6 +1309,8 @@ export default {
     if (url.pathname === '/sitemap-fr.xml') {
       return handleSitemap('fr', request, env, ctx);
     }
+
+    if (url.pathname === '/api/_diag') return handleDiag(request);
 
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
