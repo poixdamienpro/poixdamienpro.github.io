@@ -95,6 +95,7 @@ function onLangChange() {
 // fiche sans revendiquer une éligibilité aux résultats enrichis Produit
 // qu'on ne peut pas honnêtement remplir.
 function injectProductJsonLd(p) {
+  if (document.querySelector('script[type="application/ld+json"][data-ssr]')) return; // déjà fourni par le serveur (Worker)
   const script = document.createElement('script');
   script.type = 'application/ld+json';
   script.textContent = JSON.stringify({

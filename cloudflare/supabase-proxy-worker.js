@@ -1090,14 +1090,40 @@ class AppendHtml {
 // Contenu (titre, description, en-tête, corps) d'une fiche dans une langue.
 // Le français reproduit exactement l'ancien rendu ; l'anglais utilise
 // description_en (repli sur le français si vide) et les libellés traduits.
-function companyContent(c, lang) {
+// Spécifications visibles sans compte : MÊME règle que js/pages/produit.js (FREE_SPEC_COUNT, spécifications
+// non premium d'abord). Les robots voient donc exactement ce que voit un visiteur non connecté, jamais plus.
+const FREE_SPEC_COUNT = 3;
+
+// Retire les drapeaux et émojis d'un libellé (« 🇫🇷 France » -> « France »), pour les données structurées.
+const stripEmoji = s => String(s || '').replace(/\p{Regional_Indicator}|\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\s+/g, ' ').trim();
+const isHttpUrl = u => /^https?:\/\//i.test(String(u || ''));
+// Données structurées prêtes à insérer dans <head> ; « < » échappé pour qu'aucun texte ne puisse fermer la balise.
+const ldScript = obj => `<script type="application/ld+json" data-ssr="1">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
+
+function companyContent(c, lang, extra) {
   const en = lang === 'en';
+  const products = (extra && extra.products) || [];
+  const categories = ((extra && extra.categories) || []).map(k => (en ? taxEn(k) : k));
   const industry = en ? taxEn(c.industry || '') : (c.industry || '');
   const country = en ? countryEn(c.country) : (c.country || '');
   const description = (en && c.description_en) ? c.description_en : (c.description || '');
   const L = en
-    ? { desc: 'Description', info: 'Company information', founded: 'Founded', employees: 'Employees', sector: 'Sector', hq: 'Headquarters', fallback: `${c.name}, ${industry} equipment manufacturer` }
-    : { desc: 'Description', info: 'Informations société', founded: 'Fondée en', employees: 'Effectifs', sector: 'Secteur', hq: 'Siège', fallback: `${c.name}, équipementier ${industry}` };
+    ? { desc: 'Description', info: 'Company information', founded: 'Founded', employees: 'Employees', sector: 'Sector', hq: 'Headquarters', ranges: 'Ranges &amp; technologies', products: 'Listed products', page: 'product.html', fallback: `${c.name}, ${industry} equipment manufacturer` }
+    : { desc: 'Description', info: 'Informations société', founded: 'Fondée en', employees: 'Effectifs', sector: 'Secteur', hq: 'Siège', ranges: 'Gammes &amp; technologies', products: 'Produits référencés', page: 'produit.html', fallback: `${c.name}, équipementier ${industry}` };
+  const pn = p => (en && p.name_en) ? p.name_en : p.name;
+  const url = entityUrlAbs('company', lang, c.id);
+
+  const rangesHtml = categories.length ? `
+    <div class="modal-section">
+      <div class="modal-section-title">${L.ranges}</div>
+      <div class="modal-tags">${categories.map(g => `<span class="tag">${escapeHtml(g)}</span>`).join('')}</div>
+    </div>` : '';
+  const productsHtml = products.length ? `
+    <div class="modal-section">
+      <div class="modal-section-title">${L.products}</div>
+      <ul>${products.map(p => `<li><a href="${L.page}?id=${escapeHtml(p.id)}">${escapeHtml(pn(p))}</a>${p.category ? ' — ' + escapeHtml(en ? taxEn(p.category) : p.category) : ''}</li>`).join('')}</ul>
+    </div>` : '';
+
   return {
     title: `${c.name} — ${industry} — Buy-inner`,
     desc: (description || L.fallback).slice(0, 160),
@@ -1115,7 +1141,19 @@ function companyContent(c, lang) {
         <div class="detail-item"><div class="detail-label">${L.sector}</div><div class="detail-value">${escapeHtml(industry || '—')}</div></div>
         <div class="detail-item"><div class="detail-label">${L.hq}</div><div class="detail-value">${escapeHtml(c.hq || '—')}</div></div>
       </div>
-    </div>`,
+    </div>${rangesHtml}${productsHtml}`,
+    // Mêmes champs que le JSON-LD ajouté par js/pages/entreprise.js (qui s'efface s'il en trouve un déjà dans la page).
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      '@id': url + '#organization',
+      name: c.name,
+      description: description || undefined,
+      url: isHttpUrl(c.site) ? c.site : undefined,
+      mainEntityOfPage: url,
+      address: { '@type': 'PostalAddress', addressLocality: c.hq || undefined, addressCountry: stripEmoji(country) || undefined },
+      knowsAbout: categories.length ? categories : undefined,
+    },
   };
 }
 
@@ -1126,22 +1164,68 @@ function productContent(p, lang) {
   const description = (en && p.description_en) ? p.description_en : (p.description || '');
   const name = (en && p.name_en) ? p.name_en : p.name;   // name_en : voir backend/supabase_add_product_names_en_2026_10.sql
   const L = en
-    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', fallback: `${name} by ${p.company_name || ''}` }
-    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', fallback: `${name} par ${p.company_name || ''}` };
+    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', specs: 'Specifications', more: n => `+${n} more specification${n > 1 ? 's' : ''} available with a free account.`, fallback: `${name} by ${p.company_name || ''}` }
+    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', specs: 'Caractéristiques', more: n => `+${n} autre${n > 1 ? 's' : ''} caractéristique${n > 1 ? 's' : ''} visible${n > 1 ? 's' : ''} avec un compte gratuit.`, fallback: `${name} par ${p.company_name || ''}` };
+
+  const all = Array.isArray(p.specs) ? p.specs : [];
+  const shown = [...all].sort((a, b) => (a.is_premium ? 1 : 0) - (b.is_premium ? 1 : 0)).slice(0, FREE_SPEC_COUNT);
+  const hidden = Math.max(0, all.length - shown.length);
+  const sl = s => (en && s.label_en) ? s.label_en : (s.label || '');
+  const sv = s => (en && s.value_en) ? s.value_en : (s.value || '');
+  const certs = Array.isArray(p.certs) ? p.certs : [];
+  const url = entityUrlAbs('product', lang, p.id);
+
+  const imageHtml = isHttpUrl(p.image_url) ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(name)}" style="max-width:280px;border-radius:8px;margin-bottom:16px"/>` : '';
+  const specsHtml = shown.length ? `
+    <div class="modal-section">
+      <div class="modal-section-title">${L.specs}</div>
+      <table class="spec-table"><tbody>${shown.map(s => `<tr><td>${escapeHtml(sl(s))}</td><td>${escapeHtml(sv(s))}</td></tr>`).join('')}</tbody></table>
+      ${certs.length ? `<div class="cert-row" style="margin-top:10px">${certs.map(x => `<span class="tag tag-sage">${escapeHtml(x)}</span>`).join('')}</div>` : ''}
+      ${hidden ? `<p style="font-size:12px;color:var(--muted);margin:10px 0 0">${L.more(hidden)}</p>` : ''}
+    </div>` : '';
+
   return {
     title: `${name} — ${p.company_name || ''} — Buy-inner`,
     desc: (description || L.fallback).slice(0, 160),
     headerHtml: `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(category)} ${industry ? '· ' + escapeHtml(industry) : ''}</p>`,
     bodyHtml: `
+    ${imageHtml}
     <div class="modal-section">
       <div class="modal-section-title">${L.desc}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(description)}</p>
-    </div>
+    </div>${specsHtml}
     <div class="modal-section">
       <div class="modal-section-title">${L.maker}</div>
       <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.company_name || '')} — <a href="${L.page}?id=${escapeHtml(p.company_id || '')}">${L.link}</a></p>
     </div>`,
+    // « Thing » et non « Product » : choix déjà fait dans js/pages/produit.js (la plupart des fiches sont « sur devis »,
+    // sans prix ni avis, ce qu'un vrai Product signalerait en erreur dans la Search Console).
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Thing',
+      '@id': url + '#thing',
+      name,
+      description: description || undefined,
+      additionalType: category || undefined,
+      url,
+      image: isHttpUrl(p.image_url) ? p.image_url : undefined,
+    },
   };
+}
+
+// Produits et catégories d'une entreprise, pour enrichir sa fiche côté serveur (échec = fiche sans ces sections).
+async function fetchCompanyExtras(id) {
+  if (!UUID_RE.test(String(id || ''))) return {};
+  const headers = { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
+  const settle = p => p.catch(() => null);
+  const [prodRes, catRes] = await Promise.all([
+    settle(fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/get_products_by_company`, { method: 'POST', headers, body: JSON.stringify({ p_company_id: id }) })),
+    settle(fetch(`${SUPABASE_ORIGIN}/rest/v1/company_product_categories?select=category&company_id=eq.${encodeURIComponent(id)}`, { headers })),
+  ]);
+  const rows = async r => (r && r.ok) ? ((await r.json().catch(() => [])) || []) : [];
+  const products = await rows(prodRes);
+  const categories = (await rows(catRes)).map(r => r.category).filter(Boolean);
+  return { products: Array.isArray(products) ? products : [], categories };
 }
 
 async function handleEntityPage(kind, lang, request, env, ctx) {
@@ -1158,7 +1242,9 @@ async function handleEntityPage(kind, lang, request, env, ctx) {
   const row = await fetchRpcRow(kind === 'company' ? 'get_company_by_id' : 'get_product_by_id', { p_id: id });
   if (!row) return originRes;
 
-  const content = (kind === 'company' ? companyContent : productContent)(row, lang);
+  // Entreprise : on ajoute ses produits et ses catégories (jamais pour une fiche masquée).
+  const extra = (kind === 'company' && !row.hidden) ? await fetchCompanyExtras(id) : {};
+  const content = (kind === 'company' ? companyContent : productContent)(row, lang, extra);
   const [headerSel, bodySel] = kind === 'company' ? ['#ent-header', '#ent-body'] : ['#prod-header', '#prod-body'];
   const translated = hasEnglish(row);
 
@@ -1172,7 +1258,10 @@ async function handleEntityPage(kind, lang, request, env, ctx) {
   // la valeur par défaut de en/company.html et en/product.html).
   if (lang === 'en') rewriter = rewriter.on('meta[name="robots"]', new SetAttr('content', translated ? 'index,follow' : 'noindex,follow'));
   // hreflang réciproque sur les deux versions, uniquement si l'anglais existe.
-  if (translated) rewriter = rewriter.on('head', new AppendHtml(hreflangTags(kind, id)));
+  // Données structurées (Organization / Thing) rendues côté serveur : les robots qui n'exécutent pas
+  // JavaScript les voient aussi. Les scripts de js/pages/ s'effacent s'ils en trouvent déjà un.
+  const headExtra = (translated ? hreflangTags(kind, id) : '') + (content.jsonLd ? ldScript(content.jsonLd) : '');
+  if (headExtra) rewriter = rewriter.on('head', new AppendHtml(headExtra));
 
   let response = rewriter.transform(originRes);
   response = new Response(response.body, response);
