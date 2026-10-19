@@ -1345,9 +1345,10 @@ function setLang(lang) {
   // traduire sur place — le contenu de ces pages est écrit en dur.
   const alt = document.querySelector('link[rel="alternate"][hreflang="' + lang + '"]');
   if (alt) {
-    const target = new URL(alt.href).pathname;
+    const altUrl = new URL(alt.href);
+    const target = altUrl.pathname;
     if (target !== window.location.pathname) {
-      window.location.href = target;
+      window.location.href = target + altUrl.search;   // ?slug=… des actualités
       return;
     }
   }
