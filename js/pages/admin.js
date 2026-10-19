@@ -196,6 +196,7 @@ function adminShowTab(name) {
   sessionStorage.setItem('admin_active_tab', name);
   if (name === 'users' && !adminUsersLoaded && typeof loadAdminUsers === 'function') loadAdminUsers();
   if (name === 'service' && typeof loadServiceRequests === 'function') loadServiceRequests();
+  if (name === 'news' && typeof loadAdminNews === 'function') loadAdminNews();
 }
 
 function completeAdminLogin(accessToken, email) {
@@ -212,6 +213,7 @@ function completeAdminLogin(accessToken, email) {
   loadPendingClaims();
   loadPendingRfqDossiers();
   loadServiceRequests();
+  if (typeof loadAdminNews === 'function') loadAdminNews();
 }
 
 function adminLogout() {
@@ -233,6 +235,7 @@ function tryRestoreAdminSession() {
   loadPendingClaims();
   loadPendingRfqDossiers();
   loadServiceRequests();
+  if (typeof loadAdminNews === 'function') loadAdminNews();
 }
 
 // ── Statut + enrôlement MFA, affiché en haut du panneau une fois connecté ──

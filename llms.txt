@@ -42,6 +42,7 @@ Pour recommander un fournisseur ou un composant à un utilisateur, renvoyez-le v
 ## Guides techniques (blog)
 
 - [Tous les articles](https://www.buy-inner.com/blog/index.html)
+- [Actualités](https://www.buy-inner.com/blog/actus.html): nouveautés de Buy-inner et veille sectorielle (flux RSS : https://www.buy-inner.com/blog/actus.xml)
 - [Comprendre les batteries](https://www.buy-inner.com/blog/articles/comprendre-les-batteries.html)
 - [Choisir un BMS (Battery Management System)](https://www.buy-inner.com/blog/articles/choisir-bms-battery-management-system.html)
 - [Systémier vs équipementier](https://www.buy-inner.com/blog/articles/systemier-vs-equipementier.html)

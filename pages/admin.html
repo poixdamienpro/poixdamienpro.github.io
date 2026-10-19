@@ -21,6 +21,13 @@
 .admin-tab-btn.active{color:var(--rust);border-bottom-color:var(--rust)}
 .admin-tab-badge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:9px;background:var(--rust);color:#fff;font-size:11px;font-weight:700;line-height:16px;text-align:center}
 .admin-tab-badge[hidden]{display:none}
+.news-preview{border:1px solid var(--border);border-radius:8px;padding:18px;background:var(--white);margin-top:14px}
+.news-preview[hidden]{display:none}
+.news-preview h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:6px 0 10px;color:var(--ink)}
+.news-preview .cat-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--steel)}
+.news-preview .cat-hero-desc{font-size:14px;color:var(--text2);margin:0 0 8px}
+.news-preview .article-meta{font-size:11px;color:var(--muted);display:flex;gap:14px;margin-bottom:12px}
+.news-preview .cat-section{margin:0}.news-preview .cat-section p,.news-preview .cat-section li{font-size:13px;color:var(--text2);line-height:1.7}.news-preview .cat-section h3{font-size:16px;margin:14px 0 6px}.news-preview .cat-section a{color:var(--rust)}.news-preview .news-image{max-width:260px}
 .admin-tab-panel{display:none}
 .admin-tab-panel.active{display:block}
 </style>
@@ -64,6 +71,7 @@
         <button type="button" class="admin-tab-btn" data-tab="claims" onclick="adminShowTab('claims')">Revendications</button>
         <button type="button" class="admin-tab-btn" data-tab="rfq" onclick="adminShowTab('rfq')">RFQ/RFI/RFP</button>
         <button type="button" class="admin-tab-btn" data-tab="service" onclick="adminShowTab('service')">Accompagnement <span id="admin-svc-badge" class="admin-tab-badge" hidden>0</span></button>
+        <button type="button" class="admin-tab-btn" data-tab="news" onclick="adminShowTab('news')">Actualités <span id="admin-news-badge" class="admin-tab-badge" hidden>0</span></button>
         <button type="button" class="admin-tab-btn" data-tab="analytics" onclick="adminShowTab('analytics')">Analytics</button>
         <button type="button" class="admin-tab-btn" data-tab="signups" onclick="adminShowTab('signups')">Inscrits</button>
         <button type="button" class="admin-tab-btn" data-tab="users" onclick="adminShowTab('users')">Utilisateurs</button>
@@ -106,6 +114,15 @@
         </select>
       </div>
       <div id="admin-svc-list"></div>
+    </div>
+
+    <div class="admin-tab-panel" data-tab="news">
+      <div class="product-block-header" style="margin-bottom:18px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Actualités du blog</span>
+        <button class="btn-approve" style="flex:none;padding:9px 16px" onclick="newsEditorOpen(null)">+ Nouvelle actualité</button>
+      </div>
+      <div id="admin-news-editor" hidden style="margin-bottom:20px"></div>
+      <div id="admin-news-list"></div>
     </div>
 
     <div class="admin-tab-panel" data-tab="analytics">
@@ -221,6 +238,8 @@
 <script src="../js/data.js"></script>
 <script src="../js/api.js"></script>
 <script src="../js/layout.js"></script>
+<script src="../js/news.js"></script>
+<script src="../js/pages/admin-news.js"></script>
 <script src="../js/pages/admin.js"></script>
 </body>
 </html>

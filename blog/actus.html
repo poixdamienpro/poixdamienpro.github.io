@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Actualités — Buy-inner et veille composants industriels | Buy-inner</title>
+<meta name="description" content="Les actualités de Buy-inner et une veille sur les composants industriels, le spatial et l'énergie : résumés courts, source toujours citée."/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:title" content="Actualités — Buy-inner"/>
+<meta property="og:description" content="Les nouveautés de la plateforme et une veille sur les composants industriels, le spatial et l'énergie."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://www.buy-inner.com/blog/actus.html"/>
+<meta property="og:image" content="https://www.buy-inner.com/assets/logo-512.png"/>
+<link rel="canonical" href="https://www.buy-inner.com/blog/actus.html"/>
+<link rel="alternate" type="application/rss+xml" title="Buy-inner — Actualités" href="https://www.buy-inner.com/blog/actus.xml"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Actualités Buy-inner",
+  "url": "https://www.buy-inner.com/blog/actus.html",
+  "inLanguage": "fr-FR",
+  "isPartOf": { "@type": "WebSite", "@id": "https://www.buy-inner.com/#website" },
+  "publisher": { "@id": "https://www.buy-inner.com/#organization" }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/styles.css?v=20261019"/>
+<link rel="icon" href="../assets/favicon.ico" sizes="any"/>
+<script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'actus';</script>
+<style>
+:root {
+  --ink-2: #16222E; --ink-3: #0F1820;
+  --t-hi: #F3F1EC; --t-mid: rgba(243,241,236,.62); --t-low: rgba(243,241,236,.38);
+  --border: rgba(255,255,255,.10); --steel: #5B8BB5; --gold: #D2A23F; --sage: #3F9A72;
+}
+body { background: var(--ink-3); color: var(--t-hi); }
+.cat-hero{background:linear-gradient(135deg,var(--ink-3) 0%,var(--ink-2) 100%);border-bottom:1px solid var(--border);padding:72px 24px 56px}
+.cat-hero-inner{max-width:1080px;margin:0 auto}
+.cat-breadcrumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t-low);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.cat-breadcrumb a{color:var(--t-low);transition:color .2s}.cat-breadcrumb a:hover{color:var(--rust)}
+.cat-breadcrumb span{opacity:.4}
+.cat-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--steel);margin-bottom:16px}
+.cat-hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(34px,5vw,62px);line-height:1.06;margin-bottom:20px}
+.cat-hero h1 em{font-style:italic;color:var(--rust)}
+.cat-hero-desc{color:var(--t-mid);font-size:clamp(15px,2vw,17px);max-width:680px;line-height:1.7}
+.cat-body{max-width:1080px;margin:0 auto;padding:48px 24px 80px}
+.news-rss{margin-top:32px;font-family:var(--mono);font-size:12px;color:var(--t-low)}
+.news-rss a{color:var(--steel)}
+</style>
+</head>
+<body class="theme-dark">
+<div id="nav-slot"></div>
+
+<section class="cat-hero">
+  <div class="cat-hero-inner">
+    <nav class="cat-breadcrumb" aria-label="Fil d'Ariane">
+      <a href="../index.html">Accueil</a><span>/</span>
+      <a href="index.html">Blog</a><span>/</span>
+      <span style="color:var(--t-mid)">Actualités</span>
+    </nav>
+    <nav class="blog-tabs" aria-label="Sections du blog">
+      <a class="blog-tab" href="index.html">Guides techniques</a>
+      <a class="blog-tab active" href="actus.html" aria-current="page">Actualités</a>
+    </nav>
+    <div class="cat-eyebrow">Actualités</div>
+    <h1>Les actus <em>Buy-inner</em> et du secteur</h1>
+    <p class="cat-hero-desc">
+      Les nouveautés de la plateforme et une veille sur les composants industriels, le spatial et l'énergie. Pour la veille, nous résumons avec nos propres mots et citons toujours la source, avec un lien vers l'article d'origine.
+    </p>
+  </div>
+</section>
+
+<div class="cat-body">
+  <div class="news-grid" id="news-list"><p class="news-empty">Chargement des actualités…</p></div>
+  <p class="news-rss">Suivre : <a href="actus.xml">flux RSS</a></p>
+</div>
+
+<div id="modals-slot"></div>
+<div id="footer-slot"></div>
+
+<script src="../js/i18n.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/layout.js"></script>
+<script src="../js/modal.js"></script>
+<script src="../js/news.js"></script>
+<script src="../js/pages/actus.js"></script>
+</body>
+</html>

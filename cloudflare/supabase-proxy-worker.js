@@ -25,6 +25,8 @@
 //  - /pages/annuaire.html, catalogue.html, prestations.html, systemiers.html : ajoute en bas de page la liste
 //    texte des entreprises / produits (liens vers les fiches), masquée, pour les robots qui n'exécutent pas
 //    JavaScript. Retirée par js/api.js dès que la page prend la main ; affichée si le chargement échoue.
+//  - /blog/actus.html, /blog/actu.html?slug=… et /blog/actus.xml : actualités du blog (table news_posts, onglet
+//    « Actualités » de l'admin) rendues côté serveur, avec images et balises de partage pour LinkedIn, et flux RSS.
 //  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des fiches
 //    (toutes les fiches visibles en FR ; seulement les fiches traduites en
 //    EN), déclarés dans robots.txt, régénérés depuis la base (cache 1 h).
@@ -59,6 +61,9 @@
 //   www.buy-inner.com/pages/catalogue.html*
 //   www.buy-inner.com/pages/prestations.html*
 //   www.buy-inner.com/pages/systemiers.html*
+//   www.buy-inner.com/blog/actus.html*
+//   www.buy-inner.com/blog/actu.html*
+//   www.buy-inner.com/blog/actus.xml
 //   www.buy-inner.com/sitemap-en.xml
 //   www.buy-inner.com/sitemap-fr.xml
 //
@@ -1318,6 +1323,9 @@ async function handleSitemap(lang, request, env, ctx) {
   } catch (err) {
     return new Response('Sitemap temporarily unavailable', { status: 503 });
   }
+  // Actualités publiées (blog > Actualités) : listées dans le sitemap français. Échec = sitemap sans elles.
+  let news = [];
+  if (lang === 'fr') { try { news = await fetchAllRpc('get_news_page'); } catch (e) { news = []; } }
   const visible = companies.filter(c => !c.hidden);
   const visibleIds = new Set(visible.map(c => c.id));
   const entry = (kind, row) => {
@@ -1332,6 +1340,7 @@ async function handleSitemap(lang, request, env, ctx) {
   const urls = [
     ...visible.filter(keep).map(c => entry('company', c)),
     ...products.filter(p => visibleIds.has(p.company_id) && keep(p)).map(p => entry('product', p)),
+    ...news.map(n => `  <url><loc>${escapeHtml(newsPageUrl(n.slug))}</loc>${lastmod(n)}</url>`),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -1444,6 +1453,181 @@ async function handleListPage(kind, request, env, ctx) {
   return new HTMLRewriter().on('body', new AppendHtml(block)).transform(originRes);
 }
 
+// ── Actualités (blog > Actualités) ──────────────────────────────────────────────────────────
+// Écrites dans l'onglet « Actualités » de pages/admin.html (table news_posts, voir
+// backend/supabase_news_2026_10.sql). Le Worker rend le contenu côté serveur — pour tout le monde, comme les fiches
+// entreprise/produit — afin que Google, les IA et surtout le robot de LinkedIn (qui n'exécute pas de JavaScript)
+// voient le titre, le résumé et l'image au moment du partage. js/pages/actus.js prend le relais dans le navigateur.
+//
+// MÊME logique de rendu que js/news.js (un test compare les deux) : toute modification doit être reportée aux deux.
+const NEWS_KIND_LABEL = { company: 'Actu Buy-inner', watch: 'Veille sectorielle' };
+const NEWS_SHELLS = { list: '/blog/actus.html', article: '/blog/actu.html' };
+const newsEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const newsPageUrl = slug => `${SITE_URL}/blog/actu.html?slug=${encodeURIComponent(slug)}`;
+const newsDate = iso => iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' }) : '';
+
+function newsInline(s) {
+  return newsEsc(s)
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+}
+function renderNewsBody(text) {
+  return String(text || '').replace(/\r\n?/g, '\n').split(/\n[ \t]*\n/).map(b => b.trim()).filter(Boolean).map(block => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length === 1 && lines[0].startsWith('## ')) return '<h3>' + newsInline(lines[0].slice(3)) + '</h3>';
+    if (lines.every(l => l.startsWith('- '))) return '<ul>' + lines.map(l => '<li>' + newsInline(l.slice(2)) + '</li>').join('') + '</ul>';
+    return '<p>' + lines.map(newsInline).join('<br>') + '</p>';
+  }).join('\n');
+}
+function newsCardHtml(n, hrefBase) {
+  const href = (hrefBase || 'actu.html') + '?slug=' + encodeURIComponent(n.slug);
+  const kind = n.kind === 'watch' ? 'watch' : 'company';
+  return '<article class="news-card" data-kind="' + kind + '">' +
+    '<div class="news-card-meta"><span class="news-tag news-tag-' + kind + '">' + NEWS_KIND_LABEL[kind] + '</span>' +
+    '<time datetime="' + newsEsc(n.published_at) + '">' + newsEsc(newsDate(n.published_at)) + '</time></div>' +
+    '<h2><a href="' + newsEsc(href) + '">' + newsEsc(n.title) + '</a></h2>' +
+    '<p>' + newsEsc(n.summary) + '</p>' +
+    (kind === 'watch' && n.source_name ? '<div class="news-card-source">Source : ' + newsEsc(n.source_name) + '</div>' : '') +
+    '</article>';
+}
+
+// Contenu d'une page d'actualité : titre, description, en-tête, corps, données structurées.
+function newsArticleContent(n) {
+  const url = newsPageUrl(n.slug);
+  const watch = n.kind === 'watch';
+  const label = NEWS_KIND_LABEL[watch ? 'watch' : 'company'];
+  const logo = `${SITE_URL}/assets/logo-512.png`;
+  const image = /^https?:\/\//i.test(n.image_url || '') ? n.image_url : logo;
+  return {
+    title: `${n.title} — Actualités Buy-inner`,
+    desc: String(n.summary || '').slice(0, 200),
+    url, image,
+    headerHtml: `<div class="cat-eyebrow">${newsEsc(label)}</div><h1>${newsEsc(n.title)}</h1><p class="cat-hero-desc">${newsEsc(n.summary)}</p>` +
+      `<div class="article-meta"><time datetime="${newsEsc(n.published_at)}">${newsEsc(newsDate(n.published_at))}</time>${watch && n.source_name ? `<span>Source : ${newsEsc(n.source_name)}</span>` : ''}</div>`,
+    bodyHtml: (/^https?:\/\//i.test(n.image_url || '') ? `<img class="news-image" src="${newsEsc(n.image_url)}" alt="${newsEsc(n.title)}"/>` : '') +
+      renderNewsBody(n.body) +
+      (watch && /^https?:\/\//i.test(n.source_url || '') ? `<p class="news-source">Source originale : <a href="${newsEsc(n.source_url)}" target="_blank" rel="noopener">${newsEsc(n.source_name || n.source_url)}</a>. Résumé rédigé par Buy-inner : pour le texte complet, consultez l'article d'origine.</p>` : ''),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      '@id': url + '#article',
+      headline: n.title,
+      description: n.summary,
+      url, mainEntityOfPage: url,
+      datePublished: n.published_at,
+      dateModified: n.updated_at || n.published_at,
+      image: [image],
+      keywords: (n.tags && n.tags.length) ? n.tags.join(', ') : undefined,
+      inLanguage: 'fr-FR',
+      isBasedOn: watch && /^https?:\/\//i.test(n.source_url || '') ? n.source_url : undefined,
+      author: { '@type': 'Organization', name: 'Buy-inner', url: SITE_URL + '/' },
+      publisher: { '@type': 'Organization', '@id': SITE_URL + '/#organization', name: 'Buy-inner', url: SITE_URL + '/', logo: { '@type': 'ImageObject', url: logo } },
+    },
+  };
+}
+
+async function fetchRpcRows(rpcName, params) {
+  const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/${rpcName}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) throw new Error(`${rpcName}: HTTP ${res.status}`);
+  const rows = await res.json();
+  return Array.isArray(rows) ? rows : [];
+}
+
+// Page d'origine (coquille statique sur GitHub Pages) sous forme de Response, statut éventuellement forcé.
+async function newsShell(kind, status) {
+  const res = await fetch(GITHUB_PAGES_ORIGIN + NEWS_SHELLS[kind]);
+  return status ? new Response(res.body, { status, headers: res.headers }) : res;
+}
+
+async function handleNewsArticle(request, env, ctx) {
+  const url = new URL(request.url);
+  if (request.method !== 'GET' && request.method !== 'HEAD') return newsShell('article');
+  const slug = url.searchParams.get('slug') || '';
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug) || slug.length > 90) return newsShell('article', 404);
+
+  const cache = caches.default;
+  const cacheKey = new Request(`${SITE_URL}/blog/actu.html?slug=${slug}`);
+  const hit = await cache.match(cacheKey);
+  if (hit) return hit;
+
+  let row = null;
+  try { row = (await fetchRpcRows('get_news_by_slug', { p_slug: slug }))[0] || null; } catch (e) { return newsShell('article'); }
+  if (!row) return newsShell('article', 404);   // inconnue, brouillon ou programmée : la coquille « introuvable » (noindex)
+
+  const c = newsArticleContent(row);
+  let rewriter = new HTMLRewriter()
+    .on('title', new SetHtml(newsEsc(c.title)))
+    .on('meta[name="description"]', new SetAttr('content', c.desc))
+    .on('meta[name="robots"]', new SetAttr('content', 'index,follow'))
+    .on('link[rel="canonical"]', new SetAttr('href', c.url))
+    .on('meta[property="og:title"]', new SetAttr('content', row.title))
+    .on('meta[property="og:description"]', new SetAttr('content', c.desc))
+    .on('meta[property="og:url"]', new SetAttr('content', c.url))
+    .on('meta[property="og:image"]', new SetAttr('content', c.image))
+    .on('meta[name="twitter:title"]', new SetAttr('content', row.title))
+    .on('meta[name="twitter:description"]', new SetAttr('content', c.desc))
+    .on('meta[name="twitter:image"]', new SetAttr('content', c.image))
+    .on('#news-header', new SetHtml(c.headerHtml))
+    .on('#news-body', new SetHtml(c.bodyHtml))
+    .on('head', new AppendHtml(`<meta property="article:published_time" content="${newsEsc(row.published_at)}"/>` + ldScript(c.jsonLd)));
+
+  let response = rewriter.transform(await newsShell('article'));
+  response = new Response(response.body, response);
+  response.headers.set('Cache-Control', 'public, max-age=60');
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
+async function handleNewsList(request, env, ctx) {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return newsShell('list');
+  const cache = caches.default;
+  const cacheKey = new Request(`${SITE_URL}/blog/actus.html`);
+  const hit = await cache.match(cacheKey);
+  if (hit) return hit;
+
+  let rows;
+  try { rows = await fetchRpcRows('get_news_page', { p_limit: 50, p_offset: 0 }); } catch (e) { return newsShell('list'); }
+  const cards = rows.length
+    ? rows.map(n => newsCardHtml(n, 'actu.html')).join('')
+    : '<p class="news-empty">Les premières actualités arrivent bientôt.</p>';
+  let response = new HTMLRewriter().on('#news-list', new SetHtml(cards)).transform(await newsShell('list'));
+  response = new Response(response.body, response);
+  response.headers.set('Cache-Control', 'public, max-age=60');
+  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  return response;
+}
+
+// Flux RSS des actualités publiées (50 dernières).
+async function handleNewsRss(request, env, ctx) {
+  let rows;
+  try { rows = await fetchRpcRows('get_news_page', { p_limit: 50, p_offset: 0 }); } catch (e) { return new Response('Flux momentanément indisponible', { status: 503 }); }
+  const items = rows.map(n => `    <item>
+      <title>${newsEsc(n.title)}</title>
+      <link>${newsEsc(newsPageUrl(n.slug))}</link>
+      <guid isPermaLink="true">${newsEsc(newsPageUrl(n.slug))}</guid>
+      <pubDate>${new Date(n.published_at).toUTCString()}</pubDate>
+      <category>${newsEsc(NEWS_KIND_LABEL[n.kind === 'watch' ? 'watch' : 'company'])}</category>
+      <description>${newsEsc(n.summary)}</description>
+    </item>`).join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Buy-inner — Actualités</title>
+    <link>${SITE_URL}/blog/actus.html</link>
+    <description>Les actualités de Buy-inner et la veille sur les composants industriels, le spatial et l'énergie.</description>
+    <language>fr-FR</language>
+    <atom:link href="${SITE_URL}/blog/actus.xml" rel="self" type="application/rss+xml"/>
+${items}
+  </channel>
+</rss>
+`;
+  return new Response(xml, { headers: { 'Content-Type': 'application/rss+xml; charset=utf-8', 'Cache-Control': 'public, max-age=300' } });
+}
+
 async function handleStripeWebhook(request, env) {
   if (!env.STRIPE_WEBHOOK_SECRET || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: 'Webhook Stripe non configuré sur le Worker' }, 500);
@@ -1501,6 +1685,9 @@ export default {
     if (url.pathname === '/en/product.html') {
       return handleEntityPage('product', 'en', request, env, ctx);
     }
+    if (url.pathname === '/blog/actus.html') return handleNewsList(request, env, ctx);
+    if (url.pathname === '/blog/actu.html') return handleNewsArticle(request, env, ctx);
+    if (url.pathname === '/blog/actus.xml') return handleNewsRss(request, env, ctx);
     if (LIST_PAGES[url.pathname]) {
       return handleListPage(LIST_PAGES[url.pathname], request, env, ctx);
     }

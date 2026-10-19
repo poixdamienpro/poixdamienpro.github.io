@@ -19,7 +19,7 @@
 }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/styles.css"/>
+<link rel="stylesheet" href="../css/styles.css?v=20261019"/>
 <link rel="icon" href="../assets/favicon.ico" sizes="any"/>
 <script>window.ROOT_PREFIX = '../'; window.CURRENT_PAGE = 'blog';</script>
 <style>
@@ -60,6 +60,10 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <a href="../index.html">Accueil</a><span>/</span>
       <span style="color:var(--t-mid)">Guides techniques</span>
     </nav>
+    <nav class="blog-tabs" aria-label="Sections du blog">
+      <a class="blog-tab active" href="index.html" aria-current="page">Guides techniques</a>
+      <a class="blog-tab" href="actus.html">Actualités</a>
+    </nav>
     <div class="cat-eyebrow">Guides d'ingénierie</div>
     <h1>Comprendre <em>avant d'acheter</em></h1>
     <p class="cat-hero-desc">
@@ -69,6 +73,10 @@ body { background: var(--ink-3); color: var(--t-hi); }
 </section>
 
 <div class="cat-body">
+  <section class="news-latest" id="news-latest" hidden>
+    <div class="news-latest-head"><h2>Dernières actualités</h2><a href="actus.html">Toutes les actualités →</a></div>
+    <div class="news-grid" id="news-latest-list"></div>
+  </section>
   <div class="blog-grid">
     <article class="blog-card">
       <div class="blog-card-cat">Contraintes par secteur · Série 5/5</div>
@@ -178,6 +186,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
 <script src="../js/api.js"></script>
 <script src="../js/layout.js"></script>
 <script src="../js/modal.js"></script>
-<script>document.addEventListener('DOMContentLoaded', () => { loadLayout(); });</script>
+<script src="../js/news.js"></script>
+<script src="../js/pages/actus.js"></script>
 </body>
 </html>
