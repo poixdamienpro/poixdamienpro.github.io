@@ -197,6 +197,7 @@ function adminShowTab(name) {
   if (name === 'users' && !adminUsersLoaded && typeof loadAdminUsers === 'function') loadAdminUsers();
   if (name === 'service' && typeof loadServiceRequests === 'function') loadServiceRequests();
   if (name === 'news' && typeof loadAdminNews === 'function') loadAdminNews();
+  if (name === 'api' && typeof loadAdminApiKeys === 'function') loadAdminApiKeys();
 }
 
 function completeAdminLogin(accessToken, email) {
@@ -819,7 +820,7 @@ async function loadAdminAuditLog() {
   if (!box) return;
   try {
     const rows = await adminFetch('admin_audit_log?select=created_at,admin_email,action,target_email,details&order=created_at.desc&limit=15');
-    const labels = { create_user: 'a créé le compte', create_admin: 'a créé le compte administrateur', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise', detach_company: 'a retiré d\'une entreprise', set_super: 'a donné le statut super-admin à', unset_super: 'a retiré le statut super-admin à', revoke_admin: 'a retiré les droits admin de', delete_admin: 'a supprimé le compte administrateur' };
+    const labels = { create_user: 'a créé le compte', create_admin: 'a créé le compte administrateur', delete_user: 'a supprimé le compte', disable_user: 'a désactivé le compte', enable_user: 'a réactivé le compte', reset_password_link: 'a généré un lien de mot de passe pour', attach_company: 'a rattaché à une entreprise', detach_company: 'a retiré d\'une entreprise', set_super: 'a donné le statut super-admin à', unset_super: 'a retiré le statut super-admin à', revoke_admin: 'a retiré les droits admin de', delete_admin: 'a supprimé le compte administrateur', create_api_key: 'a créé une clé API pour', revoke_api_key: 'a révoqué la clé API de' };
     box.innerHTML = !rows || !rows.length
       ? '<div class="admin-empty">Aucune action enregistrée.</div>'
       : rows.map(r => `<div class="admin-field-row" style="font-size:12px"><span>${escapeHtml(new Date(r.created_at).toLocaleString('fr-FR'))} · <strong>${escapeHtml(r.admin_email)}</strong> ${escapeHtml(labels[r.action] || r.action)} ${escapeHtml(r.target_email || '')}</span></div>`).join('');
@@ -1568,6 +1569,91 @@ async function deleteServiceRequest(id) {
     await adminFetch(`service_requests?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } });
     adminSvcRows = adminSvcRows.filter(r => r.id !== id);
     renderServiceRequests();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+    card.querySelectorAll('button').forEach(b => b.disabled = false);
+  }
+}
+
+// ── API ERP : clés des clients (voir le bloc « API ERP v1 » du Worker) ──
+// Création et révocation passent par /api/admin-api-keys (réservé aux admins) :
+// la clé en clair n'existe qu'en réponse à la création, jamais en base.
+async function adminApiKeysCall(body) {
+  const token = sessionStorage.getItem('admin_access_token');
+  const res = await fetch(`${SUPABASE_URL}/admin-api-keys`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && data.error) || `HTTP ${res.status}`);
+  return data;
+}
+
+async function loadAdminApiKeys() {
+  const list = document.getElementById('admin-api-keys-list');
+  if (!list) return;
+  list.innerHTML = '<div class="admin-empty">Chargement…</div>';
+  try {
+    const { keys } = await adminApiKeysCall({ action: 'list' });
+    if (!keys.length) { list.innerHTML = '<div class="admin-empty">Aucune clé pour l\'instant.</div>'; return; }
+    const date = d => d ? new Date(d).toLocaleDateString('fr-FR') : 'jamais';
+    list.innerHTML = keys.map(k => `
+      <div class="admin-card" id="admin-api-key-${k.id}"${k.revoked_at ? ' style="opacity:.55"' : ''}>
+        <div class="admin-card-head">
+          <div>
+            <div class="admin-card-title">${escapeHtml(k.client_company)}${k.label ? ' · ' + escapeHtml(k.label) : ''}${k.revoked_at ? ' (révoquée le ' + date(k.revoked_at) + ')' : ''}</div>
+            <div class="admin-card-meta"><span style="font-family:var(--mono)">${escapeHtml(k.key_prefix)}…</span> · ${escapeHtml((k.scopes || []).join(', '))} · ${k.requests_today} / ${k.daily_quota} requêtes aujourd'hui · dernier appel : ${date(k.last_used_at)}</div>
+            <div class="admin-card-meta">Créée le ${date(k.created_at)} par ${escapeHtml(k.created_by || '—')}${k.contact_email ? ' · contact : ' + escapeHtml(k.contact_email) : ''}</div>
+          </div>
+        </div>
+        ${k.revoked_at ? '' : `<div class="admin-actions"><button class="btn-reject" onclick="adminApiKeyRevoke('${k.id}')">✕ Révoquer</button></div>`}
+      </div>`).join('');
+  } catch (err) {
+    list.innerHTML = `<div class="admin-empty" style="color:#C0392B">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+async function adminApiKeyCreate(event) {
+  event.preventDefault();
+  const errEl = document.getElementById('admin-api-create-error');
+  const resEl = document.getElementById('admin-api-create-result');
+  const btn = event.target.querySelector('button[type="submit"]');
+  errEl.style.display = 'none'; resEl.style.display = 'none';
+  btn.disabled = true;
+  try {
+    const data = await adminApiKeysCall({
+      action: 'create',
+      client_company: document.getElementById('admin-api-client').value.trim(),
+      label: document.getElementById('admin-api-label').value.trim(),
+      contact_email: document.getElementById('admin-api-email').value.trim(),
+      daily_quota: Number(document.getElementById('admin-api-quota').value),
+      scopes: document.getElementById('admin-api-quotes').checked ? ['catalog:read', 'quotes:write'] : ['catalog:read'],
+    });
+    resEl.style.display = 'block';
+    resEl.innerHTML = `<div style="padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:6px;font-size:12px">
+      <p style="margin:0 0 8px"><strong>Clé créée pour ${escapeHtml(data.record.client_company)}</strong></p>
+      <p style="margin:0 0 6px;color:#C0392B">Copie-la maintenant : elle ne sera plus jamais affichée. Transmets-la au client par un canal sûr.</p>
+      <input type="text" readonly value="${escapeHtml(data.key)}" onclick="this.select()" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:4px;font-family:var(--mono)"/>
+      <button type="button" class="btn-add-product sup-btn-sm" style="margin-top:8px" onclick="navigator.clipboard.writeText('${escapeJsAttr(data.key)}').then(() => { this.textContent = 'Copié ✓'; })">Copier la clé</button>
+    </div>`;
+    event.target.reset();
+    await loadAdminApiKeys();
+  } catch (err) {
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function adminApiKeyRevoke(id) {
+  if (!confirm('Révoquer cette clé ? L\'ERP du client ne pourra plus appeler l\'API, immédiatement et définitivement.')) return;
+  const card = document.getElementById(`admin-api-key-${id}`);
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    await adminApiKeysCall({ action: 'revoke', id });
+    await loadAdminApiKeys();
   } catch (err) {
     alert('Erreur : ' + err.message);
     card.querySelectorAll('button').forEach(b => b.disabled = false);

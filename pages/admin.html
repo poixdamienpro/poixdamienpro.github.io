@@ -75,6 +75,7 @@
         <button type="button" class="admin-tab-btn" data-tab="analytics" onclick="adminShowTab('analytics')">Analytics</button>
         <button type="button" class="admin-tab-btn" data-tab="signups" onclick="adminShowTab('signups')">Inscrits</button>
         <button type="button" class="admin-tab-btn" data-tab="users" onclick="adminShowTab('users')">Utilisateurs</button>
+        <button type="button" class="admin-tab-btn" data-tab="api" onclick="adminShowTab('api')">API ERP</button>
         <button type="button" class="admin-tab-btn" data-tab="security" onclick="adminShowTab('security')">Sécurité</button>
       </div>
       <button class="btn-remove-product" onclick="adminLogout()">Se déconnecter</button>
@@ -213,6 +214,29 @@
         <span class="submit-section-title" style="margin:0;border:none;padding:0">Journal des actions</span>
       </div>
       <div id="admin-users-audit"></div>
+    </div>
+
+    <div class="admin-tab-panel" data-tab="api">
+      <div class="product-block-header" style="margin-bottom:10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Créer une clé API</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 14px;max-width:640px">Une clé par client : son ERP peut chercher dans le catalogue et envoyer des demandes de devis (elles arrivent comme celles du site, avec la source « api »). La clé n'est affichée qu'une fois, seule son empreinte est gardée. Documentation pour l'intégrateur : <a href="https://www.buy-inner.com/api/v1/openapi.json" target="_blank" rel="noopener">openapi.json</a>.</p>
+      <form id="admin-api-key-form" onsubmit="adminApiKeyCreate(event)" style="max-width:520px">
+        <div class="lead-field"><label>Entreprise cliente</label><input type="text" id="admin-api-client" maxlength="200" required/></div>
+        <div class="lead-field"><label>Usage (optionnel)</label><input type="text" id="admin-api-label" maxlength="200" placeholder="ex. Odoo production"/></div>
+        <div class="lead-field"><label>Email du contact technique (optionnel)</label><input type="email" id="admin-api-email"/></div>
+        <div class="lead-field" style="max-width:260px"><label>Quota (requêtes par jour)</label><input type="number" id="admin-api-quota" min="1" max="100000" value="1000" required/></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0 14px"><input type="checkbox" id="admin-api-quotes" checked style="margin:0"/> Autoriser l'envoi de demandes de devis</label>
+        <button type="submit" class="btn-submit-form">Créer la clé</button>
+        <p id="admin-api-create-error" style="color:#C0392B;font-size:12px;margin-top:8px;display:none"></p>
+        <div id="admin-api-create-result" style="display:none;margin-top:14px"></div>
+      </form>
+
+      <div class="product-block-header" style="margin:34px 0 10px">
+        <span class="submit-section-title" style="margin:0;border:none;padding:0">Clés existantes</span>
+        <button type="button" class="btn-remove-product" onclick="loadAdminApiKeys()">Actualiser</button>
+      </div>
+      <div id="admin-api-keys-list"><div class="admin-empty">Ouvre l'onglet pour charger les clés.</div></div>
     </div>
 
     <div class="admin-tab-panel" data-tab="security">

@@ -15,6 +15,9 @@
 //    creation de comptes fournisseur OU administrateur, lien de nouveau mot de
 //    passe, desactivation, suppression). Verifie d'abord que l'appelant est
 //    lui-meme admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
+//  - /api/v1/* : API publique pour les ERP des acheteurs (catalogue + demandes
+//    de devis), par cle API et quota journalier. /api/admin-api-keys : creation
+//    et revocation de ces cles depuis pages/admin.html. Voir le bloc « API ERP v1 ».
 //  - /en/company.html et /en/product.html : versions anglaises des deux
 //    pages ci-dessous (mêmes données, description_en, catégories/pays
 //    traduits). Une fiche anglaise n'est indexable (robots index,follow +
@@ -1712,6 +1715,584 @@ async function handleStripeWebhook(request, env) {
   return json({ received: true });
 }
 
+// ═══════════════════════════════
+// API ERP v1 — www.buy-inner.com/api/v1/*
+// Pour que l'ERP d'un acheteur (Odoo, SAP, Dynamics, Sage…) cherche dans le
+// catalogue et envoie des demandes de devis sans passer par le site.
+// Voir backend/supabase_erp_api_2026_10.sql pour les tables et les RPC.
+//
+//   GET  /api/v1/openapi.json         spec OpenAPI (publique, sans clé)
+//   GET  /api/v1/products             recherche (q, category, industry, company_id, limit, offset)
+//   GET  /api/v1/products/{id}
+//   GET  /api/v1/companies            recherche (q, country, limit, offset)
+//   GET  /api/v1/companies/{id}       fiche + produits référencés
+//   POST /api/v1/quote-requests       demande de devis -> table leads (source 'api')
+//
+// Authentification : « Authorization: Bearer bik_… » (ou X-API-Key). Les clés
+// sont créées par un admin (onglet « API ERP » de pages/admin.html, route
+// /api/admin-api-keys plus bas) ; seul leur SHA-256 est stocké en base.
+// Quota par clé et par jour (UTC), décompté dans api_usage : 429 au-delà.
+//
+// Volontairement absent des réponses : contact_email des fournisseurs. Le
+// modèle repose sur le relais des demandes par Buy-inner (lead fee), l'API
+// ne doit pas permettre de le contourner.
+// ═══════════════════════════════
+const API_VERSION = '1.0.0';
+const API_MAX_PAGE = 100;
+// Même destinataire que FOUNDER_EMAIL (js/data.js) ; surchargeable par la variable LEADS_NOTIFY_EMAIL.
+const LEADS_NOTIFY_EMAIL = 'poixdamien.pro@gmail.com';
+const API_SCOPES = ['catalog:read', 'quotes:write'];
+const API_KEY_RE = /^bik_[0-9a-f]{40}$/;
+const EXTERNAL_REF_RE = /^[\w.\-\/:#]{1,100}$/;
+const API_CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
+  'Access-Control-Expose-Headers': 'X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After',
+};
+
+function apiJson(obj, status = 200, extraHeaders = {}) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...API_CORS, ...extraHeaders },
+  });
+}
+
+function apiError(status, code, message, extraHeaders) {
+  return apiJson({ error: { code, message } }, status, extraHeaders);
+}
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function generateApiKey() {
+  const bytes = crypto.getRandomValues(new Uint8Array(20));
+  return 'bik_' + [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function serviceRpc(env, name, params) {
+  const res = await serviceFetch(env, `rpc/${name}`, { method: 'POST', body: JSON.stringify(params) });
+  if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
+  return res.json();
+}
+
+function secondsUntilUtcMidnight() {
+  const now = new Date();
+  return Math.ceil((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - now.getTime()) / 1000);
+}
+
+// Renvoie { client, headers } ou { error: Response }. Chaque appel authentifié
+// compte dans le quota du jour, y compris ceux qui finissent en 404/422.
+async function authenticateApiKey(request, env, scope) {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) return { error: apiError(500, 'not_configured', 'API non configurée sur le Worker') };
+  const auth = request.headers.get('Authorization') || '';
+  const key = (auth.match(/^Bearer\s+(\S+)$/i) || [])[1] || request.headers.get('X-API-Key') || '';
+  if (!API_KEY_RE.test(key)) {
+    return { error: apiError(401, 'unauthorized', 'Clé API manquante ou mal formée (en-tête « Authorization: Bearer bik_… »)') };
+  }
+
+  let rows;
+  try { rows = await serviceRpc(env, 'api_consume_key', { p_key_hash: await sha256Hex(key) }); }
+  catch { return { error: apiError(502, 'upstream_error', 'Vérification de la clé impossible, réessayez') }; }
+  const k = rows && rows[0];
+  if (!k) return { error: apiError(401, 'unauthorized', 'Clé API inconnue ou révoquée') };
+
+  const headers = {
+    'X-RateLimit-Limit': String(k.daily_quota),
+    'X-RateLimit-Remaining': String(Math.max(0, k.daily_quota - k.used)),
+  };
+  if (k.used > k.daily_quota) {
+    return { error: apiError(429, 'quota_exceeded', `Quota journalier atteint (${k.daily_quota} requêtes, remis à zéro à minuit UTC)`, { ...headers, 'Retry-After': String(secondsUntilUtcMidnight()) }) };
+  }
+  if (!(k.scopes || []).includes(scope)) {
+    return { error: apiError(403, 'forbidden', `Cette clé n'a pas le droit « ${scope} »`, headers) };
+  }
+  return { client: k, headers };
+}
+
+function apiParam(url, name, max = 120) {
+  const v = (url.searchParams.get(name) || '').trim();
+  return v ? v.slice(0, max) : null;
+}
+
+function apiPaging(url) {
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 50, 1), API_MAX_PAGE);
+  const offset = Math.max(parseInt(url.searchParams.get('offset'), 10) || 0, 0);
+  return { limit, offset };
+}
+
+// Les RPC renvoient jusqu'à limit + 1 lignes : la ligne en trop dit s'il reste une page.
+function apiPage(rows, { limit, offset }, map) {
+  const more = rows.length > limit;
+  return {
+    data: rows.slice(0, limit).map(map),
+    pagination: { limit, offset, has_more: more, next_offset: more ? offset + limit : null },
+  };
+}
+
+function apiProduct(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    name_en: p.name_en || null,
+    category: p.category || null,
+    industry: p.industry || null,
+    description: p.description || null,
+    description_en: p.description_en || null,
+    manufacturer: { id: p.company_id, name: p.company_name || null },
+    specs: (Array.isArray(p.specs) ? p.specs : []).map(s => ({
+      label: s.label, value: s.value, label_en: s.label_en || null, value_en: s.value_en || null,
+    })),
+    certifications: Array.isArray(p.certs) ? p.certs : [],
+    price: p.price_label || null,
+    image_url: isHttpUrl(p.image_url) ? p.image_url : null,
+    datasheet_url: isHttpUrl(p.datasheet_url) ? p.datasheet_url : null,
+    url: `${SITE_URL}/pages/produit.html?id=${p.id}`,
+  };
+}
+
+function apiCompany(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    country: c.country || null,
+    city: c.city || null,
+    headquarters: c.hq || null,
+    industries: (c.industries && c.industries.length) ? c.industries : (c.industry ? [c.industry] : []),
+    categories: Array.isArray(c.categories) ? c.categories : [],
+    description: c.description || null,
+    description_en: c.description_en || null,
+    website: isHttpUrl(c.site) ? c.site : null,
+    founded: c.founded || null,
+    employees: c.employees || null,
+    verified: !!c.verified,
+    premium: !!c.premium,
+    url: `${SITE_URL}/pages/entreprise.html?id=${c.id}`,
+  };
+}
+
+async function apiGetCompany(env, id) {
+  const [rows, products, cats] = await Promise.all([
+    serviceRpc(env, 'get_company_by_id', { p_id: id }),
+    serviceRpc(env, 'get_products_by_company', { p_company_id: id }),
+    serviceFetch(env, `company_product_categories?select=category&company_id=eq.${id}`).then(r => (r.ok ? r.json() : [])),
+  ]);
+  if (!rows[0]) return null;
+  const categories = (cats || []).map(r => r.category).filter(Boolean);
+  return {
+    ...apiCompany({ ...rows[0], categories: categories.length ? categories : rows[0].categories }),
+    products: (products || []).map(p => ({ id: p.id, name: p.name, name_en: p.name_en || null, category: p.category || null, url: `${SITE_URL}/pages/produit.html?id=${p.id}` })),
+  };
+}
+
+async function handleApiQuoteRequest(request, env, ctx, auth) {
+  let body;
+  try { body = await request.json(); } catch { return apiError(400, 'invalid_json', 'Corps JSON invalide', auth.headers); }
+  const b = (body && typeof body === 'object') ? body : {};
+  const buyer = (b.buyer && typeof b.buyer === 'object') ? b.buyer : {};
+  const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
+  const companyId = str(b.company_id, 64);
+  const productId = str(b.product_id, 64);
+  const buyerName = str(buyer.name, 200);
+  const buyerEmail = str(buyer.email, 254);
+  const buyerCompany = str(buyer.company, 200) || auth.client.client_company;
+  const message = str(b.message, 5000);
+  const externalRef = str(b.external_ref, 100);
+
+  const errors = [];
+  if (!productId && !companyId) errors.push('company_id ou product_id requis');
+  if (companyId && !UUID_RE.test(companyId)) errors.push('company_id doit être un UUID');
+  if (productId && !UUID_RE.test(productId)) errors.push('product_id doit être un UUID');
+  if (!buyerName) errors.push('buyer.name requis');
+  if (!EMAIL_RE.test(buyerEmail)) errors.push('buyer.email invalide');
+  if (message.length < 10) errors.push('message requis (10 caractères minimum)');
+  if (externalRef && !EXTERNAL_REF_RE.test(externalRef)) errors.push('external_ref : lettres, chiffres et . - _ / : # uniquement (100 max)');
+  if (errors.length) return apiError(422, 'validation_error', errors.join(' ; '), auth.headers);
+
+  // Fournisseur et produit viennent de la base, jamais du client.
+  let product = null;
+  if (productId) {
+    product = (await serviceRpc(env, 'get_product_by_id', { p_id: productId }))[0] || null;
+    if (!product) return apiError(404, 'product_not_found', 'Produit introuvable', auth.headers);
+    if (companyId && product.company_id !== companyId) {
+      return apiError(422, 'validation_error', 'product_id n\'appartient pas à company_id', auth.headers);
+    }
+  }
+  const company = (await serviceRpc(env, 'get_company_by_id', { p_id: product ? product.company_id : companyId }))[0];
+  if (!company) return apiError(404, 'company_not_found', 'Fournisseur introuvable', auth.headers);
+
+  const row = {
+    company_id: company.id,
+    company_name: company.name,
+    product_name: product ? product.name : null,
+    buyer_name: buyerName,
+    buyer_email: buyerEmail,
+    buyer_company: buyerCompany,
+    message,
+    source: 'api',
+    api_key_id: auth.client.key_id,
+    external_ref: externalRef || null,
+  };
+  const reply = (lead, status, duplicate) => apiJson({
+    id: lead.id,
+    status: 'received',
+    duplicate: !!duplicate,
+    created_at: lead.created_at || null,
+    external_ref: row.external_ref,
+    supplier: { id: company.id, name: company.name },
+    product: product ? { id: product.id, name: product.name } : null,
+  }, status, auth.headers);
+
+  const res = await serviceFetch(env, 'leads', {
+    method: 'POST',
+    headers: { 'Prefer': 'return=representation' },
+    body: JSON.stringify([row]),
+  });
+
+  // Même external_ref déjà reçu pour cette clé (index unique) : l'ERP a
+  // probablement réessayé après un timeout, on renvoie la demande existante.
+  if (res.status === 409 && externalRef) {
+    const ex = await serviceFetch(env, `leads?api_key_id=eq.${auth.client.key_id}&external_ref=eq.${encodeURIComponent(externalRef)}&limit=1`);
+    const existing = ex.ok ? await ex.json() : [];
+    if (existing[0]) return reply(existing[0], 200, true);
+  }
+  if (!res.ok) return apiError(502, 'upstream_error', 'Enregistrement de la demande impossible, réessayez', auth.headers);
+
+  const [lead] = await res.json();
+  ctx.waitUntil(notifyApiLead(env, auth.client, row).catch(() => {}));
+  return reply(lead, 201, false);
+}
+
+// Prévient l'équipe, comme le formulaire du site (Web3Forms, js/leads.js) :
+// c'est elle qui relaie au fournisseur.
+async function notifyApiLead(env, client, row) {
+  if (!env.RESEND_API_KEY) return;
+  const to = env.LEADS_NOTIFY_EMAIL || LEADS_NOTIFY_EMAIL;
+  const subject = `Demande de devis Buy-inner (API · ${client.client_company}) · ${row.company_name}`;
+  const html = `<p><strong>Demande reçue via l'API ERP</strong> (clé : ${escapeHtml(client.client_company)}${row.external_ref ? `, réf. ERP ${escapeHtml(row.external_ref)}` : ''})</p>
+    <p>Fournisseur visé : <strong>${escapeHtml(row.company_name)}</strong>${row.product_name ? `<br/>Produit : ${escapeHtml(row.product_name)}` : ''}</p>
+    <p>Acheteur : ${escapeHtml(row.buyer_name)} · ${escapeHtml(row.buyer_email)} · ${escapeHtml(row.buyer_company)}</p>
+    <p>Besoin :<br/>${escapeHtml(row.message).replace(/\n/g, '<br/>')}</p>
+    <p style="color:#666;font-size:13px">Rappel process : transmettre ce lead à ${escapeHtml(row.company_name)} et ne facturer le lead fee que s'il l'accepte.</p>`;
+  await sendViaResend(env, to, subject, html);
+}
+
+async function handleApiV1(request, env, ctx, url) {
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: API_CORS });
+  const path = url.pathname.replace(/\/+$/, '');
+
+  if (path === '/api/v1' || path === '/api/v1/openapi.json') {
+    if (request.method !== 'GET') return apiError(405, 'method_not_allowed', 'Méthode non autorisée');
+    return apiJson(OPENAPI_SPEC, 200, { 'Cache-Control': 'public, max-age=3600' });
+  }
+
+  if (path === '/api/v1/quote-requests') {
+    if (request.method !== 'POST') return apiError(405, 'method_not_allowed', 'Méthode non autorisée');
+    const auth = await authenticateApiKey(request, env, 'quotes:write');
+    if (auth.error) return auth.error;
+    try { return await handleApiQuoteRequest(request, env, ctx, auth); }
+    catch { return apiError(502, 'upstream_error', 'Erreur temporaire, réessayez', auth.headers); }
+  }
+
+  const m = path.match(/^\/api\/v1\/(products|companies)(?:\/([^/]+))?$/);
+  if (!m) return apiError(404, 'not_found', 'Route inconnue, voir /api/v1/openapi.json');
+  if (request.method !== 'GET') return apiError(405, 'method_not_allowed', 'Méthode non autorisée');
+  const [, resource, id] = m;
+  if (id && !UUID_RE.test(id)) return apiError(404, 'not_found', 'Identifiant invalide');
+
+  const auth = await authenticateApiKey(request, env, 'catalog:read');
+  if (auth.error) return auth.error;
+
+  try {
+    if (resource === 'products' && id) {
+      const rows = await serviceRpc(env, 'get_product_by_id', { p_id: id });
+      if (!rows[0]) return apiError(404, 'not_found', 'Produit introuvable', auth.headers);
+      return apiJson({ data: apiProduct(rows[0]) }, 200, auth.headers);
+    }
+    if (resource === 'companies' && id) {
+      const company = await apiGetCompany(env, id);
+      if (!company) return apiError(404, 'not_found', 'Fournisseur introuvable', auth.headers);
+      return apiJson({ data: company }, 200, auth.headers);
+    }
+
+    const paging = apiPaging(url);
+    if (resource === 'products') {
+      const companyId = apiParam(url, 'company_id', 64);
+      if (companyId && !UUID_RE.test(companyId)) return apiError(422, 'validation_error', 'company_id doit être un UUID', auth.headers);
+      const rows = await serviceRpc(env, 'api_search_products', {
+        p_q: apiParam(url, 'q'),
+        p_category: apiParam(url, 'category'),
+        p_industry: apiParam(url, 'industry'),
+        p_company_id: companyId,
+        p_limit: paging.limit + 1,
+        p_offset: paging.offset,
+      });
+      return apiJson(apiPage(rows, paging, apiProduct), 200, auth.headers);
+    }
+    const rows = await serviceRpc(env, 'api_search_companies', {
+      p_q: apiParam(url, 'q'),
+      p_country: apiParam(url, 'country'),
+      p_limit: paging.limit + 1,
+      p_offset: paging.offset,
+    });
+    return apiJson(apiPage(rows, paging, apiCompany), 200, auth.headers);
+  } catch {
+    return apiError(502, 'upstream_error', 'Erreur temporaire, réessayez', auth.headers);
+  }
+}
+
+// ── Gestion des clés API depuis la page admin (onglet « API ERP ») ──
+//   list   : clés + requêtes du jour
+//   create : génère une clé, n'en stocke que le hash, la renvoie UNE seule fois
+//   revoke : coupe la clé immédiatement (irréversible)
+async function handleAdminApiKeys(request, env) {
+  const a = await authenticateAdmin(request, env);
+  if (a.error) return a.error;
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+  const { action } = body || {};
+
+  try {
+    if (action === 'list') {
+      const keys = await serviceFetchAll(env, 'api_keys?select=id,client_company,label,contact_email,key_prefix,scopes,daily_quota,created_by,created_at,last_used_at,revoked_at&order=created_at.desc');
+      const today = new Date().toISOString().slice(0, 10);
+      const usage = await serviceFetchAll(env, `api_usage?select=key_id,requests&day=eq.${today}`);
+      const byKey = Object.fromEntries(usage.map(u => [u.key_id, u.requests]));
+      return json({ keys: keys.map(k => ({ ...k, requests_today: byKey[k.id] || 0 })) });
+    }
+
+    if (action === 'create') {
+      const clientCompany = String(body.client_company || '').trim().slice(0, 200);
+      const label = String(body.label || '').trim().slice(0, 200) || null;
+      const contactEmail = String(body.contact_email || '').trim().slice(0, 254) || null;
+      const quota = body.daily_quota == null || body.daily_quota === '' ? 1000 : Number(body.daily_quota);
+      const scopes = Array.isArray(body.scopes) && body.scopes.length ? body.scopes : API_SCOPES;
+      if (!clientCompany) return json({ error: 'Entreprise cliente requise' }, 400);
+      if (contactEmail && !EMAIL_RE.test(contactEmail)) return json({ error: 'Email de contact invalide' }, 400);
+      if (!Number.isInteger(quota) || quota < 1 || quota > 100000) return json({ error: 'Quota entre 1 et 100 000 requêtes/jour' }, 400);
+      if (!scopes.every(s => API_SCOPES.includes(s))) return json({ error: 'Droit inconnu' }, 400);
+
+      const key = generateApiKey();
+      const res = await serviceFetch(env, 'api_keys', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=representation' },
+        body: JSON.stringify([{
+          client_company: clientCompany,
+          label,
+          contact_email: contactEmail,
+          key_prefix: key.slice(0, 12),
+          key_hash: await sha256Hex(key),
+          scopes,
+          daily_quota: quota,
+          created_by: a.caller.email || a.caller.id,
+        }]),
+      });
+      if (!res.ok) return json({ error: 'Création impossible (backend/supabase_erp_api_2026_10.sql exécuté ?)', detail: await res.text() }, 502);
+      const [record] = await res.json();
+      await auditAdminAction(env, a.caller, 'create_api_key', clientCompany, { contact_email: contactEmail, key_prefix: record.key_prefix });
+      const { key_hash, ...safe } = record;
+      return json({ key, record: safe });
+    }
+
+    if (action === 'revoke') {
+      if (!UUID_RE.test(String(body.id || ''))) return json({ error: 'id invalide' }, 400);
+      const res = await serviceFetch(env, `api_keys?id=eq.${body.id}&revoked_at=is.null`, {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=representation' },
+        body: JSON.stringify({ revoked_at: new Date().toISOString() }),
+      });
+      if (!res.ok) return json({ error: 'Révocation impossible', detail: await res.text() }, 502);
+      const [record] = await res.json();
+      if (!record) return json({ error: 'Clé introuvable ou déjà révoquée' }, 404);
+      await auditAdminAction(env, a.caller, 'revoke_api_key', record.client_company, { key_prefix: record.key_prefix });
+      return json({ success: true });
+    }
+  } catch (err) {
+    return json({ error: err.message || 'Erreur' }, 502);
+  }
+
+  return json({ error: 'action inconnue' }, 400);
+}
+
+// Spec servie telle quelle par GET /api/v1/openapi.json : un intégrateur
+// l'importe dans Postman, ou génère un client pour son ERP.
+const API_PAGINATION_PARAMS = [
+  { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 50 } },
+  { name: 'offset', in: 'query', schema: { type: 'integer', minimum: 0, default: 0 } },
+];
+const API_ERROR_RESPONSES = {
+  401: { description: 'Clé absente, inconnue ou révoquée', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+  403: { description: 'La clé n\'a pas le droit requis', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+  429: { description: 'Quota journalier atteint (voir Retry-After)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+};
+const OPENAPI_SPEC = {
+  openapi: '3.0.3',
+  info: {
+    title: 'Buy-inner API',
+    version: API_VERSION,
+    description: 'Catalogue des équipementiers industriels Buy-inner et demandes de devis, pour les ERP et outils achats. '
+      + 'Authentification par clé API (Authorization: Bearer bik_…), délivrée sur demande à contact@buy-inner.com. '
+      + 'Quota par clé et par jour (UTC), indiqué dans les en-têtes X-RateLimit-Limit / X-RateLimit-Remaining.',
+  },
+  servers: [{ url: `${SITE_URL}/api/v1` }],
+  security: [{ bearerAuth: [] }],
+  paths: {
+    '/products': {
+      get: {
+        summary: 'Rechercher des produits',
+        parameters: [
+          { name: 'q', in: 'query', description: 'Texte libre (nom, description, fabricant)', schema: { type: 'string' } },
+          { name: 'category', in: 'query', description: 'Catégorie exacte, ex. « Batteries & Stockage »', schema: { type: 'string' } },
+          { name: 'industry', in: 'query', description: 'Secteur exact, ex. « Spatial »', schema: { type: 'string' } },
+          { name: 'company_id', in: 'query', schema: { type: 'string', format: 'uuid' } },
+          ...API_PAGINATION_PARAMS,
+        ],
+        responses: {
+          200: { description: 'Page de produits', content: { 'application/json': { schema: { type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/Product' } }, pagination: { $ref: '#/components/schemas/Pagination' } } } } } },
+          ...API_ERROR_RESPONSES,
+        },
+      },
+    },
+    '/products/{id}': {
+      get: {
+        summary: 'Détail d\'un produit',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+        responses: {
+          200: { description: 'Produit', content: { 'application/json': { schema: { type: 'object', properties: { data: { $ref: '#/components/schemas/Product' } } } } } },
+          404: { description: 'Introuvable' },
+          ...API_ERROR_RESPONSES,
+        },
+      },
+    },
+    '/companies': {
+      get: {
+        summary: 'Rechercher des fournisseurs',
+        parameters: [
+          { name: 'q', in: 'query', description: 'Texte libre (nom, description)', schema: { type: 'string' } },
+          { name: 'country', in: 'query', description: 'Pays exact, ex. « France »', schema: { type: 'string' } },
+          ...API_PAGINATION_PARAMS,
+        ],
+        responses: {
+          200: { description: 'Page de fournisseurs', content: { 'application/json': { schema: { type: 'object', properties: { data: { type: 'array', items: { $ref: '#/components/schemas/Company' } }, pagination: { $ref: '#/components/schemas/Pagination' } } } } } },
+          ...API_ERROR_RESPONSES,
+        },
+      },
+    },
+    '/companies/{id}': {
+      get: {
+        summary: 'Fiche fournisseur et produits référencés',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+        responses: {
+          200: { description: 'Fournisseur', content: { 'application/json': { schema: { type: 'object', properties: { data: { $ref: '#/components/schemas/CompanyDetail' } } } } } },
+          404: { description: 'Introuvable' },
+          ...API_ERROR_RESPONSES,
+        },
+      },
+    },
+    '/quote-requests': {
+      post: {
+        summary: 'Envoyer une demande de devis à un fournisseur',
+        description: 'La demande est relayée au fournisseur par l\'équipe Buy-inner. Envoyer external_ref (numéro de demande d\'achat côté ERP) rend l\'appel idempotent : un renvoi renvoie la demande existante (200, duplicate: true) au lieu d\'en créer une seconde.',
+        requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/QuoteRequestInput' } } } },
+        responses: {
+          201: { description: 'Demande enregistrée', content: { 'application/json': { schema: { $ref: '#/components/schemas/QuoteRequest' } } } },
+          200: { description: 'Demande déjà reçue avec ce external_ref', content: { 'application/json': { schema: { $ref: '#/components/schemas/QuoteRequest' } } } },
+          404: { description: 'Fournisseur ou produit introuvable' },
+          422: { description: 'Données invalides', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          ...API_ERROR_RESPONSES,
+        },
+      },
+    },
+  },
+  components: {
+    securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer', description: 'Clé API au format bik_ suivi de 40 caractères hexadécimaux' } },
+    schemas: {
+      Error: { type: 'object', properties: { error: { type: 'object', properties: { code: { type: 'string' }, message: { type: 'string' } } } } },
+      Pagination: { type: 'object', properties: { limit: { type: 'integer' }, offset: { type: 'integer' }, has_more: { type: 'boolean' }, next_offset: { type: 'integer', nullable: true } } },
+      Product: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string' },
+          name_en: { type: 'string', nullable: true },
+          category: { type: 'string', nullable: true },
+          industry: { type: 'string', nullable: true },
+          description: { type: 'string', nullable: true },
+          description_en: { type: 'string', nullable: true },
+          manufacturer: { type: 'object', properties: { id: { type: 'string', format: 'uuid' }, name: { type: 'string' } } },
+          specs: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'string' }, label_en: { type: 'string', nullable: true }, value_en: { type: 'string', nullable: true } } } },
+          certifications: { type: 'array', items: { type: 'string' } },
+          price: { type: 'string', nullable: true, description: 'Libellé indicatif, le plus souvent « Sur devis »' },
+          image_url: { type: 'string', nullable: true },
+          datasheet_url: { type: 'string', nullable: true },
+          url: { type: 'string', description: 'Fiche produit sur buy-inner.com' },
+        },
+      },
+      Company: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string' },
+          country: { type: 'string', nullable: true },
+          city: { type: 'string', nullable: true },
+          headquarters: { type: 'string', nullable: true },
+          industries: { type: 'array', items: { type: 'string' } },
+          categories: { type: 'array', items: { type: 'string' } },
+          description: { type: 'string', nullable: true },
+          description_en: { type: 'string', nullable: true },
+          website: { type: 'string', nullable: true },
+          founded: { nullable: true },
+          employees: { nullable: true },
+          verified: { type: 'boolean' },
+          premium: { type: 'boolean' },
+          url: { type: 'string', description: 'Fiche fournisseur sur buy-inner.com' },
+        },
+      },
+      CompanyDetail: {
+        allOf: [
+          { $ref: '#/components/schemas/Company' },
+          { type: 'object', properties: { products: { type: 'array', items: { type: 'object', properties: { id: { type: 'string', format: 'uuid' }, name: { type: 'string' }, name_en: { type: 'string', nullable: true }, category: { type: 'string', nullable: true }, url: { type: 'string' } } } } } },
+        ],
+      },
+      QuoteRequestInput: {
+        type: 'object',
+        required: ['buyer', 'message'],
+        description: 'company_id ou product_id requis (le fournisseur est déduit du produit).',
+        properties: {
+          company_id: { type: 'string', format: 'uuid' },
+          product_id: { type: 'string', format: 'uuid' },
+          buyer: {
+            type: 'object',
+            required: ['name', 'email'],
+            properties: {
+              name: { type: 'string', maxLength: 200 },
+              email: { type: 'string', format: 'email' },
+              company: { type: 'string', maxLength: 200, description: 'Par défaut : l\'entreprise titulaire de la clé' },
+            },
+          },
+          message: { type: 'string', minLength: 10, maxLength: 5000, description: 'Besoin : quantités, délais, specs, etc.' },
+          external_ref: { type: 'string', maxLength: 100, pattern: '^[\\w.\\-/:#]{1,100}$', description: 'Référence côté ERP (ex. numéro de demande d\'achat)' },
+        },
+      },
+      QuoteRequest: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          status: { type: 'string', enum: ['received'] },
+          duplicate: { type: 'boolean' },
+          created_at: { type: 'string', format: 'date-time', nullable: true },
+          external_ref: { type: 'string', nullable: true },
+          supplier: { type: 'object', properties: { id: { type: 'string', format: 'uuid' }, name: { type: 'string' } } },
+          product: { type: 'object', nullable: true, properties: { id: { type: 'string', format: 'uuid' }, name: { type: 'string' } } },
+        },
+      },
+    },
+  },
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -1778,6 +2359,16 @@ export default {
 
     if (url.pathname === '/api/stripe-webhook') {
       if (request.method === 'POST') return handleStripeWebhook(request, env);
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
+    if (url.pathname === '/api/v1' || url.pathname.startsWith('/api/v1/')) {
+      return handleApiV1(request, env, ctx, url);
+    }
+
+    if (url.pathname === '/api/admin-api-keys') {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (request.method === 'POST') return handleAdminApiKeys(request, env);
       return json({ error: 'Method not allowed' }, 405);
     }
 
