@@ -28,6 +28,8 @@
 //  - /blog/actus.html, /blog/actu.html?slug=… et /blog/actus.xml (français), /en/news.html, /en/news-item.html?slug=… et
 //    /en/news.xml (anglais) : actualités du blog (table news_posts, onglet « Actualités » de l'admin) rendues côté
 //    serveur, avec images, balises de partage pour LinkedIn, hreflang réciproques et flux RSS.
+//  - /api/news-ingest : la routine de veille y dépose des propositions d'actualités (FR + EN), protégées par la clé
+//    NEWS_INGEST_KEY ; jamais publiées automatiquement (choix et publication dans l'admin).
 //  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des fiches
 //    (toutes les fiches visibles en FR ; seulement les fiches traduites en
 //    EN), déclarés dans robots.txt, régénérés depuis la base (cache 1 h).
@@ -44,7 +46,7 @@
 //    premier rendu.
 //
 // Toutes les cles secretes (RESEND_API_KEY, STRIPE_SECRET_KEY,
-// STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SUPABASE_SERVICE_ROLE_KEY)
+// STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SUPABASE_SERVICE_ROLE_KEY, NEWS_INGEST_KEY)
 // vivent UNIQUEMENT en variables secretes du Worker (Settings ->
 // Variables and Secrets) — jamais exposees au navigateur. En particulier
 // SUPABASE_SERVICE_ROLE_KEY contourne toute la RLS : elle ne doit
@@ -1671,6 +1673,88 @@ ${items}
   return new Response(xml, { headers: { 'Content-Type': 'application/rss+xml; charset=utf-8', 'Cache-Control': 'public, max-age=300' } });
 }
 
+// ── Propositions d'actualités déposées par la routine de veille ─────────────────────────────
+// La routine « Buy-inner — Veille & posts LinkedIn » (claude.ai) rédige des brouillons d'actualités en français ET en
+// anglais et les dépose ici : POST /api/news-ingest avec l'en-tête « Authorization: Bearer <NEWS_INGEST_KEY> ». Les
+// propositions vont dans la table news_suggestions (backend/supabase_news_suggestions_2026_10.sql) : ELLES NE SONT JAMAIS
+// PUBLIÉES. Dans l'onglet « Actualités » de l'admin, l'administrateur en choisit une, la modifie, puis la publie.
+//
+// Le contenu vient du web (donc non fiable) : chaque champ est validé avec les mêmes règles que la base (longueurs, veille
+// = source citée et résumé court, liens http(s), anglais obligatoire), 5 propositions au plus par appel, 20 par heure, et
+// le texte est de toute façon rendu échappé (js/news.js). La clé est un secret du Worker (Settings → Variables and Secrets).
+const NEWS_SUGG_MAX_PER_CALL = 5;
+const NEWS_SUGG_MAX_PER_HOUR = 20;
+
+// Comparaison à temps constant (on compare les empreintes SHA-256 : pas de fuite par la durée de la comparaison).
+async function newsKeyOk(provided, expected) {
+  if (!provided || !expected) return false;
+  const enc = new TextEncoder();
+  const [a, b] = await Promise.all([crypto.subtle.digest('SHA-256', enc.encode(String(provided))), crypto.subtle.digest('SHA-256', enc.encode(String(expected)))]);
+  const x = new Uint8Array(a), y = new Uint8Array(b);
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+
+const newsClean = (v, max) => (typeof v === 'string' ? v.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max) : '');
+
+// Une proposition : { row } prête à insérer, ou { errors } (messages pour la routine, qui peut corriger et renvoyer).
+function newsValidateSuggestion(s) {
+  const errors = [];
+  if (!s || typeof s !== 'object' || Array.isArray(s)) return { errors: ['proposition invalide (objet attendu)'] };
+  const kind = s.kind === 'company' ? 'company' : 'watch';
+  const max = kind === 'watch' ? 1500 : 8000;
+  const f = {
+    title: newsClean(s.title, 400), summary: newsClean(s.summary, 1000), body: newsClean(s.body, 20000),
+    title_en: newsClean(s.title_en, 400), summary_en: newsClean(s.summary_en, 1000), body_en: newsClean(s.body_en, 20000),
+  };
+  const range = (name, v, lo, hi) => { if (v.length < lo || v.length > hi) errors.push(`${name} : ${lo} à ${hi} caractères (reçu ${v.length})`); };
+  range('title', f.title, 5, 160); range('summary', f.summary, 20, 300); range('body', f.body, 20, max);
+  range('title_en', f.title_en, 5, 160); range('summary_en', f.summary_en, 20, 300); range('body_en', f.body_en, 20, max);
+  const isUrl = u => /^https?:\/\/[^\s]+$/i.test(u) && u.length <= 500;
+  const source_name = newsClean(s.source_name, 120) || null;
+  const source_url = newsClean(s.source_url, 500) || null;
+  const image_url = newsClean(s.image_url, 500) || null;
+  if (kind === 'watch' && (!source_name || !source_url)) errors.push('une veille doit citer sa source : source_name et source_url obligatoires');
+  if (source_url && !isUrl(source_url)) errors.push('source_url doit commencer par http:// ou https://');
+  if (image_url && !isUrl(image_url)) errors.push('image_url doit commencer par http:// ou https://');
+  const tags = [...new Set((Array.isArray(s.tags) ? s.tags : []).map(t => newsClean(t, 30)).filter(Boolean))].slice(0, 8);
+  const angle = newsClean(s.angle, 300) || null;
+  if (errors.length) return { errors };
+  return { row: { kind, ...f, source_name, source_url, image_url, tags, angle } };
+}
+
+async function handleNewsIngest(request, env) {
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });
+  if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+  if (!env.NEWS_INGEST_KEY || !env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'NEWS_INGEST_KEY ou SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 503);
+  const provided = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+  if (!(await newsKeyOk(provided, env.NEWS_INGEST_KEY))) return json({ error: 'Clé invalide' }, 401);
+
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
+  const list = Array.isArray(body) ? body : (body && body.suggestions);
+  if (!Array.isArray(list) || !list.length) return json({ error: 'Attendu : { "suggestions": [ … ] } avec au moins une proposition' }, 400);
+  if (list.length > NEWS_SUGG_MAX_PER_CALL) return json({ error: `${NEWS_SUGG_MAX_PER_CALL} propositions au plus par appel` }, 400);
+
+  // Plafond horaire (protège l'admin d'un emballement de la routine).
+  const since = new Date(Date.now() - 3600 * 1000).toISOString();
+  const recent = await serviceFetch(env, `news_suggestions?created_at=gte.${encodeURIComponent(since)}&select=id`);
+  if (recent.ok && (await recent.json()).length + list.length > NEWS_SUGG_MAX_PER_HOUR) return json({ error: 'Trop de propositions cette heure : réessayez plus tard' }, 429);
+
+  let inserted = 0, duplicates = 0;
+  const rejected = [];
+  for (let i = 0; i < list.length; i++) {
+    const v = newsValidateSuggestion(list[i]);
+    if (v.errors) { rejected.push({ index: i, errors: v.errors }); continue; }
+    const res = await serviceFetch(env, 'news_suggestions', { method: 'POST', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify(v.row) });
+    if (res.status === 201) inserted++;
+    else if (res.status === 409) duplicates++;     // cette source a déjà été proposée
+    else rejected.push({ index: i, errors: ['enregistrement impossible (erreur base de données)'] });
+  }
+  return json({ inserted, duplicates, rejected });
+}
+
 async function handleStripeWebhook(request, env) {
   if (!env.STRIPE_WEBHOOK_SECRET || !env.SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: 'Webhook Stripe non configuré sur le Worker' }, 500);
@@ -1745,6 +1829,8 @@ export default {
     }
 
     if (url.pathname === '/api/_diag') return handleDiag(request);
+
+    if (url.pathname === '/api/news-ingest') return handleNewsIngest(request, env);
 
     if (url.pathname === '/api/send-email') {
       if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS_HEADERS });

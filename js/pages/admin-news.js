@@ -5,13 +5,20 @@
 // cette langue (suivi par des paramètres utm). Rien n'est publié sur LinkedIn automatiquement : c'est la personne
 // connectée qui clique « Publier » là-bas.
 // Chaque actualité doit exister dans les DEUX langues pour être publiée (la base l'impose) ; un brouillon peut n'avoir
-// que le français. Table : news_posts (backend/supabase_news_2026_10.sql et supabase_news_en_2026_10.sql). Utilise
+// que le français.
+// Propositions de Claude : la routine de veille dépose 2-3 brouillons d'actualités déjà rédigés (FR + EN) dans
+// news_suggestions (backend/supabase_news_suggestions_2026_10.sql, via /api/news-ingest du Worker). Quand on veut créer
+// une actualité, on en choisit une, on la modifie librement, puis on la publie comme n'importe quelle autre : rien
+// n'est publié sans validation humaine.
+// Tables : news_posts (backend/supabase_news_2026_10.sql et supabase_news_en_2026_10.sql). Utilise
 // adminFetch / adminFetchAllPages (admin.js) et le rendu partagé de js/news.js (le même que celui des pages publiques,
 // pour une prévisualisation fidèle).
 // ═══════════════════════════════
 let adminNewsRows = [];
 let adminNewsEditingId = null;     // null = nouvelle actualité
 let adminNewsKitId = null;         // actualité dont le kit LinkedIn est ouvert
+let adminNewsSuggestions = [];     // propositions de Claude en attente (les 3 plus récentes)
+let adminNewsFromSuggestion = null; // proposition en cours de modification dans l'éditeur
 const NEWS_BODY_LIMIT = { company: 8000, watch: 1500 };
 const NEWS_LANGS = [['fr', 'Français'], ['en', 'English']];
 const NEWS_KIND_FR = NEWS_I18N.fr.kind;
@@ -29,6 +36,7 @@ async function loadAdminNews() {
   try {
     adminNewsRows = await adminFetchAllPages('news_posts?select=*&order=created_at.desc,id.asc');
     renderAdminNews();
+    loadNewsSuggestions();
   } catch (err) {
     list.innerHTML = `<div class="admin-empty">${escapeHtml(err.message)}${/42P01|does not exist|schema cache|PGRST205/i.test(err.message) ? '<br>La table n\'existe pas encore : exécute backend/supabase_news_2026_10.sql puis backend/supabase_news_en_2026_10.sql dans Supabase.' : ''}</div>`;
   }
@@ -87,11 +95,12 @@ function renderAdminNews() {
 }
 
 // ── Éditeur ───────────────────────────────────────────────────────────
-function newsEditorOpen(id) {
+function newsEditorOpen(id, prefill) {
   adminNewsEditingId = id;
+  if (id) adminNewsFromSuggestion = null;
   const r = id ? adminNewsRows.find(x => x.id === id) : null;
   const box = document.getElementById('admin-news-editor');
-  const v = r || { kind: 'company', title: '', slug: '', summary: '', body: '', title_en: '', summary_en: '', body_en: '', source_name: '', source_url: '', image_url: '', tags: [], published_at: null, status: 'draft' };
+  const v = r || prefill || { kind: 'company', title: '', slug: '', summary: '', body: '', title_en: '', summary_en: '', body_en: '', source_name: '', source_url: '', image_url: '', tags: [], published_at: null, status: 'draft' };
   box.hidden = false;
   const field = (lang, suffix) => (lang === 'en' ? v[suffix + '_en'] : v[suffix]) || '';
   const langBlock = ([lang, name]) => {
@@ -110,6 +119,7 @@ function newsEditorOpen(id) {
   box.innerHTML = `
     <div class="admin-card" style="border:2px solid var(--rust)">
       <div class="admin-card-head"><div class="admin-card-title">${r ? 'Modifier l\'actualité' : 'Nouvelle actualité'}</div></div>
+      ${adminNewsFromSuggestion ? newsFromSuggestionBanner() : ''}
       <div class="lead-field" style="max-width:320px"><label>Type</label>
         <select id="nw-kind" onchange="newsEditorKindChanged()">
           <option value="company"${v.kind === 'company' ? ' selected' : ''}>Actu Buy-inner (annonce, nouveauté, partenariat…)</option>
@@ -146,6 +156,7 @@ function newsEditorOpen(id) {
 
 function newsEditorClose() {
   adminNewsEditingId = null;
+  adminNewsFromSuggestion = null;
   const box = document.getElementById('admin-news-editor'); box.hidden = true; box.innerHTML = '';
 }
 
@@ -243,6 +254,7 @@ async function newsSave(mode) {
       method: existing ? 'PATCH' : 'POST', headers: { 'Prefer': 'return=representation' }, body: JSON.stringify(row),
     });
     const rec = Array.isArray(saved) ? saved[0] : saved;
+    if (!existing && adminNewsFromSuggestion && rec) await newsSuggestMarkUsed(adminNewsFromSuggestion, rec.id);
     newsEditorClose();
     await loadAdminNews();
     if (mode === true && rec && newsIsLive(rec)) { adminNewsKitId = rec.id; renderAdminNews(); newsKitFocus(rec.id, 'Actualité publiée en français et en anglais ✓ — étape suivante : les posts LinkedIn.'); }
@@ -311,5 +323,96 @@ async function newsKitMarkPosted(id, lang) {
     const rec = Array.isArray(saved) ? saved[0] : saved;
     const row = adminNewsRows.find(x => x.id === id); if (row && rec) row[col] = rec[col];
     renderAdminNews();
+  } catch (e) { alert('Erreur : ' + e.message); }
+}
+
+// ── Propositions de Claude ───────────────────────────────────────────────
+const newsAgo = days => new Date(Date.now() - days * 86400000).toISOString();
+
+async function loadNewsSuggestions() {
+  const box = document.getElementById('admin-news-suggest');
+  if (!box) return;
+  try {
+    // 3 propositions au plus, des 3 dernières semaines ; la table peut ne pas exister encore (script SQL pas exécuté).
+    adminNewsSuggestions = await adminFetch(`news_suggestions?status=eq.new&created_at=gte.${encodeURIComponent(newsAgo(21))}&order=created_at.desc&limit=3&select=*`) || [];
+  } catch (e) { adminNewsSuggestions = []; }
+  renderNewsSuggestions(false);
+}
+
+function newsSuggestCard(s) {
+  const watch = s.kind === 'watch';
+  return `
+    <div id="admin-sugg-${s.id}" style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px">
+      <div class="admin-card-meta"><span class="tag">${escapeHtml(NEWS_KIND_FR[watch ? 'watch' : 'company'])}</span> · reçue le ${escapeHtml(newsFmt(s.created_at))}</div>
+      <div class="admin-card-title" style="font-size:14px">${escapeHtml(s.title)}</div>
+      <div style="font-size:12px;color:var(--text2)">${escapeHtml(s.summary)}</div>
+      <div style="font-size:11px;color:var(--muted)"><strong>EN</strong> · ${escapeHtml(s.title_en)}</div>
+      ${watch && s.source_url ? `<div style="font-size:11px;color:var(--muted)">Source : <a href="${escapeHtml(s.source_url)}" target="_blank" rel="noopener" style="color:var(--rust)">${escapeHtml(s.source_name || s.source_url)}</a> (à vérifier avant de publier)</div>` : ''}
+      ${s.angle ? `<div style="font-size:11px;color:var(--muted);font-style:italic">${escapeHtml(s.angle)}</div>` : ''}
+      <div class="admin-actions" style="margin-top:auto;padding-top:8px">
+        <button class="btn-approve" onclick="newsSuggestPick('${s.id}')">Choisir et modifier</button>
+        <button class="btn-reject" style="flex:none;padding:9px 12px" onclick="newsSuggestDismiss('${s.id}')">Ignorer</button>
+      </div>
+    </div>`;
+}
+
+// `chooser` : l'utilisateur vient de cliquer « Nouvelle actualité » et doit choisir une proposition ou partir d'une page blanche.
+function renderNewsSuggestions(chooser) {
+  const box = document.getElementById('admin-news-suggest');
+  if (!box) return;
+  if (!adminNewsSuggestions.length) { box.innerHTML = ''; return; }
+  const n = adminNewsSuggestions.length;
+  box.innerHTML = `
+    <div style="border:2px solid ${chooser ? 'var(--rust)' : 'var(--border)'};border-radius:10px;padding:16px;background:rgba(91,139,181,.05)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px">🤖 ${chooser ? 'Partir d\'une proposition de Claude ?' : 'Propositions de Claude'} <span style="font-weight:400;color:var(--muted)">(${n} prête${n > 1 ? 's' : ''}, rédigée${n > 1 ? 's' : ''} en français et en anglais)</span></div>
+        ${chooser ? '<button class="btn-approve" style="flex:none;background:var(--steel);padding:8px 14px" onclick="newsEditorOpen(null)">Écrire moi-même (page blanche)</button>' : ''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">${adminNewsSuggestions.map(newsSuggestCard).join('')}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px">Issues de la routine de veille : rien n'est publié sans ta validation. Vérifie les faits et la source, modifie le texte à ta guise, puis publie.</div>
+    </div>`;
+}
+
+// « + Nouvelle actualité » : s'il y a des propositions, on les présente d'abord ; sinon éditeur vide.
+async function newsNewOpen() {
+  await loadNewsSuggestions();
+  if (!adminNewsSuggestions.length) { newsEditorOpen(null); return; }
+  newsEditorClose();
+  renderNewsSuggestions(true);
+  document.getElementById('admin-news-suggest').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function newsSuggestPick(id) {
+  const s = adminNewsSuggestions.find(x => x.id === id);
+  if (!s) return;
+  adminNewsFromSuggestion = id;
+  newsEditorOpen(null, {
+    kind: s.kind, title: s.title, slug: '', summary: s.summary, body: s.body, title_en: s.title_en, summary_en: s.summary_en, body_en: s.body_en,
+    source_name: s.source_name || '', source_url: s.source_url || '', image_url: s.image_url || '', tags: s.tags || [], published_at: null, status: 'draft',
+  });
+  newsEditorTitleChanged();
+  renderNewsSuggestions(false);
+}
+
+function newsFromSuggestionBanner() {
+  const s = adminNewsSuggestions.find(x => x.id === adminNewsFromSuggestion);
+  if (!s) return '';
+  return `<div style="background:rgba(91,139,181,.1);border:1px solid rgba(91,139,181,.35);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--text2);margin-bottom:12px">
+    🤖 <strong>Proposition de Claude</strong> — relis, corrige et adapte librement (FR et EN).${s.source_url ? ` Source à vérifier : <a href="${escapeHtml(s.source_url)}" target="_blank" rel="noopener" style="color:var(--rust)">${escapeHtml(s.source_name || s.source_url)}</a>.` : ''}${s.angle ? `<br><em>${escapeHtml(s.angle)}</em>` : ''}</div>`;
+}
+
+async function newsSuggestMarkUsed(suggId, newsId) {
+  try { await adminFetch(`news_suggestions?id=eq.${suggId}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ status: 'used', news_id: newsId }) }); }
+  catch (e) { console.error('Proposition non marquée comme utilisée :', e); }
+  adminNewsFromSuggestion = null;
+}
+
+async function newsSuggestDismiss(id) {
+  if (!confirm('Ignorer cette proposition ? Elle ne sera plus affichée.')) return;
+  try {
+    await adminFetch(`news_suggestions?id=eq.${id}`, { method: 'PATCH', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ status: 'dismissed' }) });
+    adminNewsSuggestions = adminNewsSuggestions.filter(x => x.id !== id);
+    renderNewsSuggestions(false);
+    if (adminNewsSuggestions.length < 3) loadNewsSuggestions();   // la suivante prend sa place
   } catch (e) { alert('Erreur : ' + e.message); }
 }
