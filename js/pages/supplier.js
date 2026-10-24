@@ -76,14 +76,13 @@ async function startPremiumCheckout() {
   try {
     const res = await fetch(`${SUPABASE_URL}/create-checkout-session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        companyId: supplierCompany.id,
-        companyName: supplierCompany.name,
-        email: sessionStorage.getItem('sup_email'),
-      }),
+      // Le Worker identifie la personne par son JWT et vérifie qu'elle est propriétaire de la fiche :
+      // le nom et l'e-mail ne sont plus envoyés, ils viennent de la base et du compte.
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + sessionStorage.getItem('sup_access_token') },
+      body: JSON.stringify({ companyId: supplierCompany.id }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) throw new Error(t('sp_session_exp'));
     if (!res.ok || !data.url) throw new Error(data.error || t('sp_pay_err'));
     window.location.href = data.url;
   } catch (err) {

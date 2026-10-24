@@ -260,21 +260,43 @@ function serviceFetch(env, path, options = {}) {
 // service_role — le token seul ne suffit pas). authenticateAdmin renvoie
 // { caller } (id + email) ou { error: Response } ; requireAdmin renvoie
 // seulement la Response d'erreur éventuelle (null si l'appelant est admin).
-async function authenticateAdmin(request, env) {
+// Niveau d'authentification (« aal1 » mot de passe seul, « aal2 » mot de passe + code TOTP) lu dans le
+// JWT. À n'appeler que sur un token que Supabase vient de valider (resolveCaller) : la signature a alors
+// déjà été vérifiée, on ne fait que lire une valeur qu'il a posée.
+function jwtAal(token) {
+  try {
+    const part = String(token).split('.')[1];
+    if (!part) return null;
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4)));
+    return typeof payload.aal === 'string' ? payload.aal : null;
+  } catch { return null; }
+}
+
+// Identité de l'appelant, résolue par Supabase à partir de SON token (Authorization: Bearer …).
+// Renvoie { caller, token } ou { error: Response }.
+async function resolveCaller(request, env) {
   if (!env.SUPABASE_SERVICE_ROLE_KEY) {
     return { error: json({ error: 'SUPABASE_SERVICE_ROLE_KEY non configurée sur le Worker' }, 500) };
   }
-
   const authHeader = request.headers.get('Authorization') || '';
-  const callerToken = authHeader.replace(/^Bearer\s+/i, '');
-  if (!callerToken) return { error: json({ error: 'Non authentifié' }, 401) };
+  const token = authHeader.replace(/^Bearer\s+/i, '');
+  if (!token) return { error: json({ error: 'Non authentifié' }, 401) };
 
-  // 1. Résout l'identité de l'appelant à partir de son propre token.
   const whoRes = await fetch(`${SUPABASE_ORIGIN}/auth/v1/user`, {
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${callerToken}` },
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${token}` },
   });
   if (!whoRes.ok) return { error: json({ error: 'Session invalide' }, 401) };
   const caller = await whoRes.json();
+  if (!caller || !caller.id) return { error: json({ error: 'Session invalide' }, 401) };
+  return { caller, token };
+}
+
+async function authenticateAdmin(request, env) {
+  // 1. Résout l'identité de l'appelant à partir de son propre token.
+  const who = await resolveCaller(request, env);
+  if (who.error) return who;
+  const { caller, token: callerToken } = who;
 
   // 2. Vérifie que l'appelant est bien dans la table admins, et s'il est super-admin.
   //    Repli sans la colonne is_super tant que backend/supabase_admin_roles_2026_10.sql
@@ -287,6 +309,16 @@ async function authenticateAdmin(request, env) {
   }
   const checkRows = await checkRes.json();
   if (!checkRows.length) return { error: json({ error: 'Accès refusé : tu n\'es pas administrateur' }, 403) };
+
+  // 3. Double authentification : si ce compte a un facteur TOTP vérifié, le mot de passe seul (session
+  //    aal1) ne suffit pas pour ces actions sensibles (création / suppression de comptes, e-mails admin…).
+  //    Sans cela, un mot de passe admin volé contournerait le code TOTP en appelant le Worker directement.
+  //    Un compte admin sans TOTP n'est pas bloqué (comportement inchangé).
+  const hasTotp = (Array.isArray(caller.factors) ? caller.factors : [])
+    .some(f => f && f.factor_type === 'totp' && f.status === 'verified');
+  if (hasTotp && jwtAal(callerToken) !== 'aal2') {
+    return { error: json({ error: 'Double authentification requise : reconnecte-toi avec ton code', code: 'mfa_required' }, 403) };
+  }
   return { caller: { ...caller, isSuper: checkRows[0].is_super === true } };
 }
 
@@ -882,25 +914,45 @@ async function handleSendInviteEmail(request, env) {
 }
 
 // ── Stripe : création de la session de paiement Premium ─────────────
+// L'appelant doit être connecté ET propriétaire de la fiche : l'entreprise qui sera passée en Premium
+// par le webhook (client_reference_id) ne vient jamais de la seule requête. Le nom et l'e-mail viennent
+// de la base et du compte, pas du client.
 async function handleCreateCheckoutSession(request, env) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'JSON invalide' }, 400); }
 
-  const { companyId, companyName, email } = body || {};
-  if (!companyId || !email) return json({ error: 'companyId et email requis' }, 400);
+  const { companyId } = body || {};
+  if (!companyId || !UUID_RE.test(String(companyId))) return json({ error: 'companyId invalide' }, 400);
   if (!env.STRIPE_SECRET_KEY || !env.STRIPE_PRICE_ID) {
     return json({ error: 'Stripe non configuré sur le Worker' }, 500);
   }
+
+  const who = await resolveCaller(request, env);
+  if (who.error) return who.error;
+  const { caller } = who;
+
+  const [companyRes, memberRes] = await Promise.all([
+    serviceFetch(env, `companies?id=eq.${companyId}&select=id,name,claimed_by_user_id`),
+    serviceFetch(env, `company_members?company_id=eq.${companyId}&user_id=eq.${encodeURIComponent(caller.id)}&select=role`),
+  ]);
+  if (!companyRes.ok || !memberRes.ok) return json({ error: 'Vérification de l’entreprise impossible' }, 502);
+  const company = (await companyRes.json())[0];
+  if (!company) return json({ error: 'Entreprise introuvable' }, 404);
+  const members = await memberRes.json();
+  const isOwner = company.claimed_by_user_id === caller.id || members.some(m => m.role === 'owner');
+  if (!isOwner) return json({ error: 'Seul le propriétaire de la fiche peut souscrire Premium' }, 403);
+  const email = caller.email;
+  if (!email) return json({ error: 'Compte sans adresse e-mail' }, 400);
 
   const params = new URLSearchParams();
   params.set('mode', 'subscription');
   params.set('line_items[0][price]', env.STRIPE_PRICE_ID);
   params.set('line_items[0][quantity]', '1');
-  params.set('client_reference_id', companyId);
+  params.set('client_reference_id', company.id);
   params.set('customer_email', email);
-  params.set('metadata[company_id]', companyId);
-  params.set('metadata[company_name]', companyName || '');
-  params.set('subscription_data[metadata][company_id]', companyId);
+  params.set('metadata[company_id]', company.id);
+  params.set('metadata[company_name]', company.name || '');
+  params.set('subscription_data[metadata][company_id]', company.id);
   params.set('success_url', `${SITE_URL}/pages/supplier.html?premium=success`);
   params.set('cancel_url', `${SITE_URL}/pages/supplier.html?premium=cancelled`);
 
