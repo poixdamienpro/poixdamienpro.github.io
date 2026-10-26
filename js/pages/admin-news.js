@@ -19,7 +19,7 @@ let adminNewsEditingId = null;     // null = nouvelle actualité
 let adminNewsKitId = null;         // actualité dont le kit LinkedIn est ouvert
 let adminNewsSuggestions = [];     // propositions de Claude en attente (les 3 plus récentes)
 let adminNewsFromSuggestion = null; // proposition en cours de modification dans l'éditeur
-const NEWS_BODY_LIMIT = { company: 8000, watch: 1500 };
+const NEWS_BODY_LIMIT = { company: 8000, watch: 12000 };   // une veille peut être une analyse technique longue
 const NEWS_LANGS = [['fr', 'Français'], ['en', 'English']];
 const NEWS_KIND_FR = NEWS_I18N.fr.kind;
 
@@ -113,7 +113,7 @@ function newsEditorOpen(id, prefill) {
         <div class="lead-field"><label>${lang === 'fr' ? 'Résumé' : 'Summary'} (affiché dans les listes, les aperçus de partage et le post LinkedIn) <span id="nw-summary${sfx}-count" style="color:var(--muted)"></span></label>
           <textarea id="nw-summary${sfx}" rows="2" maxlength="300" oninput="newsEditorCounters()">${escapeHtml(field(lang, 'summary'))}</textarea></div>
         <div class="lead-field"><label>${lang === 'fr' ? 'Texte' : 'Text'} <span id="nw-body${sfx}-count" style="color:var(--muted)"></span></label>
-          <textarea id="nw-body${sfx}" rows="8" maxlength="8000" oninput="newsEditorCounters()">${escapeHtml(field(lang, 'body'))}</textarea></div>
+          <textarea id="nw-body${sfx}" rows="18" maxlength="8000" oninput="newsEditorCounters()">${escapeHtml(field(lang, 'body'))}</textarea></div>
       </div>`;
   };
   box.innerHTML = `
@@ -123,16 +123,16 @@ function newsEditorOpen(id, prefill) {
       <div class="lead-field" style="max-width:320px"><label>Type</label>
         <select id="nw-kind" onchange="newsEditorKindChanged()">
           <option value="company"${v.kind === 'company' ? ' selected' : ''}>Actu Buy-inner (annonce, nouveauté, partenariat…)</option>
-          <option value="watch"${v.kind === 'watch' ? ' selected' : ''}>Veille sectorielle (résumé d'un article tiers)</option>
+          <option value="watch"${v.kind === 'watch' ? ' selected' : ''}>Veille et analyse technique (rédigée à partir d'une source citée)</option>
         </select></div>
       <div class="lead-field"><label>Adresse de la page (générée depuis le titre français, identique dans les deux langues)</label>
         <input type="text" id="nw-slug" maxlength="90" value="${escapeHtml(v.slug)}" ${r && newsIsLive(r) ? 'readonly title="Adresse figée : l\'actualité est en ligne et déjà partageable"' : ''} oninput="document.getElementById('nw-slug').dataset.touched='1'; newsEditorUrlHint()"/>
         <div style="font-size:11px;color:var(--muted);margin-top:4px" id="nw-slug-url"></div></div>
       ${NEWS_LANGS.map(langBlock).join('')}
-      <div style="font-size:11px;color:var(--muted);margin:-6px 0 14px">Mise en forme du texte : une ligne vide = nouveau paragraphe · <code>## Titre</code> = intertitre · lignes commençant par <code>- </code> = liste · <code>**gras**</code> · <code>[texte](https://lien)</code>. Le HTML n'est jamais interprété.</div>
+      <div style="font-size:11px;color:var(--muted);margin:-6px 0 14px">Mise en forme du texte : une ligne vide = nouveau paragraphe · <code>## Titre</code> = intertitre · <code>### Titre</code> = sous-intertitre · lignes commençant par <code>- </code> = liste · <code>1. </code> = liste numérotée · <code>&gt; texte</code> = encadré (point clé) · tableau : <code>| A | B |</code> puis <code>|---|---|</code> puis une ligne par rangée · <code>**gras**</code> · <code>[texte](https://lien)</code>. Le HTML n'est jamais interprété.</div>
       <div id="nw-watch-box">
         <div style="background:rgba(63,154,114,.08);border:1px solid rgba(63,154,114,.3);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--text2);margin-bottom:12px">
-          <strong>Veille : résumez avec vos propres mots</strong> (1 500 caractères maximum par langue). Ne recopiez pas le texte de l'article d'origine : citez la source et renvoyez vers elle. Le nom et le lien de la source sont obligatoires.</div>
+          <strong>Veille et analyse : rédigez avec vos propres mots</strong> (12 000 caractères maximum par langue ; à partir de 3 000 caractères, l'article est présenté comme « analyse technique »). Ne recopiez pas le texte de l'article d'origine : apportez votre analyse, citez la source principale et renvoyez vers elle. Le nom et le lien de la source sont obligatoires ; ajoutez les autres sources dans le texte.</div>
         <div class="lead-field"><label>Nom de la source (ex. ESA, Les Échos, Saft)</label><input type="text" id="nw-source-name" maxlength="120" value="${escapeHtml(v.source_name || '')}"/></div>
         <div class="lead-field"><label>Lien de l'article d'origine</label><input type="url" id="nw-source-url" placeholder="https://…" value="${escapeHtml(v.source_url || '')}"/></div>
       </div>
@@ -204,11 +204,11 @@ function newsEditorRead(needEn) {
   else if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(o.slug) || o.slug.length > 90) err = 'L\'adresse ne peut contenir que des minuscules, des chiffres et des tirets.';
   else if (o.summary.length < 20 || o.summary.length > 300) err = 'Le résumé français doit faire entre 20 et 300 caractères.';
   else if (o.body.length < 20) err = 'Le texte français est trop court (20 caractères minimum).';
-  else if (o.body.length > max) err = kind === 'watch' ? 'Une veille est un résumé : 1 500 caractères maximum.' : 'Le texte français dépasse 8 000 caractères.';
+  else if (o.body.length > max) err = kind === 'watch' ? 'Le texte français d\'une veille dépasse 12 000 caractères.' : 'Le texte français dépasse 8 000 caractères.';
   else if (needEn && !(o.title_en && o.summary_en && o.body_en)) err = 'La version anglaise est obligatoire pour publier : titre, résumé et texte.';
   else if (anyEn && (!o.title_en || o.title_en.length < 5 || o.title_en.length > 160)) err = 'English title: between 5 and 160 characters (titre anglais : 5 à 160 caractères).';
   else if (anyEn && (!o.summary_en || o.summary_en.length < 20 || o.summary_en.length > 300)) err = 'English summary: between 20 and 300 characters (résumé anglais : 20 à 300 caractères).';
-  else if (anyEn && (!o.body_en || o.body_en.length < 20 || o.body_en.length > max)) err = kind === 'watch' ? 'English text: 1,500 characters maximum for a watch item (texte anglais : 1 500 caractères maximum).' : 'English text: 20 to 8,000 characters (texte anglais : 20 à 8 000 caractères).';
+  else if (anyEn && (!o.body_en || o.body_en.length < 20 || o.body_en.length > max)) err = kind === 'watch' ? 'English text: 12,000 characters maximum for a watch item (texte anglais : 12 000 caractères maximum).' : 'English text: 20 to 8,000 characters (texte anglais : 20 à 8 000 caractères).';
   else if (kind === 'watch' && (!o.source_name || !o.source_url)) err = 'Une veille doit citer sa source : renseigne le nom et le lien de l\'article d\'origine.';
   else if (!url(o.source_url) || !url(o.image_url)) err = 'Les liens doivent commencer par http:// ou https://.';
   else if (tags.length > 8) err = '8 thèmes maximum.';
@@ -228,9 +228,9 @@ function newsPreviewToggle(lang) {
 function newsErrorText(msg) {
   if (/news_posts_slug_uniq/.test(msg)) return 'Cette adresse est déjà utilisée par une autre actualité : modifie-la.';
   if (/news_posts_en_required_chk/.test(msg)) return 'La version anglaise est obligatoire pour publier : titre, résumé et texte.';
-  if (/news_posts_watch_chk/.test(msg)) return 'Une veille doit citer sa source (nom et lien) et rester un résumé de 1 500 caractères maximum.';
-  if (/news_posts_len_en_chk/.test(msg)) return 'Longueur invalide en anglais : titre 5–160, résumé 20–300, texte 20–8 000 caractères (1 500 pour une veille).';
-  if (/news_posts_len_chk/.test(msg)) return 'Longueur invalide : titre 5–160, résumé 20–300, texte 20–8 000 caractères.';
+  if (/news_posts_watch_chk/.test(msg)) return 'Une veille doit citer sa source (nom et lien).';
+  if (/news_posts_len_en_chk/.test(msg)) return 'Longueur invalide en anglais : titre 5–160, résumé 20–300, texte 20–8 000 caractères (12 000 pour une veille).';
+  if (/news_posts_len_chk/.test(msg)) return 'Longueur invalide : titre 5–160, résumé 20–300, texte 20–8 000 caractères (12 000 pour une veille).';
   if (/news_posts_urls_chk/.test(msg)) return 'Les liens doivent commencer par http:// ou https://.';
   return msg;
 }

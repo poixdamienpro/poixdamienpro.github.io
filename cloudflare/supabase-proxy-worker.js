@@ -1523,17 +1523,17 @@ async function handleListPage(kind, request, env, ctx) {
 // MÊME logique de rendu que js/news.js (un test compare les deux) : toute modification doit être reportée aux deux.
 const NEWS_I18N = {
   fr: {
-    locale: 'fr-FR', kind: { company: 'Actu Buy-inner', watch: 'Veille sectorielle' },
+    locale: 'fr-FR', kind: { company: 'Actu Buy-inner', watch: 'Veille sectorielle' }, analysis: 'Analyse technique', read: m => `≈ ${m} min de lecture`,
     source: 'Source : ', suffix: ' — Actualités Buy-inner',
-    original: a => `Source originale : ${a}. Résumé rédigé par Buy-inner : pour le texte complet, consultez l'article d'origine.`,
+    original: a => `Source originale : ${a}. Texte rédigé par Buy-inner à partir de cette source ; pour aller plus loin, consultez l'article d'origine.`,
     itemPath: '/blog/actu.html', listPath: '/blog/actus.html', rssPath: '/blog/actus.xml', hrefBase: 'actu.html',
     empty: 'Les premières actualités arrivent bientôt.',
     rssTitle: 'Buy-inner — Actualités', rssDesc: 'Les actualités de Buy-inner et la veille sur les composants industriels, le spatial et l\'énergie.', rssLang: 'fr-FR',
   },
   en: {
-    locale: 'en-GB', kind: { company: 'Buy-inner news', watch: 'Industry watch' },
+    locale: 'en-GB', kind: { company: 'Buy-inner news', watch: 'Industry watch' }, analysis: 'Technical analysis', read: m => `≈ ${m} min read`,
     source: 'Source: ', suffix: ' — Buy-inner News',
-    original: a => `Original source: ${a}. Summary written by Buy-inner: for the full text, see the original article.`,
+    original: a => `Original source: ${a}. Text written by Buy-inner based on this source; for more detail, see the original article.`,
     itemPath: '/en/news-item.html', listPath: '/en/news.html', rssPath: '/en/news.xml', hrefBase: 'news-item.html',
     empty: 'The first news items are coming soon.',
     rssTitle: 'Buy-inner — News', rssDesc: 'Buy-inner news and industry watch on industrial components, space and energy.', rssLang: 'en-GB',
@@ -1554,20 +1554,40 @@ function newsInline(s) {
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
+// Une ligne de tableau « | a | b | » donne ['a', 'b'] ; la 2e ligne d'un tableau est « |---|---| ».
+const newsTableCells = l => l.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+const newsIsTableSep = l => /^\|?[\s:|-]+\|?$/.test(l) && l.includes('-') && l.includes('|');
+
 function renderNewsBody(text) {
   return String(text || '').replace(/\r\n?/g, '\n').split(/\n[ \t]*\n/).map(b => b.trim()).filter(Boolean).map(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length === 1 && lines[0].startsWith('### ')) return '<h4>' + newsInline(lines[0].slice(4)) + '</h4>';
     if (lines.length === 1 && lines[0].startsWith('## ')) return '<h3>' + newsInline(lines[0].slice(3)) + '</h3>';
     if (lines.every(l => l.startsWith('- '))) return '<ul>' + lines.map(l => '<li>' + newsInline(l.slice(2)) + '</li>').join('') + '</ul>';
+    if (lines.every(l => /^\d+[.)]\s+/.test(l))) return '<ol>' + lines.map(l => '<li>' + newsInline(l.replace(/^\d+[.)]\s+/, '')) + '</li>').join('') + '</ol>';
+    if (lines.every(l => l.startsWith('>'))) return '<blockquote>' + lines.map(l => newsInline(l.replace(/^>\s?/, ''))).join('<br>') + '</blockquote>';
+    if (lines.length >= 3 && lines.every(l => l.startsWith('|')) && newsIsTableSep(lines[1])) {
+      const head = newsTableCells(lines[0]), n = head.length;
+      const row = l => { const c = newsTableCells(l).slice(0, n); while (c.length < n) c.push(''); return c; };
+      return '<div class="news-table"><table><thead><tr>' + head.map(c => '<th>' + newsInline(c) + '</th>').join('') + '</tr></thead><tbody>' +
+        lines.slice(2).map(l => '<tr>' + row(l).map(c => '<td>' + newsInline(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+    }
     return '<p>' + lines.map(newsInline).join('<br>') + '</p>';
   }).join('\n');
 }
+
+// Un texte de veille d'au moins 3 000 caractères est présenté comme une « analyse technique ».
+const NEWS_ANALYSIS_MIN = 3000;
+const newsIsAnalysis = (n, lang) => n.kind === 'watch' && String(newsField(n, lang).body || '').length >= NEWS_ANALYSIS_MIN;
+const newsKindLabel = (n, lang) => { const L = NEWS_I18N[newsLang(lang)]; return newsIsAnalysis(n, lang) ? L.analysis : L.kind[n.kind === 'watch' ? 'watch' : 'company']; };
+// Temps de lecture (≈ 220 mots par minute), affiché à partir de 2 minutes.
+const newsReadMinutes = text => Math.max(1, Math.round(String(text || '').trim().split(/\s+/).filter(Boolean).length / 220));
 function newsCardHtml(n, hrefBase, lang) {
   const L = NEWS_I18N[newsLang(lang)], f = newsField(n, lang);
   const href = (hrefBase || L.hrefBase) + '?slug=' + encodeURIComponent(n.slug);
   const kind = n.kind === 'watch' ? 'watch' : 'company';
   return '<article class="news-card" data-kind="' + kind + '">' +
-    '<div class="news-card-meta"><span class="news-tag news-tag-' + kind + '">' + L.kind[kind] + '</span>' +
+    '<div class="news-card-meta"><span class="news-tag news-tag-' + kind + '">' + newsKindLabel(n, lang) + '</span>' +
     '<time datetime="' + newsEsc(n.published_at) + '">' + newsEsc(newsDate(n.published_at, lang)) + '</time></div>' +
     '<h2><a href="' + newsEsc(href) + '">' + newsEsc(f.title) + '</a></h2>' +
     '<p>' + newsEsc(f.summary) + '</p>' +
@@ -1594,8 +1614,8 @@ function newsArticleContent(n, lang) {
     title: `${f.title}${L.suffix}`,
     desc: String(f.summary || '').slice(0, 200),
     url, image,
-    headerHtml: `<div class="cat-eyebrow">${newsEsc(L.kind[watch ? 'watch' : 'company'])}</div><h1>${newsEsc(f.title)}</h1><p class="cat-hero-desc">${newsEsc(f.summary)}</p>` +
-      `<div class="article-meta"><time datetime="${newsEsc(n.published_at)}">${newsEsc(newsDate(n.published_at, lang))}</time>${watch && n.source_name ? `<span>${L.source}${newsEsc(n.source_name)}</span>` : ''}</div>`,
+    headerHtml: `<div class="cat-eyebrow">${newsEsc(newsKindLabel(n, lang))}</div><h1>${newsEsc(f.title)}</h1><p class="cat-hero-desc">${newsEsc(f.summary)}</p>` +
+      `<div class="article-meta"><time datetime="${newsEsc(n.published_at)}">${newsEsc(newsDate(n.published_at, lang))}</time>${watch && n.source_name ? `<span>${L.source}${newsEsc(n.source_name)}</span>` : ''}${newsReadMinutes(f.body) >= 2 ? `<span>${L.read(newsReadMinutes(f.body))}</span>` : ''}</div>`,
     bodyHtml: (isUrl(n.image_url) ? `<img class="news-image" src="${newsEsc(n.image_url)}" alt="${newsEsc(f.title)}"/>` : '') +
       renderNewsBody(f.body) +
       (watch && isUrl(n.source_url) ? `<p class="news-source">${L.original(`<a href="${newsEsc(n.source_url)}" target="_blank" rel="noopener">${newsEsc(n.source_name || n.source_url)}</a>`)}</p>` : ''),
@@ -1707,7 +1727,7 @@ async function handleNewsRss(request, env, ctx, lang) {
       <link>${newsEsc(newsPageUrl(n.slug, lang))}</link>
       <guid isPermaLink="true">${newsEsc(newsPageUrl(n.slug, lang))}</guid>
       <pubDate>${new Date(n.published_at).toUTCString()}</pubDate>
-      <category>${newsEsc(L.kind[n.kind === 'watch' ? 'watch' : 'company'])}</category>
+      <category>${newsEsc(newsKindLabel(n, lang))}</category>
       <description>${newsEsc(newsField(n, lang).summary)}</description>
     </item>`).join('\n');
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -1755,7 +1775,7 @@ function newsValidateSuggestion(s) {
   const errors = [];
   if (!s || typeof s !== 'object' || Array.isArray(s)) return { errors: ['proposition invalide (objet attendu)'] };
   const kind = s.kind === 'company' ? 'company' : 'watch';
-  const max = kind === 'watch' ? 1500 : 8000;
+  const max = kind === 'watch' ? 12000 : 8000;   // veille / analyse : 12 000 ; actu Buy-inner : 8 000
   const f = {
     title: newsClean(s.title, 400), summary: newsClean(s.summary, 1000), body: newsClean(s.body, 20000),
     title_en: newsClean(s.title_en, 400), summary_en: newsClean(s.summary_en, 1000), body_en: newsClean(s.body_en, 20000),

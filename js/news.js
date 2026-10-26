@@ -8,8 +8,10 @@
 //
 // Le texte d'une actualité s'écrit en balisage minimal (toujours échappé, jamais de HTML libre) :
 //   - un paragraphe = un bloc séparé du suivant par une ligne vide ;
-//   - « ## Titre » sur une ligne seule : intertitre ;
-//   - des lignes commençant par « - » : liste à puces ;
+//   - « ## Titre » sur une ligne seule : intertitre ; « ### Titre » : sous-intertitre ;
+//   - des lignes commençant par « - » : liste à puces ; par « 1. », « 2. » : liste numérotée ;
+//   - des lignes commençant par « > » : encadré (point clé) ;
+//   - un tableau : première ligne « | A | B | », deuxième « |---|---| », puis une ligne par rangée ;
 //   - **gras** et [libellé](https://lien) dans le texte.
 // Le Worker (cloudflare/supabase-proxy-worker.js) contient la MÊME logique pour le rendu côté serveur : toute
 // modification ici doit y être reportée (un test compare les deux sorties).
@@ -17,16 +19,16 @@
 const NEWS_SITE = 'https://www.buy-inner.com';
 const NEWS_I18N = {
   fr: {
-    locale: 'fr-FR', kind: { company: 'Actu Buy-inner', watch: 'Veille sectorielle' },
+    locale: 'fr-FR', kind: { company: 'Actu Buy-inner', watch: 'Veille sectorielle' }, analysis: 'Analyse technique', read: m => '≈ ' + m + ' min de lecture',
     source: 'Source : ', suffix: ' — Actualités Buy-inner',
-    original: (a) => 'Source originale : ' + a + '. Résumé rédigé par Buy-inner : pour le texte complet, consultez l\'article d\'origine.',
+    original: (a) => 'Source originale : ' + a + '. Texte rédigé par Buy-inner à partir de cette source ; pour aller plus loin, consultez l\'article d\'origine.',
     itemPath: '/blog/actu.html', listPath: '/blog/actus.html', hrefBase: 'actu.html',
     more: '👉 La suite : ', sourceLine: 'Source : ', summaryLine: 'Notre résumé, avec le lien vers l\'article d\'origine : ',
   },
   en: {
-    locale: 'en-GB', kind: { company: 'Buy-inner news', watch: 'Industry watch' },
+    locale: 'en-GB', kind: { company: 'Buy-inner news', watch: 'Industry watch' }, analysis: 'Technical analysis', read: m => '≈ ' + m + ' min read',
     source: 'Source: ', suffix: ' — Buy-inner News',
-    original: (a) => 'Original source: ' + a + '. Summary written by Buy-inner: for the full text, see the original article.',
+    original: (a) => 'Original source: ' + a + '. Text written by Buy-inner based on this source; for more detail, see the original article.',
     itemPath: '/en/news-item.html', listPath: '/en/news.html', hrefBase: 'news-item.html',
     more: '👉 Read more: ', sourceLine: 'Source: ', summaryLine: 'Our summary, with a link to the original article: ',
   },
@@ -50,14 +52,34 @@ function newsInline(s) {
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 }
 
+// Une ligne de tableau « | a | b | » donne ['a', 'b'] ; la 2e ligne d'un tableau est « |---|---| ».
+const newsTableCells = l => l.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+const newsIsTableSep = l => /^\|?[\s:|-]+\|?$/.test(l) && l.includes('-') && l.includes('|');
+
 function renderNewsBody(text) {
   return String(text || '').replace(/\r\n?/g, '\n').split(/\n[ \t]*\n/).map(b => b.trim()).filter(Boolean).map(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length === 1 && lines[0].startsWith('### ')) return '<h4>' + newsInline(lines[0].slice(4)) + '</h4>';
     if (lines.length === 1 && lines[0].startsWith('## ')) return '<h3>' + newsInline(lines[0].slice(3)) + '</h3>';
     if (lines.every(l => l.startsWith('- '))) return '<ul>' + lines.map(l => '<li>' + newsInline(l.slice(2)) + '</li>').join('') + '</ul>';
+    if (lines.every(l => /^\d+[.)]\s+/.test(l))) return '<ol>' + lines.map(l => '<li>' + newsInline(l.replace(/^\d+[.)]\s+/, '')) + '</li>').join('') + '</ol>';
+    if (lines.every(l => l.startsWith('>'))) return '<blockquote>' + lines.map(l => newsInline(l.replace(/^>\s?/, ''))).join('<br>') + '</blockquote>';
+    if (lines.length >= 3 && lines.every(l => l.startsWith('|')) && newsIsTableSep(lines[1])) {
+      const head = newsTableCells(lines[0]), n = head.length;
+      const row = l => { const c = newsTableCells(l).slice(0, n); while (c.length < n) c.push(''); return c; };
+      return '<div class="news-table"><table><thead><tr>' + head.map(c => '<th>' + newsInline(c) + '</th>').join('') + '</tr></thead><tbody>' +
+        lines.slice(2).map(l => '<tr>' + row(l).map(c => '<td>' + newsInline(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+    }
     return '<p>' + lines.map(newsInline).join('<br>') + '</p>';
   }).join('\n');
 }
+
+// Un texte de veille d'au moins 3 000 caractères est présenté comme une « analyse technique ».
+const NEWS_ANALYSIS_MIN = 3000;
+const newsIsAnalysis = (n, lang) => n.kind === 'watch' && String(newsField(n, lang).body || '').length >= NEWS_ANALYSIS_MIN;
+const newsKindLabel = (n, lang) => { const L = NEWS_I18N[newsLang(lang)]; return newsIsAnalysis(n, lang) ? L.analysis : L.kind[n.kind === 'watch' ? 'watch' : 'company']; };
+// Temps de lecture (≈ 220 mots par minute), affiché à partir de 2 minutes.
+const newsReadMinutes = text => Math.max(1, Math.round(String(text || '').trim().split(/\s+/).filter(Boolean).length / 220));
 
 // « Titre d'une actu » -> « titre-d-une-actu » (sans accents, 80 caractères maximum, coupé sur un tiret).
 function newsSlugify(title) {
@@ -74,7 +96,7 @@ function newsCardHtml(n, hrefBase, lang) {
   const href = (hrefBase || L.hrefBase) + '?slug=' + encodeURIComponent(n.slug);
   const kind = n.kind === 'watch' ? 'watch' : 'company';
   return '<article class="news-card" data-kind="' + kind + '">' +
-    '<div class="news-card-meta"><span class="news-tag news-tag-' + kind + '">' + L.kind[kind] + '</span>' +
+    '<div class="news-card-meta"><span class="news-tag news-tag-' + kind + '">' + newsKindLabel(n, lang) + '</span>' +
     '<time datetime="' + newsEsc(n.published_at) + '">' + newsEsc(newsDate(n.published_at, lang)) + '</time></div>' +
     '<h2><a href="' + newsEsc(href) + '">' + newsEsc(f.title) + '</a></h2>' +
     '<p>' + newsEsc(f.summary) + '</p>' +
@@ -90,8 +112,8 @@ function newsArticleParts(n, lang) {
   return {
     title: f.title + L.suffix,
     desc: String(f.summary || '').slice(0, 200),
-    headerHtml: '<div class="cat-eyebrow">' + newsEsc(L.kind[watch ? 'watch' : 'company']) + '</div><h1>' + newsEsc(f.title) + '</h1><p class="cat-hero-desc">' + newsEsc(f.summary) + '</p>' +
-      '<div class="article-meta"><time datetime="' + newsEsc(n.published_at) + '">' + newsEsc(newsDate(n.published_at, lang)) + '</time>' + (watch && n.source_name ? '<span>' + L.source + newsEsc(n.source_name) + '</span>' : '') + '</div>',
+    headerHtml: '<div class="cat-eyebrow">' + newsEsc(newsKindLabel(n, lang)) + '</div><h1>' + newsEsc(f.title) + '</h1><p class="cat-hero-desc">' + newsEsc(f.summary) + '</p>' +
+      '<div class="article-meta"><time datetime="' + newsEsc(n.published_at) + '">' + newsEsc(newsDate(n.published_at, lang)) + '</time>' + (watch && n.source_name ? '<span>' + L.source + newsEsc(n.source_name) + '</span>' : '') + (newsReadMinutes(f.body) >= 2 ? '<span>' + L.read(newsReadMinutes(f.body)) + '</span>' : '') + '</div>',
     bodyHtml: (newsIsUrl(n.image_url) ? '<img class="news-image" src="' + newsEsc(n.image_url) + '" alt="' + newsEsc(f.title) + '"/>' : '') +
       renderNewsBody(f.body) +
       (watch && newsIsUrl(n.source_url) ? '<p class="news-source">' + L.original('<a href="' + newsEsc(n.source_url) + '" target="_blank" rel="noopener">' + newsEsc(n.source_name || n.source_url) + '</a>') + '</p>' : ''),
@@ -117,4 +139,4 @@ function newsLinkedinText(n, lang) {
 // le texte se colle depuis le presse-papiers).
 const newsShareUrl = (n, lang) => 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(newsTrackedUrl(n, lang));
 
-if (typeof module !== 'undefined') module.exports = { newsArticleParts, newsIsUrl, newsEsc, newsInline, renderNewsBody, newsSlugify, newsDate, newsPageUrl, newsCardHtml, newsLinkedinText, newsShareUrl, newsTrackedUrl, newsHashtag, newsLang, newsField, newsHasLang, NEWS_I18N };
+if (typeof module !== 'undefined') module.exports = { newsArticleParts, newsIsUrl, newsEsc, newsInline, renderNewsBody, newsSlugify, newsDate, newsPageUrl, newsCardHtml, newsLinkedinText, newsShareUrl, newsTrackedUrl, newsHashtag, newsLang, newsField, newsHasLang, NEWS_I18N, newsKindLabel, newsIsAnalysis, newsReadMinutes };
