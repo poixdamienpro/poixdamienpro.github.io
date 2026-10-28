@@ -8,13 +8,16 @@ const SUPABASE_URL    = 'https://www.buy-inner.com/api';
 const SUPABASE_ANON   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6ZWp4d3J0c2dsbWlpdGJocGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MTEwNTMsImV4cCI6MjA5Njk4NzA1M30.-SpxNs7G_5nEuZCXL68lNVcCzFTyiaZc93dViix76Ok';     // clé publique anon
 
 // ═══════════════════════════════
-// CONFIGURATION LOGO.DEV
-// Vrais logos d'entreprise par domaine (img.logo.dev/:domain). Clé
-// "publishable" — faite pour être exposée côté client, comme la clé
-// anon Supabase ci-dessus. À remplacer par ta propre clé gratuite :
-// https://www.logo.dev -> Get free API key
+// PHOTOS DE PRODUITS — affichage suspendu
+// Une photo de produit est protégée par le droit d'auteur : l'afficher suppose l'accord de son titulaire. Les photos
+// actuellement en base (38, sur trois entreprises non revendiquées) ont été copiées sans accord écrit : elles ne sont
+// plus affichées. Les fichiers restent dans le stockage, rien n'est supprimé.
+// Remettre à `true` (ICI et dans cloudflare/supabase-proxy-worker.js, même nom) uniquement quand :
+//   - les CGV contiennent la clause de licence des fournisseurs sur les images qu'ils déposent ;
+//   - le formulaire de soumission exige la case « je suis titulaire des droits ou autorisé » ;
+//   - les photos conservées ont l'accord écrit de l'entreprise concernée.
 // ═══════════════════════════════
-const LOGO_DEV_TOKEN  = 'pk_auyA2g6JQ6aVtkiqtPU2xg';
+const SHOW_PRODUCT_PHOTOS = false;
 
 // ═══════════════════════════════
 // EMAILS TRANSACTIONNELS — relayés par le Worker Cloudflare

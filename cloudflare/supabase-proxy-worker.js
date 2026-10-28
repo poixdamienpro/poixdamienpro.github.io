@@ -86,6 +86,8 @@ const GITHUB_PAGES_ORIGIN = 'https://poixdamienpro.github.io';
 const RESEND_FROM = 'Buy-inner <noreply@buy-inner.com>';
 const STRIPE_API = 'https://api.stripe.com/v1';
 const SITE_URL = 'https://www.buy-inner.com';
+// Photos de produits : affichage suspendu (droit d'auteur, accord des titulaires non obtenu). Même interrupteur que js/data.js.
+const SHOW_PRODUCT_PHOTOS = false;
 
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1245,7 +1247,7 @@ function productContent(p, lang) {
   const certs = Array.isArray(p.certs) ? p.certs : [];
   const url = entityUrlAbs('product', lang, p.id);
 
-  const imageHtml = isHttpUrl(p.image_url) ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(name)}" style="max-width:280px;border-radius:8px;margin-bottom:16px"/>` : '';
+  const imageHtml = SHOW_PRODUCT_PHOTOS && isHttpUrl(p.image_url) ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(name)}" style="max-width:280px;border-radius:8px;margin-bottom:16px"/>` : '';
   const specsHtml = shown.length ? `
     <div class="modal-section">
       <div class="modal-section-title">${L.specs}</div>
@@ -1278,7 +1280,7 @@ function productContent(p, lang) {
       description: description || undefined,
       additionalType: category || undefined,
       url,
-      image: isHttpUrl(p.image_url) ? p.image_url : undefined,
+      image: SHOW_PRODUCT_PHOTOS && isHttpUrl(p.image_url) ? p.image_url : undefined,
     },
   };
 }

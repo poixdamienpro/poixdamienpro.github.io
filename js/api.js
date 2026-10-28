@@ -147,35 +147,15 @@ function mapCompany(row) {
   };
 }
 
-// Extrait le domaine (sans www.) du site d'une entreprise, pour interroger
-// logo.dev. Retourne null si pas de site réel renseigné.
-function companyDomain(site) {
-  if (!site || site === '#') return null;
-  try { return new URL(site).hostname.replace(/^www\./, ''); } catch { return null; }
-}
-
-// Rendu HTML du logo d'une entreprise : vrai logo via logo.dev quand un
-// site et une clé sont disponibles, avec repli automatique sur l'emoji
-// (onerror) si le logo n'existe pas chez logo.dev ou si la clé n'est pas
-// configurée — jamais de case vide.
-// Logos fournis par la plateforme (fichiers locaux), prioritaires sur logo.dev : entreprises
-// partenaires dont on a le logo officiel (le même que sur « Qui sommes-nous »).
-// Clé = domaine sans www.
-const LOCAL_COMPANY_LOGOS = {
-  'aifinity.fr': 'assets/partners/aifinity.png',
-};
-
-function companyLogoHtml(c, sizePx) {
-  sizePx = sizePx || 40;
-  const domain = companyDomain(c.site);
-  const fallback = (c.logo || '🏭').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  if (domain && LOCAL_COMPANY_LOGOS[domain]) {
-    const base = (typeof ROOT_PREFIX === 'string') ? ROOT_PREFIX : '/';
-    return `<img src="${base}${LOCAL_COMPANY_LOGOS[domain]}" alt="" loading="lazy" style="max-width:86%;max-height:86%;object-fit:contain" onerror="this.outerHTML='${fallback}'"/>`;
-  }
-  if (!domain || !LOGO_DEV_TOKEN || LOGO_DEV_TOKEN.includes('XXXX')) return fallback;
-  const url = `https://img.logo.dev/${domain}?token=${LOGO_DEV_TOKEN}&size=${sizePx * 2}&format=png`;
-  return `<img src="${url}" alt="" loading="lazy" style="max-width:78%;max-height:78%;object-fit:contain" onerror="this.outerHTML='${fallback}'"/>`;
+// Pastille d'une entreprise dans les listes, les cartes et les fiches.
+// Buy-inner n'affiche AUCUN logo de marque : les logos appartiennent aux entreprises référencées, et tant qu'elles
+// n'ont pas donné leur accord, les montrer (même via un service tiers comme logo.dev) n'est pas acceptable. On affiche
+// le pictogramme neutre enregistré sur la fiche (c.logo : un emoji, 🏭 par défaut).
+// Pour afficher un logo avec l'accord de l'entreprise : déposer le fichier fourni par elle dans assets/ et l'ajouter ici,
+// fiche par fiche. Jamais de récupération automatique depuis un service tiers.
+// (Le second argument, ancienne taille demandée à logo.dev, est conservé pour ne pas modifier les appels.)
+function companyLogoHtml(c) {
+  return escapeHtml((c && c.logo) || '🏭');
 }
 
 function mapProduct(row) {
@@ -188,7 +168,7 @@ function mapProduct(row) {
     cat:      row.category,
     industry: row.industry,
     icon:     row.icon        || '🔧',
-    image:    row.image_url   || '',
+    image:    SHOW_PRODUCT_PHOTOS ? (row.image_url || '') : '',   // voir js/data.js : affichage des photos suspendu
     desc:     row.description || '',
     // Voir js/i18n.js localize() et mapCompany() ci-dessus.
     descEn:   row.description_en || '',
