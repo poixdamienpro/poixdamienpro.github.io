@@ -6,7 +6,7 @@
 <title data-i18n="sp_doc_title">Espace fournisseur · Buy-inner</title>
 <meta name="description" data-i18n-content="sp_meta_desc" content="Espace fournisseur Buy-inner : gérez vos produits et vos leads. Chaque ajout est validé avant publication."/>
 <meta name="robots" content="noindex,follow"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/fonts.css?v=20261028"/>
 <link rel="stylesheet" href="../css/styles.css"/>
 <link rel="icon" href="../assets/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
@@ -67,6 +67,7 @@
         <form onsubmit="supplierSignup(event)">
           <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="sup-signup-email" required/></div>
           <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="sup-signup-password" minlength="8" required/></div>
+          <div data-consent="signup"></div>
           <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
         <p id="sup-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>

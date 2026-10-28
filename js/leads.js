@@ -29,8 +29,10 @@ function resetLeadForm() {
       <div class="lead-field"><label>${_t('lead_email')}</label><input type="email" id="lead-email" value="${p && p.email ? escapeHtml(p.email) : ''}" required/></div>
       <div class="lead-field"><label>${_t('lead_company')}</label><input type="text" id="lead-company" value="${p && p.company ? escapeHtml(p.company) : ''}" required/></div>
       <div class="lead-field"><label>${_t('lead_need')}</label><textarea id="lead-need" required placeholder="${_t('lead_need_placeholder')}"></textarea></div>
+      <div data-consent="lead"></div>
       <button type="submit" class="btn-quote" style="width:100%;justify-content:center">${_t('lead_submit')}</button>
     </form>`;
+  if (typeof renderConsentSlots === 'function') renderConsentSlots();
 }
 
 async function submitLeadForm(e) {
@@ -59,7 +61,7 @@ async function submitLeadForm(e) {
         message:
           `Fournisseur visé : ${leadTarget.company}${leadTarget.product ? '\nProduit : ' + leadTarget.product : ''}\n\n` +
           `Besoin :\n${need}\n\n` +
-          `Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.`,
+          `Rappel process : transmettre ce lead à ${leadTarget.company} et ne facturer le lead fee que s'il l'accepte.` + consentLine(),
       }),
     });
     const data = await res.json();

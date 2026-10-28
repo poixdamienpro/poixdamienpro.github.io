@@ -116,12 +116,12 @@ function addProductBlock() {
     </div>
     <div class="lead-field"><label data-i18n="lbl_description">Description</label><textarea class="p-desc"></textarea></div>
     <div class="lead-field"><label data-i18n="sb_p_certs">Certifications (séparées par des virgules)</label><input type="text" class="p-certs" placeholder="CE, UN38.3, ..."/></div>
-    <div class="lead-field">
+    ${SHOW_PRODUCT_PHOTOS ? `<div class="lead-field">
       <label data-i18n="sb_p_photo">Photo du produit (optionnel, 5 Mo max)</label>
       <input type="file" class="p-image" accept="image/*" onchange="handleImageSelect(event, ${idx})"/>
       <img class="p-image-preview" id="image-preview-${idx}" style="display:none;max-width:160px;border-radius:6px;margin-top:8px;border:1px solid var(--border)"/>
       <p class="p-image-status" id="image-status-${idx}" style="font-size:11px;color:var(--muted);margin-top:4px"></p>
-    </div>
+    </div>` : ''}
     <div class="lead-field">
       <label data-i18n="sb_p_specs">Specs techniques</label>
       <div class="spec-rows" id="spec-rows-${idx}"></div>

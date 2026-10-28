@@ -616,6 +616,12 @@ const TRANSLATIONS = {
 
     // Modale devis
     lead_modal_title:    'Demander un devis',
+    consent_privacy_label: 'politique de confidentialité',
+    consent_terms_label: 'conditions générales',
+    consent_lead:        'J’ai lu la {privacy} et j’accepte que ma demande soit transmise à Buy-inner puis, si le fournisseur accepte le contact, à ce fournisseur.',
+    consent_service:     'J’ai lu la {privacy} et j’accepte que ma demande soit enregistrée et utilisée pour préparer un devis.',
+    consent_signup:      'J’accepte les {terms} et j’ai pris connaissance de la {privacy}.',
+    consent_submit:      'Je confirme être titulaire des droits sur les contenus transmis (textes, caractéristiques, images) ou autorisé(e) à les communiquer, et j’autorise Buy-inner à les afficher sur le site. J’ai lu la {privacy}.',
     lead_intro:          'C\'est gratuit. Votre demande est transmise au fournisseur, qui choisit de vous recontacter ou non, vous ne serez jamais inscrit à une liste de diffusion.',
     lead_name:           'Nom complet',
     lead_email:          'Email professionnel',
@@ -1269,6 +1275,12 @@ const TRANSLATIONS = {
 
     // Modale devis
     lead_modal_title:    'Request a quote',
+    consent_privacy_label: 'privacy policy',
+    consent_terms_label: 'terms and conditions',
+    consent_lead:        'I have read the {privacy} and agree that my request is sent to Buy-inner and, if the supplier accepts the contact, to that supplier.',
+    consent_service:     'I have read the {privacy} and agree that my request is recorded and used to prepare a quote.',
+    consent_signup:      'I accept the {terms} and have read the {privacy}.',
+    consent_submit:      'I confirm that I own the rights to the content I submit (texts, specifications, images) or am authorised to provide it, and I authorise Buy-inner to display it on the site. I have read the {privacy}.',
     lead_intro:          'It\'s free. Your request is sent to the supplier, who chooses whether to contact you back — you will never be added to a mailing list.',
     lead_name:           'Full name',
     lead_email:          'Business email',
@@ -1562,6 +1574,7 @@ function priceLabel(s) {
 
 function applyLang() {
   const lang = getLang();
+  if (typeof renderConsentSlots === 'function') renderConsentSlots();   // cases de consentement des formulaires (js/layout.js)
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];

@@ -1022,6 +1022,9 @@ body.theme-dark::after{
 .svc-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .svc-consent{font-size:12px;line-height:1.55;color:var(--muted);margin:2px 0 14px}
 .svc-consent a{color:var(--text2);text-decoration:underline}
+.consent-check{display:flex;align-items:flex-start;gap:10px;margin:6px 0 14px;font-size:12.5px;line-height:1.55;color:var(--text2);cursor:pointer;text-align:left}
+.consent-check input{margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--rust)}
+.consent-check a{color:var(--rust);text-decoration:underline}
 .svc-error{color:#E5604D;font-size:13px;margin:10px 0 0}
 .svc-error[hidden]{display:none}
 .svc-banner{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;margin:0 24px 16px;padding:14px 18px;background:var(--white);border:1px solid var(--border);border-left:3px solid var(--rust);border-radius:8px}

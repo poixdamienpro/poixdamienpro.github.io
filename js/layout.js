@@ -169,3 +169,33 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
+// ═══════════════════════════════
+// INFORMATION ET CONSENTEMENT SUR LES FORMULAIRES
+// Chaque formulaire qui collecte des données personnelles ou des contenus affiche une case obligatoire avec les liens
+// vers la politique de confidentialité (et les CGV pour la création de compte). Emplacement : <div data-consent="TYPE">
+// (TYPE = lead | service | signup | submit) ; les textes sont dans js/i18n.js (clés consent_*).
+// ═══════════════════════════════
+const CONSENT_DOCS = { fr: { privacy: 'politique-confidentialite.html', terms: 'cgv.html' }, en: { privacy: 'en/privacy-policy.html', terms: 'en/terms.html' } };
+// Dates de « dernière mise à jour » des textes que la personne déclare avoir lus : à changer quand ces textes changent.
+const CONSENT_VERSIONS = { privacy: '2026-10-28', terms: '2026-10-10' };
+
+function consentLinks(text) {
+  const docs = CONSENT_DOCS[getLang() === 'en' ? 'en' : 'fr'];
+  const a = (key, label) => `<a href="${ROOT_PREFIX}${docs[key]}" target="_blank" rel="noopener">${label}</a>`;
+  return text.replace('{privacy}', a('privacy', t('consent_privacy_label'))).replace('{terms}', a('terms', t('consent_terms_label')));
+}
+function consentHtml(kind) {
+  return `<label class="consent-check"><input type="checkbox" required data-consent-box="${kind}"/><span>${consentLinks(t('consent_' + kind))}</span></label>`;
+}
+// (Re)construit toutes les cases de la page ; l'état coché est conservé lors d'un changement de langue.
+function renderConsentSlots() {
+  document.querySelectorAll('[data-consent]').forEach(el => {
+    const was = el.querySelector('input[type=checkbox]');
+    const checked = !!(was && was.checked);
+    el.innerHTML = consentHtml(el.dataset.consent);
+    if (checked) el.querySelector('input[type=checkbox]').checked = true;
+  });
+}
+// Preuve du consentement : versions des textes lus et horodatage, jointes à la demande (e-mail) ou au compte (métadonnées).
+const consentProof = () => ({ consent_privacy: CONSENT_VERSIONS.privacy, consent_terms: CONSENT_VERSIONS.terms, consent_at: new Date().toISOString() });
+const consentLine = () => `\n\nConsentement : politique de confidentialité du ${CONSENT_VERSIONS.privacy} acceptée le ${new Date().toISOString()}.`;

@@ -228,7 +228,7 @@ async function supplierSignup(e) {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/signup?redirect_to=${encodeURIComponent(new URL(ROOT_PREFIX + 'pages/supplier.html', window.location.href).href)}`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, data: (typeof consentProof === 'function' ? consentProof() : {}) }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error_description || data.msg || t('acc_err_signup'));

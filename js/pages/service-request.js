@@ -22,7 +22,6 @@ const SVC_TEXT = {
     objective: 'Votre besoin',
     objectives: { qualification: 'Qualification de l\'équipement', transformation: 'Transformation de l\'équipement', both: 'Les deux', unsure: 'Je ne sais pas encore' },
     message: 'Décrivez votre projet', messagePh: 'Contexte, exigences ou normes connues, état d\'avancement, échéance souhaitée…',
-    consent: 'Vos données servent uniquement à traiter cette demande (voir la <a href="../politique-confidentialite.html">politique de confidentialité</a>).',
     submit: 'Envoyer ma demande', sending: 'Envoi…',
     okTitle: 'Demande bien reçue', okBody: 'Merci, nous revenons vers vous à l\'adresse indiquée pour préciser votre besoin. Aucun engagement de votre part.',
     errRate: 'Trop de demandes envoyées depuis cette adresse. Réessayez demain ou écrivez-nous à ',
@@ -39,7 +38,6 @@ const SVC_TEXT = {
     objective: 'What you need',
     objectives: { qualification: 'Equipment qualification', transformation: 'Equipment transformation', both: 'Both', unsure: 'Not sure yet' },
     message: 'Describe your project', messagePh: 'Background, known requirements or standards, current status, desired timeline…',
-    consent: 'Your data is used only to handle this request (see the <a href="privacy-policy.html">privacy policy</a>).',
     submit: 'Send my request', sending: 'Sending…',
     okTitle: 'Request received', okBody: 'Thank you, we will get back to you at the address provided to clarify your need. No commitment on your side.',
     errRate: 'Too many requests sent from this address. Please try again tomorrow or write to us at ',
@@ -74,11 +72,12 @@ function svcRender() {
           <select id="svc-objective">${Object.keys(T.objectives).map(k => `<option value="${k}"${k === 'unsure' ? ' selected' : ''}>${esc(T.objectives[k])}</option>`).join('')}</select></div>
         <div class="lead-field"><label for="svc-message">${T.message}</label><textarea id="svc-message" rows="5" maxlength="5000" placeholder="${esc(T.messagePh)}" required></textarea></div>
         <div class="svc-hp" aria-hidden="true"><label>Website<input type="text" id="svc-website" tabindex="-1" autocomplete="off"/></label></div>
-        <p class="svc-consent">${T.consent}</p>
+        <div data-consent="service"></div>
         <button type="submit" class="btn-submit-form" id="svc-submit">${T.submit}</button>
         <p id="svc-error" class="svc-error" role="alert" hidden></p>
       </form>
     </div>`;
+  if (typeof renderConsentSlots === 'function') renderConsentSlots();
   document.getElementById('svc-form').addEventListener('submit', svcSubmit);
 }
 
@@ -153,7 +152,7 @@ function svcNotifyFounder(r) {
         `Équipement : ${r.equipment}\n` +
         `Domaine d'origine : ${r.source_domain || '—'}\nDomaine visé : ${r.target_domain || '—'}\n` +
         `Besoin : ${r.objective || '—'}\nTéléphone : ${r.contact_phone || '—'}\nLangue : ${r.lang}\n\n` +
-        `${r.message}\n\nÀ suivre dans l'onglet « Accompagnement » de pages/admin.html.`,
+        `${r.message}\n\nÀ suivre dans l'onglet « Accompagnement » de pages/admin.html.` + consentLine(),
     }),
   }).catch(() => {});
 }

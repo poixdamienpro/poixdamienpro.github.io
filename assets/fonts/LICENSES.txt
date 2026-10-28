@@ -1,0 +1,9 @@
+Polices utilisées par Buy-inner, hébergées localement.
+
+DM Serif Display  — Copyright (c) Colophon Foundry, avec le nom réservé « DM Serif Display »
+Public Sans       — Copyright (c) USWDS / GSA, avec le nom réservé « Public Sans »
+JetBrains Mono    — Copyright (c) JetBrains s.r.o., avec le nom réservé « JetBrains Mono »
+
+Ces trois polices sont diffusées sous la licence SIL Open Font License, Version 1.1 :
+https://openfontlicense.org/open-font-license-official-text/
+Elles peuvent être utilisées, copiées et hébergées librement, y compris à des fins commerciales ; elles ne peuvent pas être vendues seules.

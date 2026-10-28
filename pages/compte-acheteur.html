@@ -6,7 +6,7 @@
 <title data-i18n="acc_doc_title">Mon compte · Buy-inner</title>
 <meta name="description" data-i18n-content="acc_meta_desc" content="Créez un compte acheteur gratuit pour préremplir vos demandes de devis et retrouver leur historique sur Buy-inner."/>
 <meta name="robots" content="noindex,follow"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Public+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/fonts.css?v=20261028"/>
 <link rel="stylesheet" href="../css/styles.css"/>
 <link rel="icon" href="../assets/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png"/>
@@ -57,6 +57,7 @@
           <div class="lead-field"><label data-i18n="acc_company">Entreprise</label><input type="text" id="acc-signup-company" required/></div>
           <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="acc-signup-email" required/></div>
           <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="acc-signup-password" minlength="8" required/></div>
+          <div data-consent="signup"></div>
           <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
         <p id="acc-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
