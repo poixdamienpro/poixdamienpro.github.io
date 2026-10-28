@@ -190,6 +190,18 @@ function mapProduct(row) {
   };
 }
 
+// Mention sous les caractéristiques d'un produit : d'où viennent les données, et qu'elles sont reprises sans garantie.
+// Buy-inner compose ces fiches à partir de la documentation publique des fabricants ; il en est l'éditeur et doit pouvoir
+// indiquer la source (lien datasheet de la fiche, sinon « source non renseignée ») et recevoir les corrections.
+// Le même texte est produit côté serveur par productContent() dans cloudflare/supabase-proxy-worker.js.
+function specSourceHtml(p) {
+  let host = '';
+  try { host = new URL(p.datasheetUrl).hostname.replace(/^www\./, ''); } catch (e) { /* pas de lien exploitable */ }
+  const src = host ? t('prod_source').replace('{host}', escapeHtml(host)) : t('prod_source_none');
+  const subject = encodeURIComponent(t('prod_report_subject') + ' ' + p.name + ' (' + p.maker + ')');
+  return `<p class="spec-source" style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0">${src} ${t('prod_source_note')} <a href="mailto:contact@buy-inner.com?subject=${subject}">${t('prod_report')}</a></p>`;
+}
+
 // Charge COMPANIES/PRODUCTS/INDUSTRIES/PROD_CATS depuis Supabase.
 // Appelé par les pages qui en ont besoin (annuaire, catalogue, submit, home) — pas par toutes.
 async function loadTaxonomy() {

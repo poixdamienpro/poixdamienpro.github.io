@@ -1236,8 +1236,8 @@ function productContent(p, lang) {
   const description = (en && p.description_en) ? p.description_en : (p.description || '');
   const name = (en && p.name_en) ? p.name_en : p.name;   // name_en : voir backend/supabase_add_product_names_en_2026_10.sql
   const L = en
-    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', specs: 'Specifications', more: n => `+${n} more specification${n > 1 ? 's' : ''} available with a free account.`, fallback: `${name} by ${p.company_name || ''}` }
-    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', specs: 'Caractéristiques', more: n => `+${n} autre${n > 1 ? 's' : ''} caractéristique${n > 1 ? 's' : ''} visible${n > 1 ? 's' : ''} avec un compte gratuit.`, fallback: `${name} par ${p.company_name || ''}` };
+    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', specs: 'Specifications', srcHost: h => `Source: public documentation from ${h}.`, srcNone: 'Source not provided.', srcNote: 'Data reproduced without warranty: confirm with the manufacturer before any purchase decision.', report: 'Report an error', reportSubject: 'Listing error:', more: n => `+${n} more specification${n > 1 ? 's' : ''} available with a free account.`, fallback: `${name} by ${p.company_name || ''}` }
+    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', specs: 'Caractéristiques', srcHost: h => `Source : documentation publique de ${h}.`, srcNone: 'Source non renseignée.', srcNote: 'Données reprises sans garantie : à confirmer auprès du fabricant avant toute décision d’achat.', report: 'Signaler une erreur', reportSubject: 'Erreur fiche :', more: n => `+${n} autre${n > 1 ? 's' : ''} caractéristique${n > 1 ? 's' : ''} visible${n > 1 ? 's' : ''} avec un compte gratuit.`, fallback: `${name} par ${p.company_name || ''}` };
 
   const all = Array.isArray(p.specs) ? p.specs : [];
   const shown = [...all].sort((a, b) => (a.is_premium ? 1 : 0) - (b.is_premium ? 1 : 0)).slice(0, FREE_SPEC_COUNT);
@@ -1247,6 +1247,12 @@ function productContent(p, lang) {
   const certs = Array.isArray(p.certs) ? p.certs : [];
   const url = entityUrlAbs('product', lang, p.id);
 
+  // Origine des caractéristiques : même texte que specSourceHtml() dans js/api.js.
+  let srcHost = '';
+  if (isHttpUrl(p.datasheet_url)) { try { srcHost = new URL(p.datasheet_url).hostname.replace(/^www\./, ''); } catch (e) { /* lien invalide */ } }
+  const reportSubject = encodeURIComponent(`${L.reportSubject} ${name} (${p.company_name || ''})`);
+  const sourceHtml = `<p class="spec-source" style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0">${srcHost ? escapeHtml(L.srcHost(srcHost)) : L.srcNone} ${L.srcNote} <a href="mailto:contact@buy-inner.com?subject=${reportSubject}">${L.report}</a></p>`;
+
   const imageHtml = SHOW_PRODUCT_PHOTOS && isHttpUrl(p.image_url) ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(name)}" style="max-width:280px;border-radius:8px;margin-bottom:16px"/>` : '';
   const specsHtml = shown.length ? `
     <div class="modal-section">
@@ -1254,6 +1260,7 @@ function productContent(p, lang) {
       <table class="spec-table"><tbody>${shown.map(s => `<tr><td>${escapeHtml(sl(s))}</td><td>${escapeHtml(sv(s))}</td></tr>`).join('')}</tbody></table>
       ${certs.length ? `<div class="cert-row" style="margin-top:10px">${certs.map(x => `<span class="tag tag-sage">${escapeHtml(x)}</span>`).join('')}</div>` : ''}
       ${hidden ? `<p style="font-size:12px;color:var(--muted);margin:10px 0 0">${L.more(hidden)}</p>` : ''}
+      ${sourceHtml}
     </div>` : '';
 
   return {

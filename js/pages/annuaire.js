@@ -129,7 +129,7 @@ function renderCompanyPreview(c) {
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${_t('badge_premium')}</span>` : ''}
-        ${c.verified ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
+        ${c.claimed ? `<span class="badge-verified">${_t('badge_verified')}</span>` : ''}
         ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
       </div>
       <p class="dp-desc">${escapeHtml(localize(c.desc, c.descEn))}</p>

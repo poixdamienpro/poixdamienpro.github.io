@@ -65,6 +65,7 @@ function renderProduct(p) {
           <div class="bar-track"><div class="bar-fill" style="width:${escapeHtml(b.v)}%;background:${escapeHtml(b.c)}"></div></div>
         </div>`).join('') : ''}
       ${p.certs.length ? `<div class="cert-row" style="margin-top:10px">${p.certs.map(c => '<span class="tag tag-sage">' + escapeHtml(certLabel(c)) + '</span>').join('')}</div>` : ''}
+      ${specSourceHtml(p)}
     </div>
     ${loggedIn ? '' : lockBoxHtml(hiddenSpecs ? `+${hiddenSpecs} ${t('lock_more_specs')}` : '')}
     <div class="modal-actions">

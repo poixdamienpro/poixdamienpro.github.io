@@ -450,6 +450,7 @@ function renderProductPreview(p) {
       <table class="spec-table"><tbody>${specs}</tbody></table>
       ${bars}
       ${certs}
+      ${specSourceHtml(p)}
       <div class="dp-price"><span class="price-tag">💰 ${escapeHtml(priceLabel(p.price))}</span></div>
       <div class="dp-actions">
         <a class="btn-fiche" href="${entityUrl('product', p.id)}">${_t('btn_view_profile')}</a>

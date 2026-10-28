@@ -79,7 +79,7 @@ function renderCompany(c, products) {
   document.getElementById('ent-body').innerHTML = `
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
       ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
-      ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
+      ${c.claimed ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
       ${isPrestataire ? `<span class="tag tag-industry">${t('tag_prestataire')}</span>` : ''}
       ${c.isSystemier ? `<span class="tag tag-industry">${t('tag_systemier')}</span>` : ''}
       ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}

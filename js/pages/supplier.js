@@ -124,12 +124,12 @@ function openCompanyEditForm() {
       <div class="submit-section-title">${t('sp_ce_title')}</div>
       <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px">${t('sp_ce_note')}</p>
       <form onsubmit="submitCompanyEditForm(event)">
-        <div class="lead-field"><label>${t('lbl_description')}</label><textarea id="sup-c-desc" rows="3">${escapeHtml(c.desc || '')}</textarea></div>
+        <div class="lead-field"><label>${t('lbl_description')}</label><textarea id="sup-c-desc" rows="3">${escapeHtml(c.description || c.desc || '')}</textarea></div>
         <div class="lead-field"><label>${t('sp_c_site')}</label><input type="url" id="sup-c-site" value="${escapeHtml(c.site !== '#' ? c.site : '')}" placeholder="https://…"/></div>
         <div class="lead-field"><label>${t('sp_c_hq')}</label><input type="text" id="sup-c-hq" value="${escapeHtml(c.hq)}"/></div>
         <div class="lead-field"><label>${t('sp_c_country')}</label><input type="text" id="sup-c-country" value="${escapeHtml(c.country)}"/></div>
         <div class="lead-field"><label>${t('lbl_industry')}</label><input type="text" id="sup-c-industry" value="${escapeHtml(c.industry)}"/></div>
-        <div class="lead-field"><label>${t('sp_c_contact')}</label><input type="email" id="sup-c-contact" value="${escapeHtml(c.contact)}"/></div>
+        <div class="lead-field"><label>${t('sp_c_contact')}</label><input type="email" id="sup-c-contact" value="${escapeHtml(c.contact_email || c.contact || '')}"/></div>
         <div class="submit-actions">
           <button type="submit" class="btn-submit-form">${t('sp_submit_val')}</button>
           <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-company-form-wrap').style.display='none'">${t('acc_cancel')}</button>

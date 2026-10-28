@@ -83,7 +83,7 @@ const TRANSLATIONS = {
 
     st5_tag:             'Régulation',
     st5_h2:              'Le flux, <em>maîtrisé</em>.',
-    st5_p:               'Vannes, servovalves, régulateurs. Contacts vérifiés et fiches certifiées (Moog, Bürkert) pour fermer la boucle avec le bon partenaire, en confiance.',
+    st5_p:               'Vannes, servovalves, régulateurs. Fiches relues et liens vers les fiches techniques officielles (Moog, Bürkert) pour fermer la boucle avec le bon partenaire, en confiance.',
     st5_link:            'Voir les fournisseurs →',
     st5_guide:           'Comment choisir une vanne ?',
 
@@ -146,7 +146,7 @@ const TRANSLATIONS = {
     lbl_ranges_tech:     'Gammes & Technologies',
     lbl_products_referenced: 'Produits référencés sur Buy-inner',
     badge_premium:       '★ Premium',
-    badge_verified:      '✓ Vérifié',
+    badge_verified:      '✓ Fiche revendiquée',
     tag_systemier:       '🔗 Systémier',
     tag_prestataire:     '🧑‍💼 Prestataire de service',
     btn_view_profile:    'Voir la fiche complète →',
@@ -209,7 +209,7 @@ const TRANSLATIONS = {
     cb_solar: 'Panneaux solaires',
     cb_sensors: 'Capteurs',
     cb_thermal: 'Contrôle thermique',
-    spec_verified: 'vérifié',
+    spec_verified: 'fiche relue',
     aria_systemiers: 'Systémiers',
     sb_doc_title: 'Référencer mon entreprise · Buy-inner',
     sb_meta_desc: 'Référencez gratuitement votre entreprise et vos produits sur Buy-inner, l\'annuaire des équipementiers industriels. Publication après validation.',
@@ -644,6 +644,11 @@ const TRANSLATIONS = {
 
     // Preview produit
     prod_specs:          'Spécifications',
+    prod_source:         'Source : documentation publique de {host}.',
+    prod_source_none:    'Source non renseignée.',
+    prod_source_note:    'Données reprises sans garantie : à confirmer auprès du fabricant avant toute décision d’achat.',
+    prod_report:         'Signaler une erreur',
+    prod_report_subject: 'Erreur fiche :',
     prod_scores:         'Scores relatifs',
     prod_certs:          'Certifications',
     prod_compare_add:    '＋ Comparer',
@@ -742,7 +747,7 @@ const TRANSLATIONS = {
 
     st5_tag:             'Regulation',
     st5_h2:              'Flow, <em>mastered</em>.',
-    st5_p:               'Valves, servo valves, regulators. Verified contacts and certified datasheets (Moog, Bürkert) to close the loop with the right partner, with confidence.',
+    st5_p:               'Valves, servo valves, regulators. Reviewed listings and links to the official datasheets (Moog, Bürkert) to close the loop with the right partner, with confidence.',
     st5_link:            'Browse suppliers →',
     st5_guide:           'How to choose a valve?',
 
@@ -805,7 +810,7 @@ const TRANSLATIONS = {
     lbl_ranges_tech:     'Ranges & Technologies',
     lbl_products_referenced: 'Products listed on Buy-inner',
     badge_premium:       '★ Premium',
-    badge_verified:      '✓ Verified',
+    badge_verified:      '✓ Claimed profile',
     tag_systemier:       '🔗 Systems integrator',
     tag_prestataire:     '🧑‍💼 Service provider',
     btn_view_profile:    'View full profile →',
@@ -868,7 +873,7 @@ const TRANSLATIONS = {
     cb_solar: 'Solar panels',
     cb_sensors: 'Sensors',
     cb_thermal: 'Thermal control',
-    spec_verified: 'verified',
+    spec_verified: 'reviewed listing',
     aria_systemiers: 'System integrators',
     sb_doc_title: 'List my company · Buy-inner',
     sb_meta_desc: 'List your company and products for free on Buy-inner, the directory of industrial equipment makers. Published after review.',
@@ -1303,6 +1308,11 @@ const TRANSLATIONS = {
 
     // Preview produit
     prod_specs:          'Specifications',
+    prod_source:         'Source: public documentation from {host}.',
+    prod_source_none:    'Source not provided.',
+    prod_source_note:    'Data reproduced without warranty: confirm with the manufacturer before any purchase decision.',
+    prod_report:         'Report an error',
+    prod_report_subject: 'Listing error:',
     prod_scores:         'Performance scores',
     prod_certs:          'Certifications',
     prod_compare_add:    '＋ Compare',

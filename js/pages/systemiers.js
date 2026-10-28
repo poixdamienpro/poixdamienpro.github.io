@@ -145,7 +145,7 @@ function renderSystemierPreview(c) {
       </div>
       <div class="dp-badges">
         ${c.premium ? `<span class="badge-premium">${t('badge_premium')}</span>` : ''}
-        ${c.verified ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
+        ${c.claimed ? `<span class="badge-verified">${t('badge_verified')}</span>` : ''}
         <span class="tag tag-industry">${t('tag_systemier')}</span>
         ${c.industries.map(ind => `<span class="tag tag-industry">${escapeHtml(taxLabel(ind))}</span>`).join('')}
       </div>
