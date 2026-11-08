@@ -656,7 +656,7 @@ a{color:inherit;text-decoration:none}
       <div class="copy">
         <div class="st-index reveal d1"><span class="num">04</span><span data-i18n="st4_tag">Action</span><span class="ln"></span></div>
         <h2 class="reveal d1" id="t4" data-i18n-html="st4_h2">La puissance passe à <em>l'acte</em>.</h2>
-        <p class="reveal d2" data-i18n="st4_p">Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, sans compte, directement au fabricant.</p>
+        <p class="reveal d2" data-i18n="st4_p">Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, directement au fabricant.</p>
         <div class="specs reveal d3">
           <span class="spec"><b>150 kW</b> eAxle</span>
           <span class="spec">course <b>±50mm</b></span>
@@ -749,13 +749,13 @@ a{color:inherit;text-decoration:none}
     }));
   }
 
-  // Chiffres clés en direct depuis Supabase (voir js/api.js -> loadTaxonomy)
-  loadTaxonomy().then(() => {
+  // Chiffres clés en direct depuis Supabase (voir js/api.js -> fetchPublicStats : totaux publics seulement)
+  fetchPublicStats().then(s => {
     const setStat = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
-    setStat('stat-makers',     COMPANIES.length);
-    setStat('stat-products',   PRODUCTS.length);
-    setStat('stat-categories', PROD_CATS.length);
-    setStat('stat-industries', INDUSTRIES.length);
+    setStat('stat-makers',     s.n_companies);
+    setStat('stat-products',   s.n_products);
+    setStat('stat-categories', s.n_categories);
+    setStat('stat-industries', s.n_industries);
   }).catch(() => {
     // Si Supabase est injoignable, on garde le texte "…" plutôt qu'un chiffre faux.
   });

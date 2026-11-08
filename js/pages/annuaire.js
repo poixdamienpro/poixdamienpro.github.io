@@ -6,6 +6,7 @@ const dirIsDesktop = () => window.matchMedia('(min-width:1100px)').matches;
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('annuaire')) return;   // catalogue réservé aux comptes (js/buyer.js)
   showLoading(['companies-list']);
   try {
     await loadTaxonomy();
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCompanies();
   } catch (err) {
     console.error('Erreur Supabase:', err);
+    if (handleMembersError(err, 'annuaire')) return;
     showLoadError(['companies-list'], err);
   }
 });

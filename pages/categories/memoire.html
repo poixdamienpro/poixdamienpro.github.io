@@ -59,7 +59,7 @@
       "name": "Comment trouver un fournisseur de mémoires et demander un devis ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription."
+        "text": "Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit : un compte gratuit suffit."
       }
     }
   ]
@@ -633,7 +633,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <details class="faq-item"><summary>Mémoire volatile ou non-volatile : laquelle choisir ?</summary><p>Le premier critère est simple : la donnée doit-elle survivre à une coupure de courant ? Si oui, il faut une mémoire non-volatile (NOR Flash, NAND Flash, MRAM, EEPROM). Sinon, la SRAM et la DRAM offrent la vitesse. Chaque technologie répond ensuite à un compromis entre vitesse, capacité, endurance et coût.</p></details>
       <details class="faq-item"><summary>Quelle mémoire choisir pour une application spatiale critique ?</summary><p>La MRAM est la technologie de référence pour les mémoires spatiales critiques, comme la mémoire de configuration et les tables de bord : elle combine la vitesse de la SRAM et la non-volatilité de la Flash, et résiste naturellement aux radiations. Son coût au bit reste le facteur limitant.</p></details>
       <details class="faq-item"><summary>À quoi servent l'EDAC et le scrubbing ?</summary><p>L'EDAC (Error Detection And Correction) ajoute un code correcteur d'erreurs aux données stockées : il détecte une erreur sur 2 bits et en corrige une sur 1 bit à la volée. Le scrubbing relit périodiquement toute la mémoire et réécrit les données corrigées, pour éviter que des erreurs accumulées dépassent la capacité de correction.</p></details>
-      <details class="faq-item"><summary>Comment trouver un fournisseur de mémoires et demander un devis ?</summary><p>Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription.</p></details>
+      <details class="faq-item"><summary>Comment trouver un fournisseur de mémoires et demander un devis ?</summary><p>Buy-inner référence des fabricants de mémoires embarquées. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit : un compte gratuit suffit.</p></details>
     </div>
   </div>
 
@@ -650,7 +650,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
   <!-- ── CTA ──────────────────────────────────────────────────── -->
   <div class="cat-cta">
     <h2>Vous cherchez une <em>mémoire spécifique</em> ?</h2>
-    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, sans inscription.</p>
+    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, avec un compte gratuit.</p>
     <div class="cat-cta-btns">
       <a class="btn primary" href="../catalogue.html?cat=M%C3%A9moires">Voir toutes les mémoires →</a>
       <a class="btn ghost" href="obc.html">← OBC / Calculateurs</a>
@@ -678,6 +678,7 @@ function switchDomain(id, btn) {
 
 async function loadMemProducts() {
   const grid = document.getElementById('mem-products-grid');
+  if (!isMember()) { grid.innerHTML = membersTeaserHtml(); return; }   // liste réservée aux comptes (js/buyer.js)
   try {
     await loadTaxonomy();
     const products = PRODUCTS.filter(p => {
@@ -707,6 +708,7 @@ async function loadMemProducts() {
       grid.appendChild(card);
     });
   } catch(e) {
+    if (e && (e.status === 401 || e.status === 403)) { grid.innerHTML = membersTeaserHtml(); return; }
     grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Impossible de charger les produits.</div>';
   }
 }

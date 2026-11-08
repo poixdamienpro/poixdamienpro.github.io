@@ -62,7 +62,7 @@
       "name": "How do I find a memory supplier and request a quote?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+        "text": "Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need."
       }
     }
   ]
@@ -575,7 +575,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <details class="faq-item"><summary>Volatile or non-volatile memory: which should I choose?</summary><p>The first criterion is simple: must the data survive a power cut? If so, you need non-volatile memory (NOR Flash, NAND Flash, MRAM, EEPROM). If not, SRAM and DRAM provide the speed. Each technology then addresses a trade-off between speed, capacity, endurance and cost.</p></details>
       <details class="faq-item"><summary>Which memory should I use for a critical space application?</summary><p>MRAM is the reference technology for critical space memories such as configuration memory and housekeeping tables: it combines the speed of SRAM with the non-volatility of Flash and is naturally radiation-resistant. It is still costly, though density is increasing.</p></details>
       <details class="faq-item"><summary>What are EDAC and scrubbing for?</summary><p>EDAC (Error Detection And Correction) adds an error-correcting code to stored data: it detects 2-bit errors and corrects 1-bit errors on the fly. Scrubbing periodically reads all memory and rewrites corrected data, so that accumulated errors cannot exceed the correction capacity.</p></details>
-      <details class="faq-item"><summary>How do I find a memory supplier and request a quote?</summary><p>Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
+      <details class="faq-item"><summary>How do I find a memory supplier and request a quote?</summary><p>Buy-inner lists embedded memory manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need.</p></details>
     </div>
   </div>
 
@@ -590,7 +590,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
 
   <div class="cat-cta">
     <h2>Looking for a <em>specific memory</em>?</h2>
-    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, no registration required.</p>
+    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, with a free account.</p>
     <div class="cat-cta-btns">
       <a class="btn primary" href="../../pages/catalogue.html?cat=M%C3%A9moires">View all memories →</a>
       <a class="btn ghost" href="obc.html">← OBC / Computers</a>
@@ -614,6 +614,7 @@ function switchDomain(id, btn) {
 }
 async function loadMemProducts() {
   const grid = document.getElementById('mem-products-grid');
+  if (!isMember()) { grid.innerHTML = membersTeaserHtml(); return; }   // liste réservée aux comptes (js/buyer.js)
   try {
     await loadTaxonomy();
     const products = PRODUCTS.filter(p => {
@@ -636,6 +637,7 @@ async function loadMemProducts() {
       grid.appendChild(card);
     });
   } catch(e) {
+    if (e && (e.status === 401 || e.status === 403)) { grid.innerHTML = membersTeaserHtml(); return; }
     grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Unable to load products.</div>';
   }
 }

@@ -78,6 +78,7 @@ const TAG_GROUPS = [
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('catalogue')) return;   // catalogue réservé aux comptes (js/buyer.js)
   showLoading(['products-list']);
   try {
     await loadTaxonomy();
@@ -115,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCompareBanner();
   } catch (err) {
     console.error('Erreur Supabase:', err);
+    if (handleMembersError(err, 'catalogue')) return;
     showLoadError(['products-list'], err);
   }
 });

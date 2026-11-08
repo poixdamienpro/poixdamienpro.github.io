@@ -62,7 +62,7 @@
       "name": "How do I find an OBC supplier and request a quote?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+        "text": "Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need."
       }
     }
   ]
@@ -619,7 +619,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <details class="faq-item"><summary>What is an OBC?</summary><p>An OBC (On-Board Computer) is a processing unit: it receives data, executes a program and sends commands. It is the brain of an embedded system, whether a satellite, an aircraft, a vehicle or an industrial machine.</p></details>
       <details class="faq-item"><summary>How do I choose an OBC?</summary><p>Answer three questions: what processor type is needed, which interfaces it must expose to talk to the subsystems, and which software (OS, certification) must run on it. Everything else, such as housing, radiation hardening and redundancy, is a domain constraint that comes on top.</p></details>
       <details class="faq-item"><summary>Which communication buses does an OBC need to support?</summary><p>Each domain has its standards: SpaceWire for space, MIL-STD-1553 for defense and aero, ARINC 429 for civil avionics, CAN FD for automotive and industry, and Ethernet TSN for industry and mobility. The chosen bus locks in the ecosystem, as equipment often speaks only one protocol.</p></details>
-      <details class="faq-item"><summary>How do I find an OBC supplier and request a quote?</summary><p>Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
+      <details class="faq-item"><summary>How do I find an OBC supplier and request a quote?</summary><p>Buy-inner lists on-board computer manufacturers. Filter the catalogue, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need.</p></details>
     </div>
   </div>
 
@@ -634,7 +634,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
 
   <div class="cat-cta">
     <h2>Looking for a <em>specific OBC</em>?</h2>
-    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, no registration required.</p>
+    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, with a free account.</p>
     <div class="cat-cta-btns">
       <a class="btn primary" href="../../pages/catalogue.html?cat=Calculateurs%20embarqu%C3%A9s">View all OBCs →</a>
       <a class="btn ghost" href="../../pages/annuaire.html">Manufacturer directory</a>
@@ -658,6 +658,7 @@ function switchDomain(id, btn) {
 }
 async function loadOBCProducts() {
   const grid = document.getElementById('obc-products-grid');
+  if (!isMember()) { grid.innerHTML = membersTeaserHtml(); return; }   // liste réservée aux comptes (js/buyer.js)
   try {
     await loadTaxonomy();
     const products = PRODUCTS.filter(p => {
@@ -679,6 +680,7 @@ async function loadOBCProducts() {
       grid.appendChild(card);
     });
   } catch(e) {
+    if (e && (e.status === 401 || e.status === 403)) { grid.innerHTML = membersTeaserHtml(); return; }
     grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Unable to load products.</div>';
   }
 }

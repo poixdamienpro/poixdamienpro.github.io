@@ -19,6 +19,7 @@ const SERVICE_CATS = [
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('entreprise')) return;   // catalogue réservé aux comptes (js/buyer.js)
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) {
     document.getElementById('ent-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_noid')}</p>`;
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   try {
     const [companyRow, tagsRaw, catsRaw, indsRaw] = await Promise.all([
-      fetchOne('get_company_by_id', { p_id: id }),
+      fetchOne('get_company_by_id', { p_id: id }, true),
       supabase('company_tags', `select=tag&company_id=eq.${id}`),
       supabase('company_product_categories', `select=category&company_id=eq.${id}`),
       // Voir backend/supabase_add_company_industries.sql — .catch() dédié
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     companyRow.industries = indsRaw.map(i => i.industry);
     const c = mapCompany(companyRow);
 
-    const productsRows = await fetchRpc('get_products_by_company', { p_company_id: id });
+    const productsRows = await fetchRpc('get_products_by_company', { p_company_id: id }, true);
     const products = productsRows.map(mapProduct);
 
     // Caches pour re-rendu au changement de langue (voir onLangChange plus bas).
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     logEntityView({ type: 'company', companyId: c.id, companyName: c.name, industry: c.industry });
   } catch (err) {
     console.error('Erreur chargement fiche entreprise:', err);
+    if (handleMembersError(err, 'entreprise')) return;
     document.getElementById('ent-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_gone')}</p>`;
   }
 });

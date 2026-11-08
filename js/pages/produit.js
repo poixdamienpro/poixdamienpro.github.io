@@ -5,13 +5,14 @@
 // ═══════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('produit')) return;   // catalogue réservé aux comptes (js/buyer.js)
   const id = new URLSearchParams(window.location.search).get('id');
   if (!id) {
     document.getElementById('prod-body').innerHTML = `<p style="color:#C0392B">${t('ent_err_noid')}</p>`;
     return;
   }
   try {
-    const row = await fetchOne('get_product_by_id', { p_id: id });
+    const row = await fetchOne('get_product_by_id', { p_id: id }, true);
     if (!row) throw new Error('not found');
     // Cache pour re-rendu au changement de langue (voir onLangChange plus bas).
     window._prodItem = mapProduct(row);
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   } catch (err) {
     console.error('Erreur chargement fiche produit:', err);
+    if (handleMembersError(err, 'produit')) return;
     document.getElementById('prod-body').innerHTML = `<p style="color:#C0392B">${t('prod_err_gone')}</p>`;
   }
 });

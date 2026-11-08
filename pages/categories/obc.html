@@ -59,7 +59,7 @@
       "name": "Comment trouver un fournisseur d'OBC et demander un devis ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription."
+        "text": "Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit : un compte gratuit suffit."
       }
     }
   ]
@@ -772,7 +772,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <details class="faq-item"><summary>Qu'est-ce qu'un OBC ?</summary><p>Un OBC (On-Board Computer, calculateur embarqué) est une unité de traitement : elle reçoit des données, exécute un programme et envoie des commandes. C'est le cerveau du système embarqué, qu'il s'agisse d'un satellite, d'un aéronef, d'un véhicule ou d'une machine industrielle.</p></details>
       <details class="faq-item"><summary>CPU, FPGA, GPU ou SoC hybride : comment choisir ?</summary><p>Partez du besoin le plus contraignant. Un timing garanti à la nanoseconde élimine le CPU seul et le GPU. Un besoin d'inférence IA élimine le FPGA seul, sauf accélérateurs dédiés. Le SoC hybride CPU + FPGA n'a de sens que si les deux contraintes coexistent, sinon c'est un surcoût de développement inutile.</p></details>
       <details class="faq-item"><summary>Quels bus de communication un OBC doit-il gérer ?</summary><p>Chaque domaine a ses standards : SpaceWire pour le spatial, MIL-STD-1553 pour la défense et l'aéronautique, ARINC 429 pour l'avionique civile, CAN FD pour l'automobile et l'industrie, Ethernet TSN pour l'industrie et la mobilité. Le bus choisi verrouille l'écosystème, car les équipements ne parlent souvent qu'un seul protocole.</p></details>
-      <details class="faq-item"><summary>Comment trouver un fournisseur d'OBC et demander un devis ?</summary><p>Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit et sans inscription.</p></details>
+      <details class="faq-item"><summary>Comment trouver un fournisseur d'OBC et demander un devis ?</summary><p>Buy-inner référence des fabricants de calculateurs embarqués. Vous pouvez filtrer le catalogue, comparer jusqu'à 4 produits côte à côte, puis envoyer une demande de devis directement au fabricant. C'est gratuit : un compte gratuit suffit.</p></details>
     </div>
   </div>
 
@@ -789,7 +789,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
   <!-- ── CTA ──────────────────────────────────────────────────── -->
   <div class="cat-cta">
     <h2>Vous cherchez un <em>OBC spécifique</em> ?</h2>
-    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, sans inscription.</p>
+    <p>Accédez au catalogue complet, filtrez par catégorie et comparez jusqu'à 4 produits côte à côte. Gratuit, avec un compte gratuit.</p>
     <div class="cat-cta-btns">
       <a class="btn primary" href="../catalogue.html?cat=Calculateurs%20embarqu%C3%A9s">Voir tous les OBC →</a>
       <a class="btn ghost" href="../annuaire.html">Annuaire fabricants</a>
@@ -817,6 +817,7 @@ function switchDomain(id, btn) {
 
 async function loadOBCProducts() {
   const grid = document.getElementById('obc-products-grid');
+  if (!isMember()) { grid.innerHTML = membersTeaserHtml(); return; }   // liste réservée aux comptes (js/buyer.js)
   try {
     await loadTaxonomy();
     const products = PRODUCTS.filter(p => {
@@ -846,6 +847,7 @@ async function loadOBCProducts() {
       grid.appendChild(card);
     });
   } catch(e) {
+    if (e && (e.status === 401 || e.status === 403)) { grid.innerHTML = membersTeaserHtml(); return; }
     grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Impossible de charger les produits.</div>';
   }
 }

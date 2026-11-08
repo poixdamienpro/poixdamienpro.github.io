@@ -37,6 +37,7 @@ let prestaCat = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('prestations')) return;   // catalogue réservé aux comptes (js/buyer.js)
   showLoading(['companies-list']);
   try {
     await loadTaxonomy();
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCompanies();
   } catch (err) {
     console.error('Erreur Supabase:', err);
+    if (handleMembersError(err, 'prestations')) return;
     showLoadError(['companies-list'], err);
   }
 });

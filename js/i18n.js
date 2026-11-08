@@ -77,7 +77,7 @@ const TRANSLATIONS = {
 
     st4_tag:             'Action',
     st4_h2:              'La puissance passe à <em>l\'acte</em>.',
-    st4_p:               'Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, sans compte, directement au fabricant.',
+    st4_p:               'Actionneurs, vérins, eAxles. Quand vous avez trouvé le bon, demandez un devis en un clic, gratuitement, directement au fabricant.',
     st4_link:            'Voir les actionneurs →',
     st4_guide:           'Comment choisir un actionneur ?',
 
@@ -510,7 +510,7 @@ const TRANSLATIONS = {
     acc_h2: 'Vos demandes, <em>retrouvées en un clic.</em>',
     acc_p1: 'Accès aux <strong>informations complètes</strong> : specs détaillées, datasheets, carte des fournisseurs.',
     acc_p2: 'Nom, email et entreprise <strong>préremplis</strong> à chaque demande de devis.',
-    acc_p3: 'Toujours <strong>100&nbsp;% gratuit</strong> : l\'annuaire reste consultable sans compte.',
+    acc_p3: 'Toujours <strong>100&nbsp;% gratuit</strong> : consulter le catalogue ne coûte rien, il suffit d\'un compte.',
     acc_login: 'Se connecter',
     acc_email: 'Email',
     acc_password: 'Mot de passe',
@@ -741,7 +741,7 @@ const TRANSLATIONS = {
 
     st4_tag:             'Action',
     st4_h2:              'Power becomes <em>action</em>.',
-    st4_p:               'Actuators, cylinders, eAxles. Once you\'ve found the right one, request a quote in one click, for free, no account needed, directly from the manufacturer.',
+    st4_p:               'Actuators, cylinders, eAxles. Once you\'ve found the right one, request a quote in one click, for free, directly from the manufacturer.',
     st4_link:            'Browse actuators →',
     st4_guide:           'How to choose an actuator?',
 
@@ -1174,7 +1174,7 @@ const TRANSLATIONS = {
     acc_h2: 'Your requests, <em>found in one click.</em>',
     acc_p1: 'Access to <strong>full information</strong>: detailed specs, datasheets, supplier map.',
     acc_p2: 'Name, email and company <strong>prefilled</strong> on every quote request.',
-    acc_p3: 'Always <strong>100&nbsp;% free</strong>: the directory can still be browsed without an account.',
+    acc_p3: 'Always <strong>100&nbsp;% free</strong>: browsing the catalogue costs nothing, you just need an account.',
     acc_login: 'Log in',
     acc_email: 'Email',
     acc_password: 'Password',
@@ -1585,6 +1585,7 @@ function priceLabel(s) {
 function applyLang() {
   const lang = getLang();
   if (typeof renderConsentSlots === 'function') renderConsentSlots();   // cases de consentement des formulaires (js/layout.js)
+  if (typeof refreshMembersGate === 'function') refreshMembersGate();   // page fermée du catalogue (js/buyer.js)
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     const val = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key];

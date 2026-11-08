@@ -62,7 +62,7 @@
       "name": "How do I find a PDU supplier and request a quote?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration."
+        "text": "Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need."
       }
     }
   ]
@@ -600,7 +600,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
       <details class="faq-item"><summary>What is a PDU?</summary><p>A PDU (Power Distribution Unit) is a power distribution node: one input, multiple outputs. It spreads current from a source (battery, solar panel, mains, generator) to several loads. Depending on the manufacturer, it adds options such as overcurrent protection, switching and sequencing, monitoring, EMI filtering, redundancy, voltage conversion and environmental hardening.</p></details>
       <details class="faq-item"><summary>What options do PDU manufacturers add?</summary><p>Overcurrent protection (fuses, circuit breakers or SSPC), switching and sequencing, monitoring and telemetry, EMI/EMC filtering, redundancy, voltage conversion and environmental hardening. A space manufacturer will enable all of them, while a standard datacenter rack PDU may integrate only a couple. That choice of options, and their quality level, differentiates products and sets the price.</p></details>
       <details class="faq-item"><summary>When is redundancy needed in a PDU?</summary><p>Redundancy means dual input, a primary/secondary bus, automatic bypass or cross-strapping, so that if one path fails the other takes over without interruption. It is reserved for critical applications such as space, defense and medical.</p></details>
-      <details class="faq-item"><summary>How do I find a PDU supplier and request a quote?</summary><p>Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free and requires no registration.</p></details>
+      <details class="faq-item"><summary>How do I find a PDU supplier and request a quote?</summary><p>Buy-inner lists industrial, on-board and space PDU manufacturers. Filter the catalogue by category, compare up to 4 products side by side, then send a quote request straight to the manufacturer. It is free: a free account is all you need.</p></details>
     </div>
   </div>
 
@@ -615,7 +615,7 @@ body { background: var(--ink-3); color: var(--t-hi); }
 
   <div class="cat-cta">
     <h2>Looking for a <em>specific PDU</em>?</h2>
-    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, no registration required.</p>
+    <p>Access the full catalogue, filter by category and compare up to 4 products side by side. Free, with a free account.</p>
     <div class="cat-cta-btns">
       <a class="btn primary" href="../../pages/catalogue.html?cat=PDU">View all PDUs →</a>
       <a class="btn ghost" href="../../pages/annuaire.html">Manufacturer directory</a>
@@ -641,6 +641,7 @@ function switchDomain(id, btn) {
 }
 async function loadPDUProducts() {
   const grid = document.getElementById('pdu-products-grid');
+  if (!isMember()) { grid.innerHTML = membersTeaserHtml(); return; }   // liste réservée aux comptes (js/buyer.js)
   try {
     await loadTaxonomy();
     const products = PRODUCTS.filter(p => p.cat && p.cat.toUpperCase().includes('PDU'));
@@ -657,6 +658,7 @@ async function loadPDUProducts() {
       grid.appendChild(card);
     });
   } catch(e) {
+    if (e && (e.status === 401 || e.status === 403)) { grid.innerHTML = membersTeaserHtml(); return; }
     grid.innerHTML = '<div class="prod-loading" style="color:var(--rust)">Unable to load products.</div>';
   }
 }

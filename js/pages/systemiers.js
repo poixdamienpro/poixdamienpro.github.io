@@ -19,6 +19,7 @@ const SYSTEMIER_CATS = ['Plateformes satellites', 'Lanceurs', 'Véhicules'];
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
+  if (!requireMember('systemiers')) return;   // catalogue réservé aux comptes (js/buyer.js)
   showLoading(['companies-list']);
   try {
     await loadTaxonomy();
@@ -40,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderSystemiers();
   } catch (err) {
     console.error('Erreur Supabase:', err);
+    if (handleMembersError(err, 'systemiers')) return;
     showLoadError(['companies-list'], err);
   }
 });

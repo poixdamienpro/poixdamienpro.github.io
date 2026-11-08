@@ -10,7 +10,7 @@ let productImageUrls = {};
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   try {
-    await loadTaxonomy();
+    await loadPublicTaxonomy();   // formulaire de référencement : accessible sans compte
     const indList = document.getElementById('industry-list');
     if (indList) indList.innerHTML = INDUSTRIES.map(i => `<option value="${escapeHtml(i)}">`).join('');
   } catch (err) {

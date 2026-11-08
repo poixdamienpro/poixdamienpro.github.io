@@ -29,16 +29,26 @@ function escapeJsAttr(str) {
   return escapeHtml(jsSafe);
 }
 
+// Le catalogue (entreprises, produits et tables annexes) est réservé aux comptes inscrits : ces appels portent le jeton
+// du compte connecté (acheteur, ou fournisseur) à la place de la clé publique. Voir
+// backend/supabase_members_only_catalogue_2026_11.sql. Les contenus publics (actualités, totaux) restent en clé publique.
+function memberToken() {
+  try { return localStorage.getItem('buyer_access_token') || sessionStorage.getItem('sup_access_token') || null; } catch (e) { return null; }
+}
+function catalogueHeaders() {
+  return { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + (memberToken() || SUPABASE_ANON), 'Content-Type': 'application/json' };
+}
+// Erreur portant le code HTTP : 401 ou 403 = pas de compte valide (voir handleMembersError dans js/buyer.js).
+function httpError(message, status) {
+  const e = new Error(message);
+  e.status = status;
+  return e;
+}
+
 async function supabase(table, params = '') {
   const url = `${SUPABASE_URL}/rest/v1/${table}${params ? '?' + params : ''}`;
-  const res = await fetch(url, {
-    headers: {
-      'apikey': SUPABASE_ANON,
-      'Authorization': 'Bearer ' + SUPABASE_ANON,
-      'Content-Type': 'application/json',
-    }
-  });
-  if (!res.ok) throw new Error(`Supabase ${table}: HTTP ${res.status}`);
+  const res = await fetch(url, { headers: catalogueHeaders() });
+  if (!res.ok) throw httpError(`Supabase ${table}: HTTP ${res.status}`, res.status);
   return res.json();
 }
 
@@ -52,14 +62,10 @@ async function fetchAllPaged(rpcName, pageSize = 50) {
   while (true) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON,
-        'Authorization': 'Bearer ' + SUPABASE_ANON,
-        'Content-Type': 'application/json',
-      },
+      headers: catalogueHeaders(),
       body: JSON.stringify({ p_limit: pageSize, p_offset: offset }),
     });
-    if (!res.ok) throw new Error(`Supabase RPC ${rpcName}: HTTP ${res.status}`);
+    if (!res.ok) throw httpError(`Supabase RPC ${rpcName}: HTTP ${res.status}`, res.status);
     const page = await res.json();
     all = all.concat(page);
     if (page.length < pageSize) break;
@@ -89,25 +95,37 @@ async function fetchAllPagedTable(table, selectParams, pageSize = 50) {
 }
 
 // Appelle une RPC Supabase et retourne ses lignes — voir
-// backend/supabase_add_detail_page_rpcs.sql.
-async function fetchRpc(rpcName, params) {
+// backend/supabase_add_detail_page_rpcs.sql. member = true pour les RPC du catalogue (jeton du compte connecté).
+async function fetchRpc(rpcName, params, member = false) {
+  const headers = member
+    ? catalogueHeaders()
+    : { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${rpcName}`, {
     method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON,
-      'Authorization': 'Bearer ' + SUPABASE_ANON,
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(params),
   });
-  if (!res.ok) throw new Error(`Supabase RPC ${rpcName}: HTTP ${res.status}`);
+  if (!res.ok) throw httpError(`Supabase RPC ${rpcName}: HTTP ${res.status}`, res.status);
   return res.json();
 }
 
 // Variante pour les RPC qui retournent au plus une ligne (fiches dédiées).
-async function fetchOne(rpcName, params) {
-  const rows = await fetchRpc(rpcName, params);
+async function fetchOne(rpcName, params, member = false) {
+  const rows = await fetchRpc(rpcName, params, member);
   return rows[0] || null;
+}
+
+// Totaux publics (page d'accueil) : aucun nom d'entreprise ni de produit.
+async function fetchPublicStats() {
+  const rows = await fetchRpc('get_public_stats', {});
+  return rows[0] || {};
+}
+
+// Listes de secteurs et de catégories pour le formulaire de référencement, accessible sans compte.
+async function loadPublicTaxonomy() {
+  const rows = await fetchRpc('get_public_taxonomy', {});
+  INDUSTRIES = rows.filter(r => r.kind === 'industry').map(r => r.label).sort();
+  PROD_CATS  = rows.filter(r => r.kind === 'category').map(r => r.label).sort();
 }
 
 function mapCompany(row) {

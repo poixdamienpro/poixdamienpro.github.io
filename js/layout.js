@@ -177,7 +177,7 @@ function closeModal(id) {
 // ═══════════════════════════════
 const CONSENT_DOCS = { fr: { privacy: 'politique-confidentialite.html', terms: 'cgv.html' }, en: { privacy: 'en/privacy-policy.html', terms: 'en/terms.html' } };
 // Dates de « dernière mise à jour » des textes que la personne déclare avoir lus : à changer quand ces textes changent.
-const CONSENT_VERSIONS = { privacy: '2026-10-28', terms: '2026-10-10' };
+const CONSENT_VERSIONS = { privacy: '2026-10-28', terms: '2026-11-08' };
 
 function consentLinks(text) {
   const docs = CONSENT_DOCS[getLang() === 'en' ? 'en' : 'fr'];

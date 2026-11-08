@@ -15,35 +15,17 @@
 //    creation de comptes fournisseur OU administrateur, lien de nouveau mot de
 //    passe, desactivation, suppression). Verifie d'abord que l'appelant est
 //    lui-meme admin avant de toucher a SUPABASE_SERVICE_ROLE_KEY.
-//  - /en/company.html et /en/product.html : versions anglaises des deux
-//    pages ci-dessous (mêmes données, description_en, catégories/pays
-//    traduits). Une fiche anglaise n'est indexable (robots index,follow +
-//    balises hreflang fr/en/x-default sur les DEUX versions) que si elle
-//    a une description_en ; sinon elle reste noindex et aucune balise
-//    hreflang n'est émise, pour ne jamais présenter à Google une page
-//    « anglaise » qui serait en fait du français.
-//  - /pages/annuaire.html, catalogue.html, prestations.html, systemiers.html : ajoute en bas de page la liste
-//    texte des entreprises / produits (liens vers les fiches), masquée, pour les robots qui n'exécutent pas
-//    JavaScript. Retirée par js/api.js dès que la page prend la main ; affichée si le chargement échoue.
 //  - /blog/actus.html, /blog/actu.html?slug=… et /blog/actus.xml (français), /en/news.html, /en/news-item.html?slug=… et
 //    /en/news.xml (anglais) : actualités du blog (table news_posts, onglet « Actualités » de l'admin) rendues côté
 //    serveur, avec images, balises de partage pour LinkedIn, hreflang réciproques et flux RSS.
 //  - /api/news-ingest : la routine de veille y dépose des propositions d'actualités (FR + EN), protégées par la clé
 //    NEWS_INGEST_KEY ; jamais publiées automatiquement (choix et publication dans l'admin).
-//  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des fiches
-//    (toutes les fiches visibles en FR ; seulement les fiches traduites en
-//    EN), déclarés dans robots.txt, régénérés depuis la base (cache 1 h).
-//  - /pages/entreprise.html et /pages/produit.html : injecte le vrai
-//    contenu (nom, description, specs) dans le HTML AVANT de le servir,
-//    pour tout le monde (pas seulement les robots — zero risque de
-//    cloaking, et ca evite aussi le flash "Chargement..." pour un vrai
-//    visiteur). Sans ca, ces ~550 pages partent avec un HTML quasi vide
-//    ("Chargement...") tant que le JS client n'a pas fini d'aller
-//    chercher les donnees chez Supabase — Google les classait en
-//    soft-404 / "decouvertes, non indexees" a cause de ca (voir Search
-//    Console, aout 2026). Le JS client continue de tourner par-dessus
-//    normalement (hydratation), ce bloc ne fait qu'ameliorer le tout
-//    premier rendu.
+//  - /sitemap-fr.xml et /sitemap-en.xml : sitemaps dynamiques des actualités publiées (régénérés depuis la base, cache 1 h),
+//    déclarés dans robots.txt. Les fiches entreprise et produit n'y figurent plus.
+//  - /pages/entreprise.html, /pages/produit.html, /en/company.html, /en/product.html : depuis novembre 2026 le catalogue est
+//    réservé aux comptes inscrits (backend/supabase_members_only_catalogue_2026_11.sql). Le Worker ne rend plus aucun contenu
+//    de fiche côté serveur : il sert la page d'origine avec l'en-tête X-Robots-Tag: noindex. Les listes texte et les fiches
+//    pré-rendues pour les robots ont été supprimées, car elles contournaient le verrou.
 //
 // Toutes les cles secretes (RESEND_API_KEY, STRIPE_SECRET_KEY,
 // STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, SUPABASE_SERVICE_ROLE_KEY, NEWS_INGEST_KEY)
@@ -60,10 +42,6 @@
 //   www.buy-inner.com/pages/produit.html*
 //   www.buy-inner.com/en/company.html*
 //   www.buy-inner.com/en/product.html*
-//   www.buy-inner.com/pages/annuaire.html*
-//   www.buy-inner.com/pages/catalogue.html*
-//   www.buy-inner.com/pages/prestations.html*
-//   www.buy-inner.com/pages/systemiers.html*
 //   www.buy-inner.com/blog/actus.html*
 //   www.buy-inner.com/blog/actu.html*
 //   www.buy-inner.com/blog/actus.xml
@@ -1015,18 +993,6 @@ async function patchCompanies(env, filterQuery, patchBody) {
   });
 }
 
-// ── Pré-rendu : injection du vrai contenu dans entreprise.html / produit.html ──
-async function fetchRpcRow(rpcName, params) {
-  const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/${rpcName}`, {
-    method: 'POST',
-    headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
-  if (!res.ok) return null;
-  const rows = await res.json();
-  return (rows && rows[0]) || null;
-}
-
 class SetHtml {
   constructor(html) { this.html = html; }
   element(el) { el.setInnerContent(this.html, { html: true }); }
@@ -1172,180 +1138,15 @@ const isHttpUrl = u => /^https?:\/\//i.test(String(u || ''));
 // Données structurées prêtes à insérer dans <head> ; « < » échappé pour qu'aucun texte ne puisse fermer la balise.
 const ldScript = obj => `<script type="application/ld+json" data-ssr="1">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
 
-function companyContent(c, lang, extra) {
-  const en = lang === 'en';
-  const products = (extra && extra.products) || [];
-  const categories = ((extra && extra.categories) || []).map(k => (en ? taxEn(k) : k));
-  const industry = en ? taxEn(c.industry || '') : (c.industry || '');
-  const country = en ? countryEn(c.country) : (c.country || '');
-  const description = (en && c.description_en) ? c.description_en : (c.description || '');
-  const L = en
-    ? { desc: 'Description', info: 'Company information', founded: 'Founded', employees: 'Employees', sector: 'Sector', hq: 'Headquarters', ranges: 'Ranges &amp; technologies', products: 'Listed products', page: 'product.html', fallback: `${c.name}, ${industry} equipment manufacturer` }
-    : { desc: 'Description', info: 'Informations société', founded: 'Fondée en', employees: 'Effectifs', sector: 'Secteur', hq: 'Siège', ranges: 'Gammes &amp; technologies', products: 'Produits référencés', page: 'produit.html', fallback: `${c.name}, équipementier ${industry}` };
-  const pn = p => (en && p.name_en) ? p.name_en : p.name;
-  const url = entityUrlAbs('company', lang, c.id);
-
-  const rangesHtml = categories.length ? `
-    <div class="modal-section">
-      <div class="modal-section-title">${L.ranges}</div>
-      <div class="modal-tags">${categories.map(g => `<span class="tag">${escapeHtml(g)}</span>`).join('')}</div>
-    </div>` : '';
-  const productsHtml = products.length ? `
-    <div class="modal-section">
-      <div class="modal-section-title">${L.products}</div>
-      <ul>${products.map(p => `<li><a href="${L.page}?id=${escapeHtml(p.id)}">${escapeHtml(pn(p))}</a>${p.category ? ' — ' + escapeHtml(en ? taxEn(p.category) : p.category) : ''}</li>`).join('')}</ul>
-    </div>` : '';
-
-  return {
-    title: `${c.name} — ${industry} — Buy-inner`,
-    desc: (description || L.fallback).slice(0, 160),
-    headerHtml: `<h1 class="page-title">${escapeHtml(c.name)}</h1><p class="page-subtitle">${escapeHtml(country)} · ${escapeHtml(c.hq || '')} — ${escapeHtml(industry)}</p>`,
-    bodyHtml: `
-    <div class="modal-section">
-      <div class="modal-section-title">${L.desc}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(description)}</p>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">${L.info}</div>
-      <div class="detail-grid">
-        <div class="detail-item"><div class="detail-label">${L.founded}</div><div class="detail-value">${escapeHtml(c.founded || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">${L.employees}</div><div class="detail-value">${escapeHtml(c.employees || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">${L.sector}</div><div class="detail-value">${escapeHtml(industry || '—')}</div></div>
-        <div class="detail-item"><div class="detail-label">${L.hq}</div><div class="detail-value">${escapeHtml(c.hq || '—')}</div></div>
-      </div>
-    </div>${rangesHtml}${productsHtml}`,
-    // Mêmes champs que le JSON-LD ajouté par js/pages/entreprise.js (qui s'efface s'il en trouve un déjà dans la page).
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      '@id': url + '#organization',
-      name: c.name,
-      description: description || undefined,
-      url: isHttpUrl(c.site) ? c.site : undefined,
-      mainEntityOfPage: url,
-      address: { '@type': 'PostalAddress', addressLocality: c.hq || undefined, addressCountry: stripEmoji(country) || undefined },
-      knowsAbout: categories.length ? categories : undefined,
-    },
-  };
-}
-
-function productContent(p, lang) {
-  const en = lang === 'en';
-  const category = en ? taxEn(p.category || '') : (p.category || '');
-  const industry = en ? taxEn(p.industry || '') : (p.industry || '');
-  const description = (en && p.description_en) ? p.description_en : (p.description || '');
-  const name = (en && p.name_en) ? p.name_en : p.name;   // name_en : voir backend/supabase_add_product_names_en_2026_10.sql
-  const L = en
-    ? { desc: 'Description', maker: 'Manufacturer', link: 'View company profile →', page: 'company.html', specs: 'Specifications', srcHost: h => `Source: public documentation from ${h}.`, srcNone: 'Source not provided.', srcNote: 'Data reproduced without warranty: confirm with the manufacturer before any purchase decision.', report: 'Report an error', reportSubject: 'Listing error:', more: n => `+${n} more specification${n > 1 ? 's' : ''} available with a free account.`, fallback: `${name} by ${p.company_name || ''}` }
-    : { desc: 'Description', maker: 'Fabricant', link: 'Voir la fiche →', page: 'entreprise.html', specs: 'Caractéristiques', srcHost: h => `Source : documentation publique de ${h}.`, srcNone: 'Source non renseignée.', srcNote: 'Données reprises sans garantie : à confirmer auprès du fabricant avant toute décision d’achat.', report: 'Signaler une erreur', reportSubject: 'Erreur fiche :', more: n => `+${n} autre${n > 1 ? 's' : ''} caractéristique${n > 1 ? 's' : ''} visible${n > 1 ? 's' : ''} avec un compte gratuit.`, fallback: `${name} par ${p.company_name || ''}` };
-
-  const all = Array.isArray(p.specs) ? p.specs : [];
-  const shown = [...all].sort((a, b) => (a.is_premium ? 1 : 0) - (b.is_premium ? 1 : 0)).slice(0, FREE_SPEC_COUNT);
-  const hidden = Math.max(0, all.length - shown.length);
-  const sl = s => (en && s.label_en) ? s.label_en : (s.label || '');
-  const sv = s => (en && s.value_en) ? s.value_en : (s.value || '');
-  const certs = Array.isArray(p.certs) ? p.certs : [];
-  const url = entityUrlAbs('product', lang, p.id);
-
-  // Origine des caractéristiques : même texte que specSourceHtml() dans js/api.js.
-  let srcHost = '';
-  if (isHttpUrl(p.datasheet_url)) { try { srcHost = new URL(p.datasheet_url).hostname.replace(/^www\./, ''); } catch (e) { /* lien invalide */ } }
-  const reportSubject = encodeURIComponent(`${L.reportSubject} ${name} (${p.company_name || ''})`);
-  const sourceHtml = `<p class="spec-source" style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0">${srcHost ? escapeHtml(L.srcHost(srcHost)) : L.srcNone} ${L.srcNote} <a href="mailto:contact@buy-inner.com?subject=${reportSubject}">${L.report}</a></p>`;
-
-  const imageHtml = SHOW_PRODUCT_PHOTOS && isHttpUrl(p.image_url) ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(name)}" style="max-width:280px;border-radius:8px;margin-bottom:16px"/>` : '';
-  const specsHtml = shown.length ? `
-    <div class="modal-section">
-      <div class="modal-section-title">${L.specs}</div>
-      <table class="spec-table"><tbody>${shown.map(s => `<tr><td>${escapeHtml(sl(s))}</td><td>${escapeHtml(sv(s))}</td></tr>`).join('')}</tbody></table>
-      ${certs.length ? `<div class="cert-row" style="margin-top:10px">${certs.map(x => `<span class="tag tag-sage">${escapeHtml(x)}</span>`).join('')}</div>` : ''}
-      ${hidden ? `<p style="font-size:12px;color:var(--muted);margin:10px 0 0">${L.more(hidden)}</p>` : ''}
-      ${sourceHtml}
-    </div>` : '';
-
-  return {
-    title: `${name} — ${p.company_name || ''} — Buy-inner`,
-    desc: (description || L.fallback).slice(0, 160),
-    headerHtml: `<h1 class="page-title">${escapeHtml(p.icon || '')} ${escapeHtml(name)}</h1><p class="page-subtitle">${escapeHtml(p.company_name || '')} — ${escapeHtml(category)} ${industry ? '· ' + escapeHtml(industry) : ''}</p>`,
-    bodyHtml: `
-    ${imageHtml}
-    <div class="modal-section">
-      <div class="modal-section-title">${L.desc}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(description)}</p>
-    </div>${specsHtml}
-    <div class="modal-section">
-      <div class="modal-section-title">${L.maker}</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0">${escapeHtml(p.company_name || '')} — <a href="${L.page}?id=${escapeHtml(p.company_id || '')}">${L.link}</a></p>
-    </div>`,
-    // « Thing » et non « Product » : choix déjà fait dans js/pages/produit.js (la plupart des fiches sont « sur devis »,
-    // sans prix ni avis, ce qu'un vrai Product signalerait en erreur dans la Search Console).
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'Thing',
-      '@id': url + '#thing',
-      name,
-      description: description || undefined,
-      additionalType: category || undefined,
-      url,
-      image: SHOW_PRODUCT_PHOTOS && isHttpUrl(p.image_url) ? p.image_url : undefined,
-    },
-  };
-}
-
-// Produits et catégories d'une entreprise, pour enrichir sa fiche côté serveur (échec = fiche sans ces sections).
-async function fetchCompanyExtras(id) {
-  if (!UUID_RE.test(String(id || ''))) return {};
-  const headers = { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON, 'Content-Type': 'application/json' };
-  const settle = p => p.catch(() => null);
-  const [prodRes, catRes] = await Promise.all([
-    settle(fetch(`${SUPABASE_ORIGIN}/rest/v1/rpc/get_products_by_company`, { method: 'POST', headers, body: JSON.stringify({ p_company_id: id }) })),
-    settle(fetch(`${SUPABASE_ORIGIN}/rest/v1/company_product_categories?select=category&company_id=eq.${encodeURIComponent(id)}`, { headers })),
-  ]);
-  const rows = async r => (r && r.ok) ? ((await r.json().catch(() => [])) || []) : [];
-  const products = await rows(prodRes);
-  const categories = (await rows(catRes)).map(r => r.category).filter(Boolean);
-  return { products: Array.isArray(products) ? products : [], categories };
-}
-
-async function handleEntityPage(kind, lang, request, env, ctx) {
+// Fiches entreprise et produit : le catalogue est réservé aux comptes inscrits (voir
+// backend/supabase_members_only_catalogue_2026_11.sql). Le Worker ne rend donc plus aucun contenu de fiche côté serveur :
+// il sert la page d'origine (coquille vide, puis page fermée ou fiche selon le compte, voir js/buyer.js) et demande aux
+// moteurs de recherche de ne pas l'indexer.
+async function handleEntityPage(kind, lang, request) {
   const url = new URL(request.url);
-  const cache = caches.default;
-  const cacheKey = new Request(url.toString(), request);
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached;
-
   const originRes = await fetch(GITHUB_PAGES_ORIGIN + ENTITY_PATHS[kind][lang] + url.search);
-  const id = url.searchParams.get('id');
-  if (!id) return originRes;
-
-  const row = await fetchRpcRow(kind === 'company' ? 'get_company_by_id' : 'get_product_by_id', { p_id: id });
-  if (!row) return originRes;
-
-  // Entreprise : on ajoute ses produits et ses catégories (jamais pour une fiche masquée).
-  const extra = (kind === 'company' && !row.hidden) ? await fetchCompanyExtras(id) : {};
-  const content = (kind === 'company' ? companyContent : productContent)(row, lang, extra);
-  const [headerSel, bodySel] = kind === 'company' ? ['#ent-header', '#ent-body'] : ['#prod-header', '#prod-body'];
-  const translated = hasEnglish(row);
-
-  let rewriter = new HTMLRewriter()
-    .on('title', new SetHtml(escapeHtml(content.title)))
-    .on('meta[name="description"]', new SetAttr('content', content.desc))
-    .on('link[rel="canonical"]', new SetAttr('href', entityUrlAbs(kind, lang, id)))
-    .on(headerSel, new SetHtml(content.headerHtml))
-    .on(bodySel, new SetHtml(content.bodyHtml));
-  // Version anglaise : indexable seulement si traduite (sinon noindex, déjà
-  // la valeur par défaut de en/company.html et en/product.html).
-  if (lang === 'en') rewriter = rewriter.on('meta[name="robots"]', new SetAttr('content', translated ? 'index,follow' : 'noindex,follow'));
-  // hreflang réciproque sur les deux versions, uniquement si l'anglais existe.
-  // Données structurées (Organization / Thing) rendues côté serveur : les robots qui n'exécutent pas
-  // JavaScript les voient aussi. Les scripts de js/pages/ s'effacent s'ils en trouvent déjà un.
-  const headExtra = (translated ? hreflangTags(kind, id) : '') + (content.jsonLd ? ldScript(content.jsonLd) : '');
-  if (headExtra) rewriter = rewriter.on('head', new AppendHtml(headExtra));
-
-  let response = rewriter.transform(originRes);
-  response = new Response(response.body, response);
-  response.headers.set('Cache-Control', 'public, max-age=600');
-  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  const response = new Response(originRes.body, originRes);
+  response.headers.set('X-Robots-Tag', 'noindex, follow');
   return response;
 }
 
@@ -1366,13 +1167,8 @@ async function fetchAllRpc(rpcName) {
   return all;
 }
 
-// Sitemaps dynamiques des fiches entreprise/produit, régénérés depuis la
-// base (cache 1 h) :
-//  - /sitemap-fr.xml : TOUTES les fiches visibles en français (une fiche
-//    supprimée ou masquée disparaît toute seule), avec les alternates EN
-//    pour celles qui sont traduites ;
-//  - /sitemap-en.xml : seulement les fiches anglaises traduites, avec leurs
-//    alternates FR.
+// Sitemaps dynamiques : seulement les actualités publiées. Les fiches entreprise et produit sont réservées aux comptes
+// inscrits et ne figurent plus dans les plans du site. Régénérés depuis la base (cache 1 h).
 const lastmod = row => {
   const d = row && row.updated_at ? new Date(row.updated_at) : null;
   return d && !isNaN(d) ? `<lastmod>${d.toISOString().slice(0, 10)}</lastmod>` : '';
@@ -1384,31 +1180,10 @@ async function handleSitemap(lang, request, env, ctx) {
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
-  let companies, products;
-  try {
-    [companies, products] = await Promise.all([fetchAllRpc('get_companies_page'), fetchAllRpc('get_products_page')]);
-  } catch (err) {
-    return new Response('Sitemap temporarily unavailable', { status: 503 });
-  }
-  // Actualités publiées (blog > Actualités), dans chaque langue où elles existent. Échec = sitemap sans elles.
+  // Actualités publiées (blog > Actualités), dans chaque langue où elles existent. Échec = plan du site sans elles.
   let news = [];
   try { news = (await fetchAllRpc('get_news_page')).filter(n => newsHasLang(n, lang)); } catch (e) { news = []; }
-  const visible = companies.filter(c => !c.hidden);
-  const visibleIds = new Set(visible.map(c => c.id));
-  const entry = (kind, row) => {
-    const fr = escapeHtml(entityUrlAbs(kind, 'fr', row.id));
-    const en = escapeHtml(entityUrlAbs(kind, 'en', row.id));
-    const alternates = hasEnglish(row)
-      ? `<xhtml:link rel="alternate" hreflang="fr" href="${fr}"/><xhtml:link rel="alternate" hreflang="en" href="${en}"/><xhtml:link rel="alternate" hreflang="x-default" href="${fr}"/>`
-      : '';
-    return `  <url><loc>${lang === 'en' ? en : fr}</loc>${lastmod(row)}${alternates}</url>`;
-  };
-  const keep = row => lang === 'fr' || hasEnglish(row);
-  const urls = [
-    ...visible.filter(keep).map(c => entry('company', c)),
-    ...products.filter(p => visibleIds.has(p.company_id) && keep(p)).map(p => entry('product', p)),
-    ...news.map(n => `  <url><loc>${escapeHtml(newsPageUrl(n.slug, lang))}</loc>${lastmod(n)}${newsHasLang(n, 'fr') && newsHasLang(n, 'en') ? newsHreflang(n.slug).replace(/<link /g, '<xhtml:link ') : ''}</url>`),
-  ];
+  const urls = news.map(n => `  <url><loc>${escapeHtml(newsPageUrl(n.slug, lang))}</loc>${lastmod(n)}${newsHasLang(n, 'fr') && newsHasLang(n, 'en') ? newsHreflang(n.slug).replace(/<link /g, '<xhtml:link ') : ''}</url>`);
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
@@ -1417,107 +1192,6 @@ ${urls.join('\n')}
   const response = new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } });
   ctx.waitUntil(cache.put(cacheKey, response.clone()));
   return response;
-}
-
-// ── Pages de listes (annuaire, catalogue, prestations, systémiers) ──────────────────────────
-// Ces pages se remplissent par JavaScript : un robot qui n'exécute pas de script n'y voit qu'une coquille vide.
-// On ajoute donc en bas de page une liste texte (liens vers les fiches), visuellement masquée. Dès que le
-// script de la page démarre il la retire (js/api.js showLoading) ; si le chargement des données échoue, il
-// l'affiche à la place de l'erreur (showLoadError). Contenu identique à ce que la page affiche ensuite.
-//
-// À tenir à jour avec js/pages/prestations.js (SERVICE_CATS), js/pages/catalogue.js (CATALOGUE_EXCLUDED_CATS)
-// et js/pages/systemiers.js (SYSTEMIER_CATS).
-const SERVICE_CATS = [
-  'Prestation de talents', 'Développement d\'équipements', 'Fabrication de faisceaux électriques',
-  'Essais & qualification', 'Usinage & fabrication mécanique', 'Intégration & assemblage système',
-  'Segment sol & opérations', 'Sous-traitance électronique (EMS)', 'Distribution de composants', 'Prestation IA & data',
-];
-const CATALOGUE_EXCLUDED_CATS = [...SERVICE_CATS, 'Lanceurs', 'Plateformes satellites', 'Véhicules'];
-const LIST_PAGES = { '/pages/annuaire.html': 'annuaire', '/pages/catalogue.html': 'catalogue', '/pages/prestations.html': 'prestations', '/pages/systemiers.html': 'systemiers' };
-
-const shortText = (s, n = 110) => {
-  const t = String(s || '').replace(/\s+/g, ' ').trim();
-  return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : t;
-};
-const groupBy = (rows, keyFn) => {
-  const m = new Map();
-  for (const r of rows) { const k = keyFn(r) || 'Autres'; if (!m.has(k)) m.set(k, []); m.get(k).push(r); }
-  return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0], 'fr'));
-};
-const byName = (a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'fr');
-const companyLi = c => `<li><a href="/pages/entreprise.html?id=${escapeHtml(c.id)}">${escapeHtml(c.name)}</a> — ${escapeHtml(stripEmoji(c.country))}${c.hq ? ', ' + escapeHtml(c.hq) : ''}${c.description ? ' : ' + escapeHtml(shortText(c.description)) : ''}</li>`;
-const productLi = p => `<li><a href="/pages/produit.html?id=${escapeHtml(p.id)}">${escapeHtml(p.name)}</a> — ${escapeHtml(p.company_name || '')}</li>`;
-const sectionHtml = (heading, items) => `<h3>${escapeHtml(heading)} (${items.length})</h3><ul>${items.join('')}</ul>`;
-
-// Lignes d'une table REST paginées (plafond serveur de 50 lignes par requête).
-async function fetchAllRest(path) {
-  const headers = { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON };
-  let all = [];
-  for (let offset = 0; ; offset += 50) {
-    const res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/${path}${path.includes('?') ? '&' : '?'}limit=50&offset=${offset}`, { headers });
-    if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
-    const page = await res.json();
-    all = all.concat(page);
-    if (page.length < 50) break;
-  }
-  return all;
-}
-
-async function buildListBlock(kind) {
-  const companies = (await fetchAllRpc('get_companies_page')).filter(c => !c.hidden);
-  let title, intro, sections;
-  if (kind === 'annuaire' || kind === 'systemiers') {
-    const rows = (kind === 'systemiers' ? companies.filter(c => c.is_systemier) : companies).sort(byName);
-    sections = groupBy(rows, c => c.industry).map(([k, v]) => sectionHtml(k, v.map(companyLi)));
-    if (kind === 'annuaire') {
-      title = 'Annuaire des fabricants industriels';
-      intro = `${rows.length} fabricants et équipementiers industriels référencés sur Buy-inner, classés par secteur. Chaque fiche présente l'entreprise et ses produits, et permet de demander un devis.`;
-    } else {
-      title = 'Systémiers : entreprises qui livrent un système complet';
-      intro = `${rows.length} systémiers (plateformes satellites, lanceurs, véhicules…) référencés sur Buy-inner, classés par secteur.`;
-    }
-  } else if (kind === 'catalogue') {
-    const visible = new Set(companies.map(c => c.id));
-    const products = (await fetchAllRpc('get_products_page')).filter(p => visible.has(p.company_id) && !CATALOGUE_EXCLUDED_CATS.includes(p.category)).sort(byName);
-    sections = groupBy(products, p => p.category).map(([k, v]) => sectionHtml(k, v.map(productLi)));
-    title = 'Catalogue de produits et spécifications';
-    intro = `${products.length} produits industriels référencés sur Buy-inner par ${new Set(products.map(p => p.company_id)).size} fabricants, classés par catégorie. Chaque fiche détaille les caractéristiques techniques.`;
-  } else if (kind === 'prestations') {
-    const inList = SERVICE_CATS.map(c => '"' + c.replace(/"/g, '') + '"').join(',');
-    const rows = await fetchAllRest(`company_product_categories?select=company_id,category&category=in.(${encodeURIComponent(inList)})&order=company_id,category`);
-    const byId = new Map(companies.map(c => [c.id, c]));
-    const perCat = new Map();
-    for (const r of rows) { const c = byId.get(r.company_id); if (!c) continue; if (!perCat.has(r.category)) perCat.set(r.category, []); perCat.get(r.category).push(c); }
-    sections = SERVICE_CATS.filter(k => perCat.has(k)).map(k => sectionHtml(k, perCat.get(k).sort(byName).map(companyLi)));
-    const n = new Set(rows.filter(r => byId.has(r.company_id)).map(r => r.company_id)).size;
-    title = 'Prestataires de services industriels';
-    intro = `${n} prestataires de services industriels référencés sur Buy-inner : ${SERVICE_CATS.join(', ')}.`;
-  } else return '';
-  if (!sections.length) return '';
-  // Masquage EN LIGNE (et non seulement via la classe de styles.css) : le bloc ne doit jamais apparaître à l'écran,
-  // même si la feuille de styles ou js/api.js sont encore en cache dans une ancienne version.
-  return `<section id="ssr-directory" class="ssr-only" style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(intro)}</p>${sections.join('')}</section>`;
-}
-
-// Le bloc est reconstruit au plus une fois par heure (cache), la page elle-même n'est jamais mise en cache ici.
-async function getListBlock(kind, ctx) {
-  const cache = caches.default;
-  const key = new Request(`${SITE_URL}/__ssr-list/${kind}`);
-  const hit = await cache.match(key);
-  if (hit) return hit.text();
-  const html = await buildListBlock(kind);
-  if (html) ctx.waitUntil(cache.put(key, new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } })));
-  return html;
-}
-
-async function handleListPage(kind, request, env, ctx) {
-  const url = new URL(request.url);
-  const originRes = await fetch(GITHUB_PAGES_ORIGIN + url.pathname + url.search);
-  if (request.method !== 'GET' || !originRes.ok) return originRes;
-  let block = '';
-  try { block = await getListBlock(kind, ctx); } catch (e) { return originRes; }   // échec : la page d'origine, inchangée
-  if (!block) return originRes;
-  return new HTMLRewriter().on('body', new AppendHtml(block)).transform(originRes);
 }
 
 // ── Actualités (blog > Actualités), en français ET en anglais ────────────────────────────────
@@ -1882,16 +1556,16 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/pages/entreprise.html') {
-      return handleEntityPage('company', 'fr', request, env, ctx);
+      return handleEntityPage('company', 'fr', request);
     }
     if (url.pathname === '/pages/produit.html') {
-      return handleEntityPage('product', 'fr', request, env, ctx);
+      return handleEntityPage('product', 'fr', request);
     }
     if (url.pathname === '/en/company.html') {
-      return handleEntityPage('company', 'en', request, env, ctx);
+      return handleEntityPage('company', 'en', request);
     }
     if (url.pathname === '/en/product.html') {
-      return handleEntityPage('product', 'en', request, env, ctx);
+      return handleEntityPage('product', 'en', request);
     }
     if (url.pathname === '/blog/actus.html') return handleNewsList(request, env, ctx, 'fr');
     if (url.pathname === '/blog/actu.html') return handleNewsArticle(request, env, ctx, 'fr');
@@ -1899,9 +1573,6 @@ export default {
     if (url.pathname === '/en/news.html') return handleNewsList(request, env, ctx, 'en');
     if (url.pathname === '/en/news-item.html') return handleNewsArticle(request, env, ctx, 'en');
     if (url.pathname === '/en/news.xml') return handleNewsRss(request, env, ctx, 'en');
-    if (LIST_PAGES[url.pathname]) {
-      return handleListPage(LIST_PAGES[url.pathname], request, env, ctx);
-    }
     if (url.pathname === '/sitemap-en.xml') {
       return handleSitemap('en', request, env, ctx);
     }
