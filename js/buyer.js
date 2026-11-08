@@ -97,6 +97,7 @@ async function initBuyerSession() {
 }
 
 function updateBuyerNavUI() {
+  if (typeof applySiteMode === 'function') applySiteMode();   // menu visiteur ou membre (js/layout.js)
   const link = document.getElementById('buyer-account-link');
   if (!link) return;
   const href = ROOT_PREFIX + 'pages/compte-acheteur.html';

@@ -64,7 +64,7 @@ function renderPremiumBox() {
     el.innerHTML = `
       <div class="sup-premium-upsell">
         <span>${t('sp_premium_upsell')}</span>
-        <button id="sup-premium-btn" class="btn-add-product" onclick="startPremiumCheckout()">${t('sp_premium_btn')}</button>
+        <a id="sup-premium-btn" class="btn-add-product" href="mailto:contact@buy-inner.com?subject=Offre%20Premium%20fournisseur&body=${encodeURIComponent(supplierCompany.name || '')}">${t('sp_premium_btn')}</a>
       </div>`;
   }
 }

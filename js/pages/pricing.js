@@ -20,7 +20,7 @@ function renderPlans() {
       <div class="plan-price">${plan.price}</div>
       <div class="plan-period">${plan.period}</div>
       <p class="plan-desc">${plan.desc}</p>
-      <a class="plan-cta ${plan.ctaClass}" href="${ROOT_PREFIX}${plan.target === 'annuaire' || !plan.target ? 'pages/annuaire.html' : 'pages/' + plan.target + '.html'}">${plan.cta}</a>
+      <a class="plan-cta ${plan.ctaClass}" href="${plan.href || (ROOT_PREFIX + (plan.target === 'annuaire' || !plan.target ? 'pages/annuaire.html' : 'pages/' + plan.target + '.html'))}">${plan.cta}</a>
       <div class="plan-divider"></div>
       <div class="plan-features">
         ${plan.features.map(f => `<div class="plan-feature ${f.ok ? 'ok' : 'no'}"><span class="plan-feature-icon">${f.ok ? '✓' : '✕'}</span><span>${f.text}</span></div>`).join('')}

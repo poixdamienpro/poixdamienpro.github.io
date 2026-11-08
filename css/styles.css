@@ -1099,3 +1099,7 @@ html.members-closed #nav-slot ~ *:not(.members-gate):not(#modals-slot):not(#foot
 .members-gate p,.members-gate li{color:#3D3A35}
 .members-gate .gate-ex-d,.members-gate .gate-note,.members-gate .gate-ex-note{color:#3D3A35}
 .members-gate .gate-ex-s,.members-gate .gate-ex-lock,.members-gate .gate-note,.members-gate .gate-ex-note{color:#7A7568}
+
+/* ── Site vitrine / site complet : le menu et le pied de page dépendent du compte (js/layout.js applySiteMode) ── */
+html[data-site-mode="guest"] .member-only{display:none!important}
+html[data-site-mode="member"] .guest-only{display:none!important}

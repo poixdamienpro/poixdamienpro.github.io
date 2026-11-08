@@ -4,7 +4,9 @@
     <img class="logo-full" src="{{root}}assets/logo-white.png" alt="Buy-inner"/>
   </a>
   <div class="nav-links" id="navLinks">
-    <div class="nav-item">
+    <a class="nav-link guest-only" data-page="services" href="{{root}}pages/services.html" data-href-en="{{root}}en/services.html" data-i18n="nav_services">Services</a>
+    <a class="nav-link guest-only" data-page="blog" href="{{root}}blog/index.html" data-href-en="{{root}}en/news.html" data-i18n="nav_actus_guides">Actualités & guides</a>
+    <div class="nav-item member-only">
       <button class="nav-link nav-drop-btn" type="button" aria-expanded="false"><span data-i18n="nav_cat_annuaire">Annuaire</span><span class="nav-caret" aria-hidden="true">▾</span></button>
       <div class="nav-dropdown">
         <a class="nav-drop-link" data-page="annuaire" href="{{root}}pages/annuaire.html" data-i18n="nav_annuaire">Fabricants</a>
@@ -14,8 +16,8 @@
         <a class="nav-drop-link" data-page="carte" href="{{root}}pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
       </div>
     </div>
-    <a class="nav-link" data-page="catalogue" href="{{root}}pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
-    <div class="nav-item">
+    <a class="nav-link member-only" data-page="catalogue" href="{{root}}pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
+    <div class="nav-item member-only">
       <button class="nav-link nav-drop-btn" type="button" aria-expanded="false"><span data-i18n="nav_cat_ressources">Ressources</span><span class="nav-caret" aria-hidden="true">▾</span></button>
       <div class="nav-dropdown">
         <a class="nav-drop-link" data-page="appel-offres-rfq" href="{{root}}pages/appel-offres-rfq.html" data-i18n="nav_rfq">Appels d'offres RFQ</a>
@@ -24,9 +26,10 @@
         <a class="nav-drop-link" data-page="actus" href="{{root}}blog/actus.html" data-href-en="{{root}}en/news.html" data-i18n="nav_actus">Actualités</a>
       </div>
     </div>
-    <div class="nav-item">
+    <div class="nav-item member-only">
       <button class="nav-link nav-drop-btn" type="button" aria-expanded="false"><span data-i18n="nav_cat_entreprise">Entreprise</span><span class="nav-caret" aria-hidden="true">▾</span></button>
       <div class="nav-dropdown">
+        <a class="nav-drop-link" data-page="services" href="{{root}}pages/services.html" data-href-en="{{root}}en/services.html" data-i18n="nav_services">Services</a>
         <a class="nav-drop-link" data-page="qui-sommes-nous" href="{{root}}pages/qui-sommes-nous.html" data-i18n="footer_about">Qui sommes-nous</a>
         <a class="nav-drop-link" data-page="accompagnement" href="{{root}}pages/accompagnement-transformation-equipements.html" data-href-en="{{root}}en/equipment-transformation-support.html" data-i18n="nav_accompagnement">Accompagnement équipements</a>
         <a class="nav-drop-link" data-page="pricing" href="{{root}}pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
@@ -34,10 +37,11 @@
     </div>
   </div>
   <div class="nav-right">
-    <span class="free-pill" data-i18n="nav_pill">✓ Annuaire & specs 100% gratuits</span>
-    <a class="nav-link" id="buyer-account-link" data-page="compte-acheteur" href="{{root}}pages/compte-acheteur.html" style="font-size:12px" data-i18n="nav_mon_compte">Mon compte</a>
-    <a class="nav-link" data-page="supplier" href="{{root}}pages/supplier.html" style="font-size:12px" data-i18n="nav_fournisseur">Espace fournisseur</a>
-    <a class="btn-signup" href="{{root}}pages/submit.html" data-i18n="nav_referencer">Référencer mon entreprise</a>
+    <span class="free-pill member-only" data-i18n="nav_pill">✓ Annuaire & specs 100% gratuits</span>
+    <a class="nav-link member-only" id="buyer-account-link" data-page="compte-acheteur" href="{{root}}pages/compte-acheteur.html" style="font-size:12px" data-i18n="nav_mon_compte">Mon compte</a>
+    <a class="nav-link member-only" data-page="supplier" href="{{root}}pages/supplier.html" style="font-size:12px" data-i18n="nav_fournisseur">Espace fournisseur</a>
+    <a class="btn-signup member-only" href="{{root}}pages/submit.html" data-i18n="nav_referencer">Référencer mon entreprise</a>
+    <a class="btn-signup guest-only" id="nav-login-signup" href="{{root}}pages/compte-acheteur.html" data-i18n="nav_login_signup">Se connecter / S'inscrire</a>
     <div class="lang-switcher">
       <button class="lang-btn" data-lang="fr" onclick="setLang('fr')" title="Français">FR</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')" title="English">EN</button>

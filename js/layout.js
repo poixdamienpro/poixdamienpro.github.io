@@ -12,6 +12,7 @@ async function loadLayout() {
     fetch(ROOT_PREFIX + 'partials/footer.html').then(r => r.text()),
   ]);
   document.getElementById('nav-slot').innerHTML = navHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
+  document.documentElement.dataset.siteMode = hasMemberSession() ? 'member' : 'guest';
   const modalsSlot = document.getElementById('modals-slot');
   if (modalsSlot) modalsSlot.innerHTML = modalsHtml.replace(/\{\{root\}\}/g, ROOT_PREFIX);
   const footerSlot = document.getElementById('footer-slot');
@@ -30,6 +31,16 @@ async function loadLayout() {
   });
   logPageView();
   await loadBuyerScript();
+}
+
+// Site vitrine pour les visiteurs, site complet pour les comptes inscrits (acheteur, fournisseur, admin). Le test porte sur
+// la présence d'un jeton, comme js/buyer.js isMember() : synchrone, pour que le menu soit juste dès le premier affichage.
+// Les éléments .guest-only ne sont visibles que des visiteurs, les .member-only que des membres (voir css/styles.css).
+function hasMemberSession() {
+  try { return !!(localStorage.getItem('buyer_access_token') || sessionStorage.getItem('sup_access_token') || sessionStorage.getItem('admin_access_token')); } catch (e) { return false; }
+}
+function applySiteMode() {
+  document.documentElement.dataset.siteMode = hasMemberSession() ? 'member' : 'guest';
 }
 
 // Charge js/buyer.js dynamiquement (une seule fois, même si loadLayout()
@@ -159,7 +170,9 @@ function initMobileNav() {
 }
 
 function markActiveNavLink() {
-  const link = document.querySelector('[data-page="' + (window.CURRENT_PAGE || 'home') + '"]');
+  // Plusieurs liens peuvent porter le même data-page (version visiteur et version membre) : on prend celui qui est visible.
+  const hidden = hasMemberSession() ? '.guest-only' : '.member-only';
+  const link = [...document.querySelectorAll('[data-page="' + (window.CURRENT_PAGE || 'home') + '"]')].find(a => !a.closest(hidden));
   if (!link) return;
   link.classList.add('active');
   link.closest('.nav-item')?.querySelector('.nav-drop-btn')?.classList.add('active');

@@ -419,6 +419,17 @@ a{color:inherit;text-decoration:none}
 .skip:focus{left:0}
 .st-link:focus-visible,.btn:focus-visible,.hud-cta:focus-visible{outline:2px solid var(--steel);outline-offset:3px}
 </style>
+<style>
+html[data-site-mode="guest"] .member-only{display:none!important}
+html[data-site-mode="member"] .guest-only{display:none!important}
+</style>
+<script>
+(function () {
+  var member = false;
+  try { member = !!(localStorage.getItem('buyer_access_token') || sessionStorage.getItem('sup_access_token') || sessionStorage.getItem('admin_access_token')); } catch (e) {}
+  document.documentElement.dataset.siteMode = member ? 'member' : 'guest';
+})();
+</script>
 </head>
 <body>
 <a class="skip" href="#annuaire" data-i18n="skip_content">Aller au contenu</a>
@@ -439,8 +450,9 @@ a{color:inherit;text-decoration:none}
     <span class="pct" id="hud-pct">0%</span>
   </div>
   <div class="hud-actions">
-    <a class="hud-link" href="pages/submit.html" data-i18n="hud_submit">Rejoindre l'essaim</a>
-    <a class="hud-cta" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
+    <a class="hud-cta guest-only" href="pages/compte-acheteur.html" data-i18n="nav_login_signup">Se connecter / S'inscrire</a>
+    <a class="hud-link member-only" href="pages/submit.html" data-i18n="hud_submit">Rejoindre l'essaim</a>
+    <a class="hud-cta member-only" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
     <div class="lang-switcher" style="display:flex;align-items:center;gap:2px;margin-left:8px;border:1px solid var(--line-2);border-radius:5px;padding:2px">
       <button class="lang-btn" data-lang="fr" onclick="setLang('fr')" title="Français" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.03em;padding:5px 8px;border-radius:3px;color:var(--t-low);transition:color .15s,background .15s">FR</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')" title="English" style="background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.03em;padding:5px 8px;border-radius:3px;color:var(--t-low);transition:color .15s,background .15s">EN</button>
@@ -453,7 +465,7 @@ a{color:inherit;text-decoration:none}
 
 <!-- Menu latéral rapide (desktop large) -->
 <nav class="side-nav" aria-label="Navigation rapide">
-  <details>
+  <details class="member-only">
     <summary data-i18n="nav_cat_annuaire">Annuaire</summary>
     <a href="pages/annuaire.html" data-i18n="nav_annuaire">Fabricants</a>
     <a href="pages/systemiers.html" data-i18n="nav_systemiers">Systémiers</a>
@@ -461,23 +473,26 @@ a{color:inherit;text-decoration:none}
     <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
     <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
   </details>
-  <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
-  <details>
+  <a class="member-only" href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
+  <details class="member-only">
     <summary data-i18n="nav_cat_ressources">Ressources</summary>
     <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
     <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
   </details>
-  <details>
+  <details class="member-only">
     <summary data-i18n="nav_cat_entreprise">Entreprise</summary>
     <a href="pages/qui-sommes-nous.html" data-i18n="footer_about">Qui sommes-nous</a>
     <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
   </details>
-  <a class="side-nav-cta" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
+  <a class="side-nav-cta member-only" href="pages/annuaire.html" data-i18n="hud_explore">Explorer l'annuaire</a>
+  <a class="guest-only" href="pages/services.html" data-href-en="en/services.html" data-i18n="nav_services">Services</a>
+  <a class="guest-only" href="blog/index.html" data-href-en="en/news.html" data-i18n="nav_actus_guides">Actualités & guides</a>
+  <a class="guest-only side-nav-cta" href="pages/compte-acheteur.html" data-i18n="nav_login_signup">Se connecter / S'inscrire</a>
 </nav>
 
 <!-- Menu rapide replié (tablette / laptop / mobile) -->
 <div class="mnav-panel" id="mnavPanel">
-  <details>
+  <details class="member-only">
     <summary data-i18n="nav_cat_annuaire">Annuaire</summary>
     <a href="pages/annuaire.html" data-i18n="nav_annuaire">Fabricants</a>
     <a href="pages/systemiers.html" data-i18n="nav_systemiers">Systémiers</a>
@@ -485,18 +500,21 @@ a{color:inherit;text-decoration:none}
     <a href="pages/secteurs.html" data-i18n="nav_secteurs">Secteurs</a>
     <a href="pages/carte.html" data-i18n="nav_carte">Carte de l'écosystème</a>
   </details>
-  <a href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
-  <details>
+  <a class="member-only" href="pages/catalogue.html" data-i18n="nav_produits">Produits & Specs</a>
+  <details class="member-only">
     <summary data-i18n="nav_cat_ressources">Ressources</summary>
     <a href="pages/composants.html" data-i18n="nav_composants">Composants</a>
     <a href="blog/index.html" data-i18n="nav_guides">Guides techniques</a>
   </details>
-  <details>
+  <details class="member-only">
     <summary data-i18n="nav_cat_entreprise">Entreprise</summary>
     <a href="pages/qui-sommes-nous.html" data-i18n="footer_about">Qui sommes-nous</a>
     <a href="pages/pricing.html" data-i18n="nav_tarifs">Tarifs</a>
   </details>
-  <a href="pages/submit.html" data-i18n="hud_submit">Rejoindre l'essaim</a>
+  <a class="member-only" href="pages/submit.html" data-i18n="hud_submit">Rejoindre l'essaim</a>
+  <a class="guest-only" href="pages/services.html" data-href-en="en/services.html" data-i18n="nav_services">Services</a>
+  <a class="guest-only" href="blog/index.html" data-href-en="en/news.html" data-i18n="nav_actus_guides">Actualités & guides</a>
+  <a class="guest-only" href="pages/compte-acheteur.html" data-i18n="nav_login_signup">Se connecter / S'inscrire</a>
 </div>
 
 <!-- HERO -->

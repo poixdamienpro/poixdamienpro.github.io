@@ -54,26 +54,26 @@ let PROD_CATS  = [];
 let COMPANIES  = [];
 let PRODUCTS   = [];
 const PLANS = [
-  {name:"Acheteur",price:"0 €",period:"pour toujours",highlight:false,target:"annuaire",desc:"Pour les ingénieurs et acheteurs qui sourcent des équipements.",cta:"Explorer gratuitement",ctaClass:"secondary",features:[
+  {name:"Acheteur",price:"Gratuit",period:"pour toujours",highlight:false,target:"annuaire",desc:"Pour les ingénieurs et acheteurs qui sourcent des équipements.",cta:"Explorer gratuitement",ctaClass:"secondary",features:[
     {ok:true, text:"Annuaire, fiches complètes, datasheets et carte des fournisseurs avec un compte gratuit"},
     {ok:true, text:"Filtres par industrie et catégorie"},
     {ok:true, text:"Comparaison illimitée (4 produits)"},
     {ok:true, text:"Demandes de devis illimitées, formulaire prérempli"},
     {ok:true, text:"Aucune carte bancaire requise"}
   ]},
-  {name:"Fournisseur · Référencement",price:"0 €",period:"pour toujours",highlight:true,target:"submit",desc:"Votre entreprise référencée gratuitement. Vous ne payez que sur résultat.",cta:"Référencer mon entreprise",ctaClass:"primary",features:[
+  {name:"Fournisseur · Référencement",price:"Gratuit",period:"pour toujours",highlight:true,target:"submit",desc:"Votre entreprise référencée gratuitement. Vous ne payez que sur résultat.",cta:"Référencer mon entreprise",ctaClass:"primary",features:[
     {ok:true, text:"Fiche entreprise et jusqu'à 2 produits dans l'annuaire"},
     {ok:true, text:"1 compte fournisseur"},
     {ok:true, text:"Aucun paiement pour être listé ou visible"},
     {ok:true, text:"Vous choisissez d'accepter ou refuser chaque demande de contact"},
-    {ok:true, text:"Payez uniquement le lead accepté (~80 €/lead qualifié)"},
+    {ok:true, text:"Payez uniquement les demandes que vous acceptez"},
     {ok:false,text:"Badge Vérifié Premium"},
     {ok:false,text:"Priorité dans les résultats de recherche"},
     {ok:false,text:"Produits illimités"},
     {ok:false,text:"Plusieurs comptes pour votre équipe"},
     {ok:false,text:"Accès aux dossiers RFQ / RFI / RFP"}
   ]},
-  {name:"Fournisseur Premium",price:"1 500 €",period:"/an",highlight:false,target:"supplier",desc:"Pour les fabricants qui veulent maximiser leur visibilité et leurs leads. Disponible une fois votre entreprise revendiquée.",cta:"Passer Premium",ctaClass:"secondary",features:[
+  {name:"Fournisseur Premium",price:"Sur devis",period:"",highlight:false,target:"supplier",href:"mailto:contact@buy-inner.com?subject=Offre%20Premium%20fournisseur",desc:"Pour les fabricants qui veulent maximiser leur visibilité et leurs leads. Disponible une fois votre entreprise revendiquée.",cta:"Demander un devis",ctaClass:"secondary",features:[
     {ok:true, text:"Tout le plan Référencement"},
     {ok:true, text:"Badge ★ PREMIUM et mise en avant prioritaire"},
     {ok:true, text:"Profil enrichi : vidéo, datasheets, certifications"},
@@ -86,26 +86,26 @@ const PLANS = [
 ];
 
 const PLANS_EN = [
-  {name:"Buyer",price:"€0",period:"forever",highlight:false,target:"annuaire",desc:"For engineers and buyers sourcing equipment.",cta:"Explore for free",ctaClass:"secondary",features:[
+  {name:"Buyer",price:"Free",period:"forever",highlight:false,target:"annuaire",desc:"For engineers and buyers sourcing equipment.",cta:"Explore for free",ctaClass:"secondary",features:[
     {ok:true, text:"Directory, full specs, datasheets and supplier map with a free account"},
     {ok:true, text:"Filters by industry and category"},
     {ok:true, text:"Unlimited comparison (4 products)"},
     {ok:true, text:"Unlimited quote requests, prefilled form"},
     {ok:true, text:"No credit card required"}
   ]},
-  {name:"Supplier · Listing",price:"€0",period:"forever",highlight:true,target:"submit",desc:"Your company listed for free. You only pay on results.",cta:"List my company",ctaClass:"primary",features:[
+  {name:"Supplier · Listing",price:"Free",period:"forever",highlight:true,target:"submit",desc:"Your company listed for free. You only pay on results.",cta:"List my company",ctaClass:"primary",features:[
     {ok:true, text:"Company page and up to 2 products in the directory"},
     {ok:true, text:"1 supplier account"},
     {ok:true, text:"No payment to be listed or visible"},
     {ok:true, text:"You choose to accept or decline each contact request"},
-    {ok:true, text:"Pay only for accepted leads (~€80 per qualified lead)"},
+    {ok:true, text:"Pay only for the requests you accept"},
     {ok:false,text:"Verified Premium badge"},
     {ok:false,text:"Priority in search results"},
     {ok:false,text:"Unlimited products"},
     {ok:false,text:"Multiple accounts for your team"},
     {ok:false,text:"Access to RFQ / RFI / RFP files"}
   ]},
-  {name:"Supplier Premium",price:"€1,500",period:"/year",highlight:false,target:"supplier",desc:"For manufacturers who want to maximize their visibility and leads. Available once your company has been claimed.",cta:"Go Premium",ctaClass:"secondary",features:[
+  {name:"Supplier Premium",price:"On quote",period:"",highlight:false,target:"supplier",href:"mailto:contact@buy-inner.com?subject=Offre%20Premium%20fournisseur",desc:"For manufacturers who want to maximize their visibility and leads. Available once your company has been claimed.",cta:"Request a quote",ctaClass:"secondary",features:[
     {ok:true, text:"Everything in the Listing plan"},
     {ok:true, text:"★ PREMIUM badge and priority placement"},
     {ok:true, text:"Enriched profile: video, datasheets, certifications"},
@@ -118,9 +118,9 @@ const PLANS_EN = [
 ];
 const FAQ_EN = [
   {q:"Do I have to pay to have my company listed?",a:"No. Basic listing is, and will always be, free: your company page and up to 2 products. You never pay to be listed or visible in the directory. Unlimited products, RFQ access and team accounts come with the Premium plan."},
-  {q:"How does pay-per-lead work?",a:"When an engineer requests a quote on your page, we offer you the contact. You choose to accept it (~€80 per qualified lead) or decline it at no cost. No invoice is ever sent without your explicit agreement."},
+  {q:"How does pay-per-lead work?",a:"When an engineer requests a quote on your page, we offer you the contact. You choose to accept it (the rate is shown before you accept) or decline it at no cost. No invoice is ever sent without your explicit agreement."},
   {q:"Do buyers have to pay to see specs or contact a supplier?",a:"No. Buyer access is entirely free. The directory, the full technical sheets, the datasheets and the supplier map are available with a free account. Quote requests are unlimited, with no credit card."},
-  {q:"How does the supplier Premium badge work?",a:"Your company appears at the top of relevant results, with a gold frame and the ★ PREMIUM badge, for €1,500/year."},
+  {q:"How does the supplier Premium badge work?",a:"Your company appears at the top of relevant results, with a gold frame and the ★ PREMIUM badge. Premium is offered on quote."},
   {q:"Can several people from my company manage the listing?",a:"The free Listing plan includes one supplier account. With Premium, the company administrator can invite up to 20 colleagues (sales, management…) by email. They get the same access to products, quote requests and statistics, and the administrator can remove an account at any time."},
   {q:"Who can access RFQ / RFI / RFP files?",a:"Companies on the Premium plan: they can browse the files posted by system integrators, sign the confidentiality agreement and respond. Posting a file is also reserved for Premium system integrators."},
   {q:"What if my company is listed without my knowledge?",a:"Unclaimed profiles are built from public data (websites, datasheets). You can claim them for free at any time, or ask for their removal."},
@@ -128,9 +128,9 @@ const FAQ_EN = [
 ];
 const FAQ = [
   {q:"Dois-je payer pour que mon entreprise soit référencée ?",a:"Non. Le référencement de base est et restera toujours gratuit : votre fiche entreprise et jusqu'à 2 produits. Vous ne payez jamais pour être listé ou visible dans l'annuaire. Les produits illimités, l'accès aux RFQ et les comptes d'équipe sont inclus dans l'offre Premium."},
-  {q:"Comment fonctionne le paiement par lead ?",a:"Quand un ingénieur demande un devis sur votre fiche, nous vous proposons le contact. Vous choisissez de l'accepter (paiement ~80 € par lead qualifié) ou de le refuser, sans frais. Aucune facture n'est jamais envoyée sans votre accord explicite."},
+  {q:"Comment fonctionne le paiement par lead ?",a:"Quand un ingénieur demande un devis sur votre fiche, nous vous proposons le contact. Vous choisissez de l'accepter (le tarif vous est indiqué avant l'acceptation) ou de le refuser, sans frais. Aucune facture n'est jamais envoyée sans votre accord explicite."},
   {q:"Les acheteurs doivent-ils payer pour voir les specs ou contacter un fournisseur ?",a:"Non. L'accès acheteur est entièrement gratuit. L'annuaire, les fiches techniques complètes, les datasheets et la carte des fournisseurs sont accessibles avec un compte gratuit. Les demandes de devis sont illimitées, sans carte bancaire."},
-  {q:"Comment fonctionne le badge Premium fournisseur ?",a:"Votre entreprise apparaît en tête des résultats pertinents, avec un encadré doré et le badge ★ PREMIUM, pour 1 500 €/an."},
+  {q:"Comment fonctionne le badge Premium fournisseur ?",a:"Votre entreprise apparaît en tête des résultats pertinents, avec un encadré doré et le badge ★ PREMIUM. Premium est proposé sur devis."},
   {q:"Plusieurs personnes de mon entreprise peuvent-elles gérer la fiche ?",a:"Le plan Référencement gratuit inclut un compte fournisseur. Avec Premium, l'administrateur de l'entreprise peut inviter jusqu'à 20 collègues (commerciaux, direction…) par email : ils accèdent aux mêmes produits, demandes de devis et statistiques, et l'administrateur peut retirer un accès à tout moment."},
   {q:"Qui peut accéder aux dossiers RFQ / RFI / RFP ?",a:"Les entreprises ayant l'offre Premium : elles consultent les dossiers déposés par les systémiers, signent l'accord de confidentialité et répondent. Le dépôt d'un dossier est aussi réservé aux systémiers Premium."},
   {q:"Que se passe-t-il si mon entreprise est listée sans que je le sache ?",a:"Les fiches non revendiquées sont construites à partir de données publiques (sites, datasheets). Vous pouvez les revendiquer gratuitement à tout moment, ou demander leur retrait."},
