@@ -683,7 +683,6 @@ function openSupplierProductForm(productId) {
       <div class="lead-field"><label>${t('sp_p_name')}</label><input type="text" id="sup-p-name" required/></div>
       <div class="lead-field"><label>${t('sp_category')}</label><input type="text" id="sup-p-category" required/></div>
       <div class="lead-field"><label>${t('lbl_description')}</label><textarea id="sup-p-desc" rows="3"></textarea></div>
-      <div class="lead-field"><label>${t('sp_p_price')}</label><input type="text" id="sup-p-price" placeholder="${t('rq_price_ph')}"/></div>
       <div class="submit-actions">
         <button type="submit" class="btn-submit-form">${t('sp_submit_val')}</button>
         <button type="button" class="btn-remove-product" onclick="document.getElementById('sup-product-form-wrap').style.display='none'">${t('acc_cancel')}</button>
@@ -696,7 +695,6 @@ function openSupplierProductForm(productId) {
       document.getElementById('sup-p-name').value = p.name || '';
       document.getElementById('sup-p-category').value = p.category || '';
       document.getElementById('sup-p-desc').value = p.description || '';
-      document.getElementById('sup-p-price').value = p.price_label || '';
     });
   }
 }
@@ -706,7 +704,7 @@ async function submitSupplierProductForm(e) {
   const name = document.getElementById('sup-p-name').value;
   const category = document.getElementById('sup-p-category').value;
   const description = document.getElementById('sup-p-desc').value;
-  const price_label = document.getElementById('sup-p-price').value;
+  const price_label = '';   // les prix ne sont plus affichés : champ retiré du formulaire
   try {
     await supplierFetch('product_submissions', {
       method: 'POST',
@@ -816,13 +814,12 @@ function renderSupplierComparison() {
     return `<tr><td class="row-label">${escapeHtml(label)}</td>${cells}</tr>`;
   }).join('');
 
-  const priceRow = `<tr><td class="row-label">${t('sp_price')}</td>${prods.map(p => `<td style="font-weight:700;color:var(--sage)">${escapeHtml(p.price)}</td>`).join('')}</tr>`;
 
   table.innerHTML = `
     <div style="overflow-x:auto">
       <table class="cmp-table">
         <thead><tr><th style="min-width:120px">${t('sp_characteristic')}</th>${hCols}</tr></thead>
-        <tbody>${specRows}${priceRow}</tbody>
+        <tbody>${specRows}</tbody>
       </table>
     </div>`;
 }
@@ -1056,7 +1053,7 @@ function viewRfqResponses(rfqId) {
           <span class="sup-lead-who">${escapeHtml(r.submitter_name)}</span>
           <span class="sup-pill ${st.cls}">${st.txt}</span>
         </div>
-        <div class="sup-lead-meta">${escapeHtml(r.submitter_email)} · ${r.price_label ? escapeHtml(r.price_label) + ' · ' : ''}${new Date(r.created_at).toLocaleDateString(supLocale())}</div>
+        <div class="sup-lead-meta">${escapeHtml(r.submitter_email)} · ${new Date(r.created_at).toLocaleDateString(supLocale())}</div>
         <p class="sup-lead-msg">${escapeHtml(r.message)}</p>
         ${r.status === 'sent' ? `
         <div class="sup-lead-actions">

@@ -80,7 +80,6 @@ function openCompareModal() {
   }).join('');
 
   const certRow = `<tr><td class="row-label">${t('prod_certs')}</td>${prods.map(p => '<td style="font-size:11px">'+p.certs.map(escapeHtml).join(', ')+'</td>').join('')}</tr>`;
-  const priceRow = `<tr><td class="row-label">${t('cmp_price_label')}</td>${prods.map(p => '<td style="font-weight:700;color:var(--sage)">'+escapeHtml(p.price)+'</td>').join('')}</tr>`;
 
   document.getElementById('compare-table-wrap').innerHTML = `
     <table class="cmp-table">
@@ -91,7 +90,7 @@ function openCompareModal() {
         <tr><td class="row-label cmp-section" colspan="${prods.length+1}">${t('prod_scores')}</td></tr>
         ${barRows}
         <tr><td class="row-label cmp-section" colspan="${prods.length+1}">${t('cmp_price_certs')}</td></tr>
-        ${priceRow}${certRow}
+        ${certRow}
       </tbody>
     </table>
     <p style="font-size:11px;color:var(--muted);margin-top:10px">${t('cmp_legend')}</p>`;

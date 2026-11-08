@@ -112,7 +112,6 @@ function addProductBlock() {
       <div class="lead-field"><label data-i18n="sb_p_name">Nom du produit</label><input type="text" class="p-name" required/></div>
       <div class="lead-field"><label data-i18n="sp_category">Catégorie</label><input type="text" class="p-category" required placeholder="ex: Batteries & Stockage" data-i18n-placeholder="sb_p_cat_ph"/></div>
       <div class="lead-field"><label data-i18n="lbl_industry">Industrie</label><input type="text" class="p-industry" list="industry-list"/></div>
-      <div class="lead-field"><label data-i18n="sb_p_price">Prix indicatif</label><input type="text" class="p-price" placeholder="ex: ~500 € ou Sur devis" data-i18n-placeholder="sb_p_price_ph"/></div>
     </div>
     <div class="lead-field"><label data-i18n="lbl_description">Description</label><textarea class="p-desc"></textarea></div>
     <div class="lead-field"><label data-i18n="sb_p_certs">Certifications (séparées par des virgules)</label><input type="text" class="p-certs" placeholder="CE, UN38.3, ..."/></div>
@@ -204,7 +203,7 @@ async function submitSupplierForm(e) {
       product_category: block.querySelector('.p-category').value,
       product_industry: companyIndustry,
       product_description: block.querySelector('.p-desc').value || null,
-      product_price_label: block.querySelector('.p-price').value || null,
+      product_price_label: null,
       product_specs: specs,
       product_certs: certs,
     });

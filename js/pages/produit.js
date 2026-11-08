@@ -76,7 +76,7 @@ function renderProduct(p) {
         ? `<a class="btn-datasheet" href="${escapeHtml(p.datasheetUrl)}" target="_blank" rel="noopener">${t('prod_download_datasheet')}</a>`
         : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_datasheet')}</a>`) : ''}
       ${loggedIn
-        ? `<button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')} — 💰 ${escapeHtml(priceLabel(p.price))}</button>`
+        ? `<button class="btn-quote" id="prod-quote-btn">${t('btn_request_quote')}</button>`
         : `<a class="btn-locked" href="${lockAccountHref()}">${t('lock_quote')}</a>`}
     </div>
   `;
