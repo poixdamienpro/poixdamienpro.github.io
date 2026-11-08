@@ -183,7 +183,7 @@ function buyerLogout() {
 // inscrits, acheteurs ou fournisseurs. Le verrou est réel : sans compte, la base de données refuse de répondre (voir
 // backend/supabase_members_only_catalogue_2026_11.sql). Sans compte, ces pages affichent la page fermée ci-dessous.
 function isMember() {
-  try { return !!(buyerSession() || sessionStorage.getItem('sup_access_token')); } catch (e) { return !!buyerSession(); }
+  try { return !!(buyerSession() || sessionStorage.getItem('sup_access_token') || sessionStorage.getItem('admin_access_token')); } catch (e) { return !!buyerSession(); }
 }
 function isBuyerLoggedIn() {
   return isMember();

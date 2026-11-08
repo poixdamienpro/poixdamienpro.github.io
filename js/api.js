@@ -33,7 +33,8 @@ function escapeJsAttr(str) {
 // du compte connecté (acheteur, ou fournisseur) à la place de la clé publique. Voir
 // backend/supabase_members_only_catalogue_2026_11.sql. Les contenus publics (actualités, totaux) restent en clé publique.
 function memberToken() {
-  try { return localStorage.getItem('buyer_access_token') || sessionStorage.getItem('sup_access_token') || null; } catch (e) { return null; }
+  // Compte acheteur (localStorage), puis fournisseur, puis administrateur (sessionStorage : propres à l'onglet).
+  try { return localStorage.getItem('buyer_access_token') || sessionStorage.getItem('sup_access_token') || sessionStorage.getItem('admin_access_token') || null; } catch (e) { return null; }
 }
 function catalogueHeaders() {
   return { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + (memberToken() || SUPABASE_ANON), 'Content-Type': 'application/json' };
