@@ -1620,7 +1620,9 @@ export default {
     }
 
     if (!url.pathname.startsWith('/api/')) {
-      return new Response('Not found', { status: 404 });
+      // Page que le Worker ne traite plus (route Cloudflare restée configurée, par exemple annuaire.html depuis que le
+      // catalogue est réservé aux comptes) : servie telle quelle par l'origine, jamais un « Not found ».
+      return fetch(GITHUB_PAGES_ORIGIN + url.pathname + url.search);
     }
 
     // /api/rest/v1/... -> https://xxx.supabase.co/rest/v1/...
