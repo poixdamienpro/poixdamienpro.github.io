@@ -211,7 +211,8 @@ const GATE_TEXT = {
     lead: 'Buy-inner rassemble des fabricants et des équipementiers du spatial, de l’aéronautique, de l’énergie, de la mobilité électrique et du maritime, avec des fiches techniques comparables. La consultation est gratuite pour les acheteurs et les ingénieurs : il suffit de créer un compte.',
     expired: 'Votre session a expiré ou votre compte n’est pas reconnu. Reconnectez-vous pour continuer.',
     signup: 'Créer un compte gratuit', login: 'Se connecter', free: 'Gratuit pour les acheteurs et les ingénieurs. Aucune carte bancaire.',
-    whyH: 'Pourquoi Buy-inner',
+    whyEyebrow: 'POURQUOI BUY-INNER', getEyebrow: 'VOTRE COMPTE', exEyebrow: 'APERÇU', teamEyebrow: 'L\'ÉQUIPE',
+    whyH: 'Trouver le bon fournisseur prend des semaines',
     whyP: 'Trouver le bon fournisseur d’un sous-système prend des semaines : chercher entreprise par entreprise, comparer des fiches techniques qui n’ont ni le même format ni les mêmes unités, attendre des réponses. Buy-inner réunit ces informations au même endroit, avec leurs sources, pour que les équipes d’ingénierie passent leur temps sur leur produit.',
     getH: 'Avec un compte gratuit',
     get: ['Les fiches techniques complètes et les datasheets', 'La comparaison de produits côte à côte', 'La carte des fournisseurs', 'Les demandes de devis, sans limite'],
@@ -228,7 +229,8 @@ const GATE_TEXT = {
     lead: 'Buy-inner brings together manufacturers and equipment suppliers for space, aerospace, energy, electric mobility and marine, with comparable technical sheets. Browsing is free for buyers and engineers: you only need to create an account.',
     expired: 'Your session has expired or your account is not recognised. Please sign in again to continue.',
     signup: 'Create a free account', login: 'Sign in', free: 'Free for buyers and engineers. No credit card.',
-    whyH: 'Why Buy-inner',
+    whyEyebrow: 'WHY BUY-INNER', getEyebrow: 'YOUR ACCOUNT', exEyebrow: 'PREVIEW', teamEyebrow: 'THE TEAM',
+    whyH: 'Finding the right supplier takes weeks',
     whyP: 'Finding the right supplier for a subsystem takes weeks: searching company by company, comparing technical sheets that share neither format nor units, waiting for answers. Buy-inner gathers this information in one place, with its sources, so engineering teams can spend their time on their product.',
     getH: 'With a free account',
     get: ['Full technical sheets and datasheets', 'Side-by-side product comparison', 'The supplier map', 'Unlimited quote requests'],
@@ -272,37 +274,66 @@ function membersGateHtml(expired) {
   const href = lockAccountHref();
   const about = ROOT_PREFIX + (lang === 'en' ? 'en/about.html' : 'pages/qui-sommes-nous.html');
   return `
-    <div class="gate-card">
-      <div class="gate-eyebrow">🔒 ${T.eyebrow}</div>
-      ${expired ? `<div class="gate-expired">${T.expired}</div>` : ''}
-      <h1 class="gate-title">${T.title}</h1>
-      <p class="gate-lead">${T.lead}</p>
-      <div class="gate-actions">
-        <a class="gate-btn primary" href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.signup}</a>
-        <a class="gate-btn" href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.login}</a>
+    <div class="cat-wrap">
+      <div class="page-header home-hero">
+        <div class="page-header-inner">
+          <div>
+            <span class="section-eyebrow">🔒 ${T.eyebrow}</span>
+            ${expired ? `<div class="gate-expired">${T.expired}</div>` : ''}
+            <h1 class="page-title">${T.title}</h1>
+            <p class="page-subtitle">${T.lead}</p>
+            <p class="home-cta">
+              <a class="cat-cta cat-cta-solid" href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.signup}</a>
+              <a href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.login}</a>
+            </p>
+            <p class="gate-note">${T.free}</p>
+          </div>
+        </div>
       </div>
-      <p class="gate-note">${T.free}</p>
-    </div>
-    <div class="gate-cols">
-      <div class="gate-col"><h2>${T.whyH}</h2><p>${T.whyP}</p></div>
-      <div class="gate-col"><h2>${T.getH}</h2><ul>${T.get.map(x => `<li>${x}</li>`).join('')}</ul></div>
-      <div class="gate-col"><h2>${T.teamH}</h2><p>${T.teamP}</p><p><a href="${about}">${T.teamMore} →</a></p></div>
-    </div>
-    <div class="gate-examples">
-      <h2>${T.exH}</h2>
-      <div class="gate-exgrid">
-        ${GATE_EXAMPLES.map(e => `
-          <div class="gate-ex">
-            <div class="gate-ex-ico">${e.ico}</div>
-            <div class="gate-ex-t">${e[lang].t}</div>
-            <div class="gate-ex-s">${e[lang].s}</div>
-            <div class="gate-ex-d">${e[lang].d}</div>
-            <div class="gate-ex-lock">🔒 ${T.exMaker}</div>
-          </div>`).join('')}
-      </div>
-      <p class="gate-ex-note">${T.exNote}</p>
-    </div>
-    <div class="gate-supplier"><a href="${ROOT_PREFIX}pages/submit.html">${T.supplier} →</a></div>`;
+
+      <section class="cat-sec">
+        <span class="section-eyebrow">${T.whyEyebrow}</span>
+        <h2 class="cat-h2">${T.whyH}</h2>
+        <p class="cat-intro">${T.whyP}</p>
+      </section>
+
+      <section class="cat-sec">
+        <span class="section-eyebrow">${T.getEyebrow}</span>
+        <h2 class="cat-h2">${T.getH}</h2>
+        <ul class="cat-crit">${T.get.map(x => `<li><span class="cat-crit-v">${x}</span></li>`).join('')}</ul>
+      </section>
+
+      <section class="cat-sec">
+        <span class="section-eyebrow">${T.exEyebrow}</span>
+        <h2 class="cat-h2">${T.exH}</h2>
+        <div class="cat-prod-grid">
+          ${GATE_EXAMPLES.map(e => `
+            <div class="cat-prod">
+              <div class="cat-prod-top">
+                <div class="cat-prod-ico">${e.ico}</div>
+                <div>
+                  <h3 class="cat-prod-name">${e[lang].t}</h3>
+                  <div class="cat-prod-maker">🔒 ${T.exMaker}</div>
+                </div>
+              </div>
+              <p class="cat-prod-desc">${e[lang].d}</p>
+              <div class="cat-prod-specs"><span class="cat-prod-spec">${e[lang].s}</span></div>
+            </div>`).join('')}
+        </div>
+        <p class="gate-ex-note">${T.exNote}</p>
+      </section>
+
+      <section class="cat-sec">
+        <span class="section-eyebrow">${T.teamEyebrow}</span>
+        <h2 class="cat-h2">${T.teamH}</h2>
+        <p class="cat-intro">${T.teamP}</p>
+        <p style="margin-top:14px"><a href="${about}">${T.teamMore} →</a></p>
+      </section>
+
+      <section class="cat-sec" style="margin-bottom:60px">
+        <p class="cat-intro gate-sup"><a class="cat-cta" href="${ROOT_PREFIX}pages/submit.html">${T.supplier} →</a></p>
+      </section>
+    </div>`;
 }
 
 function showMembersGate(pageKey, opts = {}) {
@@ -319,6 +350,7 @@ function showMembersGate(pageKey, opts = {}) {
   el.dataset.expired = opts.expired ? '1' : '';
   el.innerHTML = membersGateHtml(!!opts.expired);
   document.documentElement.classList.add('members-closed');
+  document.body.classList.add('theme-dark');   // même thème sombre que les pages vitrine
   if (!window._gateTracked) { window._gateTracked = true; trackLockEvent('lock_view', pageKey); }
 }
 
