@@ -191,9 +191,10 @@ function isBuyerLoggedIn() {
 }
 
 // Lien vers la page compte, qui renvoie ensuite l'utilisateur ici (?next=).
-function lockAccountHref() {
+// mode : 'signup' (défaut : le formulaire d'inscription s'affiche en premier) ou 'login' (connexion en premier).
+function lockAccountHref(mode) {
   const next = window.location.pathname + window.location.search;
-  return ROOT_PREFIX + 'pages/compte-acheteur.html?src=lock&next=' + encodeURIComponent(next);
+  return ROOT_PREFIX + 'pages/compte-acheteur.html?src=lock&next=' + encodeURIComponent(next) + (mode === 'login' ? '#login' : '#signup');
 }
 
 function trackLockEvent(name, page) {
@@ -284,7 +285,7 @@ function membersGateHtml(expired) {
             <p class="page-subtitle">${T.lead}</p>
             <p class="home-cta">
               <a class="cat-cta cat-cta-solid" href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.signup}</a>
-              <a href="${href}" onclick="trackLockEvent('lock_cta_click','gate')">${T.login}</a>
+              <a href="${lockAccountHref('login')}" onclick="trackLockEvent('lock_cta_click','gate')">${T.login}</a>
             </p>
             <p class="gate-note">${T.free}</p>
           </div>
@@ -359,7 +360,7 @@ function membersTeaserHtml() {
   const lang = gateLang();
   const T = GATE_TEXT[lang];
   const href = lockAccountHref();
-  return `<div class="prod-loading">🔒 ${T.teaser} <a href="${href}" style="color:var(--rust)">${T.signup}</a> · <a href="${href}" style="color:var(--rust)">${T.login}</a></div>`;
+  return `<div class="prod-loading">🔒 ${T.teaser} <a href="${href}" style="color:var(--rust)">${T.signup}</a> · <a href="${lockAccountHref('login')}" style="color:var(--rust)">${T.login}</a></div>`;
 }
 
 // Re-rendu au changement de langue (appelé par applyLang dans js/i18n.js).
@@ -394,7 +395,7 @@ function lockBoxHtml(extraLine) {
       <p class="lock-text">${extraLine ? extraLine + ' — ' : ''}${tr('lock_text')}</p>
       <div class="lock-actions">
         <a class="lock-signup" href="${href}" onclick="trackLockEvent('lock_cta_click','${window.CURRENT_PAGE || ''}')">${tr('lock_cta_signup')}</a>
-        <a class="lock-login" href="${href}" onclick="trackLockEvent('lock_cta_click','${window.CURRENT_PAGE || ''}')">${tr('lock_cta_login')}</a>
+        <a class="lock-login" href="${lockAccountHref('login')}" onclick="trackLockEvent('lock_cta_click','${window.CURRENT_PAGE || ''}')">${tr('lock_cta_login')}</a>
       </div>
     </div>`;
 }

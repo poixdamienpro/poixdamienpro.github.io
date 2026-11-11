@@ -43,23 +43,27 @@
         </ul>
       </aside>
 
-      <div class="sup-gate-card">
+      <div class="sup-gate-card" id="acc-card">
+        <div id="acc-login-block">
         <div class="submit-section-title" data-i18n="acc_login">Se connecter</div>
         <form onsubmit="handleBuyerLogin(event)">
           <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="acc-login-email" required/></div>
           <div class="lead-field"><label data-i18n="acc_password">Mot de passe</label><input type="password" id="acc-login-password" required/></div>
           <button type="submit" class="btn-submit-form" data-i18n="acc_login">Se connecter</button>
         </form>
-        <div class="sup-gate-sep"><span data-i18n-html="acc_new">nouveau&nbsp;?</span></div>
+        </div>
+        <div class="sup-gate-sep"><span class="sep-new" data-i18n-html="acc_new">nouveau&nbsp;?</span><span class="sep-have" data-i18n-html="acc_have">déjà inscrit&nbsp;?</span></div>
+        <div id="acc-signup-block">
         <div class="submit-section-title" data-i18n="acc_signup_title">Créer un compte</div>
         <form onsubmit="handleBuyerSignup(event)">
           <div class="lead-field"><label data-i18n="acc_fullname">Nom complet</label><input type="text" id="acc-signup-name" required/></div>
-          <div class="lead-field"><label data-i18n="acc_company">Entreprise</label><input type="text" id="acc-signup-company" required/></div>
+          <div class="lead-field"><label data-i18n="acc_company_opt">Entreprise (facultatif)</label><input type="text" id="acc-signup-company"/></div>
           <div class="lead-field"><label data-i18n="acc_email">Email</label><input type="email" id="acc-signup-email" required/></div>
           <div class="lead-field"><label data-i18n="acc_password_min">Mot de passe (8 caractères min.)</label><input type="password" id="acc-signup-password" minlength="8" required/></div>
           <div data-consent="signup"></div>
           <button type="submit" class="btn-submit-form" data-i18n="acc_signup_btn">Créer mon compte</button>
         </form>
+        </div>
         <p id="acc-auth-message" style="font-size:13px;margin-top:14px;display:none"></p>
       </div>
     </div>

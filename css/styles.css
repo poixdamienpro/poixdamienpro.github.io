@@ -483,7 +483,11 @@ nav.main.nav-open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotat
 .sup-gate-foot{font-size:12px;color:rgba(243,241,236,.5)}
 .sup-gate-foot a{color:var(--steel);font-weight:600;text-decoration:none}
 .sup-gate-foot a:hover{color:#8FB4D6}
-.sup-gate-card{padding:30px 30px;background:var(--white)}
+.sup-gate-card{padding:30px 30px;background:var(--white);display:flex;flex-direction:column}
+.sup-gate-card #acc-login-block{order:0}.sup-gate-card .sup-gate-sep{order:1}.sup-gate-card #acc-signup-block{order:2}
+.sup-gate-card #acc-auth-message{order:3}
+.sup-gate-card.signup-first #acc-signup-block{order:0}.sup-gate-card.signup-first .sup-gate-sep{order:1}.sup-gate-card.signup-first #acc-login-block{order:2}
+.sup-gate-sep .sep-have{display:none}.signup-first .sup-gate-sep .sep-have{display:inline}.signup-first .sup-gate-sep .sep-new{display:none}
 .sup-gate-sep{display:flex;align-items:center;text-align:center;margin:22px 0;color:rgba(243,241,236,.4);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .sup-gate-sep::before,.sup-gate-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.12)}
 .sup-gate-sep span{padding:0 12px}

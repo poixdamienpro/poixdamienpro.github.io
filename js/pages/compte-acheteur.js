@@ -6,6 +6,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   await loadLayout();
   renderAccountState();
+  // Les liens « Créer un compte » (#signup) ouvrent l'inscription en premier ; « Se connecter » (#login) la connexion.
+  const card = document.getElementById('acc-card');
+  if (card && window.location.hash === '#signup') card.classList.add('signup-first');
 });
 
 // Retour vers la page d'où vient le visiteur (verrou "compte gratuit") —
